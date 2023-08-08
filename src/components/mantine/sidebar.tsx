@@ -1,8 +1,17 @@
-import { Code, createStyles, Group, Navbar, rem, ScrollArea } from '@mantine/core'
+import { Code, createStyles, Group, Navbar, rem, ScrollArea, TextInput } from '@mantine/core'
 import Logo from '../../../public/images/logo/m/1280.svg'
 import { UserButton } from '@/components/mantine/user.button'
 import { LinksGroup } from '@/components/mantine/links.group'
-import { IconAdjustments, IconCalendarStats, IconFileAnalytics, IconGauge, IconLock, IconNotes, IconPresentationAnalytics } from '@tabler/icons-react'
+import {
+	IconAdjustments,
+	IconCalendarStats,
+	IconFileAnalytics,
+	IconGauge,
+	IconLock,
+	IconNotes,
+	IconPresentationAnalytics,
+	IconSearch,
+} from '@tabler/icons-react'
 import clsx from 'clsx'
 import { app, user } from '@/config/app'
 
@@ -43,9 +52,23 @@ const mockdata = [
 ]
 
 const useStyles = createStyles((theme) => ({
+	
+	section: {
+		marginLeft: `calc(${theme.spacing.md} * -1)`,
+		marginRight: `calc(${theme.spacing.md} * -1)`,
+		marginBottom: theme.spacing.md,
+		
+		'&:not(:last-of-type)': {
+			borderBottom: `${rem(1)} solid ${
+				theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
+			}`,
+		},
+	},
+	
 	navbar: {
-		backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+		paddingTop: 0,
 		paddingBottom: 0,
+		backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
 	},
 	
 	header: {
@@ -65,7 +88,7 @@ const useStyles = createStyles((theme) => ({
 	},
 	
 	linksInner: {
-		paddingTop: theme.spacing.xl,
+		paddingTop: 0, // theme.spacing.xl,
 		paddingBottom: theme.spacing.xl,
 	},
 	
@@ -74,6 +97,15 @@ const useStyles = createStyles((theme) => ({
 		marginRight: `calc(${theme.spacing.md} * -1)`,
 		borderTop: `${rem(1)} solid ${
 			theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
+		}`,
+	},
+	
+	searchCode: {
+		fontWeight: 700,
+		fontSize: rem(10),
+		backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[0],
+		border: `${rem(1)} solid ${
+			theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2]
 		}`,
 	},
 }))
@@ -99,6 +131,18 @@ export default function Sidebar() {
 					<Code sx={{ fontWeight: 700 }}>Beta(0.3.1)</Code>
 				</Group>
 			</Navbar.Section>
+			
+			<div className={'mt-4 mb-0'}>
+				<TextInput
+					placeholder="Search"
+					size="xs"
+					icon={<IconSearch size="0.8rem" stroke={1.5}/>}
+					rightSectionWidth={70}
+					rightSection={<Code className={classes.searchCode}>Ctrl + K</Code>}
+					styles={{ rightSection: { pointerEvents: 'none' } }}
+					mb="sm"
+				/>
+			</div>
 			
 			<Navbar.Section grow className={classes.links} component={ScrollArea}>
 				<div className={classes.linksInner}>{links}</div>
