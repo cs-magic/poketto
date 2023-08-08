@@ -1,7 +1,9 @@
 import Head from 'next/head'
 import { app } from '@/config/app'
-import Sidebar from '@/components/mantine/sidebar'
-import { PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
+import { Sidebar } from '@/layouts/sidebar'
+import { clsx } from 'clsx'
+import Navbar from '@/layouts/navbar'
 
 
 export function RootLayout(props: PropsWithChildren) {
@@ -13,13 +15,21 @@ export function RootLayout(props: PropsWithChildren) {
 				<meta name="description" content={app.desc}/>
 				<link rel="icon" href={app.icon}/>
 			</Head>
-			<main className="h-screen | flex items-center justify-center | bg-gradient-to-b from-[#2e026d] to-[#15162c]">
+			<main className={clsx(
+				'h-screen | flex flex-col ',
+				// "| bg-gradient-to-b from-[#2e026d] to-[#15162c]"
+			)}>
 				
-				<Sidebar/>
+				<Navbar/>
 				
-				<div className={'grow'}>
-					{props.children}
+				<div className={'grow py-2 | flex divide-x '}>
+					<Sidebar/>
+					
+					<div className={'grow | flex items-center justify-center'}>
+						{props.children}
+					</div>
 				</div>
+			
 			
 			</main>
 		</>
