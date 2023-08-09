@@ -37,7 +37,7 @@ export const AgentsPage = () => {
 	return (
 		<RootLayout>
 			
-			<div className={'w-full h-full p-2 | flex flex-col gap-2'}>
+			<div className={'w-full h-full p-2 overflow-auto | flex flex-col gap-2'}>
 				<Carousel showThumbs={false}
 				          infiniteLoop
 				          autoPlay
@@ -62,7 +62,7 @@ export const AgentsPage = () => {
 					}
 				</Carousel>
 				
-				<div className={'w-full grow flex flex-col gap-2'}>
+				<div className={'w-full | flex flex-col gap-2'}>
 					
 					<ResponsiveMasonry
 						columnsCountBreakPoints={{ 360: 1, 1000: 2, 1440: 3, 1700: 4 }}
