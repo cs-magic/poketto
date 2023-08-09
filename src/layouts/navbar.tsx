@@ -7,7 +7,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu'
+import {
+	NavigationMenu,
+	NavigationMenuContent,
+	NavigationMenuItem,
+	NavigationMenuLink,
+	NavigationMenuList,
+	NavigationMenuTrigger, navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu'
+import Link from 'next/link'
 // import { CommandShortcut } from '@/components/ui/command'
 
 
@@ -43,10 +51,14 @@ export default function Navbar() {
 			
 			
 			<NavigationMenu>
-				<NavigationMenuList className={'gap-4'}>
+				<NavigationMenuList className={''}>
 					
 					<NavigationMenuItem>
-						Home
+						<Link href={'/'} legacyBehavior passHref>
+							<NavigationMenuLink className={navigationMenuTriggerStyle()}>
+								Home
+							</NavigationMenuLink>
+						</Link>
 					</NavigationMenuItem>
 					
 					{/* todo: trigger style not work as expected */}
@@ -58,7 +70,18 @@ export default function Navbar() {
 					</NavigationMenuItem>
 					
 					<NavigationMenuItem>
-						Explore
+						<NavigationMenuTrigger>Toolkits</NavigationMenuTrigger>
+						<NavigationMenuContent>
+							Mark Shawn
+						</NavigationMenuContent>
+					</NavigationMenuItem>
+					
+					<NavigationMenuItem>
+						<Link href={'/explore'} legacyBehavior passHref>
+							<NavigationMenuLink className={navigationMenuTriggerStyle()}>
+								Explore
+							</NavigationMenuLink>
+						</Link>
 					</NavigationMenuItem>
 				
 				</NavigationMenuList>
