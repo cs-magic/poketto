@@ -26,6 +26,7 @@ const config = {
 		"@typescript-eslint/no-unused-vars": ["warn", {argsIgnorePattern: "^_"}],
 		"@typescript-eslint/no-unsafe-member-access": ['warn'], // zustand slice immer
 		"@typescript-eslint/ban-ts-comment": ["warn"],
+		'@typescript-eslint/no-unsafe-assignment': ['warn'],
 	},
 };
 

@@ -7,6 +7,8 @@ import { user } from '@/config/app'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { uri } from '@/config'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { UserProfile } from '@/components/user/profile'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -50,16 +52,24 @@ export const Sidebar = () => {
 			</Card>
 			
 			<Separator className={'w-full'}/>
-			<div className={'flex items-center gap-2 text-muted-foreground'}>
-				<Avatar className={'border border-muted'}>
-					<AvatarImage src={`https://robohash.org/${user.id}?set=set2&size=180x180`}/>
-				</Avatar>
-				<div className={'grow overflow-hidden | flex flex-col gap-1'}>
-					<p className={'text-sm'}>{user.name}</p>
-					<p className={'text-xs truncate'}>{user.email}</p>
-				</div>
-				{/*<IconChevronRight className={'text-muted-foreground'}/>*/}
-			</div>
+			<HoverCard openDelay={100}>
+				<HoverCardTrigger>
+					<div className={'flex items-center gap-2 text-muted-foreground'}>
+						<Avatar className={'border border-muted'}>
+							<AvatarImage src={`https://robohash.org/${user.id}?set=set2&size=180x180`}/>
+						</Avatar>
+						<div className={'grow overflow-hidden | flex flex-col gap-1'}>
+							<p className={'text-sm'}>{user.name}</p>
+							<p className={'text-xs truncate'}>{user.email}</p>
+						</div>
+						{/*<IconChevronRight className={'text-muted-foreground'}/>*/}
+					</div>
+				</HoverCardTrigger>
+				
+				<HoverCardContent>
+					<UserProfile/>
+				</HoverCardContent>
+			</HoverCard>
 		
 		</div>
 	)
