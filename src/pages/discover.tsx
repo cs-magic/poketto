@@ -6,6 +6,10 @@ import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/utils/api'
 import { HomeCarousel } from '@/components/home.carousel'
 import { IconArrowBadgeDownFilled, IconAsterisk } from '@tabler/icons-react'
+import { GridContainer, MasonryContainer } from '@/layouts/responsive-containers'
+
+// const Container = GridContainer
+const Container = MasonryContainer
 
 
 export const AgentsPage = () => {
@@ -47,17 +51,12 @@ export const AgentsPage = () => {
 				</div>
 				
 				{/* content (carousel - cards)*/}
-				<div className={clsx(
-					'w-full gap-2',
-					// 'flex flex-wrap justify-between items-center',
-					'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-				)}>
-					
+				
+				<Container>
 					{(query.data?.pages.flatMap((item) => item.data) ?? []).map((item) => (
 						<FlowgptAgentCard {...item} key={item.id}/>
 					))}
-					{/*// <div className={'w-40 h-60 bg-accent'} key={item.id}/>*/}
-				</div>
+				</Container>
 				
 				{/* load more*/}
 				<p

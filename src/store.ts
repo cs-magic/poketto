@@ -6,14 +6,23 @@ import { FixedCacheQueue } from '@/utils/algo'
 /**
  * ui
  */
+export enum CardsLayoutType {
+	grid = 'grid',
+	masonry = 'masonry',
+}
+
 export interface UIState {
 	collapsed: boolean
 	switchCollapse: () => void
+	cardsLayout: CardsLayoutType
+	setCardsLayout: (v: CardsLayoutType) => void
 }
 
 export const createUISlice: StoreSlice<UIState> = (setState, getState, store) => ({
 	collapsed: false,
+	cardsLayout: CardsLayoutType.masonry,
 	switchCollapse: () => setState((state) => {state.collapsed = !state.collapsed}),
+	setCardsLayout: (v) => setState((state) => {state.cardsLayout = v}),
 })
 
 /**
