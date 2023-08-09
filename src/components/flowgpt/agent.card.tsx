@@ -6,6 +6,13 @@ import { PromptCardHeader } from '@/components/flowgpt/agent.card.header'
 import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
 import { uri } from '@/config'
 import { useRouter } from 'next/router'
+import React from 'react'
+import Image from 'next/image'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { IconDotsVertical, IconEye } from '@tabler/icons-react'
+import { Badge } from '@/components/ui/badge'
+import numeral from 'numeral'
 
 
 export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
@@ -13,39 +20,57 @@ export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
 	
 	return (
 		
-		<Card
+		<div
 			className={clsx(
-				'w-full', // columns 划分之后占满
-				'break-inside-avoid', // 防止被自动排布时被cut，ref: https://stackoverflow.com/a/76525368
-				'border-none rounded-xl', // pinterest 页面里的图是没有border但有倒角的
-				' text-sm text-muted-foreground group px-1',
-				// 'm-2 lg:m-4 ',
-				'mb-2 lg:mb-4',
-				'transition-all',
-				'cursor-pointer hocus:scale-[1.02] hocus:shadow-xl hocus:bg-accent',
+				'w-72',
+				'relative group', // columns 划分之后占满
+				// 'cursor-pointer', // 不要用鼠标，否则变地很频繁，影响体验
 			)}
 			onClick={() => {
 				void router.push(`${uri.product.agent}/${props.id}`)
 			}}
 		>
+			<AspectRatio ratio={3 / 4} className={'overflow-hidden rounded-2xl'}>
+				<Image src={props.thumbnailURL} fill className={'object-fill hover:scale-125'} alt={props.thumbnailURL}/>
+			</AspectRatio>
 			
-			<CardHeader>
-				<PromptCardHeader data={props}/>
-			</CardHeader>
+			{/* header desc */}
+			<div className={'absolute top-0 w-full p-4 | flex justify-between'}>
+				<div className={'flex items-center gap-2'}>
+					{props.Tag.length && <Badge variant={'destructive'}>{props.Tag[0]!.name}</Badge>}
+				</div>
+				<IconDotsVertical className={'hidden group-hover:flex'}/>
+			</div>
 			
-			<CardContent>
+			{/* footer desc */}
+			<div className={clsx(
+				'absolute bottom-0 w-full p-4 | flex flex-col gap-2',
+				'backdrop-blur',
+				'backdrop-brightness-50',
+			)}>
+				{/* title */}
+				<div className={'text-lg truncate'}>{props.title}</div>
 				
-				<CardDescription className={clsx(
-					'line-clamp-6',
-				)}>
-					{props.description}
-				</CardDescription>
-			
-			</CardContent>
-			
-			<CardFooter>
-				<AgentCardInteraction data={props} twoSide/>
-			</CardFooter>
-		</Card>
+				<div className={'text-md hidden group-hover:line-clamp-3'}>{props.description}</div>
+				
+				{/*	user - ranks */}
+				<div className={'flex justify-between | text-xs text-muted-foreground'}>
+					{/* user */}
+					<div className={'w-1/2 | flex items-center gap-2'}>
+						<Avatar className={'wh-5'}>
+							<AvatarImage src={props.User.image}/>
+						</Avatar>
+						<span className={'truncate italic'}>{props.User.name}</span>
+					</div>
+					
+					{/* ranks */}
+					<div className={'flex items-center'}>
+						<IconEye className={'wh-5'}/>
+						<span>{numeral(props.views).format('0a')}</span>
+					</div>
+				</div>
+			</div>
+		
+		</div>
 	)
 }

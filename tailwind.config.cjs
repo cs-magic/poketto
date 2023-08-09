@@ -80,7 +80,10 @@ module.exports = {
 	plugins: [
 		// @ts-ignore
 		require('tailwindcss-animate'),
-		require('tailwindcss/plugin')(({matchUtilities, theme}) => {
+		require('tailwindcss/plugin')(({addVariant, matchUtilities, theme}) => {
+			
+			addVariant("hocus", ["&:hover", "&:focus"])
+			
 			matchUtilities(
 				{
 					wh:

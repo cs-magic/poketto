@@ -37,54 +37,49 @@ export const AgentsPage = () => {
 	return (
 		<RootLayout>
 			
+			{/* main (content - load more) */}
 			<div className={'w-full h-full p-2 overflow-auto | flex flex-col gap-2'}>
-				<Carousel showThumbs={false}
-				          infiniteLoop
-				          autoPlay
-				          interval={3000}
-				          className={clsx(
-					          'rounded-2xl',
-				          )}
-				          showStatus={false}
-				          centerMode={true}
-				          centerSlidePercentage={92}
-				          stopOnHover={false}
-				>
-					{
-						carousals.map((item) => (
-							<div key={item.src} className={'rounded-2xl'}>
-								<AspectRatio ratio={16 / 5} className={'rounded-2xl'}>
-									<Image src={item.src} className={'object-cover object-bottom'} alt={item.src} fill sizes={'w-full rounded-2xl'}/>
-								</AspectRatio>
-								<p className="legend">{item.title}</p>
-							</div>
-						))
-					}
-				</Carousel>
-				
-				<div className={'w-full | flex flex-col gap-2'}>
+				{/* content (carousel - cards)*/}
+				<div className={'w-full | flex flex-wrap justify-center items-center gap-2'}>
 					
-					<ResponsiveMasonry
-						columnsCountBreakPoints={{ 360: 1, 1000: 2, 1440: 3, 1700: 4 }}
-					>
-						<Masonry gutter={'1rem'}>
-							
-							{(query.data?.pages.flatMap((item) => item.data) ?? []).map((item) => (
-								<FlowgptAgentCard {...item} key={item.id}/>
-							))}
-						</Masonry>
-					</ResponsiveMasonry>
-					
-					<p
-						ref={ref}
+					<Carousel
 						className={clsx(
-							'm-auto  px-16 py-8 rounded-2xl flex-center shrink-0',
-							' text-primary-foreground bg-card font-bold  animate-pulse',
-						)}>
-						{entry?.isIntersecting && 'Loading More Data ...'}
-					</p>
-				
+							'w-full md:w-[788px] rounded-2xl',
+						)}
+						showThumbs={false}
+						infiniteLoop
+						autoPlay
+						interval={3000}
+						showStatus={false}
+						centerMode={true}
+						centerSlidePercentage={92}
+						stopOnHover={false}
+					>
+						{
+							carousals.map((item) => (
+								<AspectRatio ratio={2} key={item.title}>
+									<Image src={item.src} className={'object-cover object-bottom'} alt={item.src} fill sizes={'w-full rounded-2xl'}/>
+									<p className="legend">{item.title}</p>
+								</AspectRatio>
+							))
+						}
+					</Carousel>
+					
+					{(query.data?.pages.flatMap((item) => item.data) ?? []).map((item) => (
+						<FlowgptAgentCard {...item} key={item.id}/>
+					))}
+					{/*// <div className={'w-40 h-60 bg-accent'} key={item.id}/>*/}
 				</div>
+				
+				{/* load more*/}
+				<p
+					ref={ref}
+					className={clsx(
+						'm-auto px-16 py-8 rounded-2xl flex-center shrink-0',
+						' text-primary-foreground bg-card font-bold  animate-pulse',
+					)}>
+					{entry?.isIntersecting && 'Loading More Data ...'}
+				</p>
 			</div>
 		
 		
