@@ -1,7 +1,7 @@
 import { create, type StateCreator } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { FixedCacheQueue } from '@/utils/algo'
+import { FixedCacheQueue } from '@/lib/algo'
 import { DataDimension } from '@/ds/flowgpt'
 
 /**

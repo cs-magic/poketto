@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
-import { getShortName } from '@/utils/string'
+import { getShortName } from '@/lib/string'
 import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
 

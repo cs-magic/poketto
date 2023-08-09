@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { clsx } from 'clsx'
 import { type ReactNode } from 'react'
-import { getShortName } from '@/utils/string'
+import { getShortName } from '@/lib/string'
 
 export const Chat = (props: {
 	isSelf: boolean
