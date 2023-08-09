@@ -11,7 +11,7 @@ export const HomeCarousel = () => {
 	return (
 		<Carousel
 			className={clsx(
-				'w-full md:w-[788px] rounded-2xl',
+				'w-full md:w-[788px] mx-auto rounded-2xl',
 			)}
 			showThumbs={false}
 			infiniteLoop

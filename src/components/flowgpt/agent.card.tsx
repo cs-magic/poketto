@@ -22,7 +22,8 @@ export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
 		
 		<div
 			className={clsx(
-				'w-72',
+				'w-full',
+				// 'w-72',
 				'relative group', // columns 划分之后占满
 				// 'cursor-pointer', // 不要用鼠标，否则变地很频繁，影响体验
 			)}
