@@ -1,17 +1,14 @@
-import React, { useEffect } from 'react'
-import { useIntersection } from '@mantine/hooks'
+import React from 'react'
 import { clsx } from 'clsx'
 import { FlowgptAgentCard } from '@/components/flowgpt/agent.card'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/utils/api'
 import { HomeCarousel } from '@/components/home.carousel'
-import { IconArrowBadgeDownFilled, IconAsterisk } from '@tabler/icons-react'
+import { IconArrowBadgeDownFilled } from '@tabler/icons-react'
 import { GridContainer, MasonryContainer } from '@/layouts/responsive-containers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CardsLayoutType, useStore } from '@/store'
-
-// const Container = GridContainer
-const Container = MasonryContainer
+import { CardsLayoutType, DataDimension, useStore } from '@/store'
+import { ScrollTrigger } from '@/components/scroll-trigger'
 
 
 export const AgentsPage = () => {
@@ -19,22 +16,9 @@ export const AgentsPage = () => {
 	const query = api.flowgpt.listPrompts.useInfiniteQuery({ order: undefined }, {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
-	const { ref, entry } = useIntersection({
-		// root: containerRef.current, // 不指定就是 window
-		rootMargin: '400px',
-	})
 	
-	const { cardsLayout, setCardsLayout } = useStore()
-	
-	useEffect(() => {
-		if (entry?.isIntersecting) {
-			// 触底，准备获取数据
-			query.fetchNextPage()
-				.catch(console.error)
-		} else {
-			// 取消触底（往回拉）
-		}
-	}, [entry?.isIntersecting])
+	const { cardsLayout, setCardsLayout, rank, setRank } = useStore()
+	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
 	
 	return (
@@ -63,6 +47,17 @@ export const AgentsPage = () => {
 							))}
 						</SelectContent>
 					</Select>
+					
+					<Select onValueChange={setCardsLayout}>
+						<SelectTrigger className={'w-28'}>
+							<SelectValue placeholder={'排序指标'}/>
+						</SelectTrigger>
+						<SelectContent>
+							{Object.values(DataDimension).map((cl) => (
+								<SelectItem value={cl} key={cl}>{cl}</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</div>
 				
 				{/* content (carousel - cards)*/}
@@ -74,14 +69,7 @@ export const AgentsPage = () => {
 				</Container>
 				
 				{/* load more*/}
-				<p
-					ref={ref}
-					className={clsx(
-						'm-auto px-16 py-8 rounded-2xl flex-center shrink-0',
-						' text-primary-foreground bg-card font-bold  animate-pulse',
-					)}>
-					{entry?.isIntersecting && 'Loading More Data ...'}
-				</p>
+				<ScrollTrigger trigger={query.fetchNextPage}/>
 			</div>
 		
 		

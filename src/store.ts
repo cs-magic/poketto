@@ -25,6 +25,35 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 	setCardsLayout: (v) => setState((state) => {state.cardsLayout = v}),
 })
 
+export enum DataDimension {
+	trends = 'trends',
+	popularity = 'popularity',
+	ranking = 'ranking',
+	adminWeight = 'adminWeight',
+	temperature = 'temperature',
+	views = 'views',
+	uses = 'uses',
+	upvotes = 'upvotes',
+	saves = 'saves',
+	shares = 'shares',
+	impressions = 'impressions',
+	comments = 'comments',
+	cup = 'cup',
+	fop = 'fop',
+	rankingForNew = 'rankingForNew',
+	tip = 'tip',
+}
+
+export interface FlowGPTState {
+	rank: DataDimension
+	setRank: (v: DataDimension) => void
+}
+
+export const createFlowgptSlice: StoreSlice<FlowGPTState> = (setState) => ({
+	rank: DataDimension.views,
+	setRank: (v) => setState((state) => {state.rank = v}),
+})
+
 /**
  * search for commands
  */
@@ -44,7 +73,7 @@ export const createSearchSlice: StoreSlice<SearchState> = (setState, getState, s
 /**
  * store
  */
-export type StoreState = UIState & SearchState
+export type StoreState = UIState & SearchState & FlowGPTState
 
 export type StoreSlice<T> = StateCreator<
 	StoreState,
@@ -63,6 +92,7 @@ export const useStore = create<StoreState>()(
 				(...a) => ({
 					...createUISlice(...a),
 					...createSearchSlice(...a),
+					...createFlowgptSlice(...a),
 				}),
 			),
 			{ name: 'zustand' },
