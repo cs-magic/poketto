@@ -20,13 +20,11 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
  * search for commands
  */
 const searchQueue = new FixedCacheQueue(3)
-console.log({ searchQueue })
 
 export interface SearchState {
 	history: string[]
 	push: (v: string) => void
 }
-
 
 export const createSearchSlice: StoreSlice<SearchState> = (setState, getState, store) => ({
 	history: [],

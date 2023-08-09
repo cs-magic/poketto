@@ -82,24 +82,27 @@ export default function CommandDialogDemo() {
 					⌘ {KEY}
 				</kbd>
 			</div>
+			
 			<CommandDialog open={open} onOpenChange={setOpen}>
 				<CommandInput placeholder="Type a command or search..."/>
-				<CommandList>
+				<CommandList className={'max-h-[600px]'}>
 					
 					<CommandEmpty>No results found.</CommandEmpty>
 					
 					<CommandGroup heading="History">
 						
-						{
-							history
-								.map((id) => commands.find((command) => command.id === id)!)
-								.map((item) => (
-									<CommandItem key={item.id} className={'flex items-center gap-2'}>
-										{item.icon}
-										<span>{item.title ?? item.id}</span>
-									</CommandItem>
-								))
-						}
+						<div className={'flex flex-wrap gap-2'}>
+							{
+								history
+									.map((id) => commands.find((command) => command.id === id)!)
+									.map((item) => (
+										<CommandItem key={item.id} className={'flex items-center gap-2'}>
+											{item.icon}
+											<span>{item.title ?? item.id}</span>
+										</CommandItem>
+									))
+							}
+						</div>
 					
 					</CommandGroup>
 					
