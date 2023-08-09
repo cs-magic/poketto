@@ -6,7 +6,7 @@ import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
 import { useMount } from '@/hooks/use-mount'
-import { CommandDemo } from '@/components/command'
+import CommandDemo from '@/components/command'
 // import { CommandShortcut } from '@/components/ui/command'
 
 
@@ -29,7 +29,7 @@ export const ThemeSwitcher = () => {
 export default function Navbar() {
 	
 	return (
-		<div className={'mx-2 py-2 | flex justify-between items-center gap-4 | border-b'}>
+		<div className={'mx-2 py-2 | flex items-center gap-4 | border-b'}>
 			<div className={'inline-flex items-center gap-2'}>
 				<Logo height={32}/>
 				{app.name}
@@ -39,6 +39,7 @@ export default function Navbar() {
 			{/*	<Input className={'max-w-md'}/>*/}
 			{/*	/!*<CommandShortcut>⌘K</CommandShortcut>*!/*/}
 			{/*</div>*/}
+			<div className={'grow'}/>
 			<CommandDemo/>
 			
 			<ThemeSwitcher/>
