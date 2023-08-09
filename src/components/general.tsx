@@ -1,5 +1,5 @@
 import React, { HTMLProps, ReactNode } from 'react'
-import { useStore } from '@/store/root'
+import { useStore } from '@/store'
 import { clsx } from 'clsx'
 
 export const IconTitleLine = ({ icon, title, className, ...props }: {

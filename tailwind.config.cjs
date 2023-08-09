@@ -1,6 +1,5 @@
-import { type Config } from 'tailwindcss'
-
-export default {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
 	darkMode: 'class',
 	content: [
 		'./pages/**/*.{ts,tsx}',
@@ -17,6 +16,11 @@ export default {
 			},
 		},
 		extend: {
+			
+			spacing: {
+				// Add any custom values you want here
+			},
+			
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -59,12 +63,12 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: { height: '0px' },
-					to: { height: 'var(--radix-accordion-content-height)' },
+					from: {height: '0px'},
+					to: {height: 'var(--radix-accordion-content-height)'},
 				},
 				'accordion-up': {
-					from: { height: 'var(--radix-accordion-content-height)' },
-					to: { height: '0px' },
+					from: {height: 'var(--radix-accordion-content-height)'},
+					to: {height: '0px'},
 				},
 			},
 			animation: {
@@ -73,5 +77,25 @@ export default {
 			},
 		},
 	},
-	plugins: [require('tailwindcss-animate')],
-} satisfies Config
+	plugins: [
+		// @ts-ignore
+		require('tailwindcss-animate'),
+		require('tailwindcss/plugin')(({matchUtilities, theme}) => {
+			matchUtilities(
+				{
+					wh:
+						(value) => {
+							console.debug({value})
+							return {
+								width: value,
+								height: value,
+							}
+						}
+				},
+				{
+					values: theme('width')
+				}
+			)
+		})
+	],
+}
