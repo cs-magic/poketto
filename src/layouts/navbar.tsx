@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
-import { NavigationMenu } from '@/components/ui/navigation-menu'
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu'
 // import { CommandShortcut } from '@/components/ui/command'
 
 
@@ -27,18 +27,43 @@ export const ThemeSwitcher = () => {
 	)
 }
 
+export const LogoWithName = () => {
+	return (
+		<div className={'inline-flex items-center gap-2'}>
+			<Logo height={32}/>
+			{app.name}
+		</div>
+	)
+}
+
 export default function Navbar() {
 	
 	return (
-		<div className={'mx-2 py-2 | flex items-center gap-4 | border-b'}>
-			<div className={'inline-flex items-center gap-2'}>
-				<Logo height={32}/>
-				{app.name}
-			</div>
+		<div className={'px-4 py-2 | flex items-center gap-4 | border-b'}>
+			
 			
 			<NavigationMenu>
-			
+				<NavigationMenuList className={'gap-4'}>
+					
+					<NavigationMenuItem>
+						Home
+					</NavigationMenuItem>
+					
+					{/* todo: trigger style not work as expected */}
+					<NavigationMenuItem>
+						<NavigationMenuTrigger>Workspaces</NavigationMenuTrigger>
+						<NavigationMenuContent>
+							Mark Shawn
+						</NavigationMenuContent>
+					</NavigationMenuItem>
+					
+					<NavigationMenuItem>
+						Explore
+					</NavigationMenuItem>
+				
+				</NavigationMenuList>
 			</NavigationMenu>
+			
 			<div className={'grow'}/>
 			<CommandDemo/>
 			

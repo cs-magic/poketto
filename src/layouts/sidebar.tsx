@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react'
-import { IconBolt, IconX } from '@tabler/icons-react'
+import { IconBolt, IconBoltOff, IconX } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import { app, InvitationStatus, user } from '@/config/app'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,7 +22,7 @@ export const Sidebar = () => {
 	const FONT_WEIGHT = 'font-light'
 	return (
 		<div className={clsx(
-			'h-full w-60 p-8 | flex flex-col gap-8 | bg-sidebar text-sm text-primary-foreground',
+			'h-full w-60 p-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
 			FONT_WEIGHT,
 		)}>
 			
@@ -32,7 +32,8 @@ export const Sidebar = () => {
 						<SelfUserAvatar/>
 						<span className={'text-xs'}>{user.name}</span>
 					</div>
-					<IconBolt className={'text-primary-foreground'}/>
+					{/*<IconBolt className={'text-primary-foreground'}/>*/}
+					<IconBoltOff className={'text-primary-foreground'}/>
 					<div className={'flex flex-col items-center gap-2'}>
 						<Icons.logo className={'!wh-12 bg-background p-2'}/>
 						<span className={'text-xs'}>{app.name}</span>
@@ -48,7 +49,7 @@ export const Sidebar = () => {
 			
 			
 			<div className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Workspace</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Workspaces</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Dashboard</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Gallery</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Integrations</Button>
@@ -66,15 +67,10 @@ export const Sidebar = () => {
 			
 			<div className={'grow'}/>
 			
-			<div className={'p-2 | flex flex-col gap-2 | border '}>
-				<div className={'flex items-center justify-between'}>
-					<Badge variant={'secondary'}>Tips</Badge>
-					<IconX className={'text-muted-foreground'}/>
-				</div>
-				<div className={'flex flex-col gap-2 | text-sm'}>
-					<p>每位魔法师用户都可以拥有三张 Lumos 社区的邀请码，您可以将其分享给您的好友，注册成功后将有 CS 币赠送哦！</p>
-					<Button>当前剩余：{user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length}</Button>
-				</div>
+			<Separator/>
+			<div className={'flex flex-col gap-2 | text-sm'}>
+				<p>每位魔法师用户都可以拥有三张 Lumos 社区的邀请码，您可以将其分享给您的好友，注册成功后将有 CS 币赠送哦！</p>
+				<Button>当前剩余：{user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length}</Button>
 			</div>
 		
 		</div>
