@@ -85,7 +85,7 @@ module.exports = {
 				{
 					wh:
 						(value) => {
-							console.debug({value})
+							// console.debug({value})
 							return {
 								width: value,
 								height: value,

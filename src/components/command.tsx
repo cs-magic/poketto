@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Fragment, ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { GearIcon, PersonIcon } from '@radix-ui/react-icons'
 
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from '@/components/ui/command'
@@ -70,8 +70,6 @@ export default function CommandDialogDemo() {
 	useHotkeys([
 		[`mod+${KEY}`, () => setOpen(!open)],
 	])
-	
-	console.log('history: ', history)
 	
 	return (
 		<>
