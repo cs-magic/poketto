@@ -22,10 +22,17 @@ export const getRobotAvatar = ({ key, width = 256, height = 256, mode = 3 }: {
 	return `https://robohash.org/${key}?set=set${mode}&size=${width}x${height}`
 }
 
+export enum InvitationStatus {
+	pending = 'pending',
+	consumed = 'consumed',
+	expired = 'expired',
+}
+
 
 export const DEFAULT_USER_ID = 'mark'
 export const user = {
 	id: DEFAULT_USER_ID,
+	workspace: `${DEFAULT_USER_ID}'s workspace`,
 	name: '南川',
 	email: 'mark@cs-magic.com',
 	avatar: `https://robohash.org/${DEFAULT_USER_ID}?set=set2&size=180x180`,
@@ -33,6 +40,15 @@ export const user = {
 	
 	balance: {
 		current: 100000,
+	},
+	
+	invitation: {
+		from: null,
+		to: [
+			{ id: 'test1', status: InvitationStatus.pending },
+			{ id: 'test1', status: InvitationStatus.consumed },
+			{ id: 'test1', status: InvitationStatus.expired },
+		],
 	},
 	
 	social: {

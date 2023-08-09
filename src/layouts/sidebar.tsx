@@ -1,15 +1,12 @@
 import React, { type ReactNode } from 'react'
-import { IconBolt, IconCategory, IconHistory, IconPlug, IconUsers, IconVectorTriangle, IconWorldCode, IconX } from '@tabler/icons-react'
-import { IconTitleLine } from '@/components/general'
+import { IconBolt, IconX } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { app, user } from '@/config/app'
+import { app, InvitationStatus, user } from '@/config/app'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { uri } from '@/config'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
-import { UserProfile } from '@/components/user/profile'
 import { Icons, SelfUserAvatar } from '@/config/icons'
+import { Button } from '@/components/ui/button'
+import { clsx } from 'clsx'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -22,68 +19,63 @@ export const NavGroups = ({ title, children }: {
 
 
 export const Sidebar = () => {
+	const FONT_WEIGHT = 'font-light'
 	return (
-		<div className={'h-full w-60 p-8 | flex flex-col gap-4 | bg-accent'}>
+		<div className={clsx(
+			'h-full w-60 p-8 | flex flex-col gap-8 | bg-sidebar text-sm text-primary-foreground',
+			FONT_WEIGHT,
+		)}>
 			
-			{/* user - brand */}
-			<div className={'flex items-center gap-2 justify-around text-muted-foreground'}>
-				<div className={'flex flex-col items-center gap-2'}>
-					<SelfUserAvatar/>
-					<span className={'text-xs'}>{user.name}</span>
+			<section className={'flex flex-col gap-4 text-muted-foreground'}>
+				<div className={'w-full | flex items-center gap-2 justify-around'}>
+					<div className={'flex flex-col items-center gap-2'}>
+						<SelfUserAvatar/>
+						<span className={'text-xs'}>{user.name}</span>
+					</div>
+					<IconBolt className={'text-primary-foreground'}/>
+					<div className={'flex flex-col items-center gap-2'}>
+						<Icons.logo className={'!wh-12 bg-background p-2'}/>
+						<span className={'text-xs'}>{app.name}</span>
+					</div>
 				</div>
-				<IconBolt className={''}/>
-				<div className={'flex flex-col items-center gap-2'}>
-					<Icons.logo className={'wh-12 bg-background p-2'}/>
-					<span className={'text-xs'}>{app.name}</span>
+				
+				<div>
+					<span className={''}>@ {user.workspace}</span>
 				</div>
+				
+				<Button>Invite</Button>
+			</section>
+			
+			
+			<div className={'flex flex-col gap-0'}>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Workspace</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Dashboard</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Gallery</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Integrations</Button>
 			</div>
 			
-			<NavGroups title={'广场'}>
-				<IconTitleLine icon={<IconCategory/>} title={'首页'} href={uri.home}/>
-				<IconTitleLine icon={<IconWorldCode/>} title={'发现'} href={uri.discover}/>
-				<IconTitleLine icon={<IconPlug/>} title={'插件'} href={uri.plugins}/>
-			</NavGroups>
+			<Separator/>
 			
-			<Separator className={'w-full'}/>
-			<NavGroups title={'我的空间'}>
-				<IconTitleLine icon={<IconUsers/>} title={'我的关注'} href={uri.me.following}/>
-				<IconTitleLine icon={<IconHistory/>} title={'历史记录'} href={uri.me.history}/>
-				<IconTitleLine icon={<IconVectorTriangle/>} title={'星空图'} href={uri.me.graph}/>
-			</NavGroups>
+			<div className={'flex flex-col gap-0'}>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>{'What\'s Lumos?'}</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Learning Center</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Support Center</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Lumos Enterprise</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Download Desktop App</Button>
+			</div>
 			
 			<div className={'grow'}/>
 			
-			<Card>
-				<CardHeader>
-					<CardTitle className={'flex items-center justify-between'}>
-						<Badge variant={'secondary'}>分享</Badge>
-						<IconX className={'text-muted-foreground'}/>
-					</CardTitle>
-				</CardHeader>
-				<CardContent className={'flex flex-col gap-2 | text-sm'}>
-					每位魔法师用户都可以拥有三张 Lumos 社区的邀请码，您可以将其分享给您的好友，注册成功后将有 CS 币赠送哦！
-				</CardContent>
-			</Card>
-			
-			<Separator className={'w-full'}/>
-			<HoverCard openDelay={100}>
-				<HoverCardTrigger>
-					<div className={'flex items-center gap-2 text-muted-foreground'}>
-						<Avatar className={'border border-muted'}>
-							<AvatarImage src={`https://robohash.org/${user.id}?set=set2&size=180x180`}/>
-						</Avatar>
-						<div className={'grow overflow-hidden | flex flex-col gap-1'}>
-							<p className={'text-sm'}>{user.name}</p>
-							<p className={'text-xs truncate'}>{user.email}</p>
-						</div>
-						{/*<IconChevronRight className={'text-muted-foreground'}/>*/}
-					</div>
-				</HoverCardTrigger>
-				
-				<HoverCardContent>
-					<UserProfile/>
-				</HoverCardContent>
-			</HoverCard>
+			<div className={'p-2 | flex flex-col gap-2 | border '}>
+				<div className={'flex items-center justify-between'}>
+					<Badge variant={'secondary'}>Tips</Badge>
+					<IconX className={'text-muted-foreground'}/>
+				</div>
+				<div className={'flex flex-col gap-2 | text-sm'}>
+					<p>每位魔法师用户都可以拥有三张 Lumos 社区的邀请码，您可以将其分享给您的好友，注册成功后将有 CS 币赠送哦！</p>
+					<Button>当前剩余：{user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length}</Button>
+				</div>
+			</div>
 		
 		</div>
 	)
