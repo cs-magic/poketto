@@ -7,6 +7,8 @@ import { api } from '@/utils/api'
 import { HomeCarousel } from '@/components/home.carousel'
 import { IconArrowBadgeDownFilled, IconAsterisk } from '@tabler/icons-react'
 import { GridContainer, MasonryContainer } from '@/layouts/responsive-containers'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { CardsLayoutType, useStore } from '@/store'
 
 // const Container = GridContainer
 const Container = MasonryContainer
@@ -21,6 +23,8 @@ export const AgentsPage = () => {
 		// root: containerRef.current, // 不指定就是 window
 		rootMargin: '400px',
 	})
+	
+	const { cardsLayout, setCardsLayout } = useStore()
 	
 	useEffect(() => {
 		if (entry?.isIntersecting) {
@@ -48,6 +52,17 @@ export const AgentsPage = () => {
 				<div className={'flex items-center gap-2 | text-2xl text-muted-foreground '}>
 					<IconArrowBadgeDownFilled/>
 					<span>玩法推荐</span>
+					
+					<Select onValueChange={setCardsLayout}>
+						<SelectTrigger className={'w-28'}>
+							<SelectValue placeholder={'卡片布局'}/>
+						</SelectTrigger>
+						<SelectContent>
+							{Object.values(CardsLayoutType).map((cl) => (
+								<SelectItem value={cl} key={cl}>{cl}</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</div>
 				
 				{/* content (carousel - cards)*/}
