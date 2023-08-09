@@ -90,7 +90,8 @@ export default function Navbar() {
 			<div className={'grow'}/>
 			<CommandDemo/>
 			
-			<ThemeSwitcher/>
+			{/* todo: 晚点再开这个 */}
+			{/*<ThemeSwitcher/>*/}
 		</div>
 	)
 }
