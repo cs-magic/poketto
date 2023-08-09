@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
+import { NavigationMenu } from '@/components/ui/navigation-menu'
 // import { CommandShortcut } from '@/components/ui/command'
 
 
@@ -35,10 +36,9 @@ export default function Navbar() {
 				{app.name}
 			</div>
 			
-			{/*<div className={'inline-flex items-center gap-2'}>*/}
-			{/*	<Input className={'max-w-md'}/>*/}
-			{/*	/!*<CommandShortcut>⌘K</CommandShortcut>*!/*/}
-			{/*</div>*/}
+			<NavigationMenu>
+			
+			</NavigationMenu>
 			<div className={'grow'}/>
 			<CommandDemo/>
 			

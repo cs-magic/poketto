@@ -1,14 +1,15 @@
 import React, { type ReactNode } from 'react'
-import { IconCategory, IconHistory, IconPlug, IconUsers, IconVectorTriangle, IconWorldCode, IconX } from '@tabler/icons-react'
+import { IconBolt, IconCategory, IconHistory, IconPlug, IconUsers, IconVectorTriangle, IconWorldCode, IconX } from '@tabler/icons-react'
 import { IconTitleLine } from '@/components/general'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { user } from '@/config/app'
+import { app, user } from '@/config/app'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { uri } from '@/config'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { UserProfile } from '@/components/user/profile'
+import { Icons, SelfUserAvatar } from '@/config/icons'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -22,7 +23,20 @@ export const NavGroups = ({ title, children }: {
 
 export const Sidebar = () => {
 	return (
-		<div className={'h-full w-52 p-2 py-2 | flex flex-col gap-4'}>
+		<div className={'h-full w-60 p-8 | flex flex-col gap-4 | bg-accent'}>
+			
+			{/* user - brand */}
+			<div className={'flex items-center gap-2 justify-around text-muted-foreground'}>
+				<div className={'flex flex-col items-center gap-2'}>
+					<SelfUserAvatar/>
+					<span className={'text-xs'}>{user.name}</span>
+				</div>
+				<IconBolt className={''}/>
+				<div className={'flex flex-col items-center gap-2'}>
+					<Icons.logo className={'wh-12 bg-background p-2'}/>
+					<span className={'text-xs'}>{app.name}</span>
+				</div>
+			</div>
 			
 			<NavGroups title={'广场'}>
 				<IconTitleLine icon={<IconCategory/>} title={'首页'} href={uri.home}/>

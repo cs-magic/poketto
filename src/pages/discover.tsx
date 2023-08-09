@@ -7,8 +7,9 @@ import { HomeCarousel } from '@/components/home.carousel'
 import { IconArrowBadgeDownFilled } from '@tabler/icons-react'
 import { GridContainer, MasonryContainer } from '@/layouts/responsive-containers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CardsLayoutType, DataDimension, useStore } from '@/store'
+import { CardsLayoutType, useStore } from '@/store'
 import { ScrollTrigger } from '@/components/scroll-trigger'
+import { DataDimension } from '@/ds/flowgpt'
 
 
 export const AgentsPage = () => {

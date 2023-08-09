@@ -28,4 +28,24 @@ export enum SortOrder {
 	top = 'top'
 }
 
+
+export enum DataDimension {
+	trends = 'trends',
+	popularity = 'popularity',
+	ranking = 'ranking',
+	adminWeight = 'adminWeight',
+	temperature = 'temperature',
+	views = 'views',
+	uses = 'uses',
+	upvotes = 'upvotes',
+	saves = 'saves',
+	shares = 'shares',
+	impressions = 'impressions',
+	comments = 'comments',
+	cup = 'cup',
+	fop = 'fop',
+	rankingForNew = 'rankingForNew',
+	tip = 'tip',
+}
+
 export const GET_PROMPTS_BATCH_SIZE = 36

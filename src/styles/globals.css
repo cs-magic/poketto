@@ -8,6 +8,8 @@ colors:
     222.2 84% 4.9%; shadcn bg AND shadcn card bg
     #0F172A, 222, 47%, 11%; tailwindcss page bg, at: https://tailwindcss.com/docs/text-overflow#ellipsis
     #243876; flowbite CTA card bg, at: https://flowbite.com/docs/components/sidebar/
+    0, 0%, 13%; postman bg, at: https://www.postman.com/
+    0, 0%, 15%; postman sidebar bg, at: https://www.postman.com/
  */
 @layer base {
     :root {
@@ -44,7 +46,8 @@ colors:
     }
 
     .dark {
-        --background: 222.2 84% 4.9%;
+        /*--background: 222.2 84% 4.9%;*/
+        --background: 0, 0%, 13%;
         --foreground: 210 40% 98%;
 
         /*--card: 222.2 84% 4.9%;*/
@@ -54,6 +57,7 @@ colors:
         --popover: 222.2 84% 4.9%;
         --popover-foreground: 210 40% 98%;
 
+        /*--primary: 210 40% 98%;*/
         --primary: 210 40% 98%;
         --primary-foreground: 222.2 47.4% 11.2%;
 
@@ -63,13 +67,15 @@ colors:
         --muted: 217.2 32.6% 17.5%;
         --muted-foreground: 215 20.2% 65.1%;
 
-        --accent: 217.2 32.6% 17.5%;
+        /*--accent: 217.2 32.6% 17.5%;*/
+        --accent: 0, 0%, 15%;
         --accent-foreground: 210 40% 98%;
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 210 40% 98%;
 
-        --border: 217.2 32.6% 17.5%;
+        /*--border: 217.2 32.6% 17.5%;*/
+        --border: 0 0% 20%;
         --input: 217.2 32.6% 17.5%;
         --ring: 212.7, 26.8%, 83.9;
     }

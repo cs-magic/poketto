@@ -22,7 +22,7 @@ export function RootLayout(props: PropsWithChildren) {
 				
 				<Navbar/>
 				
-				<div className={'grow overflow-hidden py-2 | flex divide-x'}>
+				<div className={'grow overflow-hidden | flex divide-x'}>
 					<Sidebar/>
 					
 					<div className={'grow h-full | flex items-center justify-center gap-2'}>

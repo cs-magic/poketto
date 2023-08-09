@@ -1,14 +1,41 @@
-import React from 'react'
-import Image from 'next/image'
+import React, { type ElementType, type HTMLProps } from 'react'
+
+import CSCoin from '@/../public/images/cs-coin.svg'
+import Logo from '../../public/images/logo/m/1280.svg'
 
 import OpenchatIcon from '@/../public/brands/openchat.png'
 import MidjourneyIcon from '@/../public/brands/midjourney.png'
-import CSCoin from '@/../public/images/cs-coin.svg'
 
+import { clsx } from 'clsx'
+import Image, { type ImageProps } from 'next/image'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { user } from '@/config/app'
 
-const dimension = 'wh-5'
+const ICON_DIMENSION_SM = 'wh-5'
+const ICON_DIMENSION_LG = 'wh-12'
+
+// todo: avoid alt
+export const ImageFactory = ({ src, alt, className = '', ...props }: ImageProps) =>
+	<Image src={src} alt={alt} className={clsx(ICON_DIMENSION_SM, className)} {...props}/>
+type ImageProps_ = Omit<ImageProps, 'src' | 'alt'>
+
+export const SVGFactory = ({ Comp, className = '', ...props }: HTMLProps<SVGSVGElement> & { Comp: ElementType }) =>
+	<Comp className={clsx(ICON_DIMENSION_SM, className)} {...props}/>
+export type SVGProps = Omit<HTMLProps<SVGSVGElement>, ''>
+
 export const Icons = {
-	openchat: () => <Image src={OpenchatIcon} alt={'openchat'} className={dimension}/>,
-	midjourney: () => <Image src={MidjourneyIcon} alt={'midjourney'} className={dimension}/>,
-	csCoin: () => <CSCoin className={dimension}/>,
+	logo: (props: SVGProps) => <SVGFactory Comp={Logo} {...props}/>,
+	csCoin: (props: SVGProps) => <SVGFactory Comp={CSCoin}/>,
+	
+	openchat: (props: ImageProps_) => <ImageFactory src={OpenchatIcon} alt={'OpenChat'} {...props}/>,
+	midjourney: (props: ImageProps_) => <ImageFactory src={MidjourneyIcon} alt={'MidJourney'} {...props}/>,
+}
+
+export const SelfUserAvatar = () => {
+	return (
+		<Avatar className={ICON_DIMENSION_LG}>
+			<AvatarImage src={user.avatar}/>
+			<AvatarFallback>{user.name}</AvatarFallback>
+		</Avatar>
+	)
 }
