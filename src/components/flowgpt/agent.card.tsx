@@ -33,7 +33,7 @@ export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
 						</AspectRatio>
 					)
 					: (
-						<Image src={props.thumbnailURL} width={400} height={600} className={'object-fill hover:scale-125'} alt={props.thumbnailURL}/>
+						<Image src={props.thumbnailURL} width={800} height={600} className={'object-fill hover:scale-125'} alt={props.thumbnailURL}/>
 					)
 			}
 			

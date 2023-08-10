@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { GET_PROMPTS_BATCH_SIZE, type IFlowgptBasicPrompt, type IFlowgptComment, type IFlowgptFullPrompt, SortOrder } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/api/helpers'
+// import fetch from 'node-fetch'
+import { proxyAgent } from '@/server/proxy'
 
 export const idInput = z.object({
 	id: z.string(),
@@ -10,11 +12,11 @@ const singleFetch = async <T>(props: { path: string, j: object }) => {
 	const input = encodeURI(JSON.stringify({ '0': props.j }))
 	const url = `https://flowgpt.com/api/trpc/${props.path}?batch=1&input=${input}`
 	console.log(`[API] fetching: ${url}`)
-	const result = await fetch(url, {
-		cache: 'no-cache',
-		
+	const response = await fetch(url, {
+		// agent: proxyAgent,
 	})
-	return (await result.json())[0].result.data.json as T
+	const result = await response.json()
+	return result[0].result.data.json as T
 }
 
 
