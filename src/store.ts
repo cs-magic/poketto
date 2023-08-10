@@ -15,7 +15,7 @@ export enum CardsLayoutType {
 export interface UIState {
 	collapsed: boolean
 	switchCollapse: () => void
-	cardsLayout: CardsLayoutType.masonry
+	cardsLayout: CardsLayoutType
 	setCardsLayout: (v: CardsLayoutType) => void
 }
 
