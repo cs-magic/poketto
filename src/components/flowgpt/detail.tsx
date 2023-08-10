@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import RatingChart from './rating-chart.png'
 import { type ReactNode } from 'react'
 import { FlowgptComments } from '@/components/flowgpt/flowgpt-comment'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
 
 export const FlowgptDetail = (
 	{
@@ -89,38 +90,8 @@ export const FlowgptDetail = (
 				<StatusItem a={'language'} b={language} c={'Universal'}/>
 			</section>
 			
-			<div id={'user-cases'} className={'w-full overflow-auto  | flex shrink-0 gap-4'}>
-				<div className="mockup-phone shrink-0">
-					<div className="camera"></div>
-					<div className="display">
-						<div className="artboard artboard-demo phone-1">Hi.</div>
-					</div>
-				</div>
-				<div className="mockup-phone shrink-0">
-					<div className="camera"></div>
-					<div className="display">
-						<div className="artboard artboard-demo phone-1">Hi.</div>
-					</div>
-				</div>
-				<div className="mockup-phone shrink-0">
-					<div className="camera"></div>
-					<div className="display">
-						<div className="artboard artboard-demo phone-1">Hi.</div>
-					</div>
-				</div>
-				<div className="mockup-phone shrink-0">
-					<div className="camera"></div>
-					<div className="display">
-						<div className="artboard artboard-demo phone-1">Hi.</div>
-					</div>
-				</div>
-				<div className="mockup-phone shrink-0">
-					<div className="camera"></div>
-					<div className="display">
-						<div className="artboard artboard-demo phone-1">Hi.</div>
-					</div>
-				</div>
-				<div className="mockup-phone shrink-0">
+			<div id={'user-cases'} className={'w-full overflow-auto | flex shrink-0 gap-4'}>
+				<div className="mockup-phone">
 					<div className="camera"></div>
 					<div className="display">
 						<div className="artboard artboard-demo phone-1">Hi.</div>

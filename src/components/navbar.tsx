@@ -58,20 +58,20 @@ export default function Navbar() {
 			<div className={'grow'}/>
 			<CommandDemo/>
 			
-			{/*<Popover>*/}
-			{/*	<PopoverTrigger>*/}
-			{/*		<IconContainer children={<QuestionMarkCircledIcon/>}/>*/}
-			{/*	</PopoverTrigger>*/}
-			{/*	*/}
-			{/*	<PopoverContent>*/}
-			{/*		<section className={'flex flex-col'}>*/}
-			{/*			<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'}/>*/}
-			{/*			<MenuLink field={'learning-center'}/>*/}
-			{/*			<MenuLink field={'support-center'}/>*/}
-			{/*		</section>*/}
-			{/*	*/}
-			{/*	</PopoverContent>*/}
-			{/*</Popover>*/}
+			<Popover>
+				<PopoverTrigger>
+					<IconContainer children={<QuestionMarkCircledIcon/>}/>
+				</PopoverTrigger>
+				
+				<PopoverContent>
+					<section className={'flex flex-col'}>
+						<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'}/>
+						<MenuLink field={'learning-center'}/>
+						<MenuLink field={'support-center'}/>
+					</section>
+				
+				</PopoverContent>
+			</Popover>
 			
 			{/* 由 lara 调 */}
 			<ThemeSwitcher/>

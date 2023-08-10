@@ -10,6 +10,8 @@ import Mustache from 'mustache'
 import { Badge } from '@/components/ui/badge'
 import { XIcon } from 'lucide-react'
 import { MenuLink } from '@/components/link'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import _ from 'lodash'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -90,20 +92,21 @@ export const Sidebar = () => {
 			
 			<Separator/>
 			<section className={'flex flex-col'}>
-				<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'}/>
-				<MenuLink field={'learning-center'}/>
-				<MenuLink field={'support-center'}/>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button className={clsx('w-full justify-between text-xs')} variant={'ghost'}>
+							<span>Join Platform Waitlist</span>
+							<ChevronRightIcon/>
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent>
+						<MenuLink field={'join-desktop-app-waitlist'}/>
+						<MenuLink field={'join-mobile-app-waitlist'}/>
+						<MenuLink field={'join-wechat-waitlist'}/>
+					</PopoverContent>
+				</Popover>
 				<MenuLink field={'lumos-enterprise'}/>
-				<MenuLink field={'apply-platform-waitlist'}/>
 			</section>
-			
-			{/*<Separator/>*/}
-			{/*<section className={'flex flex-col'}>*/}
-			{/*	<MenuLink field={'apply-desktop-app-waitlist'}/>*/}
-			{/*	<MenuLink field={'apply-mobile-app-waitlist'}/>*/}
-			{/*	<MenuLink field={'apply-wechat-waitlist'}/>*/}
-			{/*</section>*/}
-			
 			
 			{/* footer */}
 			<div className={'grow'}/>
