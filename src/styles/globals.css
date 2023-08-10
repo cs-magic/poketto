@@ -71,7 +71,7 @@ colors:
         --popover-foreground: 210 40% 98%;
 
         --primary: 0 0% 18%;
-        --primary-foreground: 210 40% 85%;
+        --primary-foreground: 0 100% 100%;
 
         --secondary: 217.2 32.6% 17.5%;
         /*--secondary-foreground: 210 40% 98%;*/
@@ -82,7 +82,7 @@ colors:
         --muted-foreground: 0 0% 42%;
 
         --accent: 0 0% 20%;
-        --accent-foreground: 210 40% 70%;
+        --accent-foreground: 0 20% 80%;
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 210 40% 98%;
