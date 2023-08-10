@@ -1,9 +1,9 @@
 import Head from 'next/head'
 import { app } from '@/config/app'
 import { type PropsWithChildren } from 'react'
-import { Sidebar } from '@/layouts/sidebar'
+import { Sidebar } from '@/components/sidebar'
 import { clsx } from 'clsx'
-import Navbar from '@/layouts/navbar'
+import Navbar from '@/components/navbar'
 
 
 export function RootLayout(props: PropsWithChildren) {

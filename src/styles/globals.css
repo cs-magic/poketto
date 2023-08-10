@@ -22,6 +22,9 @@ colors:
 
     tsinghua:
         #82318E; 292 49% 37%; 维基百科清华校色
+
+    general:
+        yellow: 60, 100%, 50%;
  */
 @layer base {
     :root {
@@ -71,7 +74,8 @@ colors:
         --primary-foreground: 210 40% 85%;
 
         --secondary: 217.2 32.6% 17.5%;
-        --secondary-foreground: 210 40% 98%;
+        /*--secondary-foreground: 210 40% 98%;*/
+        --secondary-foreground: 60, 60%, 40%;
 
         --muted: 217.2 32.6% 17.5%;
         --muted-foreground: 0 0% 42%;
@@ -93,6 +97,10 @@ colors:
 @layer base {
     * {
         @apply border-border transition-all;
+    }
+
+    a {
+        @apply underline underline-offset-2 text-secondary-foreground;
     }
 
     body {

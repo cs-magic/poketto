@@ -6,7 +6,7 @@ import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
-import { LumosNavigationMenu } from '@/layouts/lumos.navigation-menu'
+import { LumosNavigationMenu } from '@/components/lumos/lumos.navigation-menu'
 import { NavigationMenuDemo } from '@/components/navigation-menu.demo'
 
 
@@ -40,7 +40,7 @@ export default function Navbar() {
 	return (
 		<div className={'px-4 py-2 | flex items-center gap-4 | border-b'}>
 			
-			<LumosNavigationMenu/>
+			{/*<LumosNavigationMenu/>*/}
 			{/*<NavigationMenuDemo/>*/}
 			
 			<div className={'grow'}/>

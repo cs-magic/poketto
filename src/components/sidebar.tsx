@@ -1,12 +1,12 @@
 import React, { type ReactNode } from 'react'
-import { IconBolt, IconBoltOff, IconX } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import { app, InvitationStatus, user } from '@/config/app'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Icons, SelfUserAvatar } from '@/config/icons'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
+import { LightningBoltIcon } from '@radix-ui/react-icons'
+import ReactMarkdown from 'react-markdown'
+import Mustache from 'mustache'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -20,6 +20,8 @@ export const NavGroups = ({ title, children }: {
 
 export const Sidebar = () => {
 	const FONT_WEIGHT = 'font-light'
+	const surplus = user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length
+	
 	return (
 		<div className={clsx(
 			'h-full w-60 p-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
@@ -33,7 +35,9 @@ export const Sidebar = () => {
 						<span className={'text-xs'}>{user.name}</span>
 					</div>
 					{/*<IconBolt className={'text-primary-foreground'}/>*/}
-					<IconBoltOff className={'text-primary-foreground'}/>
+					{/*<IconBoltOff className={'text-primary-foreground'}/>*/}
+					{/*<MagicWandIcon className={'text-primary-foreground'}/>*/}
+					<LightningBoltIcon className={'text-primary-foreground'}/>
 					<div className={'flex flex-col items-center gap-2'}>
 						<Icons.logo className={'!wh-12 bg-background p-2'}/>
 						<span className={'text-xs'}>{app.name}</span>
@@ -43,34 +47,45 @@ export const Sidebar = () => {
 				<div>
 					<span className={''}>@ {user.workspace}</span>
 				</div>
-				
-				<Button>Invite</Button>
+			
 			</section>
 			
 			
-			<div className={'flex flex-col gap-0'}>
+			<section className={'flex flex-col gap-0'}>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Workspaces</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Dashboard</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Gallery</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Toolkits</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Integrations</Button>
-			</div>
+			</section>
 			
 			<Separator/>
 			
-			<div className={'flex flex-col gap-0'}>
+			<section className={'flex flex-col gap-0'}>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Dashboard</Button>
+				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Gallery</Button>
+			</section>
+			
+			<Separator/>
+			
+			<section className={'flex flex-col gap-0'}>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>{'What\'s Lumos?'}</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Learning Center</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Support Center</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Lumos Enterprise</Button>
 				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Download Desktop App</Button>
-			</div>
+			</section>
 			
 			<div className={'grow'}/>
 			
 			<Separator/>
 			<div className={'flex flex-col gap-2 | text-sm'}>
-				<p>每位魔法师用户都可以拥有三张 Lumos 社区的邀请码，您可以将其分享给您的好友，注册成功后将有 CS 币赠送哦！</p>
-				<Button>当前剩余：{user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length}</Button>
+				<ReactMarkdown>
+					{
+						Mustache.render('每位 LUMOS 用户都可以拥有 **3** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)', { surplus })
+					}
+				
+				</ReactMarkdown>
+				<Button>Invite</Button>
+			
 			</div>
 		
 		</div>
