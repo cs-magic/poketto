@@ -73,7 +73,7 @@ export default function CommandDialogDemo() {
 	
 	return (
 		<>
-			<div className={'max-w-sm | relative flex items-center | text-muted-foreground text-sm'}>
+			<div className={'w-[256px] | relative flex items-center | text-muted-foreground text-sm'}>
 				<IconSearch className={'absolute left-2 wh-5'}/>
 				<Input className={'grow'} onFocus={() => setOpen(!open)}/>
 				<kbd className="absolute right-2 shrink-0 h-6 p-2 |  pointer-events-none inline-flex select-none items-center gap-1 rounded border bg-muted font-mono font-medium text-muted-foreground opacity-100">

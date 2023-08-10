@@ -12,7 +12,8 @@ import Image, { type ImageProps } from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { user } from '@/config/app'
 
-export const ICON_DIMENSION_SM = 'wh-5'
+export const ICON_DIMENSION_SM = 'wh-4'
+export const ICON_DIMENSION_MD = 'wh-8'
 export const ICON_DIMENSION_LG = 'wh-12'
 
 // todo: avoid alt
@@ -37,7 +38,7 @@ export const Icons = {
 
 export const SelfUserAvatar = () => {
 	return (
-		<Avatar className={ICON_DIMENSION_LG}>
+		<Avatar className={ICON_DIMENSION_MD}>
 			<AvatarImage src={user.avatar}/>
 			<AvatarFallback>{user.name}</AvatarFallback>
 		</Avatar>

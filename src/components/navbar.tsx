@@ -30,7 +30,7 @@ export const LogoWithName = () => {
 	return (
 		<div className={'inline-flex items-center gap-2'}>
 			<Logo height={32}/>
-			{app.name}
+			<span className={'text-xl tracking-widest'}>{app.name}</span>
 		</div>
 	)
 }
@@ -43,11 +43,14 @@ export default function Navbar() {
 			{/*<LumosNavigationMenu/>*/}
 			{/*<NavigationMenuDemo/>*/}
 			
+			<LogoWithName/>
+			
 			<div className={'grow'}/>
 			<CommandDemo/>
 			
 			{/* 由 lara 调 */}
 			<ThemeSwitcher/>
+		
 		</div>
 	)
 }
