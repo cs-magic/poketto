@@ -68,36 +68,34 @@ export const InviteCard = () => {
 }
 
 export const Sidebar = () => {
-	const FONT_WEIGHT = 'font-light'
 	
 	return (
 		<div className={clsx(
-			'h-full w-60 px-4 pt-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
-			FONT_WEIGHT,
+			'h-full w-60 shrink-0 px-4 pt-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
 		)}>
 			
 			<section className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Workspaces</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Explore</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Toolkits</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Workspaces</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Explore</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Toolkits</Button>
 			</section>
 			
 			<Separator/>
 			
 			<section className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Dashboard</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Gallery</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Integrations</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Dashboard</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Gallery</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Integrations</Button>
 			</section>
 			
 			<Separator/>
 			
 			<section className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>{'What\'s Lumos?'}</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Learning Center</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Support Center</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Lumos Enterprise</Button>
-				<Button className={clsx('justify-start text-xs', FONT_WEIGHT)} variant={'ghost'}>Download Desktop App</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>{'What\'s Lumos?'}</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Learning Center</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Support Center</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Lumos Enterprise</Button>
+				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Download Desktop App</Button>
 			</section>
 			
 			

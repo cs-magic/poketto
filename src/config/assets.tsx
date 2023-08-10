@@ -3,7 +3,7 @@ import React, { type ElementType, type HTMLProps } from 'react'
 import CSCoin from '@/../public/images/cs-coin.svg'
 import Logo from '../../public/images/logo/m/1280.svg'
 import OpenchatIcon from '@/../public/brands/openchat.svg'
-import MidjourneyIcon from '@/../public/brands/midjourney.png'
+import MidjourneyIcon from '@/../public/brands/midjourney.svg'
 
 import { clsx } from 'clsx'
 import Image, { type ImageProps } from 'next/image'
@@ -39,8 +39,7 @@ export const Assets = {
 	logo: (props: SVGProps) => <SVGFactory Comp={Logo} presetClassName={'bg-black text-white'} {...props}/>,
 	csCoin: (props: SVGProps) => <SVGFactory Comp={CSCoin} {...props}/>,
 	openchat: (props: SVGProps) => <SVGFactory Comp={OpenchatIcon}  {...props}/>,
-	
-	midjourney: (props: ImageProps_) => <ImageFactory src={MidjourneyIcon} alt={'MidJourney'} {...props}/>,
+	midjourney: (props: SVGProps) => <SVGFactory Comp={MidjourneyIcon}  {...props}/>,
 }
 
 export const SelfUserAvatar = () => {

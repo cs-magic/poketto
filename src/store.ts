@@ -8,14 +8,14 @@ import { SortOrder } from '@/ds/flowgpt'
  * ui
  */
 export enum CardsLayoutType {
-	grid = 'grid',
 	masonry = 'masonry',
+	grid = 'grid',
 }
 
 export interface UIState {
 	collapsed: boolean
 	switchCollapse: () => void
-	cardsLayout: CardsLayoutType
+	cardsLayout: CardsLayoutType.masonry
 	setCardsLayout: (v: CardsLayoutType) => void
 }
 
@@ -32,7 +32,7 @@ export interface FlowGPTState {
 }
 
 export const createFlowgptSlice: StoreSlice<FlowGPTState> = (setState) => ({
-	order: SortOrder.top,
+	order: SortOrder.recommended,
 	setOrder: (v) => setState((state) => {state.order = v}),
 })
 

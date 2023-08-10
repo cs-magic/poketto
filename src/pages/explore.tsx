@@ -13,11 +13,29 @@ import { Separator } from '@/components/ui/separator'
 import _ from 'lodash'
 import { FrameIcon } from '@radix-ui/react-icons'
 import { Skeleton } from '@/components/ui/skeleton'
+import { order2icon } from '@/config/assets'
 
+export const SelectCardsLayout = () => {
+	const { cardsLayout, setCardsLayout } = useStore()
+	
+	// todo: in settings
+	return (
+		<Select value={cardsLayout} onValueChange={setCardsLayout}>
+			<SelectTrigger className={'w-28 hidden md:flex'}>
+				<SelectValue placeholder={'卡片布局'}/>
+			</SelectTrigger>
+			<SelectContent>
+				{Object.values(CardsLayoutType).map((cl) => (
+					<SelectItem value={cl} key={cl}>{cl}</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
+	)
+}
 
 export const AgentsPage = () => {
 	
-	const { cardsLayout, setCardsLayout, order, setOrder } = useStore()
+	const { cardsLayout, order, setOrder } = useStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
 	const query = api.flowgpt.listPrompts.useInfiniteQuery({ order }, {
@@ -37,36 +55,30 @@ export const AgentsPage = () => {
 				{/*<HomeCarousel/>*/}
 				
 				{/* title */}
-				<div className={'w-full px-2 | flex items-center gap-2'}>
+				<div className={'w-full px-2 | flex items-center gap-2 whitespace-nowrap '}>
 					<FrameIcon/>
 					<span className={'text-lg'}>玩法推荐</span>
 					
-					<Select onValueChange={setCardsLayout}>
-						<SelectTrigger className={'w-28'}>
-							<SelectValue placeholder={'卡片布局'}/>
-						</SelectTrigger>
-						<SelectContent>
-							{Object.values(CardsLayoutType).map((cl) => (
-								<SelectItem value={cl} key={cl}>{cl}</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					
 					<div className={'grow'}/>
+					<span className={'hidden md:block'}>Sort By</span>
 					<div className={'flex items-center'}>
 						{
 							Object.values(SortOrder)
-								.map((order) => (
-									<Fragment key={order}>
-										<Separator orientation={'vertical'} className={'h-4 first:hidden'}/>
-										<Button
-											className={'hover:bg-transparent px-2'}
-											variant={'ghost'}
-											key={order} onClick={() => {setOrder(order)}}>
-											{_.startCase(_.capitalize(order))}
-										</Button>
-									</Fragment>
-								))
+								.map((order) => {
+									const Icon = order2icon[order]
+									return (
+										<Fragment key={order}>
+											<Separator orientation={'vertical'} className={'h-4 first:hidden'}/>
+											<Button
+												className={'hover:bg-transparent px-2 flex items-center gap-1'}
+												variant={'ghost'}
+												key={order} onClick={() => {setOrder(order)}}>
+												<Icon className={''}/>
+												<span className={'hidden lg:block'}>{_.startCase(_.capitalize(order))}</span>
+											</Button>
+										</Fragment>
+									)
+								})
 						}
 					</div>
 				</div>
