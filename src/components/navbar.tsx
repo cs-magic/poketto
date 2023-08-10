@@ -6,8 +6,8 @@ import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
-import { LumosNavigationMenu } from '@/components/lumos/lumos.navigation-menu'
-import { NavigationMenuDemo } from '@/components/navigation-menu.demo'
+import { BellIcon, GearIcon } from '@radix-ui/react-icons'
+import { ICON_DIMENSION_SM } from '@/config/icons'
 
 
 export const ThemeSwitcher = () => {
@@ -18,10 +18,10 @@ export const ThemeSwitcher = () => {
 	
 	const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length]!
 	return (
-		<div onClick={() => setTheme(nextTheme)}>
-			{theme === 'light' && <IconSun/>}
-			{theme === 'dark' && <IconMoon/>}
-			{theme === 'system' && <IconBrightnessHalf/>}
+		<div onClick={() => setTheme(nextTheme)} className={'p-2 hover:bg-accent'}>
+			{theme === 'light' && <IconSun className={ICON_DIMENSION_SM}/>}
+			{theme === 'dark' && <IconMoon className={ICON_DIMENSION_SM}/>}
+			{theme === 'system' && <IconBrightnessHalf className={ICON_DIMENSION_SM}/>}
 		</div>
 	)
 }
@@ -38,7 +38,7 @@ export const LogoWithName = () => {
 export default function Navbar() {
 	
 	return (
-		<div className={'px-4 py-2 | flex items-center gap-4 | border-b'}>
+		<div className={'px-4 py-2 | flex items-center | border-b'}>
 			
 			{/*<LumosNavigationMenu/>*/}
 			{/*<NavigationMenuDemo/>*/}
@@ -50,6 +50,14 @@ export default function Navbar() {
 			
 			{/* 由 lara 调 */}
 			<ThemeSwitcher/>
+			
+			<div className={'p-2 hover:bg-accent'}>
+				<BellIcon/>
+			</div>
+			
+			<div className={'p-2 hover:bg-accent'}>
+				<GearIcon/>
+			</div>
 		
 		</div>
 	)

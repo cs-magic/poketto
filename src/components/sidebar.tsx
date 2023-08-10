@@ -7,6 +7,8 @@ import { clsx } from 'clsx'
 import { ArrowRightIcon, ChevronRightIcon, LightningBoltIcon } from '@radix-ui/react-icons'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
+import { Badge } from '@/components/ui/badge'
+import { XIcon } from 'lucide-react'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -48,7 +50,11 @@ export const InviteCard = () => {
 	const surplus = user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length
 	
 	return (
-		<div className={'flex flex-col gap-2 | text-sm'}>
+		<div className={'flex flex-col gap-2 | text-sm border p-4 rounded-xl'}>
+			<div className={'flex items-center justify-between'}>
+				<Badge variant={'destructive'} className={'w-fit'}>Tips</Badge>
+				<XIcon className={'wh-4 text-muted-foreground'}/>
+			</div>
 			<ReactMarkdown>
 				{
 					Mustache.render('每位 LUMOS 用户都可以拥有 **3** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)', { surplus })
@@ -97,6 +103,8 @@ export const Sidebar = () => {
 			
 			{/* footer */}
 			<div className={'grow'}/>
+			
+			<InviteCard/>
 			
 			<div className={'flex items-center gap-2 p-4 border-t'}>
 				<SelfUserAvatar/>
