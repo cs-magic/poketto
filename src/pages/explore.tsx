@@ -48,8 +48,7 @@ export const AgentsPage = () => {
 			
 			{/* main (content - load more) */}
 			<div className={clsx(
-				'w-full max-w-[1360px] h-full p-2 overflow-auto | flex flex-col gap-4',
-				// ' bg-cyan-800',
+				'w-full max-w-[1360px] h-full overflow-auto | flex flex-col gap-4',
 			)}>
 				
 				{/*<HomeCarousel/>*/}

@@ -28,7 +28,7 @@ export function RootLayout(props: PropsWithChildren) {
 				<div className={'grow overflow-hidden | flex divide-x'}>
 					<Sidebar/>
 					
-					<div className={'grow h-full | flex items-center justify-center gap-2'}>
+					<div className={'grow h-full p-4 | flex items-center justify-center gap-2'}>
 						{props.children}
 					</div>
 				</div>
