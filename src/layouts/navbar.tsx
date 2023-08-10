@@ -90,8 +90,8 @@ export default function Navbar() {
 			<div className={'grow'}/>
 			<CommandDemo/>
 			
-			{/* todo: 晚点再开这个 */}
-			{/*<ThemeSwitcher/>*/}
+			{/* 由 lara 调 */}
+			<ThemeSwitcher/>
 		</div>
 	)
 }
