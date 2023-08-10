@@ -97,7 +97,9 @@ colors:
 
 @layer base {
     * {
-        @apply border-border transition-all;
+        @apply border-border;
+        /* 不要对所有的都是用 transition，尤其是有动画的场景，会有闪屏的意外 */
+        /*@apply transition-all;*/
     }
 
     a {

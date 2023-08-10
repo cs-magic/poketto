@@ -2,7 +2,7 @@ import { create, type StateCreator } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { FixedCacheQueue } from '@/lib/algo'
-import { DataDimension } from '@/ds/flowgpt'
+import { SortOrder } from '@/ds/flowgpt'
 
 /**
  * ui
@@ -27,13 +27,13 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 })
 
 export interface FlowGPTState {
-	rank: DataDimension
-	setRank: (v: DataDimension) => void
+	order: SortOrder
+	setOrder: (v: SortOrder) => void
 }
 
 export const createFlowgptSlice: StoreSlice<FlowGPTState> = (setState) => ({
-	rank: DataDimension.views,
-	setRank: (v) => setState((state) => {state.rank = v}),
+	order: SortOrder.top,
+	setOrder: (v) => setState((state) => {state.order = v}),
 })
 
 /**

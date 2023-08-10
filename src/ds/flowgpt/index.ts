@@ -20,12 +20,13 @@ export enum AgentAspect {
 }
 
 export enum SortOrder {
-	new = 'new',
 	
-	recommend = 'recommend',
+	recommended = 'recommended',
 	trending = 'trending',
-	following = 'following',
-	top = 'top'
+	follow = 'follow',
+	top = 'top',
+	new = 'new',
+	mostSaved = 'most-saved'
 }
 
 

@@ -3,13 +3,13 @@ import { clsx } from 'clsx'
 import { FlowgptAgentCard } from '@/components/flowgpt/agent.card'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
-import { HomeCarousel } from '@/components/home.carousel'
 import { IconArrowBadgeDownFilled } from '@tabler/icons-react'
 import { GridContainer, MasonryContainer } from '@/components/responsive-containers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CardsLayoutType, useStore } from '@/store'
 import { ScrollTrigger } from '@/components/scroll-trigger'
-import { DataDimension } from '@/ds/flowgpt'
+import { SortOrder } from '@/ds/flowgpt'
+// import SelectDemo from '@/components/radix-ui/select.demo'
 
 
 export const AgentsPage = () => {
@@ -18,7 +18,7 @@ export const AgentsPage = () => {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
 	
-	const { cardsLayout, setCardsLayout, rank, setRank } = useStore()
+	const { cardsLayout, setCardsLayout, order, setOrder } = useStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
 	
@@ -31,7 +31,7 @@ export const AgentsPage = () => {
 				// ' bg-cyan-800',
 			)}>
 				
-				<HomeCarousel/>
+				{/*<HomeCarousel/>*/}
 				
 				{/* title */}
 				<div className={'flex items-center gap-2 | text-2xl text-muted-foreground '}>
@@ -54,7 +54,7 @@ export const AgentsPage = () => {
 							<SelectValue placeholder={'排序指标'}/>
 						</SelectTrigger>
 						<SelectContent>
-							{Object.values(DataDimension).map((cl) => (
+							{Object.values(SortOrder).map((cl) => (
 								<SelectItem value={cl} key={cl}>{cl}</SelectItem>
 							))}
 						</SelectContent>

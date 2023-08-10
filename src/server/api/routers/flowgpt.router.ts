@@ -10,7 +10,11 @@ const singleFetch = async <T>(props: { path: string, j: object }) => {
 	const input = encodeURI(JSON.stringify({ '0': props.j }))
 	const url = `https://flowgpt.com/api/trpc/${props.path}?batch=1&input=${input}`
 	console.log(`[API] fetching: ${url}`)
-	return (await (await fetch(url, { cache: 'no-cache' })).json())[0].result.data.json as T
+	const result = await fetch(url, {
+		cache: 'no-cache',
+		
+	})
+	return (await result.json())[0].result.data.json as T
 }
 
 
@@ -31,7 +35,7 @@ export const flowgptRouter = createTRPCRouter({
 		)
 		.query<{ data: IFlowgptBasicPrompt[], nextCursor: number | undefined }>(async (opts) => {
 			const skip = opts.input.cursor ?? 0
-			const sort = opts.input.order ?? SortOrder.recommend
+			const sort = opts.input.order ?? SortOrder.recommended
 			const j = {
 				'json': { sort, skip, 'tag': null, 'q': null, 'language': 'en' },
 				'meta': { 'values': { 'tag': ['undefined'], 'q': ['undefined'] } },

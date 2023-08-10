@@ -6,17 +6,18 @@ import '@/styles/globals.css'
 import React from 'react'
 import { ThemeProvider } from 'next-themes'
 
-const MyApp: AppType<{ session: Session | null }> = ({
-	                                                     Component,
-	                                                     pageProps: { session, ...pageProps },
-                                                     }) => {
-	return (
-		<ThemeProvider attribute="class" defaultTheme={'dark'}>
-			<SessionProvider session={session}>
-				<Component {...pageProps} />
-			</SessionProvider>
-		</ThemeProvider>
-	)
-}
+const MyApp: AppType<{ session: Session | null }> =
+	({
+		 Component,
+		 pageProps: { session, ...pageProps },
+	 }) => {
+		return (
+			<ThemeProvider attribute="class" defaultTheme={'dark'}>
+				<SessionProvider session={session}>
+					<Component {...pageProps} />
+				</SessionProvider>
+			</ThemeProvider>
+		)
+	}
 
 export default api.withTRPC(MyApp)
