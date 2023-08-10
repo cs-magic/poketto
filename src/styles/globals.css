@@ -106,6 +106,10 @@ colors:
         @apply underline underline-offset-2 text-secondary-foreground;
     }
 
+    h2 {
+        @apply text-2xl font-semibold;
+    }
+
     body {
         @apply bg-background text-foreground;
     }
