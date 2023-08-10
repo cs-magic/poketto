@@ -1,13 +1,15 @@
 import Logo from '../../public/images/logo/m/1280.svg'
 import { app } from '@/config/app'
-import React from 'react'
+import React, { type PropsWithChildren } from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
-import { BellIcon, GearIcon } from '@radix-ui/react-icons'
+import { BellIcon, GearIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 import { ICON_DIMENSION_SM } from '@/config/assets'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { MenuLink } from '@/components/link'
 
 
 export const ThemeSwitcher = () => {
@@ -35,6 +37,14 @@ export const LogoWithName = () => {
 	)
 }
 
+export const IconContainer = ({ children }: PropsWithChildren) => {
+	return (
+		<div className={'p-2 hover:bg-accent'}>
+			{children}
+		</div>
+	)
+}
+
 export default function Navbar() {
 	
 	return (
@@ -48,16 +58,27 @@ export default function Navbar() {
 			<div className={'grow'}/>
 			<CommandDemo/>
 			
+			{/*<Popover>*/}
+			{/*	<PopoverTrigger>*/}
+			{/*		<IconContainer children={<QuestionMarkCircledIcon/>}/>*/}
+			{/*	</PopoverTrigger>*/}
+			{/*	*/}
+			{/*	<PopoverContent>*/}
+			{/*		<section className={'flex flex-col'}>*/}
+			{/*			<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'}/>*/}
+			{/*			<MenuLink field={'learning-center'}/>*/}
+			{/*			<MenuLink field={'support-center'}/>*/}
+			{/*		</section>*/}
+			{/*	*/}
+			{/*	</PopoverContent>*/}
+			{/*</Popover>*/}
+			
 			{/* 由 lara 调 */}
 			<ThemeSwitcher/>
 			
-			<div className={'p-2 hover:bg-accent'}>
-				<BellIcon/>
-			</div>
+			<IconContainer children={<BellIcon/>}/>
 			
-			<div className={'p-2 hover:bg-accent'}>
-				<GearIcon/>
-			</div>
+			<IconContainer children={<GearIcon/>}/>
 		
 		</div>
 	)

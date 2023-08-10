@@ -4,11 +4,12 @@ import { app, InvitationStatus, user } from '@/config/app'
 import { Assets, SelfUserAvatar } from '@/config/assets'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
-import { ArrowRightIcon, ChevronRightIcon, LightningBoltIcon } from '@radix-ui/react-icons'
+import { ChevronRightIcon, LightningBoltIcon } from '@radix-ui/react-icons'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
 import { Badge } from '@/components/ui/badge'
 import { XIcon } from 'lucide-react'
+import { MenuLink } from '@/components/link'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -50,7 +51,7 @@ export const InviteCard = () => {
 	const surplus = user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length
 	
 	return (
-		<div className={'flex flex-col gap-2 | text-sm border p-4 rounded-xl'}>
+		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>
 			<div className={'flex items-center justify-between'}>
 				<Badge variant={'destructive'} className={'w-fit'}>Tips</Badge>
 				<XIcon className={'wh-4 text-muted-foreground'}/>
@@ -71,32 +72,37 @@ export const Sidebar = () => {
 	
 	return (
 		<div className={clsx(
-			'h-full w-60 shrink-0 px-4 pt-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
+			'h-full w-60 shrink-0 whitespace-nowrap px-4 pt-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
 		)}>
 			
-			<section className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Workspaces</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Explore</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Toolkits</Button>
+			<section className={'flex flex-col'}>
+				<MenuLink field={'workspaces'}/>
+				<MenuLink field={'explore'}/>
+				<MenuLink field={'toolkits'}/>
 			</section>
 			
 			<Separator/>
-			
-			<section className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Dashboard</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Gallery</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Integrations</Button>
+			<section className={'flex flex-col'}>
+				<MenuLink field={'dashboard'}/>
+				<MenuLink field={'gallery'}/>
+				<MenuLink field={'integrations'}/>
 			</section>
 			
 			<Separator/>
-			
-			<section className={'flex flex-col gap-0'}>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>{'What\'s Lumos?'}</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Learning Center</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Support Center</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Lumos Enterprise</Button>
-				<Button className={clsx('justify-start text-xs')} variant={'ghost'}>Download Desktop App</Button>
+			<section className={'flex flex-col'}>
+				<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'}/>
+				<MenuLink field={'learning-center'}/>
+				<MenuLink field={'support-center'}/>
+				<MenuLink field={'lumos-enterprise'}/>
+				<MenuLink field={'apply-platform-waitlist'}/>
 			</section>
+			
+			{/*<Separator/>*/}
+			{/*<section className={'flex flex-col'}>*/}
+			{/*	<MenuLink field={'apply-desktop-app-waitlist'}/>*/}
+			{/*	<MenuLink field={'apply-mobile-app-waitlist'}/>*/}
+			{/*	<MenuLink field={'apply-wechat-waitlist'}/>*/}
+			{/*</section>*/}
 			
 			
 			{/* footer */}
