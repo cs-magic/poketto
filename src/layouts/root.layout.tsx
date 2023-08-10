@@ -1,9 +1,9 @@
 import Head from 'next/head'
 import { app } from '@/config/app'
-import { type PropsWithChildren } from 'react'
+import React, { type PropsWithChildren } from 'react'
 import { Sidebar } from '@/components/sidebar'
-import { clsx } from 'clsx'
 import Navbar from '@/components/navbar'
+import { clsx } from 'clsx'
 import { font } from '@/config/assets'
 
 
@@ -16,12 +16,8 @@ export function RootLayout(props: PropsWithChildren) {
 				<meta name="description" content={app.desc}/>
 				<link rel="icon" href={app.icon}/>
 			</Head>
-			<main className={clsx(
-				// todo: allow font weight/source adjustment in settings
-				'h-screen | flex flex-col | font-light text-foreground bg-background text-sm',
-				font.className,
-				// "| bg-gradient-to-b from-[#2e026d] to-[#15162c]"
-			)}>
+			
+			<main className={clsx('h-screen | flex flex-col | font-light text-foreground bg-background text-sm', font.className)}>
 				
 				<Navbar/>
 				
@@ -32,9 +28,8 @@ export function RootLayout(props: PropsWithChildren) {
 						{props.children}
 					</div>
 				</div>
-			
-			
 			</main>
+		
 		</>
 	)
 }
