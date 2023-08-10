@@ -1,53 +1,14 @@
-import { type IFlowgptBasicPrompt, type IFlowgptComment, type IFlowgptFullPrompt } from '@/ds/flowgpt'
+import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
 import Image from 'next/image'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import numeral from 'numeral'
 import _ from 'lodash'
 import { PersonIcon, StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
-import { StarOffIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import RatingChart from './rating-chart.png'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { api } from '@/lib/api'
 import { type ReactNode } from 'react'
-
-export const FlowgptComment = (
-	{
-		id,
-		body,
-	}: IFlowgptComment) => {
-	
-	return (
-		<Card>
-			<CardHeader>
-				{/* todo: title of comment like Apple */}
-				{/*<CardTitle>{item.title}</CardTitle>*/}
-				<div className={'flex items-center justify-between'}>
-					<p className={'font-semibold'}>{'No Title (todo)'}</p>
-					<p>{}</p>
-				</div>
-			</CardHeader>
-			<CardContent>
-				{body}
-				{/*	todo: body */}
-			</CardContent>
-		</Card>
-	)
-}
-
-export const FlowgptComments = ({ id }: { id: string }) => {
-	const { data } = api.flowgpt.listComments.useQuery({ id })
-	return (
-		<div className={'w-full overflow-auto grid grid-cols-2 gap-2'}>
-			{data
-				? data.slice(0, 2).map((item) => (
-					<FlowgptComment {...item} key={item.id}/>
-				))
-				: 'Loading'}
-		</div>
-	)
-}
+import { FlowgptComments } from '@/components/flowgpt/flowgpt-comment'
 
 export const FlowgptDetail = (
 	{
@@ -77,7 +38,7 @@ export const FlowgptDetail = (
 	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 		return (
-			<div className={'flex flex-col items-center gap-1'}>
+			<div className={'flex flex-col items-center gap-1 shrink-0'}>
 				<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
 				<div className={'text-2xl font-semibold text-primary-foreground/75'}>{b}</div>
 				<div className={'text-primary-foreground/75'}>{c}</div>
@@ -95,7 +56,7 @@ export const FlowgptDetail = (
 	}
 	
 	return (
-		<div className={'h-full w-full overflow-auto | flex items-stretch justify-stretch flex-col gap-4'}>
+		<div className={'max-w-[1080px] mx-auto h-full overflow-x-hidden overflow-y-auto | flex flex-col gap-4'}>
 			
 			<section id={'basic'} className={'w-full flex items-center gap-4'}>
 				<Avatar className={'wh-32 p-4 shrink-0'}>
@@ -113,7 +74,7 @@ export const FlowgptDetail = (
 			
 			<Separator orientation={'horizontal'}/>
 			
-			<section id={'status'} className={'w-full flex items-center justify-around gap-4'}>
+			<section id={'status'} className={'w-full overflow-auto | flex shrink-0  items-center justify-between gap-4'}>
 				<StatusItem a={'model'} b={language} c={'Chat'}/>
 				<Separator orientation={'vertical'} className={'h-1/2'}/>
 				<StatusItem a={'ratings'} b={numeral(ranking).format('0.0')} c={<div className={'flex items-center'}>
@@ -127,6 +88,45 @@ export const FlowgptDetail = (
 				<Separator orientation={'vertical'} className={'h-1/2'}/>
 				<StatusItem a={'language'} b={language} c={'Universal'}/>
 			</section>
+			
+			<div id={'user-cases'} className={'w-full overflow-auto  | flex shrink-0 gap-4'}>
+				<div className="mockup-phone shrink-0">
+					<div className="camera"></div>
+					<div className="display">
+						<div className="artboard artboard-demo phone-1">Hi.</div>
+					</div>
+				</div>
+				<div className="mockup-phone shrink-0">
+					<div className="camera"></div>
+					<div className="display">
+						<div className="artboard artboard-demo phone-1">Hi.</div>
+					</div>
+				</div>
+				<div className="mockup-phone shrink-0">
+					<div className="camera"></div>
+					<div className="display">
+						<div className="artboard artboard-demo phone-1">Hi.</div>
+					</div>
+				</div>
+				<div className="mockup-phone shrink-0">
+					<div className="camera"></div>
+					<div className="display">
+						<div className="artboard artboard-demo phone-1">Hi.</div>
+					</div>
+				</div>
+				<div className="mockup-phone shrink-0">
+					<div className="camera"></div>
+					<div className="display">
+						<div className="artboard artboard-demo phone-1">Hi.</div>
+					</div>
+				</div>
+				<div className="mockup-phone shrink-0">
+					<div className="camera"></div>
+					<div className="display">
+						<div className="artboard artboard-demo phone-1">Hi.</div>
+					</div>
+				</div>
+			</div>
 			
 			<section id={'desc'} className={'w-full flex'}>
 				<div className={'line-clamp-4'}>

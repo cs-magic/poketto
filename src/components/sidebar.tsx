@@ -58,7 +58,7 @@ export const InviteCard = () => {
 			</div>
 			<ReactMarkdown>
 				{
-					Mustache.render('每位 LUMOS 用户都可以拥有 **3** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)', { surplus })
+					Mustache.render('每位 LUMOS 用户都可以拥有 **5** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)', { surplus })
 				}
 			
 			</ReactMarkdown>
