@@ -64,12 +64,12 @@ export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
 				'backdrop-brightness-50',
 			)}>
 				{/* title */}
-				<div className={'text-lg truncate'}>{props.title}</div>
+				<div className={'text-lg truncate font-normal'}>{props.title}</div>
 				
 				<div className={'text-md hidden group-hover:line-clamp-3 transition-all'}>{props.description}</div>
 				
 				{/*	user - ranks */}
-				<div className={'flex justify-between | text-xs text-muted-foreground'}>
+				<div className={'flex justify-between | text-xs text-primary-foreground/75'}>
 					{/* user */}
 					<div className={'w-1/2 | flex items-center gap-2'}>
 						<Avatar className={'wh-5'}>
