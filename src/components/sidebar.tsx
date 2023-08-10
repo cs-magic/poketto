@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { app, InvitationStatus, user } from '@/config/app'
-import { Icons, SelfUserAvatar } from '@/config/icons'
+import { Assets, SelfUserAvatar } from '@/config/assets'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
 import { ArrowRightIcon, ChevronRightIcon, LightningBoltIcon } from '@radix-ui/react-icons'
@@ -33,7 +33,7 @@ export const UserVSLumos = () => {
 				{/*<MagicWandIcon className={'text-primary-foreground'}/>*/}
 				<LightningBoltIcon className={'text-primary-foreground'}/>
 				<div className={'flex flex-col items-center gap-2'}>
-					<Icons.logo className={'!wh-12 bg-background p-2'}/>
+					<Assets.logo className={'!wh-12 bg-background p-2'}/>
 					<span className={'text-xs'}>{app.name}</span>
 				</div>
 			</div>

@@ -19,7 +19,7 @@ export const ScrollTrigger = ({ trigger }: {
 			ref={ref}
 			className={clsx(
 				'm-auto px-16 py-8 rounded-2xl flex-center shrink-0',
-				' text-primary-foreground bg-card font-bold  animate-pulse',
+				' text-primary-foreground bg-card font-bold animate-pulse',
 			)}>
 			{entry?.isIntersecting && 'Loading More Data ...'}
 		</p>

@@ -1,6 +1,6 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { user } from '@/config/app'
-import { Icons } from '@/config/icons'
+import { Assets } from '@/config/assets'
 import numeral from 'numeral'
 import { Button } from '@/components/ui/button'
 import React from 'react'
@@ -21,7 +21,7 @@ export const UserProfile = () => {
 			
 			{/* cs coins */}
 			<div className={'flex items-center gap-2'}>
-				<Icons.csCoin/>
+				<Assets.csCoin/>
 				{numeral(user.balance.current).format('0a')} CS 币
 				<Button className={'ml-auto'}>充值</Button>
 			</div>

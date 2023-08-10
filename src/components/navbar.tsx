@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
 import { BellIcon, GearIcon } from '@radix-ui/react-icons'
-import { ICON_DIMENSION_SM } from '@/config/icons'
+import { ICON_DIMENSION_SM } from '@/config/assets'
 
 
 export const ThemeSwitcher = () => {

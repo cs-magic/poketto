@@ -1,6 +1,7 @@
 import { type sampleComment } from '@/ds/flowgpt/sample/comment'
 import { type sampleConversation } from '@/ds/flowgpt/sample/conversation'
 import { type sampleBasicPrompt } from '@/ds/flowgpt/sample/prompt'
+import React from 'react'
 
 export type IFlowgptComment = typeof sampleComment
 export type IFlowgptBasicPrompt = typeof sampleBasicPrompt
@@ -22,11 +23,11 @@ export enum AgentAspect {
 export enum SortOrder {
 	
 	recommended = 'recommended',
-	trending = 'trending',
-	follow = 'follow',
 	top = 'top',
+	mostSaved = 'most-saved',
+	trending = 'trending',
 	new = 'new',
-	mostSaved = 'most-saved'
+	follow = 'follow',
 }
 
 

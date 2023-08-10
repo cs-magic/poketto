@@ -1,9 +1,8 @@
 import React, { Fragment } from 'react'
 import { clsx } from 'clsx'
-import { FlowgptAgentCard } from '@/components/flowgpt/agent.card'
+import { FlowgptAgentCard } from '@/components/flowgpt/card'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
-import { IconArrowBadgeDownFilled } from '@tabler/icons-react'
 import { GridContainer, MasonryContainer } from '@/components/responsive-containers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CardsLayoutType, useStore } from '@/store'
@@ -12,7 +11,8 @@ import { SortOrder } from '@/ds/flowgpt'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import _ from 'lodash'
-// import SelectDemo from '@/components/radix-ui/select.demo'
+import { FrameIcon } from '@radix-ui/react-icons'
+import { Skeleton } from '@/components/ui/skeleton'
 
 
 export const AgentsPage = () => {
@@ -23,7 +23,8 @@ export const AgentsPage = () => {
 	const query = api.flowgpt.listPrompts.useInfiniteQuery({ order }, {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
-	
+	const items = query.data?.pages.flatMap((item) => item.data) ?? []
+	console.log('[FlowGPT] ', items)
 	return (
 		<RootLayout>
 			
@@ -36,9 +37,9 @@ export const AgentsPage = () => {
 				{/*<HomeCarousel/>*/}
 				
 				{/* title */}
-				<div className={'w-full | flex items-center gap-2 | text-2xl text-muted-foreground '}>
-					<IconArrowBadgeDownFilled/>
-					<span>玩法推荐</span>
+				<div className={'w-full px-2 | flex items-center gap-2'}>
+					<FrameIcon/>
+					<span className={'text-lg'}>玩法推荐</span>
 					
 					<Select onValueChange={setCardsLayout}>
 						<SelectTrigger className={'w-28'}>
@@ -51,16 +52,6 @@ export const AgentsPage = () => {
 						</SelectContent>
 					</Select>
 					
-					{/*<Select onValueChange={setOrder}>*/}
-					{/*	<SelectTrigger className={'w-28'}>*/}
-					{/*		<SelectValue placeholder={'排序指标'}/>*/}
-					{/*	</SelectTrigger>*/}
-					{/*	<SelectContent>*/}
-					{/*		{Object.values(SortOrder).map((cl) => (*/}
-					{/*			<SelectItem value={cl} key={cl}>{cl}</SelectItem>*/}
-					{/*		))}*/}
-					{/*	</SelectContent>*/}
-					{/*</Select>*/}
 					<div className={'grow'}/>
 					<div className={'flex items-center'}>
 						{
@@ -83,13 +74,18 @@ export const AgentsPage = () => {
 				{/* content (carousel - cards)*/}
 				
 				<Container>
-					{(query.data?.pages.flatMap((item) => item.data) ?? []).map((item) => (
-						<FlowgptAgentCard {...item} key={item.id}/>
-					))}
+					{items.map((item) => <FlowgptAgentCard {...item} key={item.id}/>)}
 				</Container>
 				
 				{/* load more*/}
-				<ScrollTrigger trigger={query.fetchNextPage}/>
+				{query.hasNextPage === false // note: 显式指明
+					? (
+						<div className={'w-80 p-4 m-auto | flex items-center justify-center text-center | bg-destructive text-destructive-foreground'}>
+							You have loaded ALL the data.
+						</div>
+					)
+					: <ScrollTrigger trigger={query.fetchNextPage}/>
+				}
 			</div>
 		
 		

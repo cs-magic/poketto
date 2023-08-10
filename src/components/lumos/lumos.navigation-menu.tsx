@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { IconArrowRight, IconUser, IconUsersGroup } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import { useFocusTrap } from '@mantine/hooks'
-import { ICON_DIMENSION_LG, ICON_DIMENSION_SM } from '@/config/icons'
+import { ICON_DIMENSION_LG, ICON_DIMENSION_SM } from '@/config/assets'
 import { clsx } from 'clsx'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
 
