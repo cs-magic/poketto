@@ -33,6 +33,7 @@ const config = {
 		'@typescript-eslint/no-unsafe-argument': ['warn'],
 		'@typescript-eslint/no-unsafe-member-access': ['warn'],// zustand slice immer
 		'react/no-children-prop': ['warn'],
+		'@typescript-eslint/no-inferrable-types': ['off'],
 	},
 };
 
