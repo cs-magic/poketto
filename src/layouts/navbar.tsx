@@ -4,19 +4,10 @@ import React from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Input } from '@/components/ui/input'
 import { useMount } from '@/hooks/use-mount'
 import CommandDemo from '@/components/command'
-import {
-	NavigationMenu,
-	NavigationMenuContent,
-	NavigationMenuItem,
-	NavigationMenuLink,
-	NavigationMenuList,
-	NavigationMenuTrigger, navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
-import Link from 'next/link'
-// import { CommandShortcut } from '@/components/ui/command'
+import { LumosNavigationMenu } from '@/layouts/lumos.navigation-menu'
+import { NavigationMenuDemo } from '@/components/navigation-menu.demo'
 
 
 export const ThemeSwitcher = () => {
@@ -49,43 +40,8 @@ export default function Navbar() {
 	return (
 		<div className={'px-4 py-2 | flex items-center gap-4 | border-b'}>
 			
-			
-			<NavigationMenu>
-				<NavigationMenuList className={''}>
-					
-					<NavigationMenuItem>
-						<Link href={'/'} legacyBehavior passHref>
-							<NavigationMenuLink className={navigationMenuTriggerStyle()}>
-								Home
-							</NavigationMenuLink>
-						</Link>
-					</NavigationMenuItem>
-					
-					{/* todo: trigger style not work as expected */}
-					<NavigationMenuItem>
-						<NavigationMenuTrigger>Workspaces</NavigationMenuTrigger>
-						<NavigationMenuContent>
-							Mark Shawn
-						</NavigationMenuContent>
-					</NavigationMenuItem>
-					
-					<NavigationMenuItem>
-						<NavigationMenuTrigger>Toolkits</NavigationMenuTrigger>
-						<NavigationMenuContent>
-							Mark Shawn
-						</NavigationMenuContent>
-					</NavigationMenuItem>
-					
-					<NavigationMenuItem>
-						<Link href={'/explore'} legacyBehavior passHref>
-							<NavigationMenuLink className={navigationMenuTriggerStyle()}>
-								Explore
-							</NavigationMenuLink>
-						</Link>
-					</NavigationMenuItem>
-				
-				</NavigationMenuList>
-			</NavigationMenu>
+			<LumosNavigationMenu/>
+			{/*<NavigationMenuDemo/>*/}
 			
 			<div className={'grow'}/>
 			<CommandDemo/>

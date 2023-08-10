@@ -12,8 +12,8 @@ import Image, { type ImageProps } from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { user } from '@/config/app'
 
-const ICON_DIMENSION_SM = 'wh-5'
-const ICON_DIMENSION_LG = 'wh-12'
+export const ICON_DIMENSION_SM = 'wh-5'
+export const ICON_DIMENSION_LG = 'wh-12'
 
 // todo: avoid alt
 export const ImageFactory = ({ src, alt, className = '', ...props }: ImageProps) =>

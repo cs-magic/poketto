@@ -18,6 +18,7 @@ colors:
     postman:
         0, 0%, 13%; postman bg, at: https://www.postman.com/
         0, 0%, 15%; postman sidebar bg, at: https://www.postman.com/
+        0, 0%, 42%; placeholder / small title
 
     tsinghua:
         #82318E; 292 49% 37%; 维基百科清华校色
@@ -60,11 +61,10 @@ colors:
         --background: 0 0% 10%;
         --foreground: 210 40% 98%;
 
-        /*--card: 222 47% 11%;*/
         --card: 222 27% 11%;
         --card-foreground: 210 40% 98%;
 
-        --popover: 222.2 84% 4.9%;
+        --popover: 0 0% 10%;
         --popover-foreground: 210 40% 98%;
 
         --primary: 0 0% 18%;
@@ -74,10 +74,10 @@ colors:
         --secondary-foreground: 210 40% 98%;
 
         --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
+        --muted-foreground: 0 0% 42%;
 
-        --accent: 0 0% 30%;
-        --accent-foreground: 210 40% 98%;
+        --accent: 0 0% 20%;
+        --accent-foreground: 210 40% 70%;
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 210 40% 98%;

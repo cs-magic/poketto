@@ -29,6 +29,8 @@ const config = {
 		'@typescript-eslint/no-unsafe-assignment': ['warn'],
 		'@typescript-eslint/no-explicit-any': ['warn'],
 		'react/display-name': ['warn'],
+		'@next/next/no-html-link-for-pages': ['warn'],
+		'@typescript-eslint/no-unsafe-call': ['warn'],
 	},
 };
 

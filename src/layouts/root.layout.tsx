@@ -16,7 +16,7 @@ export function RootLayout(props: PropsWithChildren) {
 				<link rel="icon" href={app.icon}/>
 			</Head>
 			<main className={clsx(
-				'h-screen | flex flex-col ',
+				'h-screen | flex flex-col | font-extralight text-foreground bg-background text-sm',
 				// "| bg-gradient-to-b from-[#2e026d] to-[#15162c]"
 			)}>
 				
