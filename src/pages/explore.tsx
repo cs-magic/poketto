@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import _ from 'lodash'
 import { FrameIcon } from '@radix-ui/react-icons'
-import { Skeleton } from '@/components/ui/skeleton'
+
 
 import { order2icon } from '@/components/utils/assets'
 
@@ -34,7 +34,7 @@ export const SelectCardsLayout = () => {
 	)
 }
 
-export const AgentsPage = () => {
+export default function ExplorePage() {
 	
 	const { cardsLayout, order, setOrder } = useStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
@@ -105,4 +105,3 @@ export const AgentsPage = () => {
 	)
 }
 
-export default AgentsPage

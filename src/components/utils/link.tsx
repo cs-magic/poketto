@@ -11,7 +11,7 @@ export const MenuLink = ({ field, link, title }: {
 }) => {
 	return (
 		<Link href={link ?? `/${field}`} className={'w-full'}>
-			<Button className={clsx('w-full justify-start text-xs')} variant={'ghost'}>
+			<Button className={clsx('w-full justify-start text-xs tracking-widest')} variant={'ghost'}>
 				{title ?? _.startCase(_.capitalize(field))}
 			</Button>
 		</Link>
