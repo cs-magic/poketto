@@ -2,7 +2,7 @@ import { CardsLayoutType, useStore } from '@/store'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import React from 'react'
 
-export const SelectCardsLayout = () => {
+export default function SettingsPage() {
 	const { cardsLayout, setCardsLayout } = useStore()
 	
 	// todo: in settings

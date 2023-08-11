@@ -1,6 +1,6 @@
 import { RootLayout } from '@/layouts/root.layout'
 
-export default function SeekEnterpriseChangePage() {
+export default function LearnPage() {
 	return (
 		<RootLayout>
 			hello world
