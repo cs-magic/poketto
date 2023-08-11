@@ -32,7 +32,7 @@ export const ThemeSwitcher = () => {
 export const LogoWithName = () => {
 	return (
 		<div className={'inline-flex items-center gap-2'}>
-			<Logo height={32}/>
+			<Logo height={32} className={'rotate-180'}/>
 			<span className={'text-xl tracking-widest'}>{app.name}</span>
 		</div>
 	)

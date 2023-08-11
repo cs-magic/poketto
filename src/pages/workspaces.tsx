@@ -15,11 +15,28 @@ import _ from 'lodash'
 import Link from 'next/link'
 
 import { uri } from '@/config/uri'
+import { type ReactNode } from 'react'
 
 export const Grow = () => <div className={'grow'}/>
 
 export default function WorkspacesPage() {
 	const { data: page } = api.flowgpt.listPrompts.useQuery({ order: SortOrder.recommended })
+	const uid = user.id
+	
+	const WorkspaceItem = ({ wid, title, avatar, icon }: { wid: string, title: string, avatar: string, icon: ReactNode }) => {
+		return (
+			<Link href={`/w/${wid}`} className={'w-full p-2'}>
+				<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
+					{icon}
+					<p>{title}</p>
+					<Grow/>
+					<Avatar className={ICON_DIMENSION_MD}>
+						<AvatarImage src={avatar}/>
+					</Avatar>
+				</Button>
+			</Link>
+		)
+	}
 	
 	return (
 		<RootLayout>
@@ -30,24 +47,9 @@ export default function WorkspacesPage() {
 							Recently visited workspaces
 						</CardTitle>
 					</CardHeader>
-					<CardContent className={'w-full | flex flex-col gap-1'}>
-						<Button variant={'ghost'} className={'inline-flex items-center gap-2'}>
-							<PersonIcon/>
-							<p>My Workspace</p>
-							<Grow/>
-							<Avatar className={ICON_DIMENSION_MD}>
-								<AvatarImage src={user.avatar}/>
-							</Avatar>
-						</Button>
-						<Separator orientation={'horizontal'}/>
-						<Button variant={'ghost'} className={'inline-flex items-center gap-2'}>
-							<UsersIcon className={ICON_DIMENSION_SM}/>
-							<span>Team Workspace</span>
-							<Grow/>
-							<Avatar className={ICON_DIMENSION_MD}>
-								<AvatarImage src={user.avatar}/>
-							</Avatar>
-						</Button>
+					<CardContent className={'w-full | flex flex-col divide-y'}>
+						<WorkspaceItem wid={uid} title={'My Workspace'} avatar={user.avatar} icon={<PersonIcon/>}/>
+						<WorkspaceItem wid={'team'} title={'Team Workspace'} avatar={user.avatar} icon={<UsersIcon className={ICON_DIMENSION_SM}/>}/>
 					</CardContent>
 				</Card>
 				
