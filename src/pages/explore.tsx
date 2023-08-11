@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { clsx } from 'clsx'
-import { PocketCardView } from '@/components/pocket/pocket.card.view'
+import { PocketCardView } from '@/components/flowgpt/card.view'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
 import { GridContainer, MasonryContainer } from '@/components/utils/responsive-containers'
@@ -30,7 +30,7 @@ export default function ExplorePage() {
 			
 			{/* main (content - load more) */}
 			<div className={clsx(
-				'w-full max-w-[1360px] h-full overflow-auto | flex flex-col gap-4',
+				'w-full p-4 lg:p-8 max-w-[1360px] h-full overflow-auto | flex flex-col gap-4',
 			)}>
 				
 				{/*<HomeCarousel/>*/}

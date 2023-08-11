@@ -1,15 +1,23 @@
-import { PrismaClient } from "@prisma/client";
-import { env } from "@/env.mjs";
+import { PrismaClient } from '@prisma/client'
+import { MongoClient } from 'mongodb'
+import { env } from '@/env.mjs'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+const globalForDB = globalThis as unknown as {
+	prisma: PrismaClient | undefined;
+	mongo: MongoClient | undefined;
+}
 
 export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log:
-      env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  });
+	globalForDB.prisma ??
+	new PrismaClient({
+		log:
+			env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+	})
 
-if (env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI)
+
+if (env.NODE_ENV !== 'production') {
+	globalForDB.prisma = prisma
+	globalForDB.mongo = mongo
+}

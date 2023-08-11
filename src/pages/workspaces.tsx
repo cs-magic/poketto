@@ -1,6 +1,5 @@
 import { RootLayout } from '@/layouts/root.layout'
 import { ArrowRightIcon, PersonIcon } from '@radix-ui/react-icons'
-import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { user } from '@/config/user'
@@ -8,8 +7,7 @@ import { UsersIcon } from 'lucide-react'
 import { ICON_DIMENSION_MD, ICON_DIMENSION_SM } from '@/config/assets'
 import { api } from '@/lib/api'
 import { SortOrder } from '@/ds/flowgpt'
-import { Skeleton } from '@/components/ui/skeleton'
-import { PocketListView } from '@/components/pocket/pocket.list.view'
+import { PocketListView } from '@/components/flowgpt/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
@@ -20,7 +18,7 @@ import { type ReactNode } from 'react'
 export const Grow = () => <div className={'grow'}/>
 
 export default function WorkspacesPage() {
-	const { data: page } = api.flowgpt.listPrompts.useQuery({ order: SortOrder.recommended })
+	const { data: page } = api.flowgpt.listPrompts.useQuery({})
 	const uid = user.id
 	
 	const WorkspaceItem = ({ wid, title, avatar, icon }: { wid: string, title: string, avatar: string, icon: ReactNode }) => {
