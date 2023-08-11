@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { app, uri } from '@/config/app'
+import { app } from '@/config/app'
 import { Icons } from '@/config/assets'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
@@ -15,6 +15,7 @@ import _ from 'lodash'
 import { InvitationStatus } from '@/ds/status'
 import { SelfUserAvatar } from '@/components/user'
 import { user } from '@/config/user'
+import { uri } from '@/config/uri'
 
 export const NavGroups = ({ title, children }: {
 	title: string
@@ -63,7 +64,8 @@ export const InviteCard = () => {
 			</div>
 			<ReactMarkdown>
 				{
-					Mustache.render('每位 LUMOS 用户都可以拥有 **5** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)', { surplus })
+					Mustache.render('每位{{appName}}用户都可以拥有 **5** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)',
+						{ surplus, appName: app.name })
 				}
 			
 			</ReactMarkdown>

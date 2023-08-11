@@ -13,7 +13,8 @@ import { PocketListView } from '@/components/pocket/pocket.list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
-import { uri } from '@/config/app'
+
+import { uri } from '@/config/uri'
 
 export const Grow = () => <div className={'grow'}/>
 

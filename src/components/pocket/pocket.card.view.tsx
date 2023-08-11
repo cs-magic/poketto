@@ -17,7 +17,8 @@ import { toast } from '@/components/ui/use-toast'
 import { getShortName } from '@/lib/string'
 import { Button } from '@/components/ui/button'
 import { order2icon } from '@/components/utils/assets'
-import { uri } from '@/config/app'
+
+import { uri } from '@/config/uri'
 
 
 export const PocketCardView = (props: IFlowgptBasicPrompt) => {

@@ -1,5 +1,5 @@
 import Logo from '../../../public/images/logo/m/1280.svg'
-import { app, uri } from '@/config/app'
+import { app } from '@/config/app'
 import React, { type PropsWithChildren } from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
@@ -10,6 +10,7 @@ import { BellIcon, GearIcon, QuestionMarkCircledIcon } from '@radix-ui/react-ico
 import { ICON_DIMENSION_SM } from '@/config/assets'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { MenuLink } from '@/components/utils/link'
+import { uri } from '@/config/uri'
 
 
 export const ThemeSwitcher = () => {
