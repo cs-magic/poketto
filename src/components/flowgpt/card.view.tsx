@@ -23,8 +23,8 @@ import { uri } from '@/config/uri'
 
 export const PocketCardView = (props: IFlowgptBasicPrompt) => {
 	const router = useRouter()
-	const { cardsLayout, order } = useStore()
-	const Icon = order2icon[order]
+	const { cardsLayout, sort } = useStore()
+	const Icon = order2icon[sort]
 	
 	return (
 		
@@ -209,7 +209,7 @@ export const PromptCardHeader = ({ data, forDetail }: {
 				</CardTitle>
 				
 				<div className={'w-full inline-flex whitespace-nowrap items-center gap-2 overflow-y-hidden overflow-x-auto'}>
-					{data?.Tag.slice(0, 3).map((item) => (
+					{data?.Tag.slice(0, 3).map((item: { name: string }) => (
 						<Badge key={item.name} variant={'outline'}>{item.name}</Badge>
 					)) ?? _.range(3).map((i) => (
 						<Skeleton className={'w-8'} key={i}/>

@@ -17,10 +17,10 @@ import { order2icon } from '@/components/utils/assets'
 
 export default function ExplorePage() {
 	
-	const { cardsLayout, order, setOrder } = useStore()
+	const { cardsLayout, sort, setSortOrder } = useStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
-	const query = api.flowgpt.listPrompts.useInfiniteQuery({ order }, {
+	const query = api.flowgpt.listPrompts.useInfiniteQuery({ sort }, {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
 	const items = query.data?.pages.flatMap((item) => item.data) ?? []
@@ -53,7 +53,7 @@ export default function ExplorePage() {
 											<Button
 												className={'hover:bg-transparent px-2 flex items-center gap-1'}
 												variant={'ghost'}
-												key={order} onClick={() => {setOrder(order)}}>
+												key={order} onClick={() => {setSortOrder(order)}}>
 												<Icon className={''}/>
 												<span className={'hidden lg:block'}>{_.startCase(_.capitalize(order))}</span>
 											</Button>

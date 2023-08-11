@@ -27,13 +27,13 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 })
 
 export interface FlowGPTState {
-	order: SortOrder
-	setOrder: (v: SortOrder) => void
+	sort: SortOrder
+	setSortOrder: (v: SortOrder) => void
 }
 
 export const createFlowgptSlice: StoreSlice<FlowGPTState> = (setState) => ({
-	order: SortOrder.recommended,
-	setOrder: (v) => setState((state) => {state.order = v}),
+	sort: SortOrder.recommended,
+	setSortOrder: (v) => setState((state) => {state.sort = v}),
 })
 
 /**

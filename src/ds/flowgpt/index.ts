@@ -1,6 +1,6 @@
-import { type sampleComment } from '@/ds/flowgpt/sample/comment'
-import { type sampleConversation } from '@/ds/flowgpt/sample/conversation'
-import { type sampleBasicPrompt } from '@/ds/flowgpt/sample/prompt'
+import { type sampleComment } from '@/ds/flowgpt/comment'
+import { type sampleConversation } from '@/ds/flowgpt/conversation'
+import { type sampleBasicPrompt } from '@/ds/flowgpt/prompt'
 import React from 'react'
 
 export type IFlowgptComment = typeof sampleComment
