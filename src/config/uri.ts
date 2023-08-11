@@ -4,7 +4,8 @@ export const uri = {
 		explore: '/explore',
 		pocketApp: '/p',
 		docs: {
-			intro: '/docs/intro',
+			intro: '/docs/whats-poketto',
+			currency: '/docs/whats-dora',
 			learn: '/docs/learn',
 			support: '/docs/support',
 		},

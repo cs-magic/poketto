@@ -51,8 +51,6 @@ export default function Navbar() {
 	return (
 		<div className={'px-4 py-2 | flex items-center | border-b'}>
 			
-			{/*<LumosNavigationMenu/>*/}
-			{/*<NavigationMenuDemo/>*/}
 			
 			<LogoWithName/>
 			
@@ -66,7 +64,8 @@ export default function Navbar() {
 				
 				<PopoverContent>
 					<section className={'flex flex-col'}>
-						<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'} link={uri.app.docs.intro}/>
+						<MenuLink field={'whats-poketto'} title={'What\'s Poketto.AI ?'} link={uri.app.docs.intro}/>
+						<MenuLink field={'whats-dora'} title={'What\'s Dora ?'} link={uri.app.docs.currency}/>
 						<MenuLink field={'learning-center'} link={uri.app.docs.learn}/>
 						<MenuLink field={'support-center'} link={uri.app.docs.support}/>
 					</section>

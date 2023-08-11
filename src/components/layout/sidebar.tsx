@@ -27,7 +27,7 @@ export const NavGroups = ({ title, children }: {
 	</section>
 
 
-export const UserVSLumos = () => {
+export const UserVsBrand = () => {
 	return (
 		<section className={'flex flex-col gap-4 text-muted-foreground'}>
 			<div className={'w-full | flex items-center gap-2 justify-around'}>
@@ -62,13 +62,21 @@ export const InviteCard = () => {
 				<Badge variant={'destructive'} className={'w-fit'}>Tips</Badge>
 				<XIcon className={'wh-4 text-muted-foreground'}/>
 			</div>
-			<ReactMarkdown>
-				{
-					Mustache.render('每位{{appName}}用户都可以拥有 **5** 张邀请码，分享给您的好友注册成功后将有光子赠送哦！当前剩余：[{{surplus}}](/dashboard)',
-						{ surplus, appName: app.name })
-				}
-			
-			</ReactMarkdown>
+			<article className={'prose dark:prose-invert'}>
+				<ReactMarkdown>
+					{
+						Mustache.render('每位 [{{appName}}]({{appDoc}}) 用户都拥有 **5** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})' +
+							' 赠送哦！当前剩余：[{{surplus}}](/dashboard)',
+							{
+								surplus,
+								appName: app.name,
+								appDoc: uri.app.docs.intro,
+								currencyName: app.currency,
+								currencyDoc: uri.app.docs.currency,
+							})
+					}
+				</ReactMarkdown>
+			</article>
 			<Button>Invite</Button>
 		
 		</div>
@@ -110,7 +118,7 @@ export const Sidebar = () => {
 						<MenuLink field={'join-wechat-waitlist'} link={uri.user.seek.waitlist + '?platform=wechat'}/>
 					</PopoverContent>
 				</Popover>
-				<MenuLink field={'lumos-enterprise'} link={uri.user.seek.enterprise}/>
+				<MenuLink field={'poketto-enterprise'} link={uri.user.seek.enterprise}/>
 			</section>
 			
 			{/* footer */}
