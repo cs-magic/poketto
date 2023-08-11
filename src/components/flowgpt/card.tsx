@@ -1,5 +1,4 @@
 import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
-import { uri } from '@/config'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -10,7 +9,6 @@ import { CardsLayoutType, useStore } from '@/store'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import Image from 'next/image'
 import _ from 'lodash'
-import { order2icon } from '@/config/assets'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CardTitle } from '@/components/ui/card'
 import clsx from 'clsx'
@@ -18,6 +16,8 @@ import Link from 'next/link'
 import { toast } from '@/components/ui/use-toast'
 import { getShortName } from '@/lib/string'
 import { Button } from '@/components/ui/button'
+import { order2icon } from '@/components/utils/assets'
+import { uri } from '@/config/app'
 
 
 export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
@@ -30,7 +30,7 @@ export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
 		<div
 			className="w-full relative group overflow-hidden rounded-2xl"
 			onClick={() => {
-				void router.push(`${uri.product.agent}/${props.id}`)
+				void router.push(`${uri.app.prompt}/${props.id}`)
 			}}
 		>
 			{

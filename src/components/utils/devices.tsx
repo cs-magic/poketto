@@ -1,5 +1,5 @@
 import { type PropsWithChildren } from 'react'
-import { type DEVICE_TYPE, DEVICES } from '@/const'
+import { type DEVICE_TYPE, DEVICES } from '@/config/external/const'
 import { clsx } from 'clsx'
 
 export const DeviceContainerInner = ({ height, width, ratio = 1, children }: PropsWithChildren & {

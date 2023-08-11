@@ -1,10 +1,10 @@
 import { clsx } from 'clsx'
-import { carousals } from '@/config'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import Image from 'next/image'
 import React from 'react'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { Carousel } from 'react-responsive-carousel'
+import { carousals } from '@/config/app'
 
 
 export const HomeCarousel = () => {

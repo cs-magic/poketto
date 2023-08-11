@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { app, InvitationStatus, user } from '@/config/app'
-import { Assets, SelfUserAvatar } from '@/config/assets'
+import { app } from '@/config/app'
+import { Assets } from '@/config/assets'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
 import { ChevronRightIcon, LightningBoltIcon } from '@radix-ui/react-icons'
@@ -9,9 +9,12 @@ import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
 import { Badge } from '@/components/ui/badge'
 import { XIcon } from 'lucide-react'
-import { MenuLink } from '@/components/link'
+import { MenuLink } from '@/components/utils/link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import _ from 'lodash'
+import { InvitationStatus } from '@/ds/status'
+import { SelfUserAvatar } from '@/components/user'
+import { user } from '@/config/user'
 
 export const NavGroups = ({ title, children }: {
 	title: string

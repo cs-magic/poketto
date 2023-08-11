@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import { app } from '@/config/app'
 import React, { type PropsWithChildren } from 'react'
-import { Sidebar } from '@/components/sidebar'
-import Navbar from '@/components/navbar'
+import { Sidebar } from '@/components/layout/sidebar'
+import Navbar from '@/components/layout/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/config/assets'
 

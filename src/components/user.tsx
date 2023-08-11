@@ -1,9 +1,9 @@
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { user } from '@/config/app'
-import { Assets } from '@/config/assets'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Assets, ICON_DIMENSION_MD } from '@/config/assets'
 import numeral from 'numeral'
 import { Button } from '@/components/ui/button'
 import React from 'react'
+import { user } from '@/config/user'
 
 export const UserProfile = () => {
 	return (
@@ -48,5 +48,14 @@ export const UserProfile = () => {
 				<Button>收藏</Button>
 			</div>
 		</div>
+	)
+}
+
+export const SelfUserAvatar = () => {
+	return (
+		<Avatar className={ICON_DIMENSION_MD}>
+			<AvatarImage src={user.avatar}/>
+			<AvatarFallback>{user.name}</AvatarFallback>
+		</Avatar>
 	)
 }

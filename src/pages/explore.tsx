@@ -3,17 +3,18 @@ import { clsx } from 'clsx'
 import { FlowgptAgentCard } from '@/components/flowgpt/card'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
-import { GridContainer, MasonryContainer } from '@/components/responsive-containers'
+import { GridContainer, MasonryContainer } from '@/components/utils/responsive-containers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CardsLayoutType, useStore } from '@/store'
-import { ScrollTrigger } from '@/components/scroll-trigger'
+import { ScrollTrigger } from '@/components/utils/scroll-trigger'
 import { SortOrder } from '@/ds/flowgpt'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import _ from 'lodash'
 import { FrameIcon } from '@radix-ui/react-icons'
 import { Skeleton } from '@/components/ui/skeleton'
-import { order2icon } from '@/config/assets'
+
+import { order2icon } from '@/components/utils/assets'
 
 export const SelectCardsLayout = () => {
 	const { cardsLayout, setCardsLayout } = useStore()

@@ -1,15 +1,15 @@
-import Logo from '../../public/images/logo/m/1280.svg'
+import Logo from '../../../public/images/logo/m/1280.svg'
 import { app } from '@/config/app'
 import React, { type PropsWithChildren } from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMount } from '@/hooks/use-mount'
-import CommandDemo from '@/components/command'
+import CommandDemo from '@/components/utils/command'
 import { BellIcon, GearIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 import { ICON_DIMENSION_SM } from '@/config/assets'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { MenuLink } from '@/components/link'
+import { MenuLink } from '@/components/utils/link'
 
 
 export const ThemeSwitcher = () => {

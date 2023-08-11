@@ -1,64 +1,21 @@
-import React, { type ElementType, type HTMLProps } from 'react'
+import React from 'react'
 
 import CSCoin from '@/../public/images/cs-coin.svg'
 import Logo from '../../public/images/logo/m/1280.svg'
 import OpenchatIcon from '@/../public/brands/openchat.svg'
 import MidjourneyIcon from '@/../public/brands/midjourney.svg'
-
-import { clsx } from 'clsx'
-import Image, { type ImageProps } from 'next/image'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { user } from '@/config/app'
-import { IconCalendarFilled, IconDownload, IconStackPush, IconTelescope, IconThumbUp, IconTrendingUp, type TablerIconsProps } from '@tabler/icons-react'
-import { SortOrder } from '@/ds/flowgpt'
 import localFont from 'next/font/local'
+import { SVGFactory, type SVGProps } from '@/components/utils/assets'
 
 export const ICON_DIMENSION_SM = 'wh-4'
 export const ICON_DIMENSION_MD = 'wh-8'
 export const ICON_DIMENSION_LG = 'wh-12'
-
-// todo: avoid alt
-export const ImageFactory = ({ src, alt, className = '', ...props }: ImageProps) =>
-	<Image src={src} alt={alt} className={clsx(ICON_DIMENSION_SM, className)} {...props}/>
-type ImageProps_ = Omit<ImageProps, 'src' | 'alt'>
-
-export const TablerIconFactory = ({ Comp, presetClassName = '', className = '', ...props }: TablerIconsProps & {
-	Comp: ElementType
-	presetClassName?: string
-}) =>
-	<Comp className={clsx(ICON_DIMENSION_SM, presetClassName, className)} {...props}/>
-export type TablerIconProps = Omit<TablerIconsProps, ''>
-
-export const SVGFactory = ({ Comp, presetClassName = '', className = '', ...props }: HTMLProps<SVGSVGElement> & {
-	Comp: ElementType
-	presetClassName?: string
-}) =>
-	<Comp className={clsx(ICON_DIMENSION_SM, presetClassName, className)} {...props}/>
-export type SVGProps = Omit<HTMLProps<SVGSVGElement>, ''>
 
 export const Assets = {
 	logo: (props: SVGProps) => <SVGFactory Comp={Logo} presetClassName={'bg-black text-white'} {...props}/>,
 	csCoin: (props: SVGProps) => <SVGFactory Comp={CSCoin} {...props}/>,
 	openchat: (props: SVGProps) => <SVGFactory Comp={OpenchatIcon}  {...props}/>,
 	midjourney: (props: SVGProps) => <SVGFactory Comp={MidjourneyIcon}  {...props}/>,
-}
-
-export const SelfUserAvatar = () => {
-	return (
-		<Avatar className={ICON_DIMENSION_MD}>
-			<AvatarImage src={user.avatar}/>
-			<AvatarFallback>{user.name}</AvatarFallback>
-		</Avatar>
-	)
-}
-
-export const order2icon: Record<SortOrder, JSX.ElementType> = {
-	[SortOrder.recommended]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconStackPush} {...props}/>,
-	[SortOrder.top]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconThumbUp} {...props}/>,
-	[SortOrder.mostSaved]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconDownload} {...props}/>,
-	[SortOrder.trending]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTrendingUp} {...props}/>,
-	[SortOrder.new]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconCalendarFilled} {...props}/>,
-	[SortOrder.follow]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTelescope} {...props}/>,
 }
 
 export const font = localFont({

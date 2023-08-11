@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import RatingChart from './rating-chart.png'
 import { type ReactNode } from 'react'
 import { FlowgptComments } from '@/components/flowgpt/flowgpt-comment'
-import { DeviceContainer } from '@/components/devices'
+import { DeviceContainer } from '@/components/utils/devices'
 import { useMobile } from '@/hooks/use-device'
 
 export const FlowgptDetail = (
