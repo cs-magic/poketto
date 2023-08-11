@@ -9,7 +9,8 @@ import { Separator } from '@/components/ui/separator'
 import RatingChart from './rating-chart.png'
 import { type ReactNode } from 'react'
 import { FlowgptComments } from '@/components/flowgpt/flowgpt-comment'
-import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { DeviceContainer } from '@/components/devices'
+import { useMobile } from '@/hooks/use-device'
 
 export const FlowgptDetail = (
 	{
@@ -36,6 +37,7 @@ export const FlowgptDetail = (
 	}: IFlowgptBasicPrompt,
 ) => {
 	const rankingStar = Math.floor(ranking)
+	const isMobile = useMobile()
 	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 		return (
@@ -56,8 +58,9 @@ export const FlowgptDetail = (
 		)
 	}
 	
+	
 	return (
-		<div className={'max-w-[1080px] mx-auto h-full overflow-x-hidden overflow-y-auto | flex flex-col gap-4'}>
+		<div className={'max-w-[1440px] mx-auto h-full overflow-x-hidden overflow-y-auto | flex flex-col gap-4'}>
 			
 			<section id={'basic'} className={'w-full flex items-center gap-4'}>
 				<Avatar className={'wh-32 p-4 shrink-0'}>
@@ -90,14 +93,18 @@ export const FlowgptDetail = (
 				<StatusItem a={'language'} b={language} c={'Universal'}/>
 			</section>
 			
-			<div id={'user-cases'} className={'w-full overflow-auto | flex shrink-0 gap-4'}>
-				<div className="mockup-phone">
-					<div className="camera"></div>
-					<div className="display">
-						<div className="artboard artboard-demo phone-1">Hi.</div>
+			<section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}>
+				
+				<DeviceContainer ratio={.6} device={isMobile ? 'iphone-14-pro' : 'surface-pro-2017'}>
+					<div className={'w-full flex flex-col'}>
+						<h2>heading 1</h2>
+						<div>hhh</div>
+						<h2>heading 2</h2>
+						<div>hhh2</div>
 					</div>
-				</div>
-			</div>
+				
+				</DeviceContainer>
+			</section>
 			
 			<section id={'desc'} className={'w-full flex'}>
 				<div className={'line-clamp-4'}>
