@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react'
 import { clsx } from 'clsx'
-import { FlowgptAgentCard } from '@/components/flowgpt/card'
+import { PocketCardView } from '@/components/pocket/pocket.card.view'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
 import { GridContainer, MasonryContainer } from '@/components/utils/responsive-containers'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CardsLayoutType, useStore } from '@/store'
 import { ScrollTrigger } from '@/components/utils/scroll-trigger'
 import { SortOrder } from '@/ds/flowgpt'
@@ -15,24 +14,6 @@ import { FrameIcon } from '@radix-ui/react-icons'
 
 
 import { order2icon } from '@/components/utils/assets'
-
-export const SelectCardsLayout = () => {
-	const { cardsLayout, setCardsLayout } = useStore()
-	
-	// todo: in settings
-	return (
-		<Select value={cardsLayout} onValueChange={setCardsLayout}>
-			<SelectTrigger className={'w-28 hidden md:flex'}>
-				<SelectValue placeholder={'卡片布局'}/>
-			</SelectTrigger>
-			<SelectContent>
-				{Object.values(CardsLayoutType).map((cl) => (
-					<SelectItem value={cl} key={cl}>{cl}</SelectItem>
-				))}
-			</SelectContent>
-		</Select>
-	)
-}
 
 export default function ExplorePage() {
 	
@@ -86,7 +67,7 @@ export default function ExplorePage() {
 				{/* content (carousel - cards)*/}
 				
 				<Container>
-					{items.map((item) => <FlowgptAgentCard {...item} key={item.id}/>)}
+					{items.map((item) => <PocketCardView {...item} key={item.id}/>)}
 				</Container>
 				
 				{/* load more*/}

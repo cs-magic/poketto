@@ -8,7 +8,7 @@ import { PersonIcon, StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
 import { Separator } from '@/components/ui/separator'
 import RatingChart from './rating-chart.png'
 import { type ReactNode } from 'react'
-import { FlowgptComments } from '@/components/flowgpt/flowgpt-comment'
+import { FlowgptComments } from '@/components/pocket/flowgpt-comment'
 import { DeviceContainer } from '@/components/utils/devices'
 import { useMobile } from '@/hooks/use-device'
 

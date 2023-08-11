@@ -20,7 +20,7 @@ import { order2icon } from '@/components/utils/assets'
 import { uri } from '@/config/app'
 
 
-export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
+export const PocketCardView = (props: IFlowgptBasicPrompt) => {
 	const router = useRouter()
 	const { cardsLayout, order } = useStore()
 	const Icon = order2icon[order]
@@ -30,7 +30,7 @@ export const FlowgptAgentCard = (props: IFlowgptBasicPrompt) => {
 		<div
 			className="w-full relative group overflow-hidden rounded-2xl"
 			onClick={() => {
-				void router.push(`${uri.app.prompt}/${props.id}`)
+				void router.push(`${uri.app.pocketApp}/${props.id}`)
 			}}
 		>
 			{

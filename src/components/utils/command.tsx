@@ -8,7 +8,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { Input } from '@/components/ui/input'
 import { useHotkeys } from '@mantine/hooks'
 import { IconBrandOpenai, IconLayoutDashboard, IconSearch } from '@tabler/icons-react'
-import { Assets } from '@/config/assets'
+import { Icons } from '@/config/assets'
 import _ from 'lodash'
 import { useStore } from '@/store'
 
@@ -34,12 +34,12 @@ export const commands: ICommandItem[] = [
 	},
 	{
 		id: 'OpenChat',
-		icon: <Assets.openchat/>,
+		icon: <Icons.openchat/>,
 		category: CommandType.suggestion,
 	},
 	{
 		id: 'MidJourney',
-		icon: <Assets.midjourney/>,
+		icon: <Icons.midjourney/>,
 		category: CommandType.suggestion,
 	},
 	{

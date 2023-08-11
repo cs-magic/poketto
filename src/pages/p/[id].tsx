@@ -1,4 +1,4 @@
-import { FlowgptDetail } from '@/components/flowgpt/detail'
+import { FlowgptDetail } from '@/components/pocket/detail'
 import { api } from '@/lib/api'
 import { useRouter } from 'next/router'
 import { IconTruckLoading } from '@tabler/icons-react'

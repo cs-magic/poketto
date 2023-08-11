@@ -17,7 +17,10 @@ export function RootLayout(props: PropsWithChildren) {
 				<link rel="icon" href={app.icon}/>
 			</Head>
 			
-			<main className={clsx('h-screen | flex flex-col | font-light text-foreground bg-background text-sm', font.className)}>
+			<main className={clsx(
+				'h-screen | flex flex-col | font-light text-foreground bg-background text-sm',
+				font.className,
+			)}>
 				
 				<Navbar/>
 				

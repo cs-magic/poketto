@@ -1,5 +1,5 @@
 import Logo from '../../../public/images/logo/m/1280.svg'
-import { app } from '@/config/app'
+import { app, uri } from '@/config/app'
 import React, { type PropsWithChildren } from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
@@ -65,9 +65,9 @@ export default function Navbar() {
 				
 				<PopoverContent>
 					<section className={'flex flex-col'}>
-						<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'}/>
-						<MenuLink field={'learning-center'}/>
-						<MenuLink field={'support-center'}/>
+						<MenuLink field={'whats-lumos'} title={'What\'s Lumos?'} link={uri.app.docs.intro}/>
+						<MenuLink field={'learning-center'} link={uri.app.docs.learn}/>
+						<MenuLink field={'support-center'} link={uri.app.docs.support}/>
 					</section>
 				
 				</PopoverContent>

@@ -23,6 +23,7 @@ export const SVGFactory = ({ Comp, presetClassName = '', className = '', ...prop
 	presetClassName?: string
 }) =>
 	<Comp className={clsx(ICON_DIMENSION_SM, presetClassName, className)} {...props}/>
+
 export const order2icon: Record<SortOrder, JSX.ElementType> = {
 	[SortOrder.recommended]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconStackPush} {...props}/>,
 	[SortOrder.top]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconThumbUp} {...props}/>,

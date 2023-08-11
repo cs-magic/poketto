@@ -1,17 +1,28 @@
 export const uri = {
 	app: {
 		home: '/',
-		prompt: '/p',
-	},
-	auth: {
-		login: '/auth/login',
-		register: '/auth/register',
+		explore: '/explore',
+		pocketApp: '/p',
+		docs: {
+			intro: '/docs/intro',
+			learn: '/docs/learn',
+			support: '/docs/support',
+		},
 	},
 	user: {
-		following: '/me/following',
-		history: '/me/history',
-		stars: '/me/stars',
-		graph: '/me/graph',
+		dashboard: '/u/dashboard',
+		gallery: '/u/gallery',
+		integrations: '/u/integrations',
+		
+		auth: {
+			login: '/auth/login',
+			register: '/auth/register',
+		},
+		
+		seek: {
+			waitlist: '/seek/waitlist',
+			enterprise: '/seek/enterprise',
+		},
 	},
 	images: {
 		favicon: '/favicon.ico',

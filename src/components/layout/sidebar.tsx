@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { app } from '@/config/app'
-import { Assets } from '@/config/assets'
+import { app, uri } from '@/config/app'
+import { Icons } from '@/config/assets'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
 import { ChevronRightIcon, LightningBoltIcon } from '@radix-ui/react-icons'
@@ -39,7 +39,7 @@ export const UserVSLumos = () => {
 				{/*<MagicWandIcon className={'text-primary-foreground'}/>*/}
 				<LightningBoltIcon className={'text-primary-foreground'}/>
 				<div className={'flex flex-col items-center gap-2'}>
-					<Assets.logo className={'!wh-12 bg-background p-2'}/>
+					<Icons.logo className={'!wh-12 bg-background p-2'}/>
 					<span className={'text-xs'}>{app.name}</span>
 				</div>
 			</div>
@@ -88,9 +88,9 @@ export const Sidebar = () => {
 			
 			<Separator/>
 			<section className={'flex flex-col'}>
-				<MenuLink field={'dashboard'}/>
-				<MenuLink field={'gallery'}/>
-				<MenuLink field={'integrations'}/>
+				<MenuLink field={'dashboard'} link={uri.user.dashboard}/>
+				<MenuLink field={'gallery'} link={uri.user.gallery}/>
+				<MenuLink field={'integrations'} link={uri.user.integrations}/>
 			</section>
 			
 			<Separator/>
@@ -103,12 +103,12 @@ export const Sidebar = () => {
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent>
-						<MenuLink field={'join-desktop-app-waitlist'}/>
-						<MenuLink field={'join-mobile-app-waitlist'}/>
-						<MenuLink field={'join-wechat-waitlist'}/>
+						<MenuLink field={'join-desktop-app-waitlist'} link={uri.user.seek.waitlist + '?platform=desktop'}/>
+						<MenuLink field={'join-mobile-app-waitlist'} link={uri.user.seek.waitlist + '?platform=app'}/>
+						<MenuLink field={'join-wechat-waitlist'} link={uri.user.seek.waitlist + '?platform=wechat'}/>
 					</PopoverContent>
 				</Popover>
-				<MenuLink field={'lumos-enterprise'}/>
+				<MenuLink field={'lumos-enterprise'} link={uri.user.seek.enterprise}/>
 			</section>
 			
 			{/* footer */}
