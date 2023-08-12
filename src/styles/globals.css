@@ -40,7 +40,8 @@ colors:
         --popover: 0 0% 100%;
         --popover-foreground: 222.2 84% 4.9%;
 
-        --primary: 222.2 47.4% 11.2%;
+        /*--primary: 222.2 47.4% 11.2%;*/
+        --primary: 211.542, 100%, 50%;
         --primary-foreground: 210 40% 98%;
 
         --secondary: 210 40% 96.1%;
@@ -67,13 +68,14 @@ colors:
         --background: 0 0% 10%;
         --foreground: 210 40% 98%;
 
-        --card: 222 10% 21%;
+        --card: 222 1% 15%;
         --card-foreground: 210 40% 98%;
 
         --popover: 0 0% 10%;
         --popover-foreground: 210 40% 98%;
 
-        --primary: 0 0% 18%;
+        /*--primary: 0 0% 18%;*/
+        --primary: 0 0% 28%;
         --primary-foreground: 0 100% 100%;
 
         --secondary: 217.2 32.6% 17.5%;
@@ -87,7 +89,10 @@ colors:
         --accent: 0 0% 20%;
         --accent-foreground: 0 20% 80%;
 
-        --destructive: 0 62.8% 30.6%;
+
+        --destructive: 0 62.8% 30.6%; /* 褐红色 */
+        /*--destructive: 211.542 100% 40%; !*app store  *!*/
+        /*--destructive: 201.913 100% 55%; !*哆啦A梦*!*/
         --destructive-foreground: 210 40% 98%;
 
         --border: 0 0% 20%;

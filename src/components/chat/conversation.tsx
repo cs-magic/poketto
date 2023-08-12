@@ -10,12 +10,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 
 export const ChatConversation = () => {
-	const { poketto, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useStore()
+	const { pokettoBasic, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useStore()
 	
 	return (
 		<section id={'chat-contents'} className={'w-full min-w-[320px] grow h-full overflow-hidden | flex flex-col bg-background'}>
 			<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
-				<div>{poketto?.basic.title}</div>
+				<div>{pokettoBasic?.basic.title}</div>
 				<Popover>
 					<PopoverTrigger>
 						<DotsVerticalIcon/>
@@ -37,7 +37,7 @@ export const ChatConversation = () => {
 			
 			<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
 				{
-					poketto?.conversation?.messages.map((msg, index) => (
+					pokettoBasic?.conversation?.messages.map((msg, index) => (
 						<div
 							key={index}
 							className={clsx(

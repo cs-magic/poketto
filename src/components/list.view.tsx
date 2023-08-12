@@ -3,11 +3,11 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import React from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UsesField, ViewsField } from '@/components/utils/responsive-field'
-import { type IPoketto } from '@/ds/poketto'
+import { type IPokettoBasic } from '@/ds/poketto'
 import Link from 'next/link'
 import { getPokettoUri } from '@/lib/poketto'
 
-export const AppListView = ({ poketto }: { poketto: IPoketto | undefined }) => {
+export const AppListView = ({ poketto }: { poketto: IPokettoBasic | undefined }) => {
 	if (!poketto) return (
 		<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
 			<Skeleton className={'wh-12'}/>
@@ -41,7 +41,7 @@ export const AppListView = ({ poketto }: { poketto: IPoketto | undefined }) => {
 			</div>
 			
 			<div className={'inline-flex gap-2 shrink-0'}>
-				<UsesField v={poketto.state.usage.users}/>
+				<UsesField v={poketto.state.users}/>
 				<ViewsField v={poketto.state.views}/>
 			</div>
 		</Link>

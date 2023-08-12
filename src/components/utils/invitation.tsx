@@ -15,7 +15,7 @@ export const InviteCard = () => {
 	return (
 		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>
 			<div className={'flex items-center justify-between'}>
-				<Badge variant={'destructive'} className={'w-fit'}>Tips</Badge>
+				<Badge className={'w-fit'}>Tips</Badge>
 				<XIcon className={'wh-4 text-muted-foreground'}/>
 			</div>
 			<article className={'prose dark:prose-invert'}>
@@ -33,7 +33,7 @@ export const InviteCard = () => {
 					}
 				</ReactMarkdown>
 			</article>
-			<Button>Invite</Button>
+			<Button variant={'destructive'}>Invite</Button>
 		
 		</div>
 	)

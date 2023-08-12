@@ -8,7 +8,7 @@ export default function AppPage() {
 	const router = useRouter()
 	const id = router.query.id as string // string | undefined
 	
-	const { poketto, setPokettoId } = useStore()
+	const { pokettoBasic, setPokettoId, pokettoComments } = useStore()
 	
 	useEffect(() => {
 		setPokettoId(id)
@@ -16,7 +16,7 @@ export default function AppPage() {
 	
 	return (
 		<RootLayout>
-			{poketto && <PokettoDetail poketto={poketto}/>}
+			{pokettoBasic && <PokettoDetail poketto={pokettoBasic} comments={pokettoComments}/>}
 		</RootLayout>
 	)
 }

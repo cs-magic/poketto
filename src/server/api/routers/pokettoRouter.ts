@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { GET_PROMPTS_BATCH_SIZE, type IFlowgptPromptBasic } from '@/ds/flowgpt'
+import { GET_PROMPTS_BATCH_SIZE, type IFlowGPTComment, type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/api/helpers'
 import partialSearch from './partial-search.agg.json'
-import { type IPoketto, type IPokettoComment } from '@/ds/poketto'
-import { flowgpt2poketto } from '@/lib/transform'
+import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
+import { flowgpt2poketto, flowgpt2poketto_comment } from '@/lib/transform'
 import { SortOrder } from '@/ds/system'
 import _ from 'lodash'
 
@@ -35,7 +35,7 @@ export const pokettoRouter = createTRPCRouter({
 				hideNsfw: z.boolean().default(true),
 			}),
 		)
-		.query<IPoketto[]>(async (opts) => {
+		.query<IPokettoBasic[]>(async (opts) => {
 			partialSearch[0]!.$search!.phrase.query = opts.input.query // <-- mongodb partial search
 			let result
 			result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<IFlowgptPromptBasic>(partialSearch).toArray()
@@ -56,7 +56,7 @@ export const pokettoRouter = createTRPCRouter({
 				tag: z.string().optional(),
 			}),
 		)
-		.query<{ data: IPoketto[], nextCursor: number | undefined }>(async (opts) => {
+		.query<{ data: IPokettoBasic[], nextCursor: number | undefined }>(async (opts) => {
 			// 所有空的要填 ["undefined"]
 			const emptyFields = Object.entries(opts.input)
 				.filter(([field, val]) => !val)
@@ -74,7 +74,7 @@ export const pokettoRouter = createTRPCRouter({
 	
 	getPoketto: publicProcedure
 		.input(idInput)
-		.query<IPoketto | undefined>(async (opts) => {
+		.query<IPokettoBasic | undefined>(async (opts) => {
 			const { id } = opts.input
 			if (!id) return
 			
@@ -95,8 +95,8 @@ export const pokettoRouter = createTRPCRouter({
 					id,
 				},
 			}
-			const data = await singleFetch<IPokettoComment[]>({ path: 'comment.getComments', j })
-			return data
+			const data = await singleFetch<IFlowGPTComment[]>({ path: 'comment.getComments', j })
+			return data.map(flowgpt2poketto_comment)
 		}),
 	
 	// getSimilarPrompts: procedure

@@ -3,7 +3,7 @@ import { type ID, type IUser } from '@/ds/general'
 import { type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
 
 
-export interface IPoketto {
+export interface IPokettoBasic {
 	id: string
 	user: IUser
 	conversation?: IFlowgptConversation

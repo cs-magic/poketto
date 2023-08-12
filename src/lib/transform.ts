@@ -1,8 +1,8 @@
-import { type FlowgptPromptFull, type IFlowgptPromptBasic } from '@/ds/flowgpt'
-import { type IPoketto } from '@/ds/poketto'
+import { type FlowgptPromptFull, type IFlowGPTComment, type IFlowgptPromptBasic } from '@/ds/flowgpt'
+import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
 import dayjs from 'dayjs'
 
-export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull): IPoketto => {
+export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull): IPokettoBasic => {
 	
 	return {
 		id: prompt.id,
@@ -56,3 +56,13 @@ export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull)
 		},
 	}
 }
+
+export const flowgpt2poketto_comment = (comment: IFlowGPTComment): IPokettoComment => ({
+	...comment,
+	ratedStars: 0,
+	content: comment.body,
+	user: {
+		...comment.user,
+		avatar: comment.user.image,
+	},
+})

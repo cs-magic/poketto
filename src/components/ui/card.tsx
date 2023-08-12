@@ -9,7 +9,7 @@ const cardVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: '', // hover:bg-primary/50',
+				default: 'bg-card', // hover:bg-primary/50',
 				ghost: 'bg-transparent border-none',
 			},
 			size: {

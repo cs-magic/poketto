@@ -6,7 +6,7 @@ import { FixedCacheQueue } from '@/lib/algo'
 
 import { type IFlowgptPromptBasic, type FlowgptPromptFull, FlowGPTSortOrder } from '@/ds/flowgpt'
 import { type SortOrder } from '@/ds/system'
-import { type IPoketto } from '@/ds/poketto'
+import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
 
 /**
  * ui
@@ -50,17 +50,23 @@ export interface PokettoState {
 	setSortOrder: (v: SortOrder) => void
 	pokettoId?: string
 	setPokettoId: (v: string | undefined) => void
-	poketto?: IPoketto | undefined
-	setPoketto: (v: IPoketto | undefined) => void
+	pokettoBasic?: IPokettoBasic
+	setPokettoBasic: (v: IPokettoBasic | undefined) => void
+	pokettoComments: IPokettoComment[]
+	setPokettoComments: (v: IPokettoComment[]) => void
+	pushPokettoComments: (v: IPokettoComment[]) => void
 }
 
 export const createFlowGPTSlice: StoreSlice<PokettoState> = (setState) => ({
 	sort: FlowGPTSortOrder.recommended,
 	pokettoId: undefined,
 	setPokettoId: (v) => setState((state) => {state.pokettoId = v}),
-	poketto: undefined,
-	setPoketto: (v) => setState((state) => {state.poketto = v}),
+	pokettoBasic: undefined,
+	setPokettoBasic: (v) => setState((state) => {state.pokettoBasic = v}),
 	setSortOrder: (v) => setState((state) => {state.sort = v}),
+	pokettoComments: [],
+	setPokettoComments: (v) => setState((state) => {state.pokettoComments = v}),
+	pushPokettoComments: (v) => setState((state) => {state.pokettoComments.push(...v)}),
 })
 
 /**

@@ -41,6 +41,7 @@
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
     "dayjs": "^1.11.9",
+    "framer-motion": "^10.15.1",
     "https-proxy-agent": "^7.0.1",
     "immer": "^10.0.2",
     "lodash": "^4.17.21",

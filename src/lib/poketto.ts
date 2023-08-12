@@ -1,3 +1,3 @@
-import { type IPoketto } from '@/ds/poketto'
+import { type IPokettoBasic } from '@/ds/poketto'
 
-export const getPokettoUri = (poketto: IPoketto) => `/p/${poketto.id}`
+export const getPokettoUri = (poketto: IPokettoBasic) => `/p/${poketto.id}`

@@ -16,11 +16,21 @@ export function RootLayout(props: PropsWithChildren) {
 	const mounted = useMount()
 	
 	// !IMPORTANT: (force state direction) always change [only ID] in sub pages/components, and trigger prompt update in root layout when id changes
-	const { pokettoId, setPoketto } = useStore()
-	const { data } = api.poketto.getPoketto.useQuery({ id: pokettoId })
+	const { pokettoId: id, setPokettoBasic, setPokettoComments } = useStore()
+	const { data: withConversation } = api.poketto.getPoketto.useQuery({ id })
+	const { data: comments } = api.poketto.listComments.useQuery({ id })
+	
+	console.log({ comments })
+	
 	useEffect(() => {
-		setPoketto(data)
-	}, [data])
+		if (withConversation) // 防止闪烁
+			setPokettoBasic(withConversation)
+	}, [withConversation])
+	
+	useEffect(() => {
+		if (comments)  // 防止闪烁
+			setPokettoComments(comments)
+	}, [comments])
 	
 	return (
 		<>

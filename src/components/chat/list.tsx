@@ -7,10 +7,10 @@ import { useStore } from '@/store'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/utils/responsive-field'
 import clsx from 'clsx'
-import { type IPoketto } from '@/ds/poketto'
+import { type IPokettoBasic } from '@/ds/poketto'
 
 
-export const SearchResultItem = ({ poketto }: { poketto: IPoketto }) => {
+export const SearchResultItem = ({ poketto }: { poketto: IPokettoBasic }) => {
 	console.log(poketto)
 	const { setPokettoId } = useStore()
 	
@@ -33,14 +33,14 @@ export const SearchResultItem = ({ poketto }: { poketto: IPoketto }) => {
 	)
 }
 
-export const ChatList = () => {
+export const PokettoList = () => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
 	const { data: searchedPoketto } = api.poketto.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
 	
 	const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
 	
 	return (
-		<section id={'chat-list'} className={'w-full min-w-[320px] max-w-sm | flex flex-col items-center | bg-slate-800'}>
+		<section id={'chat-list'} className={'w-full max-w-[320px] | flex flex-col items-center | bg-slate-800'}>
 			
 			<Input defaultValue={search}
 			       placeholder={'Search: Title / Description / Init Prompt'}

@@ -1,29 +1,27 @@
-import Image from 'next/image'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import numeral from 'numeral'
 import _ from 'lodash'
 import { StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
 import { Separator } from '@/components/ui/separator'
-import RatingChart from '../../public/images/rating-chart.png'
 import { type ReactNode } from 'react'
-import { Comments } from '@/components/comment'
+import { PokettoComment } from '@/components/pokettoComment'
 import clsx from 'clsx'
 import { CollapsablePara } from '@/components/utils/collapsable-para'
-import { type IPoketto } from '@/ds/poketto'
-import { useStore } from '@/store'
+import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
 import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from '@/config/system'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { MarqueeContainer, MasonryContainer } from '@/components/utils/containers'
 
-export const PokettoDetail = (
-	{ poketto }: { poketto: IPoketto },
-) => {
-	
+export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
 	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
+		
 		return (
-			<div className={'w-full overflow-hidden whitespace-nowrap p-2 | flex flex-col items-center justify-between gap-1'}>
+			<div className={'w-full overflow-hidden whitespace-nowrap p-2 | flex flex-col items-center justify-between gap-1 '}>
 				<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
-				<div className={'text-xl font-semibold text-primary-foreground/75'}>{b}</div>
+				<MarqueeContainer className={'text-2xl'}>{b}</MarqueeContainer>
 				<div className={'flex justify-center items-center text-primary-foreground/50'}>{c}</div>
 			</div>
 		)
@@ -38,9 +36,8 @@ export const PokettoDetail = (
 		)
 	}
 	
-	
 	return (
-		<div className={'w-full max-w-[1440px] mx-auto overflow-x-hidden h-full overflow-y-auto | flex flex-col gap-4 '}>
+		<div className={'w-full overflow-x-hidden h-full overflow-y-auto | flex flex-col gap-4 '}>
 			
 			<section id={'basic'} className={'w-full | flex items-center gap-2'}>
 				<Avatar className={'wh-28 p-4  shrink-0'}>
@@ -53,41 +50,24 @@ export const PokettoDetail = (
 						<p className={'truncate text-primary-foreground/75'}>by {poketto.user.name}</p>
 					</div>
 				</div>
-				<Button className={'w-20 | rounded-3xl bg-destructive/75 hover:bg-destructive'} size={'thin'}>Get</Button>
+				<Button
+					variant={'destructive'}
+					className={clsx(
+						'w-20 | rounded-3xl',
+						// 'bg-destructive/75  hover:bg-destructive',
+						// 'bg-[#027AFF]', // Apple Store get 按钮色
+						// 'bg-[#19abff] bg-[#D70010] bg-[#CCE0BB] bg-[#F3A9CA] bg-[#FFC148] bg-[#94B3EA] bg-[#FAA883]  ', // 哆啦A梦颜色，https://www.pinterest.com/pin/271130840040488009/
+					)} size={'thin'}>Get</Button>
 			</section>
 			
 			<Separator orientation={'horizontal'}/>
 			
-			{/*<div className="stats shadow shrink-0">*/}
-			{/*	*/}
-			{/*	<div className="stat place-items-center">*/}
-			{/*		<div className="stat-title">Category</div>*/}
-			{/*		<div className="stat-value text-2xl">{poketto.basic.category[0] ?? 'Universal'}</div>*/}
-			{/*		<div className="stat-desc">of all 32</div>*/}
-			{/*	</div>*/}
-			{/*	*/}
-			{/*	<div className="stat place-items-center">*/}
-			{/*		<div className="stat-title">Model</div>*/}
-			{/*		<div className="stat-value text-2xl">{poketto.model.type}</div>*/}
-			{/*		<div className="stat-desc">{poketto.model.manufacturer}</div>*/}
-			{/*	</div>*/}
-			{/*	*/}
-			{/*	<div className="stat place-items-center ">*/}
-			{/*		<div className="stat-title">Language</div>*/}
-			{/*		<div className="stat-value text-2xl">{poketto.basic.language}</div>*/}
-			{/*		<div className="stat-desc">Compatible</div>*/}
-			{/*	</div>*/}
-			
-			{/*</div>*/}
-			
 			<section id={'status'} className={clsx(
 				'w-full',
-				'flex items-center justify-between',
+				'flex items-center justify-between gap-1',
 			)}>
-				
 				<StatusItem a={'category'} b={poketto.basic.category[0]} c={'of All 31'}/>
 				<StatusItem a={'model'} b={poketto.model.type} c={poketto.model.manufacturer}/>
-				
 				{
 					POKETTO_DETAIL_RATINGS_ENABLED && (
 						<StatusItem a={'ratings'} b={numeral(poketto.state.ratedStars).format('0.0')} c={<>
@@ -96,12 +76,6 @@ export const PokettoDetail = (
 						</>}/>
 					)
 				}
-				
-				{/*<StatusItem a={'chart'} b={`No. ${numeral(ranking).format('0.0')}`} c={Tag ? Tag[0]!.name : 'ALL'}/>*/}
-				
-				{/*<StatusItem a={'developer'} b={<PersonIcon className={'wh-8'}/>} c={User.name}/>*/}
-				
-				{/*<Separator orientation={'vertical'} className={'h-1/2'}/>*/}
 				<StatusItem a={'language'} b={poketto.basic.language} c={'Universal'}/>
 			</section>
 			
@@ -117,29 +91,57 @@ export const PokettoDetail = (
 			{/*	</DeviceContainer>*/}
 			{/*</section>*/}
 			
+			{/* tags */}
+			<section id={'tags'} className={'w-full flex flex-wrap gap-2'}>
+				{poketto.basic.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+			</section>
+			
 			<section id={'desc'} className={'relative w-full flex flex-col'}>
 				<CollapsablePara content={poketto.basic.desc}/>
 			</section>
 			
-			{POKETTO_DETAIL_RATINGS_ENABLED && (
-				<section id={'ratings-reviews'} className={'w-full flex flex-col gap-4'}>
-					<div className={'flex items-center justify-between'}>
-						<h2>Ratings & Reviews</h2>
-						<Button variant={'ghost'}>See All</Button>
-					</div>
-					<div className={'grid grid-col-1 md:grid-cols-2 gap-4'}>
-						<div className={'flex items-end justify-between'}>
-							<p className={'flex items-end gap-2'}>
-								<span className={'text-4xl font-bold'}>{numeral(poketto.state.ratedStars).format('0.0')}</span>
-								<span className={'text-sm font-'}>out of 5</span>
-							</p>
-							<span>{numeral(poketto.state.ratedStars).format('0a')} Ratings</span>
-						</div>
-						<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>
-					</div>
-					<Comments id={poketto.id}/>
-				</section>
-			)}
+			<section id={'ratings-reviews'} className={'w-full flex flex-col gap-4'}>
+				<div className={'flex items-center justify-between'}>
+					{/* todo: Ratings & */}
+					<h2>Reviews</h2>
+					{
+						comments.length > 2 && (
+							<Dialog>
+								<DialogTrigger asChild>
+									<Button variant={'ghost'}>See All</Button>
+								</DialogTrigger>
+								<DialogContent className={'max-w-[80vw]  h-[80vh] overflow-auto'}>
+									<h2>All the comments</h2>
+									<MasonryContainer>
+										{comments.map((item) => (
+											<PokettoComment comment={item} key={item.id}/>
+										))}
+									</MasonryContainer>
+								</DialogContent>
+							</Dialog>
+						)
+					}
+				</div>
+				{comments.length === 0 && 'No Comments Yet !'}
+				
+				{/* todo: rate level */}
+				{/*<div className={'grid grid-col-1 md:grid-cols-2 gap-4'}>*/}
+				{/*	<div className={'flex items-end justify-between'}>*/}
+				{/*		<p className={'flex items-end gap-2'}>*/}
+				{/*			<span className={'text-4xl font-bold'}>{numeral(poketto.state.ratedStars).format('0.0')}</span>*/}
+				{/*			<span className={'text-sm font-'}>out of 5</span>*/}
+				{/*		</p>*/}
+				{/*		<span>{numeral(poketto.state.ratedStars).format('0a')} Ratings</span>*/}
+				{/*	</div>*/}
+				{/*	<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>*/}
+				{/*</div>*/}
+				<div className={'grid gap-2'}>
+					{comments.slice(0, 2).map((item) => (
+						<PokettoComment comment={item} key={item.id}/>
+					))}
+				</div>
+			</section>
+			
 			
 			<section id={'information'} className={'w-full flex flex-col gap-4'}>
 				<h2>Information</h2>
@@ -148,10 +150,7 @@ export const PokettoDetail = (
 					<InfoItem a={'category'} b={poketto.basic.category[0] ?? 'No Category'}/>
 					<InfoItem a={'language'} b={poketto.basic.language}/>
 				</div>
-			</section>
-			
-			<section id={'information'} className={'w-full flex flex-col gap-4'}>
-				<h2>Stats</h2>
+				<Separator orientation={'horizontal'}/>
 				<div className={'grid grid-cols-2 gap-4'}>
 					{Object.entries(poketto.state)
 						.sort((a, b) => a[0] < b[0] ? -1 : 1)
@@ -160,6 +159,7 @@ export const PokettoDetail = (
 						))}
 				</div>
 			</section>
+			
 			
 			{POKETTO_DETAIL_FEATURES_ENABLED && (
 				<>

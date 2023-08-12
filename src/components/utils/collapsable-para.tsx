@@ -24,14 +24,10 @@ export const CollapsablePara = ({ content }: { content: string }) => {
 				</ReactMarkdown>
 			</article>
 			
-			{!shownMore && needMore && (
-				<Button
-					onClick={() => setShownMore(true)}
-					variant={'link'}
-					className={'h-0 pl-6 show-more absolute right-1 bottom-0'}>More</Button>
+			{needMore && (
+				// todo: better show-more effect with harmonious gradient
+				<Button variant={'link'} className={'ml-auto'} onClick={() => setShownMore(!shownMore)}>Less</Button>
 			)}
-			
-			{shownMore && <Button variant={'link'} className={'ml-auto'} onClick={() => setShownMore(false)}>Less</Button>}
 		</div>
 	)
 }
