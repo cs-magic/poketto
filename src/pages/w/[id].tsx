@@ -13,17 +13,17 @@ import { ViewsField } from '@/components/utils/responsive-field'
 export const PromptList = ({ prompt }: { prompt: FlowgptPromptBasic }) => {
 	console.log(prompt)
 	return (
-		<div className={'w-full p-2 | flex gap-2 | hover:bg-accent cursor-pointer'}>
+		<div className={'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hover:bg-accent cursor-pointer'}>
 			<Avatar className={'shrink-0'}>
 				<AvatarImage src={prompt.thumbnailURL}/>
 			</Avatar>
-			<div className={'grow | flex flex-col gap-1'}>
-				<p className={'font-semibold'}>{prompt.title}</p>
-				<p className={'text-muted-foreground'}>{prompt.description}</p>
+			<div className={'grow overflow-hidden | flex flex-col gap-1'}>
+				<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{prompt.title}</p>
+				<p className={'truncate | '}>{prompt.description}</p>
 			</div>
-			<div className={'w-20 overflow-hidden | flex flex-col gap-1'}>
+			<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
 				<ViewsField v={prompt.views}/>
-				<p className={'truncate | text-muted-foreground text-xs'}>@{prompt.User.name}</p>
+				<p className={'truncate'}>@{prompt.User.name}</p>
 			</div>
 		</div>
 	)

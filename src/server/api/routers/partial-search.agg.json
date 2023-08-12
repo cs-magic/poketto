@@ -24,6 +24,11 @@
     "$limit": 5
   },
   {
+    "$addFields": {
+      "ratedStars": 0
+    }
+  },
+  {
     "$project": {
       "_id": 1,
       "thumbnailURL": 1,
@@ -33,9 +38,8 @@
       "User": 1,
       "state": {
         "views": "$views",
-        "uses": "$uses",
-        "upVoted": "$upVoted",
-        "starsRated": 0
+        "stars": "$uses",
+        "ratedStars": "$ratedStars"
       },
       "highlights": {
         "$meta": "searchHighlights"
