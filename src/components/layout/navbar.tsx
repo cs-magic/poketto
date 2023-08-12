@@ -11,6 +11,7 @@ import { ICON_DIMENSION_SM } from '@/config/assets'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { MenuLink } from '@/components/utils/link'
 import { uri } from '@/config/uri'
+import clsx from 'clsx'
 
 
 export const ThemeSwitcher = () => {
@@ -32,7 +33,9 @@ export const ThemeSwitcher = () => {
 export const LogoWithName = () => {
 	return (
 		<div className={'inline-flex items-center gap-2'}>
-			<Logo height={32} className={'rotate-180'}/>
+			<Logo height={32} className={clsx(
+				// 'rotate-180'
+			)}/>
 			<span className={'text-xl tracking-widest'}>{app.name}</span>
 		</div>
 	)

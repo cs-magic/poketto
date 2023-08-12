@@ -1,13 +1,13 @@
 import { useStore } from '@/store'
 import clsx from 'clsx'
 import ReactMarkdown from 'react-markdown'
-import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { DotsVerticalIcon } from '@radix-ui/react-icons'
 
 import remarkGfm from 'remark-gfm'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
 
 
 export const ChatConversation = () => {
@@ -39,7 +39,7 @@ export const ChatConversation = () => {
 						<div
 							key={index}
 							className={clsx(
-								'chat tracking-wide',
+								'chat tracking-normal text-sm',
 								msg.role === 'user' ? 'chat-end' : 'chat-start',
 							)}>
 							
@@ -59,9 +59,11 @@ export const ChatConversation = () => {
 						</div>
 					))
 				}
+				<Separator orientation={'horizontal'} className={'w-1/2 mx-auto my-8'}/>
 			</div>
 			
-			<div className={'w-full p-2 | flex justify-center items-center gap-2'}>
+			
+			<div className={'w-full p-4 | flex justify-center items-center gap-2'}>
 				<Input className={'w-[95%]'}/>
 				<Button>Send</Button>
 			</div>

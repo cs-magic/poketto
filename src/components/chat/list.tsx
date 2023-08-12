@@ -7,6 +7,7 @@ import { type FlowgptPromptBasic } from '@/ds/flowgpt'
 import { useStore } from '@/store'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/utils/responsive-field'
+import clsx from 'clsx'
 
 
 export const SearchResultItem = ({ prompt }: { prompt: FlowgptPromptBasic }) => {
@@ -14,7 +15,9 @@ export const SearchResultItem = ({ prompt }: { prompt: FlowgptPromptBasic }) => 
 	const { setPromptId } = useStore()
 	
 	return (
-		<div onClick={() => setPromptId(prompt.id)} className={'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hover:bg-accent cursor-pointer'}>
+		<div onClick={() => setPromptId(prompt.id)} className={clsx(
+			'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent cursor-pointer',
+		)}>
 			<Avatar className={'shrink-0'}>
 				<AvatarImage src={prompt.thumbnailURL}/>
 			</Avatar>
@@ -32,7 +35,7 @@ export const SearchResultItem = ({ prompt }: { prompt: FlowgptPromptBasic }) => 
 
 export const ChatList = () => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
-	const { data: prompts } = api.flowgpt.searchPrompts.useQuery({ query: search }, { enabled: search.length > 0 })
+	const { data: searchedPrompts } = api.flowgpt.searchPrompts.useQuery({ query: search }, { enabled: search.length > 0 })
 	
 	const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
 	
@@ -44,13 +47,18 @@ export const ChatList = () => {
 			       className={'w-[95%] my-2 rounded-2xl'}
 			       onChange={(event) => {setSearch(event.currentTarget.value)}}/>
 			{
-				search && (
-					prompts ? <>
-						<SectionTitle>Global search results {prompts.length ? '' : ' (0)'}</SectionTitle>
-						{prompts.slice(0, 10).map((prompt) => <SearchResultItem prompt={prompt} key={prompt.id}/>)}
+				search ? (
+					// 搜索时
+					searchedPrompts ? <>
+						<SectionTitle>Global search results {searchedPrompts.length ? '' : ' (0)'}</SectionTitle>
+						{searchedPrompts.slice(0, 10).map((prompt) => <SearchResultItem prompt={prompt} key={prompt.id}/>)}
 					</> : <>
 						<SectionTitle>Global search results</SectionTitle>
 						<Skeleton className={'h-8'}/>
+					</>
+				) : (
+					// 	没有搜索时显示最近聊天列表
+					<>
 					</>
 				)
 			}

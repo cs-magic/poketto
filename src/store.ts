@@ -36,6 +36,9 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 	setShowChatList: (v) => setState((state) => {state.showChatList = v}),
 })
 
+/**
+ * flowgpt
+ */
 export interface FlowGPTState {
 	sort: FlowGPTSortOrder
 	setSortOrder: (v: FlowGPTSortOrder) => void
@@ -45,7 +48,7 @@ export interface FlowGPTState {
 	setPrompt: (v: FlowgptPromptFull | undefined) => void
 }
 
-export const createFlowgptSlice: StoreSlice<FlowGPTState> = (setState) => ({
+export const createFlowGPTSlice: StoreSlice<FlowGPTState> = (setState) => ({
 	sort: FlowGPTSortOrder.recommended,
 	promptId: undefined,
 	setPromptId: (v) => setState((state) => {state.promptId = v}),
@@ -69,6 +72,14 @@ export const createSearchSlice: StoreSlice<SearchState> = (setState, getState, s
 	push: (v: string) => setState((state) => {state.history = searchQueue.push(v)}),
 })
 
+/**
+ * chats
+ */
+
+export interface ChatsState {
+	history: string[]
+	push: (v: string) => void
+}
 
 /**
  * store
@@ -92,7 +103,7 @@ export const useStore = create<StoreState>()(
 				(...a) => ({
 					...createUISlice(...a),
 					...createSearchSlice(...a),
-					...createFlowgptSlice(...a),
+					...createFlowGPTSlice(...a),
 				}),
 			),
 			{ name: 'zustand' },
