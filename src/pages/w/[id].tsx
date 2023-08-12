@@ -7,18 +7,18 @@ import { ChatList } from '@/components/chat/list'
 
 export default function WorkspacePage() {
 	
-	const { poketto, showChatList, showChatDetail } = useStore()
+	const { poketto, chatListVisible, chatDetailVisible } = useStore()
 	// console.log('[WorkspacePage] ', { wid, search, prompts, prompt })
 	
 	return (
 		<RootLayout>
 			<div className={'w-full h-full overflow-hidden | flex divide-x'}>
 				
-				{showChatList && <ChatList/>}
+				{chatListVisible && <ChatList/>}
 				
 				<ChatConversation/>
 				
-				{showChatDetail && (
+				{chatDetailVisible && (
 					<section id={'chat-detail'} className={'w-full min-w-[320px] max-w-sm p-4 | hidden xl:flex'}>
 						{poketto && <PokettoDetail poketto={poketto}/>}
 					</section>

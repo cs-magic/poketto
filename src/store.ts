@@ -21,10 +21,12 @@ export interface UIState {
 	switchCollapse: () => void
 	cardsLayout: CardsLayoutType
 	setCardsLayout: (v: CardsLayoutType) => void
-	showChatList: boolean
-	setShowChatList: (v: boolean) => void
-	showChatDetail: boolean
-	setShowChatDetail: (v: boolean) => void
+	chatListVisible: boolean
+	toggleChatList: () => void
+	chatDetailVisible: boolean
+	toggleChatDetail: () => void
+	sidebarVisible: boolean
+	toggleSidebar: () => void
 }
 
 export const createUISlice: StoreSlice<UIState> = (setState, getState, store) => ({
@@ -32,10 +34,12 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 	cardsLayout: CardsLayoutType.masonry,
 	switchCollapse: () => setState((state) => {state.collapsed = !state.collapsed}),
 	setCardsLayout: (v) => setState((state) => {state.cardsLayout = v}),
-	showChatDetail: true,
-	setShowChatDetail: (v) => setState((state) => {state.showChatDetail = v}),
-	showChatList: true,
-	setShowChatList: (v) => setState((state) => {state.showChatList = v}),
+	chatDetailVisible: true,
+	toggleChatDetail: () => setState((state) => {state.chatDetailVisible = !state.chatDetailVisible}),
+	chatListVisible: true,
+	toggleChatList: () => setState((state) => {state.chatListVisible = !state.chatListVisible}),
+	sidebarVisible: true,
+	toggleSidebar: () => setState((state) => {state.sidebarVisible = !state.sidebarVisible}),
 })
 
 /**

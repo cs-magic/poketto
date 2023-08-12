@@ -2,17 +2,22 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
 import _ from 'lodash'
-import React from 'react'
+import React, { type ReactNode } from 'react'
+import { useStore } from '@/store'
 
-export const MenuLink = ({ field, link, title }: {
+export const MenuLink = ({ field, icon, link, title }: {
 	field: string
+	icon?: ReactNode
 	link?: string
 	title?: string
 }) => {
+	const { sidebarVisible } = useStore()
+	
 	return (
-		<Link href={link ?? `/${field}`} className={'w-full'}>
-			<Button className={clsx('w-full justify-start text-xs tracking-widest')} variant={'ghost'}>
-				{title ?? _.startCase(_.capitalize(field))}
+		<Link href={link ?? `/${field}`} className={'w-full transition-all'}>
+			<Button className={clsx('w-full justify-start text-xs tracking-widest gap-2')} variant={'ghost'}>
+				{icon}
+				{sidebarVisible && <span>{title ?? _.startCase(_.capitalize(field))}</span>}
 			</Button>
 		</Link>
 	)

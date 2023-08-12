@@ -12,6 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { MenuLink } from '@/components/utils/link'
 import { uri } from '@/config/uri'
 import clsx from 'clsx'
+import { Button } from '@/components/ui/button'
+import { useStore } from '@/store'
 
 
 export const ThemeSwitcher = () => {
@@ -31,13 +33,14 @@ export const ThemeSwitcher = () => {
 }
 
 export const LogoWithName = () => {
+	const { toggleSidebar } = useStore()
 	return (
-		<div className={'inline-flex items-center gap-2'}>
-			<Logo height={32} className={clsx(
+		<Button variant={'ghost'} className={'justify-start gap-2'} onClick={toggleSidebar}>
+			<Logo height={24} className={clsx(
 				// 'rotate-180'
 			)}/>
-			<span className={'text-xl tracking-widest'}>{app.name}</span>
-		</div>
+			<span className={'text-lg tracking-widest'}>{app.name}</span>
+		</Button>
 	)
 }
 
@@ -53,7 +56,6 @@ export default function Navbar() {
 	
 	return (
 		<div className={'px-4 py-2 | flex items-center | border-b'}>
-			
 			
 			<LogoWithName/>
 			

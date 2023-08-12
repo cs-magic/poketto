@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 
 export const ChatConversation = () => {
-	const { poketto, showChatDetail, setShowChatDetail, showChatList, setShowChatList } = useStore()
+	const { poketto, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useStore()
 	
 	return (
 		<section id={'chat-contents'} className={'w-full min-w-[320px] grow h-full overflow-hidden | flex flex-col bg-background'}>
@@ -21,11 +21,15 @@ export const ChatConversation = () => {
 						<DotsVerticalIcon/>
 					</PopoverTrigger>
 					<PopoverContent className={'flex flex-col gap-2'}>
-						<Button className={'justify-start pl-4'} variant={'ghost'} onClick={() => setShowChatList(!showChatList)}>{showChatList ? 'Hide List' : 'Show' +
-							' List'}</Button>
 						<Button className={'justify-start pl-4'}
 						        variant={'ghost'}
-						        onClick={() => setShowChatDetail(!showChatDetail)}>{showChatDetail ? 'Hide Detail' : 'Show Detail'}</Button>
+						        onClick={toggleSidebar}>{(sidebarVisible ? 'Hide' : 'Show') + ' Sidebar'}</Button>
+						<Button className={'justify-start pl-4'}
+						        variant={'ghost'}
+						        onClick={toggleChatList}>{(chatListVisible ? 'Hide' : 'Show') + ' Chat List'}</Button>
+						<Button className={'justify-start pl-4'}
+						        variant={'ghost'}
+						        onClick={toggleChatDetail}>{(chatDetailVisible ? 'Hide' : 'Show') + ' Chat Detail'}</Button>
 						<Button className={'justify-start pl-4'} variant={'ghost'}>Share (todo)</Button>
 					</PopoverContent>
 				</Popover>
