@@ -1,11 +1,10 @@
 import { z } from 'zod'
-import { GET_PROMPTS_BATCH_SIZE, type FlowgptPromptBasic, type FlowgptComment, type FlowgptPromptFull, FlowGPTSortOrder } from '@/ds/flowgpt'
+import { type FlowgptComment, type FlowgptPromptBasic, type FlowgptPromptFull, FlowGPTSortOrder, GET_PROMPTS_BATCH_SIZE } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/api/helpers'
-import { sleep } from '@/lib/datetime'
 import partialSearch from './partial-search.agg.json'
 
 export const idInput = z.object({
-	id: z.string(),
+	id: z.string().optional(),
 })
 
 const singleFetch = async <T>(props: { path: string, j: object }) => {
@@ -74,8 +73,11 @@ export const flowgptRouter = createTRPCRouter({
 	
 	getPrompt: publicProcedure
 		.input(idInput)
-		.query<FlowgptPromptFull>(async (opts) => {
-			const j = { json: opts.input.id }
+		.query<FlowgptPromptFull | undefined>(async (opts) => {
+			const { id } = opts.input
+			if (!id) return
+			
+			const j = { json: id }
 			const data = await singleFetch<FlowgptPromptFull>({ path: 'prompt.getById', j })
 			return data
 		}),
@@ -83,10 +85,13 @@ export const flowgptRouter = createTRPCRouter({
 	listComments: publicProcedure
 		.input(idInput)
 		.query<FlowgptComment[]>(async (opts) => {
+			const { id } = opts.input
+			if (!id) return []
+			
 			const j = {
 				json: {
 					type: 'prompt',
-					id: opts.input.id,
+					id,
 				},
 			}
 			const data = await singleFetch<FlowgptComment[]>({ path: 'comment.getComments', j })

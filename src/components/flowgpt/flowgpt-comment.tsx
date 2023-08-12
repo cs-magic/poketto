@@ -25,8 +25,8 @@ export const FlowgptCommentComp = (
 		</Card>
 	)
 }
+
 export const FlowGPTComments = ({ id }: { id: string }) => {
-	console.log('[FlowGPT Comments] ', { id })
 	const { data } = api.flowgpt.listComments.useQuery({ id }, { enabled: id !== undefined })
 	return (
 		<div className={'w-full overflow-auto grid grid-cols-2 gap-2'}>

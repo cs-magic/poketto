@@ -4,45 +4,15 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import numeral from 'numeral'
 import _ from 'lodash'
-import { PersonIcon, StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
+import { StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
 import { Separator } from '@/components/ui/separator'
 import RatingChart from '../../../public/images/rating-chart.png'
-import { type ReactNode, useCallback, useRef, useState } from 'react'
+import { type ReactNode } from 'react'
 import { FlowGPTComments } from '@/components/flowgpt/flowgpt-comment'
 import { DeviceContainer } from '@/components/utils/devices'
 import { useMobile } from '@/hooks/use-device'
 import clsx from 'clsx'
-import { api } from '@/lib/api'
-
-export const CollapsablePara = ({ content }: { content: string }) => {
-	const [shownMore, setShownMore] = useState(false)
-	const [needMore, setNeedMore] = useState(false)
-	
-	const ref = useCallback((node: HTMLParagraphElement) => {
-		if (!node) return
-		setNeedMore(node.scrollHeight > node.clientHeight)
-	}, [])
-	
-	
-	return (
-		<div className={'w-full flex flex-col'}>
-			<p className={clsx(
-				!shownMore && 'line-clamp-4',
-			)} ref={ref}>
-				{content}
-			</p>
-			
-			{!shownMore && needMore && (
-				<Button
-					onClick={() => setShownMore(true)}
-					variant={'link'}
-					className={'h-0 pl-6 show-more absolute right-1 bottom-0'}>More</Button>
-			)}
-			
-			{shownMore && <Button variant={'link'} className={'ml-auto'} onClick={() => setShownMore(false)}>Less</Button>}
-		</div>
-	)
-}
+import { CollapsablePara } from '@/components/utils/collapsable-para'
 
 export const FlowgptDetail = (
 	{
@@ -72,10 +42,6 @@ export const FlowgptDetail = (
 ) => {
 	const rankingStar = Math.floor(ranking)
 	const isMobile = useMobile()
-	
-	const query = api.flowgpt.getPrompt.useQuery({ id }, { enabled: id !== undefined })
-	
-	console.log('[detail] ', { basic: prompt, detail: query.data })
 	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 		return (

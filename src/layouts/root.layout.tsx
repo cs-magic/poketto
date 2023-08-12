@@ -1,17 +1,26 @@
 import Head from 'next/head'
 import { app } from '@/config/app'
-import React, { type PropsWithChildren } from 'react'
+import React, { type PropsWithChildren, useEffect } from 'react'
 import { Sidebar } from '@/components/layout/sidebar'
 import Navbar from '@/components/layout/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/config/assets'
 import { useMount } from '@/hooks/use-mount'
+import { useStore } from '@/store'
+import { api } from '@/lib/api'
 
 
 export function RootLayout(props: PropsWithChildren) {
 	
 	// !IMPORTANT: avoid persistence ssr
 	const mounted = useMount()
+	
+	// !IMPORTANT: (force state direction) always change [only ID] in sub pages/components, and trigger prompt update in root layout when id changes
+	const { promptId, setPrompt } = useStore()
+	const { data } = api.flowgpt.getPrompt.useQuery({ id: promptId })
+	useEffect(() => {
+		setPrompt(data)
+	}, [data])
 	
 	return (
 		<>
