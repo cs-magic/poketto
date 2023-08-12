@@ -15,9 +15,9 @@ const singleFetch = async <T>(props: { path: string, j: object }) => {
 	const url = `https://flowgpt.com/api/trpc/${props.path}?batch=1&input=${input}`
 	console.log('[API] ', 'fetching: ', url)
 	const response = await fetch(url)
-	console.log('[API] ', 'response: ', response)
+	// console.log('[API] ', 'response: ', response)
 	const result = await response.json()
-	console.log('[API] ', 'fetched: ', result)
+	console.debug('[API] ', 'fetched: ', result)
 	return result[0].result.data.json as T
 }
 
@@ -85,7 +85,7 @@ export const flowgptRouter = createTRPCRouter({
 		.query<FlowgptComment[]>(async (opts) => {
 			const j = {
 				json: {
-					type: prompt,
+					type: 'prompt',
 					id: opts.input.id,
 				},
 			}

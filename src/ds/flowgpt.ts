@@ -1,4 +1,4 @@
-import type sampleComment from '../../sample/flowgpt/comment.json'
+import type sampleComment from '../../sample/flowgpt/comment.getComments/comment.json'
 import type sampleConversation from '../../sample/flowgpt/conversation.json'
 import type sampleBasicPrompt from '../../sample/flowgpt/prompt-basic.json'
 

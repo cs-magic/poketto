@@ -12,7 +12,7 @@ export default function AppPage() {
 	if (!data) return <IconTruckLoading/>
 	return (
 		<RootLayout>
-			<FlowgptDetail {...data}/>
+			{data && <FlowgptDetail prompt={data}/>}
 		</RootLayout>
 	)
 }

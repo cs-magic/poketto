@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { FixedCacheQueue } from '@/lib/algo'
 
 
-import { FlowGPTSortOrder } from '@/ds/flowgpt'
+import { type FlowgptPromptBasic, FlowGPTSortOrder } from '@/ds/flowgpt'
 
 /**
  * ui
@@ -31,10 +31,14 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 export interface FlowGPTState {
 	sort: FlowGPTSortOrder
 	setSortOrder: (v: FlowGPTSortOrder) => void
+	prompt?: FlowgptPromptBasic
+	setPrompt: (v: FlowgptPromptBasic | undefined) => void
 }
 
 export const createFlowgptSlice: StoreSlice<FlowGPTState> = (setState) => ({
 	sort: FlowGPTSortOrder.recommended,
+	prompt: undefined,
+	setPrompt: (v) => setState((state) => {state.prompt = v}),
 	setSortOrder: (v) => setState((state) => {state.sort = v}),
 })
 

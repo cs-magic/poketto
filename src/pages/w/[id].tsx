@@ -8,12 +8,17 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { type PropsWithChildren } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ViewsField } from '@/components/utils/responsive-field'
+import Link from 'next/link'
+import { useStore } from '@/store'
+import { FlowgptDetail } from '@/components/flowgpt/detail'
 
 
-export const PromptList = ({ prompt }: { prompt: FlowgptPromptBasic }) => {
+export const SearchResultItem = ({ prompt }: { prompt: FlowgptPromptBasic }) => {
 	console.log(prompt)
+	const { setPrompt } = useStore()
+	
 	return (
-		<div className={'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hover:bg-accent cursor-pointer'}>
+		<div onClick={() => setPrompt(prompt)} className={'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hover:bg-accent cursor-pointer'}>
 			<Avatar className={'shrink-0'}>
 				<AvatarImage src={prompt.thumbnailURL}/>
 			</Avatar>
@@ -33,11 +38,13 @@ export default function WorkspacePage() {
 	
 	const router = useRouter()
 	const wid = router.query.id as string
-	console.log({ wid })
 	
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
 	const { data: prompts } = api.flowgpt.searchPrompts.useQuery({ query: search }, { enabled: search.length > 0 })
-	console.log({ search, prompts })
+	
+	const { prompt } = useStore()
+	console.log('[WorkspacePage] ', { wid, search, prompts, prompt })
+	
 	
 	const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
 	return (
@@ -53,7 +60,7 @@ export default function WorkspacePage() {
 						search && (
 							prompts ? <>
 								<SectionTitle>Global search results {prompts.length ? '' : ' (0)'}</SectionTitle>
-								{prompts.slice(0, 10).map((prompt) => <PromptList prompt={prompt} key={prompt.id}/>)}
+								{prompts.slice(0, 10).map((prompt) => <SearchResultItem prompt={prompt} key={prompt.id}/>)}
 							</> : <>
 								<SectionTitle>Global search results</SectionTitle>
 								<Skeleton className={'h-8'}/>
@@ -68,8 +75,8 @@ export default function WorkspacePage() {
 				
 				</section>
 				
-				<section id={'chat-detail'} className={'w-full max-w-sm | hidden xl:flex | bg-gray-800'}>
-				
+				<section id={'chat-detail'} className={'w-full max-w-sm p-4 | hidden xl:flex'}>
+					{prompt && <FlowgptDetail prompt={prompt}/>}
 				</section>
 			</div>
 		</RootLayout>

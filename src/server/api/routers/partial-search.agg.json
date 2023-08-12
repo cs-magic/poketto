@@ -25,17 +25,7 @@
   },
   {
     "$addFields": {
-      "ratedStars": 0
-    }
-  },
-  {
-    "$project": {
-      "_id": 1,
-      "thumbnailURL": 1,
-      "title": 1,
-      "description": 1,
-      "initPrompt": 1,
-      "User": 1,
+      "ratedStars": 0,
       "state": {
         "views": "$views",
         "stars": "$uses",

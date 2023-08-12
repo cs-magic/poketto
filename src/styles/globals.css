@@ -111,10 +111,14 @@ colors:
     }
 
     h2 {
-        @apply text-2xl font-semibold;
+        @apply text-xl font-semibold;
     }
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    .show-more {
+        background-image: linear-gradient(to right, transparent 0%, hsl(var(--background)) 20%);
     }
 }

@@ -1,8 +1,8 @@
-import { type FlowgptComment } from '@/ds/flowgpt'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { api } from '@/lib/api'
+import { type FlowgptComment } from '@/ds/flowgpt'
 
-export const FlowgptComment = (
+export const FlowgptCommentComp = (
 	{
 		id,
 		body,
@@ -25,13 +25,14 @@ export const FlowgptComment = (
 		</Card>
 	)
 }
-export const FlowgptComments = ({ id }: { id: string }) => {
-	const { data } = api.flowgpt.listComments.useQuery({ id })
+export const FlowGPTComments = ({ id }: { id: string }) => {
+	console.log('[FlowGPT Comments] ', { id })
+	const { data } = api.flowgpt.listComments.useQuery({ id }, { enabled: id !== undefined })
 	return (
 		<div className={'w-full overflow-auto grid grid-cols-2 gap-2'}>
 			{data
 				? data.slice(0, 2).map((item) => (
-					<FlowgptComment {...item} key={item.id}/>
+					<FlowgptCommentComp {...item} key={item.id}/>
 				))
 				: 'Loading'}
 		</div>

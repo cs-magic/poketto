@@ -7,44 +7,79 @@ import _ from 'lodash'
 import { PersonIcon, StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
 import { Separator } from '@/components/ui/separator'
 import RatingChart from '../../../public/images/rating-chart.png'
-import { type ReactNode } from 'react'
-import { FlowgptComments } from '@/components/flowgpt/flowgpt-comment'
+import { type ReactNode, useCallback, useRef, useState } from 'react'
+import { FlowGPTComments } from '@/components/flowgpt/flowgpt-comment'
 import { DeviceContainer } from '@/components/utils/devices'
 import { useMobile } from '@/hooks/use-device'
+import clsx from 'clsx'
+
+export const CollapsablePara = ({ content }: { content: string }) => {
+	const [shownMore, setShownMore] = useState(false)
+	const [needMore, setNeedMore] = useState(false)
+	
+	const ref = useCallback((node: HTMLParagraphElement) => {
+		if (!node) return
+		setNeedMore(node.scrollHeight > node.clientHeight)
+	}, [])
+	
+	
+	return (
+		<div className={'w-full flex flex-col'}>
+			<p className={clsx(
+				!shownMore && 'line-clamp-4',
+			)} ref={ref}>
+				{content}
+			</p>
+			
+			{!shownMore && needMore && (
+				<Button
+					onClick={() => setShownMore(true)}
+					variant={'link'}
+					className={'h-0 pl-6 show-more absolute right-1 bottom-0'}>More</Button>
+			)}
+			
+			{shownMore && <Button variant={'link'} className={'ml-auto'} onClick={() => setShownMore(false)}>Less</Button>}
+		</div>
+	)
+}
 
 export const FlowgptDetail = (
 	{
-		id,
+		prompt: {
+			id,
+			
+			upvotes,
+			ranking,
+			rankingForNew,
+			comments,
+			
+			User,
+			Tag,
+			
+			model,
+			type,
+			
+			title,
+			description,
+			initPrompt,
+			
+			thumbnailURL,
+			language,
+		},
 		
-		upvotes,
-		ranking,
-		rankingForNew,
-		comments,
-		
-		User,
-		Tag,
-		
-		model,
-		type,
-		
-		title,
-		description,
-		initPrompt,
-		
-		thumbnailURL,
-		language,
-		
-	}: FlowgptPromptBasic,
+	}: { prompt: FlowgptPromptBasic },
 ) => {
 	const rankingStar = Math.floor(ranking)
 	const isMobile = useMobile()
 	
+	console.log('[detail] ', prompt)
+	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 		return (
-			<div className={'flex flex-col items-center gap-1 shrink-0'}>
+			<div className={'w-full overflow-hidden whitespace-nowrap p-2 | flex flex-col items-center justify-between gap-1'}>
 				<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
-				<div className={'text-2xl font-semibold text-primary-foreground/75'}>{b}</div>
-				<div className={'text-primary-foreground/75'}>{c}</div>
+				<div className={'text-xl font-semibold text-primary-foreground/75'}>{b}</div>
+				<div className={'flex justify-center items-center text-primary-foreground/50'}>{c}</div>
 			</div>
 		)
 	}
@@ -60,36 +95,40 @@ export const FlowgptDetail = (
 	
 	
 	return (
-		<div className={'max-w-[1440px] mx-auto h-full overflow-x-hidden overflow-y-auto | flex flex-col gap-4'}>
+		<div className={'w-full max-w-[1440px] mx-auto overflow-x-hidden h-full overflow-y-auto | flex flex-col gap-4 '}>
 			
-			<section id={'basic'} className={'w-full flex items-center gap-4'}>
-				<Avatar className={'wh-32 p-4 shrink-0'}>
-					<AvatarImage src={thumbnailURL} className={'rounded-3xl '}/>
+			<section id={'basic'} className={'w-full | flex items-center gap-2'}>
+				<Avatar className={'wh-28 p-4  shrink-0'}>
+					<AvatarImage src={thumbnailURL} className={'rounded-2xl'}/>
 				</Avatar>
 				
-				<div className={'flex flex-col gap-4'}>
-					<div className={'overflow-hidden |flex flex-col gap-2'}>
-						<h2 className={'truncate'}>{title}</h2>
-						<p className={'truncate'}>{User.name}</p>
+				<div className={'grow overflow-hidden | flex flex-col gap-2'}>
+					<div className={'w-full | flex flex-col '}>
+						<h2 className={'line-clamp-2'}>{title}</h2>
+						<p className={'truncate text-primary-foreground/75'}>by {User.name}</p>
 					</div>
-					<Button className={'w-20 rounded-3xl'} size={'thin'}>Get</Button>
 				</div>
+				<Button className={'w-20 | rounded-3xl bg-destructive/75 hover:bg-destructive'} size={'thin'}>Get</Button>
 			</section>
 			
 			<Separator orientation={'horizontal'}/>
 			
-			<section id={'status'} className={'w-full overflow-auto | flex shrink-0  items-center justify-between gap-4'}>
-				<StatusItem a={'model'} b={language} c={'Chat'}/>
-				<Separator orientation={'vertical'} className={'h-1/2'}/>
-				<StatusItem a={'ratings'} b={numeral(ranking).format('0.0')} c={<div className={'flex items-center'}>
-					{_.range(ranking).map((i) => <StarFilledIcon key={i}/>)}
-					{_.range(5 - rankingStar).map((i) => <StarIcon key={i}/>)}
-				</div>}/>
-				<Separator orientation={'vertical'} className={'h-1/2'}/>
+			<section id={'status'} className={clsx(
+				'w-full',
+				'flex items-center justify-between',
+			)}>
+				<StatusItem a={'model'} b={model} c={'Chat'}/>
+				
+				<StatusItem a={'ratings'} b={numeral(ranking).format('0.0')} c={<>
+					{_.range(rankingStar).map((i) => <StarFilledIcon className={'vh-4 leading-none'} key={i}/>)}
+					{_.range(5 - rankingStar).map((i) => <StarIcon className={'vh-4 leading-none'} key={i}/>)}
+				</>}/>
+				
 				<StatusItem a={'chart'} b={`No. ${numeral(ranking).format('0.0')}`} c={Tag ? Tag[0]!.name : 'ALL'}/>
-				<Separator orientation={'vertical'} className={'h-1/2'}/>
-				<StatusItem a={'developer'} b={<PersonIcon className={'wh-8'}/>} c={User.name}/>
-				<Separator orientation={'vertical'} className={'h-1/2'}/>
+				
+				{/*<StatusItem a={'developer'} b={<PersonIcon className={'wh-8'}/>} c={User.name}/>*/}
+				
+				{/*<Separator orientation={'vertical'} className={'h-1/2'}/>*/}
 				<StatusItem a={'language'} b={language} c={'Universal'}/>
 			</section>
 			
@@ -102,15 +141,11 @@ export const FlowgptDetail = (
 						<h2>heading 2</h2>
 						<div>hhh2</div>
 					</div>
-				
 				</DeviceContainer>
 			</section>
 			
-			<section id={'desc'} className={'w-full flex'}>
-				<div className={'line-clamp-4'}>
-					{description}
-					{/*	todo: add `more` button if clamped */}
-				</div>
+			<section id={'desc'} className={'relative w-full flex flex-col'}>
+				<CollapsablePara content={description}/>
 			</section>
 			
 			<section id={'ratings-reviews'} className={'w-full flex flex-col gap-4'}>
@@ -128,7 +163,7 @@ export const FlowgptDetail = (
 					</div>
 					<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>
 				</div>
-				<FlowgptComments id={id}/>
+				<FlowGPTComments id={id}/>
 			</section>
 			
 			<section id={'information'} className={'w-full flex flex-col gap-4'}>
