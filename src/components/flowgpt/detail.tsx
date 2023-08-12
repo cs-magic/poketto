@@ -12,6 +12,7 @@ import { FlowGPTComments } from '@/components/flowgpt/flowgpt-comment'
 import { DeviceContainer } from '@/components/utils/devices'
 import { useMobile } from '@/hooks/use-device'
 import clsx from 'clsx'
+import { api } from '@/lib/api'
 
 export const CollapsablePara = ({ content }: { content: string }) => {
 	const [shownMore, setShownMore] = useState(false)
@@ -72,7 +73,9 @@ export const FlowgptDetail = (
 	const rankingStar = Math.floor(ranking)
 	const isMobile = useMobile()
 	
-	console.log('[detail] ', prompt)
+	const query = api.flowgpt.getPrompt.useQuery({ id }, { enabled: id !== undefined })
+	
+	console.log('[detail] ', { basic: prompt, detail: query.data })
 	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 		return (

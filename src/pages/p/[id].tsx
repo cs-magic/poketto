@@ -9,7 +9,9 @@ export default function AppPage() {
 	const id = router.query.id as string // string | undefined
 	const { data } = api.flowgpt.getPrompt.useQuery({ id }, { enabled: id !== undefined })
 	console.log('[App] ', data)
+	
 	if (!data) return <IconTruckLoading/>
+	
 	return (
 		<RootLayout>
 			{data && <FlowgptDetail prompt={data}/>}

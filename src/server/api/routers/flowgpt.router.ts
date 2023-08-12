@@ -17,7 +17,7 @@ const singleFetch = async <T>(props: { path: string, j: object }) => {
 	const response = await fetch(url)
 	// console.log('[API] ', 'response: ', response)
 	const result = await response.json()
-	console.debug('[API] ', 'fetched: ', result)
+	// console.debug('[API] ', 'fetched: ', result)
 	return result[0].result.data.json as T
 }
 

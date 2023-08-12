@@ -5,9 +5,13 @@ import { Sidebar } from '@/components/layout/sidebar'
 import Navbar from '@/components/layout/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/config/assets'
+import { useMount } from '@/hooks/use-mount'
 
 
 export function RootLayout(props: PropsWithChildren) {
+	
+	// !IMPORTANT: avoid persistence ssr
+	const mounted = useMount()
 	
 	return (
 		<>
@@ -28,7 +32,7 @@ export function RootLayout(props: PropsWithChildren) {
 					<Sidebar/>
 					
 					<div className={'grow overflow-hidden h-full | flex flex-col items-center justify-center gap-2'}>
-						{props.children}
+						{!mounted ? 'Loading...' : props.children}
 					</div>
 				</div>
 			</main>

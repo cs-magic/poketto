@@ -47,10 +47,11 @@ export default function WorkspacePage() {
 	
 	
 	const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
+	
 	return (
 		<RootLayout>
 			<div className={'w-full h-full overflow-hidden | flex divide-x'}>
-				<section id={'chat-list'} className={'w-full max-w-sm | flex flex-col items-center | bg-slate-800'}>
+				<section id={'chat-list'} className={'w-full min-w-[320px] max-w-sm | flex flex-col items-center | bg-slate-800'}>
 					
 					<Input defaultValue={search}
 					       placeholder={'Search: Title / Description / Init Prompt'}
@@ -71,11 +72,11 @@ export default function WorkspacePage() {
 					<SectionTitle>No messages found</SectionTitle>
 				</section>
 				
-				<section id={'chat-contents'} className={'grow | bg-cyan-800'}>
+				<section id={'chat-contents'} className={'w-full min-w-[320px] grow | bg-cyan-800'}>
 				
 				</section>
 				
-				<section id={'chat-detail'} className={'w-full max-w-sm p-4 | hidden xl:flex'}>
+				<section id={'chat-detail'} className={'w-full min-w-[320px] max-w-sm p-4 | hidden xl:flex'}>
 					{prompt && <FlowgptDetail prompt={prompt}/>}
 				</section>
 			</div>
