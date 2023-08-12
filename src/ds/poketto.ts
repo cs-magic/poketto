@@ -1,39 +1,38 @@
 import { type ChatGPTPromptItem } from '@/ds/chatgpt'
-import { type ID, type Text, type User } from '@/ds/general'
+import { type ID, type IUser } from '@/ds/general'
+import { type IFlowGPTComment } from '@/ds/flowgpt'
 
-export interface PokettoAppFunction /* extends ChatGPTFunction */
+export interface IPokettoFunction /* extends ChatGPTFunction */
 {
 	
 }
 
-export type PokettoAppComment = {
-	ratedStars: number
-	content: string // !important: support markdown
-	user: User
-}
 
-export interface PokettoAppBasic {
+export interface IPokettoBasic {
 	id: string
-	user: User
-	version: string // !important: 用户打开的时候默认拉取最新版
+	user: IUser
 	basic: {
+		version: string // !important: 用户打开的时候默认拉取最新版
 		title: string
 		desc: string
+		avatar: string
 		// todo: industry 和 category 有啥区别，两者有必要并存吗
-		industry: Text[] // 按级分类（父子关系），e.g. [娱乐, 游戏]
-		category: Text[] // 按级分类（父子关系），e.g. [生产力, 平面设计]
-		tags: Text[] // 并列关系，e.g. 法律 | GPT4
+		industry: ID[] // 按级分类（父子关系），e.g. [娱乐, 游戏]
+		category: ID[] // 按级分类（父子关系），e.g. [生产力, 平面设计]
+		tags: string[] // 并列关系，e.g. 法律 | GPT4，用户在创建 tag 的时候，只跟自己的语言有关
+		createdAt: number
+		updatedAt: number
 	}
 	permissions: {
 		visible: boolean | ID[]
 		openSource: boolean // 用户是否可以看到 initPrompts，以及支持 fork
 	}
 	model: {
-		manufacturer: Text // ChatGPT | Claude | OpenChat | ...
+		manufacturer: string // ChatGPT | Claude | OpenChat | ...
 		type: string // 具体的模型号：gpt-3.5-xxx | gpt-4-xx | ...
 		initPrompts: ChatGPTPromptItem[] // 不直接用 systemPrompt 是因为要支持 few-shot
 		temperature: number
-		functions: PokettoAppFunction[] // todo: support plugins
+		functions: IPokettoFunction[] // todo: support plugins
 		// ... other args
 	}
 	state: {
@@ -59,7 +58,10 @@ export interface PokettoAppBasic {
 	}
 }
 
-export interface PokettoAppFull
-	extends PokettoAppBasic {
-	comments: PokettoAppComment[]
+
+export interface IPokettoComment
+	extends Omit<IFlowGPTComment, 'user'> {
+	ratedStars: number
+	content: string // !important: support markdown
+	user: IUser
 }

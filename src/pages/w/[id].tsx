@@ -1,6 +1,6 @@
 import { RootLayout } from '@/layouts/root.layout'
 import { useStore } from '@/store'
-import { FlowgptDetail } from '@/components/flowgpt/detail'
+import { FlowgptDetail } from '@/components/detail'
 import { ChatConversation } from '@/components/chat/conversation'
 import { ChatList } from '@/components/chat/list'
 

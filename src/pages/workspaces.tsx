@@ -6,7 +6,7 @@ import { user } from '@/config/user'
 import { UsersIcon } from 'lucide-react'
 import { ICON_DIMENSION_MD, ICON_DIMENSION_SM } from '@/config/assets'
 import { api } from '@/lib/api'
-import { PocketListView } from '@/components/flowgpt/list.view'
+import { AppListView } from '@/components/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
@@ -52,7 +52,7 @@ export default function WorkspacesPage() {
 				<Card id={'explore'} variant={'ghost'} className={'w-full'}>
 					<CardHeader>
 						<div className={'shrink-0 | flex justify-between items-end'}>
-							<CardTitle>Explore popular Pocket Apps</CardTitle>
+							<CardTitle>Explore popular Poketto Apps</CardTitle>
 							<Link href={uri.app.explore}>
 								<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'}>
 									<span>Explore all</span>
@@ -63,7 +63,7 @@ export default function WorkspacesPage() {
 					</CardHeader>
 					<CardContent className={'w-full flex justify-between'}>
 						<div className={'w-full flex flex-col divide-y'}>
-							{_.range(3).map((i) => <PocketListView props={page?.data[i]} key={i}/>)}
+							{_.range(3).map((i) => <AppListView poketto={page?.data[i]} key={i}/>)}
 						</div>
 					</CardContent>
 				</Card>

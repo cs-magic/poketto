@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { clsx } from 'clsx'
-import { PocketCardView } from '@/components/flowgpt/card.view'
+import { PocketCardView } from '@/components/card.view'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
 import { GridContainer, MasonryContainer } from '@/components/utils/responsive-containers'

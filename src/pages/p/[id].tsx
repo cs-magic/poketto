@@ -1,4 +1,4 @@
-import { FlowgptDetail } from '@/components/flowgpt/detail'
+import { FlowgptDetail } from '@/components/detail'
 import { useRouter } from 'next/router'
 import { RootLayout } from '@/layouts/root.layout'
 import { useStore } from '@/store'

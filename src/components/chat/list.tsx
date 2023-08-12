@@ -3,14 +3,14 @@ import { api } from '@/lib/api'
 import { type PropsWithChildren } from 'react'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { type FlowgptPromptBasic } from '@/ds/flowgpt'
+import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { useStore } from '@/store'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/utils/responsive-field'
 import clsx from 'clsx'
 
 
-export const SearchResultItem = ({ prompt }: { prompt: FlowgptPromptBasic }) => {
+export const SearchResultItem = ({ prompt }: { prompt: IFlowgptPromptBasic }) => {
 	console.log(prompt)
 	const { setPromptId } = useStore()
 	

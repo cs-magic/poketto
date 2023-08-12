@@ -1,7 +1,11 @@
 import { z } from 'zod'
-import { type FlowgptComment, type FlowgptPromptBasic, type FlowgptPromptFull, FlowGPTSortOrder, GET_PROMPTS_BATCH_SIZE } from '@/ds/flowgpt'
+import { type IFlowgptPromptBasic, type FlowgptPromptFull, GET_PROMPTS_BATCH_SIZE } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/api/helpers'
 import partialSearch from './partial-search.agg.json'
+import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
+import { flowgpt2poketto } from '@/lib/transform'
+import { SortOrder } from '@/ds/system'
+import _ from 'lodash'
 
 export const idInput = z.object({
 	id: z.string().optional(),
@@ -31,44 +35,41 @@ export const flowgptRouter = createTRPCRouter({
 				hideNsfw: z.boolean().default(true),
 			}),
 		)
-		.query<FlowgptPromptBasic[]>(async (opts) => {
-			
+		.query<IPokettoBasic[]>(async (opts) => {
 			partialSearch[0]!.$search!.phrase.query = opts.input.query // <-- mongodb partial search
-			const result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<FlowgptPromptBasic>(partialSearch).toArray()
-			// console.log({ result })
-			return result
-			
-			const j = { json: opts.input }
-			return await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.searchPrompts', j })
+			let result
+			result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<IFlowgptPromptBasic>(partialSearch).toArray()
+			// result = await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.searchPrompts', { json: opts.input } })
+			return result.map(flowgpt2poketto)
 		}),
 	
 	listPrompts: publicProcedure
 		.input(
 			z.object({
 				cursor: z.number().nullish(),
-				sort: z.nativeEnum(FlowGPTSortOrder).optional(),
+				sort: z.nativeEnum(SortOrder).optional(),
 				q: z.string().optional(),
+				categoryId: z.string().optional(),
+				subCategoryId: z.string().optional(),
 				language: z.string().default('zh'),
 				skip: z.number().default(0),
 				tag: z.string().optional(),
 			}),
 		)
-		.query<{ data: FlowgptPromptBasic[], nextCursor: number | undefined }>(async (opts) => {
+		.query<{ data: IPokettoBasic[], nextCursor: number | undefined }>(async (opts) => {
+			// 所有空的要填 ["undefined"]
+			const emptyFields = Object.entries(opts.input)
+				.filter(([field, val]) => !val)
+				.map(([field, val]) => field)
+			const meta = _.zipObject(emptyFields, emptyFields.map(() => ['undefined']))
+			console.log({ query: opts.input, meta })
 			const j = {
 				json: opts.input,
-				meta: {
-					values: {
-						tag: ['undefined'],
-						categoryId: ['undefined'],
-						subCategoryId: ['undefined'],
-						sort: ['undefined'],
-						q: ['undefined'],
-					},
-				},
+				meta: { values: meta },
 			}
-			const data = await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.getPrompts', j })
+			const data = await singleFetch<IFlowgptPromptBasic[]>({ path: 'prompt.getPrompts', j })
 			const nextCursor = data.length < GET_PROMPTS_BATCH_SIZE ? undefined : opts.input.skip + GET_PROMPTS_BATCH_SIZE
-			return { data, nextCursor }
+			return { data: data.map(flowgpt2poketto), nextCursor }
 		}),
 	
 	getPrompt: publicProcedure
@@ -84,7 +85,7 @@ export const flowgptRouter = createTRPCRouter({
 	
 	listComments: publicProcedure
 		.input(idInput)
-		.query<FlowgptComment[]>(async (opts) => {
+		.query<IPokettoComment[]>(async (opts) => {
 			const { id } = opts.input
 			if (!id) return []
 			
@@ -94,7 +95,7 @@ export const flowgptRouter = createTRPCRouter({
 					id,
 				},
 			}
-			const data = await singleFetch<FlowgptComment[]>({ path: 'comment.getComments', j })
+			const data = await singleFetch<IPokettoComment[]>({ path: 'comment.getComments', j })
 			return data
 		}),
 	

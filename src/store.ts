@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { FixedCacheQueue } from '@/lib/algo'
 
 
-import { type FlowgptPromptBasic, type FlowgptPromptFull, FlowGPTSortOrder } from '@/ds/flowgpt'
+import { type IFlowgptPromptBasic, type FlowgptPromptFull, FlowGPTSortOrder } from '@/ds/flowgpt'
 
 /**
  * ui

@@ -36,9 +36,6 @@ export const UserVsBrand = () => {
 					<SelfUserAvatar/>
 					<span className={'text-xs'}>{user.name}</span>
 				</div>
-				{/*<IconBolt className={'text-primary-foreground'}/>*/}
-				{/*<IconBoltOff className={'text-primary-foreground'}/>*/}
-				{/*<MagicWandIcon className={'text-primary-foreground'}/>*/}
 				<LightningBoltIcon className={'text-primary-foreground'}/>
 				<div className={'flex flex-col items-center gap-2'}>
 					<Icons.logo className={'!wh-12 bg-background p-2'}/>
@@ -94,14 +91,14 @@ export const Sidebar = () => {
 			<section className={'flex flex-col'}>
 				<MenuLink field={'workspaces'}/>
 				<MenuLink field={'explore'}/>
-				<MenuLink field={'toolkits'}/>
+				{/*<MenuLink field={'toolkits'}/>*/}
 			</section>
 			
 			<Separator/>
 			<section className={'flex flex-col'}>
 				<MenuLink field={'dashboard'} link={uri.user.dashboard}/>
 				<MenuLink field={'gallery'} link={uri.user.gallery}/>
-				<MenuLink field={'integrations'} link={uri.user.integrations}/>
+				{/*<MenuLink field={'integrations'} link={uri.user.integrations}/>*/}
 			</section>
 			
 			<Separator/>

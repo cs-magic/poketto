@@ -1,4 +1,4 @@
-import { type FlowgptPromptBasic } from '@/ds/flowgpt'
+import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import Image from 'next/image'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -6,9 +6,9 @@ import numeral from 'numeral'
 import _ from 'lodash'
 import { StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
 import { Separator } from '@/components/ui/separator'
-import RatingChart from '../../../public/images/rating-chart.png'
+import RatingChart from '../../public/images/rating-chart.png'
 import { type ReactNode } from 'react'
-import { FlowGPTComments } from '@/components/flowgpt/flowgpt-comment'
+import { Comments } from '@/components/comment'
 import { DeviceContainer } from '@/components/utils/devices'
 import { useMobile } from '@/hooks/use-device'
 import clsx from 'clsx'
@@ -38,7 +38,7 @@ export const FlowgptDetail = (
 			language,
 		},
 		
-	}: { prompt: FlowgptPromptBasic },
+	}: { prompt: IFlowgptPromptBasic },
 ) => {
 	const rankingStar = Math.floor(ranking)
 	const isMobile = useMobile()
@@ -132,7 +132,7 @@ export const FlowgptDetail = (
 					</div>
 					<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>
 				</div>
-				<FlowGPTComments id={id}/>
+				<Comments id={id}/>
 			</section>
 			
 			<section id={'information'} className={'w-full flex flex-col gap-4'}>

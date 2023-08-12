@@ -1,13 +1,13 @@
-export type ID = string
+export type ID = string | number
 
-export type User = {
-	id: number
+export type IUser = {
+	id: ID
 	name: string
 	avatar: string // note: 可以用 robohash 生成
 }
 
 export type Text = {
-	id: string
+	id: ID
 	title: string // i18n support
 }
 

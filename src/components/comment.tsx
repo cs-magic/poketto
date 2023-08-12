@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { api } from '@/lib/api'
-import { type FlowgptComment } from '@/ds/flowgpt'
+import { type IPokettoComment } from '@/ds/poketto'
 
-export const FlowgptCommentComp = (
+export const Comment = (
 	{
 		id,
 		body,
-	}: FlowgptComment) => {
+	}: IPokettoComment) => {
 	
 	return (
 		<Card>
@@ -26,13 +26,13 @@ export const FlowgptCommentComp = (
 	)
 }
 
-export const FlowGPTComments = ({ id }: { id: string }) => {
+export const Comments = ({ id }: { id: string }) => {
 	const { data } = api.flowgpt.listComments.useQuery({ id }, { enabled: id !== undefined })
 	return (
 		<div className={'w-full overflow-auto grid grid-cols-2 gap-2'}>
 			{data
 				? data.slice(0, 2).map((item) => (
-					<FlowgptCommentComp {...item} key={item.id}/>
+					<Comment {...item} key={item.id}/>
 				))
 				: 'Loading'}
 		</div>
