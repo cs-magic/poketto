@@ -39,21 +39,20 @@ export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull)
 		},
 		state: {
 			views: prompt.views,
-			interactions: {
-				upvotes: prompt.upvotes,
-				// todo: add more
-			},
+			
 			stars: prompt.saves,
 			forks: 0,
 			shares: prompt.shares,
-			usage: {
-				users: prompt.uses,
-				tokens: 0,
-				triggers: 0,
-			},
 			comments: prompt.comments,
 			ratedStars: 0,
 			tips: prompt.tip,
+			
+			// usage
+			users: prompt.uses,
+			tokens: 0,
+			triggers: 0,
+			// todo: more interactions
+			upvotes: prompt.upvotes,
 		},
 	}
 }

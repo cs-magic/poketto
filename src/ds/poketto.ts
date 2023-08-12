@@ -40,20 +40,22 @@ export interface IPoketto {
 		 * --> [used] comment(rate) / tip(付小费) / share
 		 */
 		views: number
-		interactions: Record<string, number> // 统计类似 discord 的表情回复
 		stars: number // 收藏（也就可以使用了）
 		forks: number // 前提要开源
 		shares: number
-		usage: {
-			users: number // 统计总用户数
-			triggers: number // 统计用户总的交互次数
-			tokens: number // 统计所有会话的词量
-			// ... 其他统计指标（比如频率……）
-		}
+		
 		comments: number
 		ratedStars: number // 基于评论平均出来（考虑要不要基于用户声望加权）
 		tips: number
-	}
+		
+		// 用户使用相关
+		users: number // 统计总用户数
+		triggers: number // 统计用户总的交互次数
+		tokens: number // 统计所有会话的词量
+		// ... 其他统计指标（比如频率……）
+	} & Record<string, number> // interactions 统计类似 discord 的表情回复
+	
+	
 }
 
 

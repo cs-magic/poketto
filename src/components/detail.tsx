@@ -58,11 +58,35 @@ export const PokettoDetail = (
 			
 			<Separator orientation={'horizontal'}/>
 			
+			{/*<div className="stats shadow shrink-0">*/}
+			{/*	*/}
+			{/*	<div className="stat place-items-center">*/}
+			{/*		<div className="stat-title">Category</div>*/}
+			{/*		<div className="stat-value text-2xl">{poketto.basic.category[0] ?? 'Universal'}</div>*/}
+			{/*		<div className="stat-desc">of all 32</div>*/}
+			{/*	</div>*/}
+			{/*	*/}
+			{/*	<div className="stat place-items-center">*/}
+			{/*		<div className="stat-title">Model</div>*/}
+			{/*		<div className="stat-value text-2xl">{poketto.model.type}</div>*/}
+			{/*		<div className="stat-desc">{poketto.model.manufacturer}</div>*/}
+			{/*	</div>*/}
+			{/*	*/}
+			{/*	<div className="stat place-items-center ">*/}
+			{/*		<div className="stat-title">Language</div>*/}
+			{/*		<div className="stat-value text-2xl">{poketto.basic.language}</div>*/}
+			{/*		<div className="stat-desc">Compatible</div>*/}
+			{/*	</div>*/}
+			
+			{/*</div>*/}
+			
 			<section id={'status'} className={clsx(
 				'w-full',
 				'flex items-center justify-between',
 			)}>
-				<StatusItem a={'model'} b={poketto.model.type} c={'Chat'}/>
+				
+				<StatusItem a={'category'} b={poketto.basic.category[0]} c={'of All 31'}/>
+				<StatusItem a={'model'} b={poketto.model.type} c={poketto.model.manufacturer}/>
 				
 				{
 					POKETTO_DETAIL_RATINGS_ENABLED && (
@@ -126,6 +150,16 @@ export const PokettoDetail = (
 				</div>
 			</section>
 			
+			<section id={'information'} className={'w-full flex flex-col gap-4'}>
+				<h2>Stats</h2>
+				<div className={'grid grid-cols-2 gap-4'}>
+					{Object.entries(poketto.state)
+						.sort((a, b) => a[0] < b[0] ? -1 : 1)
+						.map(([key, val]) => (
+							<InfoItem key={key} a={key} b={val}/>
+						))}
+				</div>
+			</section>
 			
 			{POKETTO_DETAIL_FEATURES_ENABLED && (
 				<>
