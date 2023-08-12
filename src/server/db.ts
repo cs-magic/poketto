@@ -15,7 +15,9 @@ export const prisma =
 	})
 
 
-export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI)
+export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI, {
+	connectTimeoutMS: 20000,
+})
 
 if (env.NODE_ENV !== 'production') {
 	globalForDB.prisma = prisma

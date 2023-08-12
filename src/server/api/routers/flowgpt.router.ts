@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { GET_PROMPTS_BATCH_SIZE, type IFlowgptBasicPrompt, type IFlowgptComment, type IFlowgptFullPrompt, SortOrder } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/api/helpers'
 import { sleep } from '@/lib/datetime'
+import partialSearch from './partial-search.agg.json'
 
 export const idInput = z.object({
 	id: z.string(),
@@ -12,9 +13,11 @@ const singleFetch = async <T>(props: { path: string, j: object }) => {
 	
 	const input = encodeURI(JSON.stringify({ '0': props.j }))
 	const url = `https://flowgpt.com/api/trpc/${props.path}?batch=1&input=${input}`
-	console.log(`[API] fetching: ${url}, params: `, props.j)
+	console.log('[API] ', 'fetching: ', url)
 	const response = await fetch(url)
+	// console.log('[API] ', 'response: ', response)
 	const result = await response.json()
+	console.log('[API] ', 'fetched: ', result)
 	return result[0].result.data.json as T
 }
 
@@ -23,7 +26,7 @@ export const flowgptRouter = createTRPCRouter({
 	
 	searchPrompts: publicProcedure
 		.input(z.object({
-				query: z.string().optional(),
+				query: z.string(),
 				language: z.string().default('zh'),
 				threshold: z.number().default(.8),
 				hideNsfw: z.boolean().default(true),
@@ -31,40 +34,9 @@ export const flowgptRouter = createTRPCRouter({
 		)
 		.query<IFlowgptBasicPrompt[]>(async (opts) => {
 			
-			const result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<IFlowgptBasicPrompt>([
-				{
-					'$search': {
-						index: 'partial-match-tutorial',
-						phrase: {
-							path: ['title', 'description', 'initPrompt'],
-							query: opts.input.query,
-							slop: 20,
-						},
-						highlight: {
-							path: ['title', 'description', 'initPrompt'],
-						},
-					},
-				},
-				
-				{
-					'$limit': 5,
-				},
-				
-				{
-					'$project': {
-						_id: 1,
-						thumbnailURL: 1,
-						title: 1,
-						description: 1,
-						initPrompt: 1,
-						User: 1,
-						highlights: {
-							'$meta': 'searchHighlights',
-						},
-					},
-				},
-			]).toArray()
-			console.log({ result })
+			partialSearch[0]!.$search!.phrase.query = opts.input.query // <-- mongodb partial search
+			const result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<IFlowgptBasicPrompt>(partialSearch).toArray()
+			// console.log({ result })
 			return result
 			
 			const j = { json: opts.input }

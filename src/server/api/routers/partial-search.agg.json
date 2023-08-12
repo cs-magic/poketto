@@ -1,0 +1,39 @@
+[
+  {
+    "$search": {
+      "index": "partial-match-tutorial",
+      "phrase": {
+        "path": [
+          "title",
+          "description",
+          "initPrompt"
+        ],
+        "query": "{{query}}",
+        "slop": 20
+      },
+      "highlight": {
+        "path": [
+          "title",
+          "description",
+          "initPrompt"
+        ]
+      }
+    }
+  },
+  {
+    "$limit": 5
+  },
+  {
+    "$project": {
+      "_id": 1,
+      "thumbnailURL": 1,
+      "title": 1,
+      "description": 1,
+      "initPrompt": 1,
+      "User": 1,
+      "highlights": {
+        "$meta": "searchHighlights"
+      }
+    }
+  }
+]
