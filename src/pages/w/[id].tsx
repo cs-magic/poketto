@@ -1,15 +1,14 @@
 import { RootLayout } from '@/layouts/root.layout'
 import { useStore } from '@/store'
-import { FlowgptDetail } from '@/components/detail'
+import { PokettoDetail } from '@/components/detail'
 import { ChatConversation } from '@/components/chat/conversation'
 import { ChatList } from '@/components/chat/list'
 
 
 export default function WorkspacePage() {
 	
-	const { prompt, showChatList, showChatDetail } = useStore()
+	const { poketto, showChatList, showChatDetail } = useStore()
 	// console.log('[WorkspacePage] ', { wid, search, prompts, prompt })
-	
 	
 	return (
 		<RootLayout>
@@ -21,7 +20,7 @@ export default function WorkspacePage() {
 				
 				{showChatDetail && (
 					<section id={'chat-detail'} className={'w-full min-w-[320px] max-w-sm p-4 | hidden xl:flex'}>
-						{prompt && <FlowgptDetail prompt={prompt}/>}
+						{poketto && <PokettoDetail poketto={poketto}/>}
 					</section>
 				)}
 			</div>

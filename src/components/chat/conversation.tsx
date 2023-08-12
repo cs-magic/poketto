@@ -7,17 +7,15 @@ import { DotsVerticalIcon } from '@radix-ui/react-icons'
 
 import remarkGfm from 'remark-gfm'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Separator } from '@/components/ui/separator'
 
 
 export const ChatConversation = () => {
-	const { prompt, showChatDetail, setShowChatDetail, showChatList, setShowChatList } = useStore()
-	
+	const { poketto, showChatDetail, setShowChatDetail, showChatList, setShowChatList } = useStore()
 	
 	return (
 		<section id={'chat-contents'} className={'w-full min-w-[320px] grow h-full overflow-hidden | flex flex-col bg-background'}>
 			<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
-				<div>{prompt?.title}</div>
+				<div>{poketto?.basic.title}</div>
 				<Popover>
 					<PopoverTrigger>
 						<DotsVerticalIcon/>
@@ -35,7 +33,7 @@ export const ChatConversation = () => {
 			
 			<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
 				{
-					prompt?.Conversation.messages.map((msg, index) => (
+					poketto?.conversation?.messages.map((msg, index) => (
 						<div
 							key={index}
 							className={clsx(
@@ -44,7 +42,7 @@ export const ChatConversation = () => {
 							)}>
 							
 							<div className={clsx(
-								'w-full overflow-auto | chat-bubble prose dark:prose-invert',
+								'w-full overflow-auto | chat-bubble prose dark:prose-invert prose-sm',
 								msg.role === 'user'
 									? 'bg-green-600 text-black' //  'chat-bubble-primary/50'
 									: 'bg-sidebar text-primary-foreground/75', // 'chat-bubble-secondary',
@@ -59,7 +57,7 @@ export const ChatConversation = () => {
 						</div>
 					))
 				}
-				<Separator orientation={'horizontal'} className={'w-1/2 mx-auto my-8'}/>
+				{/*<Separator orientation={'horizontal'} className={'w-1/2 mx-auto my-8'}/>*/}
 			</div>
 			
 			

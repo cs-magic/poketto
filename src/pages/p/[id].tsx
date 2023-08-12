@@ -1,4 +1,4 @@
-import { FlowgptDetail } from '@/components/detail'
+import { PokettoDetail } from '@/components/detail'
 import { useRouter } from 'next/router'
 import { RootLayout } from '@/layouts/root.layout'
 import { useStore } from '@/store'
@@ -8,15 +8,15 @@ export default function AppPage() {
 	const router = useRouter()
 	const id = router.query.id as string // string | undefined
 	
-	const { setPromptId, prompt } = useStore()
+	const { poketto, setPokettoId } = useStore()
 	
 	useEffect(() => {
-		setPromptId(id)
+		setPokettoId(id)
 	}, [id])
 	
 	return (
 		<RootLayout>
-			{prompt && <FlowgptDetail prompt={prompt}/>}
+			{poketto && <PokettoDetail poketto={poketto}/>}
 		</RootLayout>
 	)
 }

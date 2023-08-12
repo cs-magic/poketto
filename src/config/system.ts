@@ -1,0 +1,2 @@
+export const POKETTO_DETAIL_RATINGS_ENABLED = false
+export const POKETTO_DETAIL_FEATURES_ENABLED = false

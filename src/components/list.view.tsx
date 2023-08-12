@@ -3,11 +3,11 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import React from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UsesField, ViewsField } from '@/components/utils/responsive-field'
-import { type IPokettoBasic } from '@/ds/poketto'
+import { type IPoketto } from '@/ds/poketto'
 import Link from 'next/link'
 import { getPokettoUri } from '@/lib/poketto'
 
-export const AppListView = ({ poketto }: { poketto: IPokettoBasic | undefined }) => {
+export const AppListView = ({ poketto }: { poketto: IPoketto | undefined }) => {
 	if (!poketto) return (
 		<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
 			<Skeleton className={'wh-12'}/>

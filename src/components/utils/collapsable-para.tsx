@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import clsx from 'clsx'
 import { Button } from '@/components/ui/button'
+import ReactMarkdown from 'react-markdown'
 
 export const CollapsablePara = ({ content }: { content: string }) => {
 	const [shownMore, setShownMore] = useState(false)
@@ -14,11 +15,14 @@ export const CollapsablePara = ({ content }: { content: string }) => {
 	
 	return (
 		<div className={'w-full flex flex-col'}>
-			<p className={clsx(
+			<article className={clsx(
+				'prose dark:prose-invert',
 				!shownMore && 'line-clamp-4',
 			)} ref={ref}>
-				{content}
-			</p>
+				<ReactMarkdown>
+					{content}
+				</ReactMarkdown>
+			</article>
 			
 			{!shownMore && needMore && (
 				<Button

@@ -16,10 +16,10 @@ export function RootLayout(props: PropsWithChildren) {
 	const mounted = useMount()
 	
 	// !IMPORTANT: (force state direction) always change [only ID] in sub pages/components, and trigger prompt update in root layout when id changes
-	const { promptId, setPrompt } = useStore()
-	const { data } = api.flowgpt.getPrompt.useQuery({ id: promptId })
+	const { pokettoId, setPoketto } = useStore()
+	const { data } = api.poketto.getPoketto.useQuery({ id: pokettoId })
 	useEffect(() => {
-		setPrompt(data)
+		setPoketto(data)
 	}, [data])
 	
 	return (

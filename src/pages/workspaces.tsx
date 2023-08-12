@@ -16,7 +16,7 @@ import { type ReactNode } from 'react'
 import { Grow } from '@/components/utils/grow'
 
 export default function WorkspacesPage() {
-	const { data: page } = api.flowgpt.listPrompts.useQuery({})
+	const { data: page } = api.poketto.listPoketto.useQuery({})
 	const uid = user.id
 	
 	const WorkspaceItem = ({ wid, title, avatar, icon }: { wid: string, title: string, avatar: string, icon: ReactNode }) => {

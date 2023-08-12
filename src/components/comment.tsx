@@ -27,7 +27,7 @@ export const Comment = (
 }
 
 export const Comments = ({ id }: { id: string }) => {
-	const { data } = api.flowgpt.listComments.useQuery({ id }, { enabled: id !== undefined })
+	const { data } = api.poketto.listComments.useQuery({ id }, { enabled: id !== undefined })
 	return (
 		<div className={'w-full overflow-auto grid grid-cols-2 gap-2'}>
 			{data

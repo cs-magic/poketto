@@ -3,31 +3,31 @@ import { api } from '@/lib/api'
 import { type PropsWithChildren } from 'react'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { useStore } from '@/store'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/utils/responsive-field'
 import clsx from 'clsx'
+import { type IPoketto } from '@/ds/poketto'
 
 
-export const SearchResultItem = ({ prompt }: { prompt: IFlowgptPromptBasic }) => {
-	console.log(prompt)
-	const { setPromptId } = useStore()
+export const SearchResultItem = ({ poketto }: { poketto: IPoketto }) => {
+	console.log(poketto)
+	const { setPokettoId } = useStore()
 	
 	return (
-		<div onClick={() => setPromptId(prompt.id)} className={clsx(
+		<div onClick={() => setPokettoId(poketto.id)} className={clsx(
 			'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent cursor-pointer',
 		)}>
 			<Avatar className={'shrink-0'}>
-				<AvatarImage src={prompt.thumbnailURL}/>
+				<AvatarImage src={poketto.basic.avatar}/>
 			</Avatar>
 			<div className={'grow overflow-hidden | flex flex-col gap-1'}>
-				<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{prompt.title}</p>
-				<p className={'truncate | '}>{prompt.description}</p>
+				<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{poketto.basic.title}</p>
+				<p className={'truncate | '}>{poketto.basic.desc}</p>
 			</div>
 			<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
-				<ViewsField v={prompt.views}/>
-				<p className={'truncate'}>@{prompt.User.name}</p>
+				<ViewsField v={poketto.state.views}/>
+				<p className={'truncate'}>@{poketto.user.name}</p>
 			</div>
 		</div>
 	)
@@ -35,7 +35,7 @@ export const SearchResultItem = ({ prompt }: { prompt: IFlowgptPromptBasic }) =>
 
 export const ChatList = () => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
-	const { data: searchedPrompts } = api.flowgpt.searchPrompts.useQuery({ query: search }, { enabled: search.length > 0 })
+	const { data: searchedPoketto } = api.poketto.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
 	
 	const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
 	
@@ -49,9 +49,9 @@ export const ChatList = () => {
 			{
 				search ? (
 					// 搜索时
-					searchedPrompts ? <>
-						<SectionTitle>Global search results {searchedPrompts.length ? '' : ' (0)'}</SectionTitle>
-						{searchedPrompts.slice(0, 10).map((prompt) => <SearchResultItem prompt={prompt} key={prompt.id}/>)}
+					searchedPoketto ? <>
+						<SectionTitle>Global search results {searchedPoketto.length ? '' : ' (0)'}</SectionTitle>
+						{searchedPoketto.slice(0, 10).map((prompt) => <SearchResultItem poketto={prompt} key={prompt.id}/>)}
 					</> : <>
 						<SectionTitle>Global search results</SectionTitle>
 						<Skeleton className={'h-8'}/>

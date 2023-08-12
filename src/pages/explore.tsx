@@ -21,7 +21,7 @@ export default function ExplorePage() {
 	const { cardsLayout, sort, setSortOrder } = useStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
-	const query = api.flowgpt.listPrompts.useInfiniteQuery({ sort }, {
+	const query = api.poketto.listPoketto.useInfiniteQuery({ sort }, {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
 	const items = query.data?.pages.flatMap((item) => item.data) ?? []
@@ -42,7 +42,7 @@ export default function ExplorePage() {
 					<span className={'text-lg'}>玩法推荐</span>
 					
 					<div className={'grow'}/>
-					<span className={'hidden md:block'}>Sort By</span>
+					{/*<span className={'hidden md:block'}>Sort By</span>*/}
 					<div className={'flex items-center'}>
 						{
 							Object.values(FlowGPTSortOrder)

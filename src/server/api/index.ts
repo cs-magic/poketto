@@ -1,6 +1,6 @@
 import { exampleRouter } from '@/server/api/routers/example'
 import { createTRPCRouter } from '@/server/api/helpers'
-import { flowgptRouter } from '@/server/api/routers/flowgpt.router'
+import { pokettoRouter } from '@/server/api/routers/pokettoRouter'
 
 /**
  * This is the primary router for your server.
@@ -9,7 +9,7 @@ import { flowgptRouter } from '@/server/api/routers/flowgpt.router'
  */
 export const appRouter = createTRPCRouter({
 	example: exampleRouter,
-	flowgpt: flowgptRouter,
+	poketto: pokettoRouter,
 })
 
 

@@ -14,6 +14,7 @@ export interface FlowgptPromptFull // todo: add comments
 	Conversation: IFlowgptConversation
 }
 
+
 export enum FlowGPTSortOrder {
 	
 	recommended = 'recommended',

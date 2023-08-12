@@ -5,6 +5,8 @@ import { FixedCacheQueue } from '@/lib/algo'
 
 
 import { type IFlowgptPromptBasic, type FlowgptPromptFull, FlowGPTSortOrder } from '@/ds/flowgpt'
+import { type SortOrder } from '@/ds/system'
+import { type IPoketto } from '@/ds/poketto'
 
 /**
  * ui
@@ -39,21 +41,21 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
 /**
  * flowgpt
  */
-export interface FlowGPTState {
-	sort: FlowGPTSortOrder
-	setSortOrder: (v: FlowGPTSortOrder) => void
-	promptId?: string
-	setPromptId: (v: string | undefined) => void
-	prompt?: FlowgptPromptFull | undefined
-	setPrompt: (v: FlowgptPromptFull | undefined) => void
+export interface PokettoState {
+	sort: SortOrder
+	setSortOrder: (v: SortOrder) => void
+	pokettoId?: string
+	setPokettoId: (v: string | undefined) => void
+	poketto?: IPoketto | undefined
+	setPoketto: (v: IPoketto | undefined) => void
 }
 
-export const createFlowGPTSlice: StoreSlice<FlowGPTState> = (setState) => ({
+export const createFlowGPTSlice: StoreSlice<PokettoState> = (setState) => ({
 	sort: FlowGPTSortOrder.recommended,
-	promptId: undefined,
-	setPromptId: (v) => setState((state) => {state.promptId = v}),
-	prompt: undefined,
-	setPrompt: (v) => setState((state) => {state.prompt = v}),
+	pokettoId: undefined,
+	setPokettoId: (v) => setState((state) => {state.pokettoId = v}),
+	poketto: undefined,
+	setPoketto: (v) => setState((state) => {state.poketto = v}),
 	setSortOrder: (v) => setState((state) => {state.sort = v}),
 })
 
@@ -84,7 +86,7 @@ export interface ChatsState {
 /**
  * store
  */
-export type StoreState = UIState & SearchState & FlowGPTState
+export type StoreState = UIState & SearchState & PokettoState
 
 export type StoreSlice<T> = StateCreator<
 	StoreState,

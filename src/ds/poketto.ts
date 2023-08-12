@@ -1,18 +1,16 @@
 import { type ChatGPTPromptItem } from '@/ds/chatgpt'
 import { type ID, type IUser } from '@/ds/general'
-import { type IFlowGPTComment } from '@/ds/flowgpt'
-
-export interface IPokettoFunction /* extends ChatGPTFunction */
-{
-	
-}
+import { type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
 
 
-export interface IPokettoBasic {
+export interface IPoketto {
 	id: string
 	user: IUser
+	conversation?: IFlowgptConversation
+	comments?: IPokettoComment[]
 	basic: {
 		version: string // !important: 用户打开的时候默认拉取最新版
+		language: string
 		title: string
 		desc: string
 		avatar: string
@@ -64,4 +62,9 @@ export interface IPokettoComment
 	ratedStars: number
 	content: string // !important: support markdown
 	user: IUser
+}
+
+export interface IPokettoFunction /* extends ChatGPTFunction */
+{
+
 }

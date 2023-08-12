@@ -1,4 +1,3 @@
-import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import Image from 'next/image'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -9,39 +8,16 @@ import { Separator } from '@/components/ui/separator'
 import RatingChart from '../../public/images/rating-chart.png'
 import { type ReactNode } from 'react'
 import { Comments } from '@/components/comment'
-import { DeviceContainer } from '@/components/utils/devices'
-import { useMobile } from '@/hooks/use-device'
 import clsx from 'clsx'
 import { CollapsablePara } from '@/components/utils/collapsable-para'
+import { type IPoketto } from '@/ds/poketto'
+import { useStore } from '@/store'
+import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from '@/config/system'
 
-export const FlowgptDetail = (
-	{
-		prompt: {
-			id,
-			
-			upvotes,
-			ranking,
-			rankingForNew,
-			comments,
-			
-			User,
-			Tag,
-			
-			model,
-			type,
-			
-			title,
-			description,
-			initPrompt,
-			
-			thumbnailURL,
-			language,
-		},
-		
-	}: { prompt: IFlowgptPromptBasic },
+export const PokettoDetail = (
+	{ poketto }: { poketto: IPoketto },
 ) => {
-	const rankingStar = Math.floor(ranking)
-	const isMobile = useMobile()
+	
 	
 	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 		return (
@@ -68,13 +44,13 @@ export const FlowgptDetail = (
 			
 			<section id={'basic'} className={'w-full | flex items-center gap-2'}>
 				<Avatar className={'wh-28 p-4  shrink-0'}>
-					<AvatarImage src={thumbnailURL} className={'rounded-2xl'}/>
+					<AvatarImage src={poketto.basic.avatar} className={'rounded-2xl'}/>
 				</Avatar>
 				
 				<div className={'grow overflow-hidden | flex flex-col gap-2'}>
 					<div className={'w-full | flex flex-col '}>
-						<h2 className={'line-clamp-2'}>{title}</h2>
-						<p className={'truncate text-primary-foreground/75'}>by {User.name}</p>
+						<h2 className={'line-clamp-2'}>{poketto.basic.title}</h2>
+						<p className={'truncate text-primary-foreground/75'}>by {poketto.user.name}</p>
 					</div>
 				</div>
 				<Button className={'w-20 | rounded-3xl bg-destructive/75 hover:bg-destructive'} size={'thin'}>Get</Button>
@@ -86,70 +62,81 @@ export const FlowgptDetail = (
 				'w-full',
 				'flex items-center justify-between',
 			)}>
-				<StatusItem a={'model'} b={model} c={'Chat'}/>
+				<StatusItem a={'model'} b={poketto.model.type} c={'Chat'}/>
 				
-				<StatusItem a={'ratings'} b={numeral(ranking).format('0.0')} c={<>
-					{_.range(rankingStar).map((i) => <StarFilledIcon className={'vh-4 leading-none'} key={i}/>)}
-					{_.range(5 - rankingStar).map((i) => <StarIcon className={'vh-4 leading-none'} key={i}/>)}
-				</>}/>
+				{
+					POKETTO_DETAIL_RATINGS_ENABLED && (
+						<StatusItem a={'ratings'} b={numeral(poketto.state.ratedStars).format('0.0')} c={<>
+							{_.range(Math.floor(poketto.state.ratedStars)).map((i) => <StarFilledIcon className={'vh-4 leading-none'} key={i}/>)}
+							{_.range(5 - Math.floor(poketto.state.ratedStars)).map((i) => <StarIcon className={'vh-4 leading-none'} key={i}/>)}
+						</>}/>
+					)
+				}
 				
-				<StatusItem a={'chart'} b={`No. ${numeral(ranking).format('0.0')}`} c={Tag ? Tag[0]!.name : 'ALL'}/>
+				{/*<StatusItem a={'chart'} b={`No. ${numeral(ranking).format('0.0')}`} c={Tag ? Tag[0]!.name : 'ALL'}/>*/}
 				
 				{/*<StatusItem a={'developer'} b={<PersonIcon className={'wh-8'}/>} c={User.name}/>*/}
 				
 				{/*<Separator orientation={'vertical'} className={'h-1/2'}/>*/}
-				<StatusItem a={'language'} b={language} c={'Universal'}/>
+				<StatusItem a={'language'} b={poketto.basic.language} c={'Universal'}/>
 			</section>
 			
-			<section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}>
-				
-				<DeviceContainer ratio={.6} device={isMobile ? 'iphone-14-pro' : 'surface-pro-2017'}>
-					<div className={'w-full flex flex-col'}>
-						<h2>heading 1</h2>
-						<div>hhh</div>
-						<h2>heading 2</h2>
-						<div>hhh2</div>
-					</div>
-				</DeviceContainer>
-			</section>
+			{/*<section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}>*/}
+			{/*	*/}
+			{/*	<DeviceContainer ratio={.6} device={isMobile ? 'iphone-14-pro' : 'surface-pro-2017'}>*/}
+			{/*		<div className={'w-full flex flex-col'}>*/}
+			{/*			<h2>heading 1</h2>*/}
+			{/*			<div>hhh</div>*/}
+			{/*			<h2>heading 2</h2>*/}
+			{/*			<div>hhh2</div>*/}
+			{/*		</div>*/}
+			{/*	</DeviceContainer>*/}
+			{/*</section>*/}
 			
 			<section id={'desc'} className={'relative w-full flex flex-col'}>
-				<CollapsablePara content={description}/>
+				<CollapsablePara content={poketto.basic.desc}/>
 			</section>
 			
-			<section id={'ratings-reviews'} className={'w-full flex flex-col gap-4'}>
-				<div className={'flex items-center justify-between'}>
-					<h2>Ratings & Reviews</h2>
-					<Button variant={'ghost'}>See All</Button>
-				</div>
-				<div className={'grid grid-col-1 md:grid-cols-2 gap-4'}>
-					<div className={'flex items-end justify-between'}>
-						<p className={'flex items-end gap-2'}>
-							<span className={'text-4xl font-bold'}>{numeral(ranking).format('0.0')}</span>
-							<span className={'text-sm font-'}>out of 5</span>
-						</p>
-						<span>{numeral(ranking).format('0a')} Ratings</span>
+			{POKETTO_DETAIL_RATINGS_ENABLED && (
+				<section id={'ratings-reviews'} className={'w-full flex flex-col gap-4'}>
+					<div className={'flex items-center justify-between'}>
+						<h2>Ratings & Reviews</h2>
+						<Button variant={'ghost'}>See All</Button>
 					</div>
-					<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>
-				</div>
-				<Comments id={id}/>
-			</section>
+					<div className={'grid grid-col-1 md:grid-cols-2 gap-4'}>
+						<div className={'flex items-end justify-between'}>
+							<p className={'flex items-end gap-2'}>
+								<span className={'text-4xl font-bold'}>{numeral(poketto.state.ratedStars).format('0.0')}</span>
+								<span className={'text-sm font-'}>out of 5</span>
+							</p>
+							<span>{numeral(poketto.state.ratedStars).format('0a')} Ratings</span>
+						</div>
+						<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>
+					</div>
+					<Comments id={poketto.id}/>
+				</section>
+			)}
 			
 			<section id={'information'} className={'w-full flex flex-col gap-4'}>
 				<h2>Information</h2>
 				<div className={'grid grid-cols-2 gap-4'}>
-					<InfoItem a={'provider'} b={User.name}/>
-					<InfoItem a={'category'} b={Tag[0] ? Tag[0].name : 'NONE'}/>
-					<InfoItem a={'language'} b={language}/>
+					<InfoItem a={'provider'} b={poketto.user.name}/>
+					<InfoItem a={'category'} b={poketto.basic.category[0] ?? 'No Category'}/>
+					<InfoItem a={'language'} b={poketto.basic.language}/>
 				</div>
 			</section>
 			
 			
-			<Separator orientation={'horizontal'}/>
-			<section id={'collections'} className={'w-full flex flex-col gap-4'}>
-				<h2>Featured In</h2>
-				<div>TODO</div>
-			</section>
+			{POKETTO_DETAIL_FEATURES_ENABLED && (
+				<>
+					<Separator orientation={'horizontal'}/>
+					<section id={'collections'} className={'w-full flex flex-col gap-4'}>
+						<h2>Featured In</h2>
+						<div>TODO</div>
+					</section>
+				</>
+			)}
+		
 		</div>
 	)
 }

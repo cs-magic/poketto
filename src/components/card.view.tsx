@@ -17,11 +17,11 @@ import { Button } from '@/components/ui/button'
 import { order2icon } from '@/components/utils/assets'
 
 import { uri } from '@/config/uri'
-import { type IPokettoBasic } from '@/ds/poketto'
+import { type IPoketto } from '@/ds/poketto'
 import { getUserUri } from '@/lib/user'
 
 
-export const PocketCardView = (app: IPokettoBasic) => {
+export const PocketCardView = (app: IPoketto) => {
 	const router = useRouter()
 	const { cardsLayout, sort } = useStore()
 	const Icon = order2icon[sort]
@@ -91,7 +91,7 @@ export const PocketCardView = (app: IPokettoBasic) => {
 	)
 }
 export const User = ({ avatarAndName, app, forDetail }: {
-	app: IPokettoBasic | undefined
+	app: IPoketto | undefined
 	avatarAndName?: boolean
 	forDetail?: boolean
 }) => {
