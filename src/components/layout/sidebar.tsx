@@ -12,10 +12,11 @@ import { XIcon } from 'lucide-react'
 import { MenuLink } from '@/components/utils/link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import _ from 'lodash'
-import { InvitationStatus } from '@/ds/status'
 import { SelfUserAvatar } from '@/components/user'
 import { user } from '@/config/user'
 import { uri } from '@/config/uri'
+
+import { InvitationStatus } from '@/ds/system'
 
 export const NavGroups = ({ title, children }: {
 	title: string

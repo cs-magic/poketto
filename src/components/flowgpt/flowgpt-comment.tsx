@@ -1,4 +1,4 @@
-import { type IFlowgptComment } from '@/ds/flowgpt'
+import { type FlowgptComment } from '@/ds/flowgpt'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { api } from '@/lib/api'
 
@@ -6,7 +6,7 @@ export const FlowgptComment = (
 	{
 		id,
 		body,
-	}: IFlowgptComment) => {
+	}: FlowgptComment) => {
 	
 	return (
 		<Card>

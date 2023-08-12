@@ -1,4 +1,4 @@
-import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
+import { type FlowgptPromptBasic } from '@/ds/flowgpt'
 import Image from 'next/image'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -34,7 +34,7 @@ export const FlowgptDetail = (
 		thumbnailURL,
 		language,
 		
-	}: IFlowgptBasicPrompt,
+	}: FlowgptPromptBasic,
 ) => {
 	const rankingStar = Math.floor(ranking)
 	const isMobile = useMobile()

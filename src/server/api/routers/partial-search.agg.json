@@ -31,6 +31,12 @@
       "description": 1,
       "initPrompt": 1,
       "User": 1,
+      "state": {
+        "views": "$views",
+        "uses": "$uses",
+        "upVoted": "$upVoted",
+        "starsRated": 0
+      },
       "highlights": {
         "$meta": "searchHighlights"
       }

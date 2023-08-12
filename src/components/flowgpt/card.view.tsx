@@ -1,4 +1,4 @@
-import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
+import { type FlowgptPromptBasic } from '@/ds/flowgpt'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -21,7 +21,7 @@ import { order2icon } from '@/components/utils/assets'
 import { uri } from '@/config/uri'
 
 
-export const PocketCardView = (props: IFlowgptBasicPrompt) => {
+export const PocketCardView = (props: FlowgptPromptBasic) => {
 	const router = useRouter()
 	const { cardsLayout, sort } = useStore()
 	const Icon = order2icon[sort]
@@ -91,7 +91,7 @@ export const PocketCardView = (props: IFlowgptBasicPrompt) => {
 	)
 }
 export const User = ({ avatarAndName, data, forDetail }: {
-	data: IFlowgptBasicPrompt | undefined
+	data: FlowgptPromptBasic | undefined
 	avatarAndName?: boolean
 	forDetail?: boolean
 }) => {
@@ -130,7 +130,7 @@ export const User = ({ avatarAndName, data, forDetail }: {
 	)
 }
 export const AgentCardInteraction = ({ data, twoSide, forDetail }: {
-	data: IFlowgptBasicPrompt | undefined
+	data: FlowgptPromptBasic | undefined
 	twoSide?: boolean
 	forDetail?: boolean
 }) => {
@@ -182,7 +182,7 @@ export const AgentCardInteraction = ({ data, twoSide, forDetail }: {
 	)
 }
 export const PromptCardHeader = ({ data, forDetail }: {
-	data?: IFlowgptBasicPrompt
+	data?: FlowgptPromptBasic
 	forDetail?: boolean
 }) => {
 	return (

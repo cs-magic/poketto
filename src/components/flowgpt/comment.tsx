@@ -4,11 +4,11 @@ import dayjs from 'dayjs'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { IconThumbUp } from '@tabler/icons-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { type IFlowgptComment } from '@/ds/flowgpt'
+import { type FlowgptComment } from '@/ds/flowgpt'
 import { getShortName } from '@/lib/string'
 import { Button } from '@/components/ui/button'
 
-export const Comment = ({ data }: { data: IFlowgptComment | undefined }) => {
+export const Comment = ({ data }: { data: FlowgptComment | undefined }) => {
 	return (
 		
 		<Card className={clsx(

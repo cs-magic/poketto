@@ -35,6 +35,7 @@ const config = {
 		'react/no-children-prop': ['warn'],
 		'@typescript-eslint/no-inferrable-types': ['off'],
 		'@typescript-eslint/no-unsafe-return': ['warn'],
+		'@typescript-eslint/no-empty-interface': ['off'],
 	},
 };
 

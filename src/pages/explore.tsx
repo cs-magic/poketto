@@ -6,7 +6,6 @@ import { api } from '@/lib/api'
 import { GridContainer, MasonryContainer } from '@/components/utils/responsive-containers'
 import { CardsLayoutType, useStore } from '@/store'
 import { ScrollTrigger } from '@/components/utils/scroll-trigger'
-import { SortOrder } from '@/ds/flowgpt'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import _ from 'lodash'
@@ -14,6 +13,8 @@ import { FrameIcon } from '@radix-ui/react-icons'
 
 
 import { order2icon } from '@/components/utils/assets'
+
+import { FlowGPTSortOrder } from '@/ds/flowgpt'
 
 export default function ExplorePage() {
 	
@@ -44,7 +45,7 @@ export default function ExplorePage() {
 					<span className={'hidden md:block'}>Sort By</span>
 					<div className={'flex items-center'}>
 						{
-							Object.values(SortOrder)
+							Object.values(FlowGPTSortOrder)
 								.map((order) => {
 									const Icon = order2icon[order]
 									return (

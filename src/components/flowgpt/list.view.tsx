@@ -1,4 +1,4 @@
-import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
+import { type FlowgptPromptBasic } from '@/ds/flowgpt'
 import dayjs from 'dayjs'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import React from 'react'
@@ -6,8 +6,9 @@ import { IconEye, IconGitFork } from '@tabler/icons-react'
 import { ICON_DIMENSION_SM } from '@/config/assets'
 import numeral from 'numeral'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ResponsiveField, UsesField, ViewsField } from '@/components/utils/responsive-field'
 
-export const PocketListView = ({ props }: { props: IFlowgptBasicPrompt | undefined }) => {
+export const PocketListView = ({ props }: { props: FlowgptPromptBasic | undefined }) => {
 	if (!props) return (
 		<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
 			<Skeleton className={'wh-12'}/>
@@ -41,8 +42,8 @@ export const PocketListView = ({ props }: { props: IFlowgptBasicPrompt | undefin
 			</div>
 			
 			<div className={'inline-flex gap-2 shrink-0'}>
-				<p className={'inline-flex items-center gap-1'}><IconGitFork className={ICON_DIMENSION_SM}/> {numeral(props?.uses).format('0a')} Uses</p>
-				<p className={'inline-flex items-center gap-1'}><IconEye className={ICON_DIMENSION_SM}/> {numeral(props?.views).format('0a')} Views</p>
+				<UsesField v={props.uses}/>
+				<ViewsField v={props.views}/>
 			</div>
 		</div>
 	)

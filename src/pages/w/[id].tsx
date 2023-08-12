@@ -3,21 +3,27 @@ import { useRouter } from 'next/router'
 import { Input } from '@/components/ui/input'
 import { useDebouncedState } from '@mantine/hooks'
 import { api } from '@/lib/api'
-import { type IFlowgptBasicPrompt } from '@/ds/flowgpt'
+import { type FlowgptPromptBasic } from '@/ds/flowgpt'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { type PropsWithChildren } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ViewsField } from '@/components/utils/responsive-field'
 
 
-export const PromptList = ({ prompt }: { prompt: IFlowgptBasicPrompt }) => {
+export const PromptList = ({ prompt }: { prompt: FlowgptPromptBasic }) => {
+	console.log(prompt)
 	return (
 		<div className={'w-full p-2 | flex gap-2 | hover:bg-accent cursor-pointer'}>
 			<Avatar className={'shrink-0'}>
 				<AvatarImage src={prompt.thumbnailURL}/>
 			</Avatar>
-			<div className={'flex flex-col gap-1'}>
+			<div className={'grow | flex flex-col gap-1'}>
 				<p className={'font-semibold'}>{prompt.title}</p>
-				<p className={'text-muted-foreground text-xs'}>@{prompt.User.name}</p>
+				<p className={'text-muted-foreground'}>{prompt.description}</p>
+			</div>
+			<div className={'w-20 overflow-hidden | flex flex-col gap-1'}>
+				<ViewsField v={prompt.views}/>
+				<p className={'truncate | text-muted-foreground text-xs'}>@{prompt.User.name}</p>
 			</div>
 		</div>
 	)

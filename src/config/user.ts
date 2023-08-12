@@ -1,4 +1,4 @@
-import { InvitationStatus } from '@/ds/status'
+import { InvitationStatus } from '@/ds/system'
 
 export const DEFAULT_USER_ID = 'mark'
 

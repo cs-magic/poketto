@@ -3,7 +3,9 @@ import React, { type ElementType, type HTMLProps } from 'react'
 import { clsx } from 'clsx'
 import Image, { type ImageProps } from 'next/image'
 import { ICON_DIMENSION_SM } from '@/config/assets'
-import { SortOrder } from '@/ds/flowgpt'
+
+
+import { FlowGPTSortOrder } from '@/ds/flowgpt'
 
 // todo: avoid alt
 type ImageProps_ = Omit<ImageProps, 'src' | 'alt'>
@@ -24,11 +26,11 @@ export const SVGFactory = ({ Comp, presetClassName = '', className = '', ...prop
 }) =>
 	<Comp className={clsx(ICON_DIMENSION_SM, presetClassName, className)} {...props}/>
 
-export const order2icon: Record<SortOrder, JSX.ElementType> = {
-	[SortOrder.recommended]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconStackPush} {...props}/>,
-	[SortOrder.top]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconThumbUp} {...props}/>,
-	[SortOrder.mostSaved]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconDownload} {...props}/>,
-	[SortOrder.trending]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTrendingUp} {...props}/>,
-	[SortOrder.new]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconCalendarFilled} {...props}/>,
-	[SortOrder.follow]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTelescope} {...props}/>,
+export const order2icon: Record<FlowGPTSortOrder, JSX.ElementType> = {
+	[FlowGPTSortOrder.recommended]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconStackPush} {...props}/>,
+	[FlowGPTSortOrder.top]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconThumbUp} {...props}/>,
+	[FlowGPTSortOrder.mostSaved]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconDownload} {...props}/>,
+	[FlowGPTSortOrder.trending]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTrendingUp} {...props}/>,
+	[FlowGPTSortOrder.new]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconCalendarFilled} {...props}/>,
+	[FlowGPTSortOrder.follow]: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTelescope} {...props}/>,
 }
