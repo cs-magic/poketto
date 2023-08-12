@@ -7,7 +7,7 @@ import { ChatList } from '@/components/chat/list'
 
 export default function WorkspacePage() {
 	
-	const { prompt } = useStore()
+	const { prompt, showChatList, showChatDetail } = useStore()
 	// console.log('[WorkspacePage] ', { wid, search, prompts, prompt })
 	
 	
@@ -15,13 +15,15 @@ export default function WorkspacePage() {
 		<RootLayout>
 			<div className={'w-full h-full overflow-hidden | flex divide-x'}>
 				
-				<ChatList/>
+				{showChatList && <ChatList/>}
 				
 				<ChatConversation/>
 				
-				<section id={'chat-detail'} className={'w-full min-w-[320px] max-w-sm p-4 | hidden xl:flex'}>
-					{prompt && <FlowgptDetail prompt={prompt}/>}
-				</section>
+				{showChatDetail && (
+					<section id={'chat-detail'} className={'w-full min-w-[320px] max-w-sm p-4 | hidden xl:flex'}>
+						{prompt && <FlowgptDetail prompt={prompt}/>}
+					</section>
+				)}
 			</div>
 		</RootLayout>
 	)
