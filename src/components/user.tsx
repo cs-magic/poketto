@@ -3,9 +3,15 @@ import { Icons, ICON_DIMENSION_MD } from '@/config/assets'
 import numeral from 'numeral'
 import { Button } from '@/components/ui/button'
 import React from 'react'
-import { user } from '@/config/user'
 
-export const UserProfile = () => {
+/**
+ * todo: next-auth with user profile
+ *
+ * @param user
+ * @return {JSX.Element}
+ * @constructor
+ */
+export const UserProfile = (user: any) => {
 	return (
 		<div className={'w-72 h-96 bg-card rounded-2xl | p-8 | flex flex-col justify-around gap-2'}>
 			{/* avatar info*/}
@@ -48,14 +54,5 @@ export const UserProfile = () => {
 				<Button>收藏</Button>
 			</div>
 		</div>
-	)
-}
-
-export const SelfUserAvatar = () => {
-	return (
-		<Avatar className={ICON_DIMENSION_MD}>
-			<AvatarImage src={user.avatar}/>
-			<AvatarFallback>{user.name}</AvatarFallback>
-		</Avatar>
 	)
 }

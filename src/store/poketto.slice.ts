@@ -1,5 +1,4 @@
-import { SortOrder } from '@/ds/system'
-import { type IChannelMessage, type IPokettoBasic, type IPokettoChannel, type IPokettoComment } from '@/ds/poketto'
+import { type IChannelMessage, type IPokettoBasic, type IPokettoChannel, type IPokettoComment, SortOrder } from '@/ds/poketto'
 
 import { type StoreSlice } from '@/store/index'
 import { type ID } from '@/ds/general'

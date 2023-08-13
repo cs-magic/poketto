@@ -14,7 +14,8 @@ import Link from 'next/link'
 import { uri } from '@/config/uri'
 import { type ReactNode } from 'react'
 import { Grow } from '@/components/utils/grow'
-import { SortOrder } from '@/ds/system'
+
+import { SortOrder } from '@/ds/poketto'
 
 export default function WorkspacesPage() {
 	const { data: page } = api.poketto.listPoketto.useQuery({ sort: SortOrder.trending })

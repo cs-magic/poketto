@@ -48,14 +48,39 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum InvitationStatus {
+  Idle
+  Pending
+  Accepted
+  Expired
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  status    InvitationStatus @default(Idle)
+  // code if necessary
+
+  from   User   @relation("from", fields: [fromId], references: [id])
+  fromId String
+
+  to   User?   @relation("to", fields: [toId], references: [id])
+  toId String? @unique
+}
+
 model User {
+  invitedFrom Invitation[] @relation("from")
+  invitdeTo   Invitation[] @relation("to")
+
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
+
+  accounts Account[]
+  sessions Session[]
 }
 
 model VerificationToken {

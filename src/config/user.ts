@@ -1,4 +1,4 @@
-import { InvitationStatus } from '@/ds/system'
+import { InvitationStatus } from '.prisma/client'
 
 export const DEFAULT_USER_ID = 'mark'
 
@@ -17,9 +17,9 @@ export const user = {
 	invitation: {
 		from: null,
 		to: [
-			{ id: 'test1', status: InvitationStatus.pending },
-			{ id: 'test1', status: InvitationStatus.consumed },
-			{ id: 'test1', status: InvitationStatus.expired },
+			{ id: 'test1', status: InvitationStatus.Pending },
+			{ id: 'test1', status: InvitationStatus.Accepted },
+			{ id: 'test1', status: InvitationStatus.Expired },
 		],
 	},
 	

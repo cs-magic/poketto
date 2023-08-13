@@ -6,22 +6,17 @@ import { MenuLink } from '@/components/utils/link'
 import { uri } from '@/config/uri'
 import { InviteCard } from '@/components/utils/invitation'
 import { useAppStore } from '@/store'
-import { SelfUserAvatar } from '@/components/user'
 import { useUser } from '@/hooks/use-user'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ICON_DIMENSION_MD } from '@/config/assets'
-import { user } from '@/config/user'
 import { UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/router'
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signIn, signOut } from 'next-auth/react'
 
 
 export const Sidebar = () => {
 	
 	const { sidebarVisible } = useAppStore()
-	const router = useRouter()
-	console.log({ sidebarVisible })
 	const user = useUser()
 	
 	return (

@@ -1,5 +1,5 @@
 import { type ID, type IUser } from '@/ds/general'
-import { type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
+import { FlowGPTSortOrder, type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
 import d from '@/lib/datetime'
 import { type Message } from 'ai'
 import { nanoid } from 'nanoid'
@@ -141,3 +141,6 @@ export interface IPokettoChannelListView {
 	latestMessage: IChannelMessage
 	latestUser?: IPokettoChannelUser
 }
+
+export const SortOrder = { ...FlowGPTSortOrder }
+export type SortOrder = FlowGPTSortOrder

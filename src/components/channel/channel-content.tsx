@@ -9,9 +9,10 @@ import { toast } from 'sonner'
 import { useAppStore } from '@/store'
 import { useEffect, useRef } from 'react'
 import { nanoid } from 'nanoid'
-import { user } from '@/config/user'
+import { useUserId } from '@/hooks/use-user'
 
 export const ChannelContent = () => {
+	const userId = useUserId()
 	const questionId = useRef<string>()
 	const { channels, pokettoBasic, pushMessage } = useAppStore()
 	const initMessages = useAppStore((state) => state.messages.filter((m) => m.channelId === pokettoBasic.id))
@@ -38,7 +39,7 @@ export const ChannelContent = () => {
 				type: 'user',
 				format: 'text',
 				parentId: questionId.current,
-				userId: user.id,
+				userId,
 			})
 		},
 	})
@@ -105,7 +106,7 @@ export const ChannelContent = () => {
 					format: 'text',
 					createdAt: new Date(),
 					parentId: undefined,
-					userId: user.id,
+					userId,
 				})
 				handleSubmit(event)
 			}}>

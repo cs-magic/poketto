@@ -1,5 +1,3 @@
-import { user } from '@/config/user'
-import { InvitationStatus } from '@/ds/system'
 import { Badge } from '@/components/ui/badge'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
@@ -8,9 +6,12 @@ import { uri } from '@/config/uri'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import { Cross1Icon } from '@radix-ui/react-icons'
+import { api } from '@/lib/api'
+import { InvitationStatus } from '.prisma/client'
 
 export const InviteCard = () => {
-	const surplus = user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length
+	const { data = [] } = api.example.getInvitations.useQuery()
+	const surplus = data.filter((item) => [InvitationStatus.Idle].includes(item.status)).length
 	
 	return (
 		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>
