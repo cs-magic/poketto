@@ -3,17 +3,26 @@ import { Separator } from '@/components/ui/separator'
 import { clsx } from 'clsx'
 import { ChevronRightIcon, EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from '@radix-ui/react-icons'
 import { MenuLink } from '@/components/utils/link'
-import { user } from '@/config/user'
 import { uri } from '@/config/uri'
 import { InviteCard } from '@/components/utils/invitation'
 import { useAppStore } from '@/store'
 import { SelfUserAvatar } from '@/components/user'
+import { useUser } from '@/hooks/use-user'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ICON_DIMENSION_MD } from '@/config/assets'
+import { user } from '@/config/user'
+import { UserIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/router'
+import { signIn, signOut, useSession } from 'next-auth/react'
 
 
 export const Sidebar = () => {
 	
 	const { sidebarVisible } = useAppStore()
+	const router = useRouter()
 	console.log({ sidebarVisible })
+	const user = useUser()
 	
 	return (
 		<div className={clsx(
@@ -45,16 +54,26 @@ export const Sidebar = () => {
 			{sidebarVisible && <InviteCard/>}
 			
 			<div className={'flex justify-center items-center gap-2 py-4 border-t'}>
-				<SelfUserAvatar/>
+				<Avatar className={ICON_DIMENSION_MD}>
+					<AvatarImage src={user?.image ?? undefined}/>
+					<AvatarFallback><UserIcon/></AvatarFallback>
+				</Avatar>
+				
 				{sidebarVisible && (
-					<>
-						<div className={'flex flex-col gap-0'}>
-							<span className={'text-xs'}>{user.name}</span>
-							<span className={'text-xs'}>{user.id}</span>
-						</div>
-						<div className={'grow'}/>
-						<ChevronRightIcon/>
-					</>
+					user ? (
+						<>
+							<div className={'flex flex-col gap-0'} onClick={() => void signOut()}>
+								<span className={'text-xs'}>{user.name}</span>
+								<span className={'text-xs'}>{user.id}</span>
+							</div>
+							<div className={'grow'}/>
+							<ChevronRightIcon/>
+						</>
+					) : (
+						<Button className={'grow'} variant={'destructive'} onClick={() => void signIn()}>
+							登录
+						</Button>
+					)
 				)}
 			</div>
 		</div>
