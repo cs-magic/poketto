@@ -13,12 +13,22 @@ import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from 
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MarqueeContainer, MasonryContainer } from '@/components/utils/containers'
+import { useAppStore } from '@/store'
+import { createPokettoChannel } from '@/lib/poketto'
 
 export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
+	const { addChannel, channels } = useAppStore()
 	
+	const onAddPokettoChannel = () => {
+		addChannel(createPokettoChannel(poketto))
+	}
 	
 	return (
-		<div className={'w-full overflow-x-hidden h-full overflow-y-auto | flex flex-col gap-4 '}>
+		<section id={'poketto-channel-detail'} className={clsx(
+			'w-full md:w-[375px] shrink-0 overflow-x-hidden',
+			'h-full overflow-y-auto p-4 gap-4',
+			'flex flex-col ',
+		)}>
 			
 			<section id={'basic'} className={'w-full | flex items-center gap-2'}>
 				<Avatar className={'wh-28 p-4  shrink-0'}>
@@ -28,17 +38,27 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 				<div className={'grow overflow-hidden | flex flex-col gap-2'}>
 					<div className={'w-full | flex flex-col '}>
 						<h2 className={'line-clamp-2'}>{poketto.basic.title}</h2>
-						<p className={'truncate text-primary-foreground/75'}>by {poketto.user.name}</p>
+						<p className={'truncate text-primary-foreground/75'}>by {poketto.model.manufacturer}</p>
 					</div>
 				</div>
-				<Button
-					variant={'destructive'}
-					className={clsx(
-						'w-20 | rounded-3xl',
-						// 'bg-destructive/75  hover:bg-destructive',
-						// 'bg-[#027AFF]', // Apple Store get 按钮色
-						// 'bg-[#19abff] bg-[#D70010] bg-[#CCE0BB] bg-[#F3A9CA] bg-[#FFC148] bg-[#94B3EA] bg-[#FAA883]  ', // 哆啦A梦颜色，https://www.pinterest.com/pin/271130840040488009/
-					)} size={'thin'}>Get</Button>
+				{
+					channels.find((c) => c.poketto.id === poketto.id)
+						?
+						<Button
+							disabled
+							className={clsx(
+								'w-20 | rounded-3xl',
+							)} size={'thin'} onClick={onAddPokettoChannel}>Got</Button>
+						:
+						<Button
+							variant={'destructive'}
+							className={clsx(
+								'w-20 | rounded-3xl',
+								// 'bg-destructive/75  hover:bg-destructive',
+								// 'bg-[#027AFF]', // Apple Store get 按钮色
+								// 'bg-[#19abff] bg-[#D70010] bg-[#CCE0BB] bg-[#F3A9CA] bg-[#FFC148] bg-[#94B3EA] bg-[#FAA883]  ', // 哆啦A梦颜色，https://www.pinterest.com/pin/271130840040488009/
+							)} size={'thin'} onClick={onAddPokettoChannel}>Get</Button>
+				}
 			</section>
 			
 			<Separator orientation={'horizontal'}/>
@@ -127,7 +147,7 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 			<section id={'information'} className={'w-full flex flex-col gap-4'}>
 				<h2>Information</h2>
 				<div className={'grid grid-cols-2 gap-4'}>
-					<InfoItem a={'provider'} b={poketto.user.name}/>
+					<InfoItem a={'provider'} b={poketto.model.manufacturer}/>
 					<InfoItem a={'category'} b={poketto.basic.category[0] ?? 'No Category'}/>
 					<InfoItem a={'language'} b={poketto.basic.language}/>
 				</div>
@@ -152,16 +172,16 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 				</>
 			)}
 		
-		</div>
+		</section>
 	)
 }
 
 
 const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 	return (
-		<div className={'w-full overflow-hidden whitespace-nowrap p-2 | flex flex-col items-center justify-between gap-1 '}>
+		<div className={'w-full overflow-hidden whitespace-nowrap py-2 | flex flex-col items-center justify-between gap-1'}>
 			<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
-			<MarqueeContainer className={'text-2xl'}>{b}</MarqueeContainer>
+			<MarqueeContainer className={'text-lg'}>{b}</MarqueeContainer>
 			<div className={'flex justify-center items-center text-primary-foreground/50'}>{c}</div>
 		</div>
 	)

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { GET_PROMPTS_BATCH_SIZE, type IFlowGPTComment, type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/api/helpers'
-import partialSearch from './partial-search.agg.json'
+import partialSearch from '../../../data/partial-search.agg.json'
 import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
 import { flowgpt2poketto, flowgpt2poketto_comment } from '@/lib/transform'
 import { SortOrder } from '@/ds/system'

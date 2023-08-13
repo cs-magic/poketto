@@ -1,12 +1,12 @@
 import { type FlowgptPromptFull, type IFlowGPTComment, type IFlowgptPromptBasic } from '@/ds/flowgpt'
-import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
+import { flowgpt2poketto_conversation, type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
 import dayjs from 'dayjs'
 
 export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull): IPokettoBasic => {
 	
 	return {
 		id: prompt.id,
-		conversation: 'Conversation' in prompt ? prompt.Conversation : undefined,
+		conversation: 'Conversation' in prompt ? flowgpt2poketto_conversation(prompt.Conversation) : undefined,
 		basic: {
 			version: '1.0.0',
 			language: prompt.language,

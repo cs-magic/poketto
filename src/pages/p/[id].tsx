@@ -1,4 +1,4 @@
-import { PokettoDetail } from '@/components/detail'
+import { PokettoDetail } from '@/components/channel/channel-detail'
 import { useRouter } from 'next/router'
 import { RootLayout } from '@/layouts/root.layout'
 import { useEffect } from 'react'

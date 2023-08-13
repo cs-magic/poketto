@@ -4912,6 +4912,11 @@ mz@^2.7.0:
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
 
+nano-id@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/nano-id/-/nano-id-1.1.0.tgz#0ee02e76f3482c1c148ab1830e45d59cafa304e0"
+  integrity sha512-vQB87xWh4CCBZq2d7/wF46uiwZOx+n6ShQ4QBuiejQhBSijkTeK6Ugv1EhgjVAg8fwIu9wtWk3GhCN4ViD0TJQ==
+
 nanoid@^3.3.4, nanoid@^3.3.6:
   version "3.3.6"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.6.tgz#443380c856d6e9f9824267d960b4236ad583ea4c"

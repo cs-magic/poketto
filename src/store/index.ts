@@ -25,11 +25,28 @@ export const useAppStore = create<StoreState>()(
 		persist(
 			immer(
 				(...a) => ({
-					...createUISlice(...a),
-					...createSystemSlice(...a),
-					...createPokettoSlice(...a),
+					...createUISlice(
+						...a,
+					),
+					...createSystemSlice(
+						...a,
+					),
+					...createPokettoSlice(
+						...a,
+					),
 				}),
 			),
-			{ name: 'zustand' }),
+			{
+				name: 'zustand',
+				version: 0.2,
+				// @ts-ignore
+				migrate: (persistedState: StoreState, version) => {
+					if (version === 0.1) {
+						const data = persistedState.channels[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
+						persistedState.channels[0]!.messages[0] = { ...persistedState.channels[0]!.messages[0]!, ...data }
+					}
+					return persistedState
+				},
+			}),
 	),
 )

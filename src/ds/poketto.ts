@@ -1,12 +1,24 @@
-import { type ChatGPTPromptItem } from '@/ds/chatgpt'
+import { type IChatGPTPrompt } from '@/ds/chatgpt'
 import { type ID, type IUser } from '@/ds/general'
 import { type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
+import d, { getTimestampMS } from '@/lib/datetime'
+import { nanoid } from 'nanoid'
+
+export interface IPokettoConversation {
+	createdAt: number
+	messages: IChatGPTPrompt[]
+}
+
+export const flowgpt2poketto_conversation = (c: IFlowgptConversation): IPokettoConversation => ({
+	createdAt: d(c.createdAt).toDate().getMilliseconds(),
+	messages: c.messages as IChatGPTPrompt[],
+})
 
 
 export interface IPokettoBasic {
 	id: string
 	user: IUser
-	conversation?: IFlowgptConversation
+	conversation?: IPokettoConversation,
 	comments?: IPokettoComment[]
 	basic: {
 		version: string // !important: 用户打开的时候默认拉取最新版
@@ -28,10 +40,10 @@ export interface IPokettoBasic {
 	model: {
 		manufacturer: string // ChatGPT | Claude | OpenChat | ...
 		type: string // 具体的模型号：gpt-3.5-xxx | gpt-4-xx | ...
-		initPrompts: ChatGPTPromptItem[] // 不直接用 systemPrompt 是因为要支持 few-shot
-		temperature: number
+		initPrompts: IChatGPTPrompt[] // 不直接用 systemPrompt 是因为要支持 few-shot
 		functions: IPokettoFunction[] // todo: support plugins
 		// ... other args
+		temperature?: number
 	}
 	state: {
 		/**
@@ -69,4 +81,53 @@ export interface IPokettoComment
 export interface IPokettoFunction /* extends ChatGPTFunction */
 {
 
+}
+
+
+export interface IPokettoMessageContent {
+	type: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote' | 'notification'
+	content: string
+}
+
+export const SYSTEM_USER_ID = 'poketto' as const
+export type SYSTEM_USER_TYPE = typeof SYSTEM_USER_ID
+
+/**
+ * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
+ */
+export interface IPokettoChannelMessage {
+	type: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote' | 'notification'
+	content: string
+	id: ID
+	channelId: ID //
+	userId?: ID // 1. 不要存user，这样可以保证批量更新 2. 通知等就没有 userId
+	parentId?: ID
+	
+	createdAt: number
+	interactions: Record<string, number>
+}
+
+export interface IPokettoChannelUser
+	extends IUser {
+	state: 'active' | 'leave'
+	type:
+		'user'
+		| 'bot' // 预设消息
+		| SYSTEM_USER_TYPE // like tg: Mark Shawn joined the group
+}
+
+export interface IPokettoChannel {
+	joinTime: number
+	latestTime: number
+	poketto: IPokettoBasic
+	users: IPokettoChannelUser[]
+	messages: IPokettoChannelMessage[]
+}
+
+export interface IPokettoChannelListView {
+	id: ID
+	avatar: string
+	title: string
+	latestMessage: IPokettoChannelMessage
+	latestUser?: IPokettoChannelUser
 }

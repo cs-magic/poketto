@@ -17,11 +17,10 @@ export const getShortName = (s: string, len: number = 2) => {
  * @param {number} mode
  * @return {`https://robohash.org/${string}?set=set${number}&size=${number}x${number}`}
  */
-export const getRobotAvatar = ({ key, width = 256, height = 256, mode = 3 }: {
-	key: string
-	width: number
-	height: number
-	mode: number
-}) => {
+export const getRobotAvatar = (key: string, { width = 256, height = 256, mode = 3 }: {
+	width?: number
+	height?: number
+	mode?: number
+} = {}) => {
 	return `https://robohash.org/${key}?set=set${mode}&size=${width}x${height}`
 }

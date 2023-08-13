@@ -1,13 +1,13 @@
 import { user } from '@/config/user'
 import { InvitationStatus } from '@/ds/system'
 import { Badge } from '@/components/ui/badge'
-import { XIcon } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
 import { app } from '@/config/app'
 import { uri } from '@/config/uri'
 import { Button } from '@/components/ui/button'
 import React from 'react'
+import { Cross1Icon } from '@radix-ui/react-icons'
 
 export const InviteCard = () => {
 	const surplus = user.invitation.to.filter((item) => item.status === InvitationStatus.pending).length
@@ -16,7 +16,7 @@ export const InviteCard = () => {
 		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>
 			<div className={'flex items-center justify-between'}>
 				<Badge className={'w-fit'}>Tips</Badge>
-				<XIcon className={'wh-4 text-muted-foreground'}/>
+				<Cross1Icon className={'wh-4 text-muted-foreground'}/>
 			</div>
 			<article className={'prose dark:prose-invert'}>
 				<ReactMarkdown>

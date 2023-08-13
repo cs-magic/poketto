@@ -13,7 +13,11 @@ export const ChatConversation = () => {
 	const { pokettoBasic, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
 	
 	return (
-		<section id={'chat-contents'} className={'w-full min-w-[320px] grow h-full overflow-hidden | flex flex-col bg-background'}>
+		<section id={'chat-contents'} className={clsx(
+			'w-full grow h-full overflow-hidden | flex flex-col',
+			'  bg-slate-800 bg-background bg-indigo-800 bg-zinc-800',
+			// 'bg-background',
+		)}>
 			<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
 				<div>{pokettoBasic?.basic.title}</div>
 				<Popover>
@@ -66,7 +70,7 @@ export const ChatConversation = () => {
 			
 			
 			<div className={'w-full p-4 | flex justify-center items-center gap-2'}>
-				<Input className={'w-[95%]'}/>
+				<Input className={'w-[95%]'} autoFocus/>
 				<Button>Send</Button>
 			</div>
 		

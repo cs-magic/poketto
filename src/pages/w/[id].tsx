@@ -1,7 +1,7 @@
 import { RootLayout } from '@/layouts/root.layout'
-import { PokettoDetail } from '@/components/detail'
-import { ChatConversation } from '@/components/chat/conversation'
-import { PokettoList } from '@/components/chat/list'
+import { PokettoDetail } from '@/components/channel/channel-detail'
+import { ChatConversation } from '@/components/channel/channel-conv'
+import { PokettoList } from '@/components/channel/channel-list'
 import { useAppStore } from '@/store'
 
 
@@ -17,11 +17,7 @@ export default function WorkspacePage() {
 				
 				<ChatConversation/>
 				
-				{chatDetailVisible && (
-					<section id={'chat-detail'} className={'w-full min-w-[320px] max-w-sm p-4 | hidden xl:flex'}>
-						{pokettoBasic && <PokettoDetail poketto={pokettoBasic} comments={pokettoComments}/>}
-					</section>
-				)}
+				{chatDetailVisible && pokettoBasic && <PokettoDetail poketto={pokettoBasic} comments={pokettoComments}/>}
 			</div>
 		</RootLayout>
 	)

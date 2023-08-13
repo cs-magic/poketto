@@ -1,6 +1,6 @@
-import type sampleComment from '../../sample/flowgpt/comment.getComments/comment.json'
-import type sampleConversation from '../../sample/flowgpt/conversation.json'
-import type sampleBasicPrompt from '../../sample/flowgpt/prompt-basic_2.json'
+import type sampleComment from '@/data/flowgpt/comment.getComments/comment.json'
+import type sampleConversation from '@/data/flowgpt/conversation.json'
+import type sampleBasicPrompt from '@/data/flowgpt/prompt-basic_2.json'
 
 
 export type IFlowgptPromptBasic = typeof sampleBasicPrompt

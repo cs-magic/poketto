@@ -12,11 +12,11 @@ import { useAppStore } from '@/store'
 
 export function RootLayout(props: PropsWithChildren) {
 	
-	// !IMPORTANT: avoid persistence ssr
 	const mounted = useMount()
 	
 	// !IMPORTANT: (force state direction) always change [only ID] in sub pages/components, and trigger prompt update in root layout when id changes
-	const { pokettoId: id, setPokettoBasic, setPokettoComments } = useAppStore()
+	const { pokettoId, setPokettoBasic, setPokettoComments } = useAppStore()
+	const id = pokettoId as string
 	const { data: withConversation } = api.poketto.getPoketto.useQuery({ id })
 	const { data: comments } = api.poketto.listComments.useQuery({ id })
 	
@@ -35,7 +35,9 @@ export function RootLayout(props: PropsWithChildren) {
 			</Head>
 			
 			<main className={clsx(
-				'h-screen | flex flex-col | font-light text-foreground bg-background text-sm',
+				'h-screen | flex flex-col | font-light text-foreground text-sm',
+				'bg-background',
+				// 'bg-zinc-900',
 				font.className,
 			)}>
 				
@@ -45,7 +47,11 @@ export function RootLayout(props: PropsWithChildren) {
 					<Sidebar/>
 					
 					<div className={'grow overflow-hidden h-full | flex flex-col items-center justify-center gap-2'}>
-						{!mounted ? 'Loading...' : props.children}
+						{
+							!mounted
+								? 'Loading...' // !IMPORTANT: avoid persistence ssr
+								: props.children
+						}
 					</div>
 				</div>
 			</main>

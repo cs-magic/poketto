@@ -116,7 +116,7 @@ colors:
     }
 
     h2 {
-        @apply text-xl font-semibold;
+        @apply text-lg font-semibold;
     }
 
     body {
