@@ -5,7 +5,8 @@ import { api } from '@/lib/api'
 import '@/styles/globals.css'
 import React from 'react'
 import { ThemeProvider } from 'next-themes'
-import { Toaster } from '@/components/ui/toaster'
+// import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from 'sonner'
 
 const MyApp: AppType<{ session: Session | null }> =
 	({

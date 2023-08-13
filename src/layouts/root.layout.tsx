@@ -28,7 +28,7 @@ export function RootLayout(props: PropsWithChildren) {
 		if (comments) setPokettoComments(comments)
 	}, [withConversation, comments])
 	
-	console.log('[RootLayout] ', { id, withConversation, comments })
+	// console.log('[RootLayout] ', { id, withConversation, comments })
 	
 	return (
 		<>

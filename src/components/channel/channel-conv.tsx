@@ -7,9 +7,18 @@ import { DotsVerticalIcon } from '@radix-ui/react-icons'
 import remarkGfm from 'remark-gfm'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useAppStore } from '@/store'
+import { useChat } from 'ai/react'
+import { toast } from 'sonner'
 
 
 export const ChatConversation = () => {
+	
+	const { messages, handleSubmit, input, handleInputChange } = useChat({
+		onError: err => {
+			toast.error(err.message)
+		},
+	})
+	
 	const { pokettoBasic, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
 	
 	return (
@@ -41,7 +50,8 @@ export const ChatConversation = () => {
 			
 			<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
 				{
-					pokettoBasic?.conversation?.messages.map((msg, index) => (
+					// pokettoBasic?.conversation?.
+					messages.map((msg, index) => (
 						<div
 							key={index}
 							className={clsx(
@@ -68,11 +78,10 @@ export const ChatConversation = () => {
 				{/*<Separator orientation={'horizontal'} className={'w-1/2 mx-auto my-8'}/>*/}
 			</div>
 			
-			
-			<div className={'w-full p-4 | flex justify-center items-center gap-2'}>
-				<Input className={'w-[95%]'} autoFocus/>
-				<Button>Send</Button>
-			</div>
+			<form className={'w-full p-4 | flex justify-center items-center gap-2'} onSubmit={handleSubmit}>
+				<Input name={'prompt'} className={'w-[95%]'} autoFocus value={input} onChange={handleInputChange} id={'input'}/>
+				<Button type={'submit'}>Send</Button>
+			</form>
 		
 		</section>
 	)

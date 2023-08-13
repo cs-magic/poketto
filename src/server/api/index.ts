@@ -1,6 +1,7 @@
 import { exampleRouter } from '@/server/api/routers/example'
 import { createTRPCRouter } from '@/server/api/helpers'
 import { pokettoRouter } from '@/server/api/routers/pokettoRouter'
+import { chatRouter } from '@/server/api/routers/chat'
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { pokettoRouter } from '@/server/api/routers/pokettoRouter'
 export const appRouter = createTRPCRouter({
 	example: exampleRouter,
 	poketto: pokettoRouter,
+	chat: chatRouter,
 })
 
 
