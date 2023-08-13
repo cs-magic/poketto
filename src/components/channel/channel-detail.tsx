@@ -150,6 +150,7 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 				<h2>Information</h2>
 				<div className={'grid grid-cols-2 gap-4'}>
 					<InfoItem a={'provider'} b={poketto.model.manufacturer}/>
+					<InfoItem a={'Open Source'} b={poketto.permissions.openSource.toString()}/>
 					<InfoItem a={'category'} b={poketto.basic.category[0] ?? 'No Category'}/>
 					<InfoItem a={'language'} b={poketto.basic.language}/>
 				</div>

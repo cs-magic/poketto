@@ -37,6 +37,7 @@ const config = {
 		'@typescript-eslint/no-unsafe-return': ['warn'],
 		'@typescript-eslint/no-empty-interface': ['off'],
 		'prefer-const': ['warn'],
+		'@typescript-eslint/prefer-nullish-coalescing': ['warn'],
 	},
 };
 

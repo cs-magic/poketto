@@ -16,6 +16,7 @@ export const createPokettoChannel = (poketto: IPokettoBasic): IPokettoChannel =>
 			interactions: {},
 			parentId: undefined,
 			userId: undefined,
+			invisible: false,
 		},
 	],
 	poketto: poketto,

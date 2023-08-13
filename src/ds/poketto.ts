@@ -1,17 +1,40 @@
-import { type IChatGPTPrompt } from '@/ds/chatgpt'
 import { type ID, type IUser } from '@/ds/general'
 import { type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
-import d, { getTimestampMS } from '@/lib/datetime'
+import d from '@/lib/datetime'
+import { type Message } from 'ai'
 import { nanoid } from 'nanoid'
+
+/**
+ * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
+ */
+export interface IChannelMessage extends Message {
+	type: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote' | 'notification'
+	
+	channelId: ID //
+	userId?: ID // 1. 不要存user，这样可以保证批量更新 2. 通知等就没有 userId
+	parentId?: ID
+	
+	interactions: Record<string, number>
+}
 
 export interface IPokettoConversation {
 	createdAt: number
-	messages: IChatGPTPrompt[]
+	messages: IChannelMessage[]
 }
 
-export const flowgpt2poketto_conversation = (c: IFlowgptConversation): IPokettoConversation => ({
-	createdAt: d(c.createdAt).toDate().getMilliseconds(),
-	messages: c.messages as IChatGPTPrompt[],
+export const flowgpt2poketto_conversation = (f: IFlowgptConversation, p: IPokettoBasic): IPokettoConversation => ({
+	createdAt: d(f.createdAt).toDate().getMilliseconds(),
+	messages: f.messages.map((m) => ({
+		...m,
+		type: 'text',
+		channelId: f.id,
+		userId: undefined,
+		parentId: undefined,
+		interactions: {},
+		id: nanoid(),
+		createdAt: new Date(),
+		role: m.role as 'system' | 'user' | 'assistant' | 'function',
+	})),
 })
 
 
@@ -40,7 +63,7 @@ export interface IPokettoBasic {
 	model: {
 		manufacturer: string // ChatGPT | Claude | OpenChat | ...
 		type: string // 具体的模型号：gpt-3.5-xxx | gpt-4-xx | ...
-		initPrompts: IChatGPTPrompt[] // 不直接用 systemPrompt 是因为要支持 few-shot
+		initPrompts: IChannelMessage[] // 不直接用 systemPrompt 是因为要支持 few-shot
 		functions: IPokettoFunction[] // todo: support plugins
 		// ... other args
 		temperature?: number
@@ -67,7 +90,6 @@ export interface IPokettoBasic {
 		// ... 其他统计指标（比如频率……）
 	} & Record<string, number> // interactions 统计类似 discord 的表情回复
 	
-	
 }
 
 
@@ -80,7 +102,7 @@ export interface IPokettoComment
 
 export interface IPokettoFunction /* extends ChatGPTFunction */
 {
-
+	
 }
 
 
@@ -92,20 +114,6 @@ export interface IPokettoMessageContent {
 export const SYSTEM_USER_ID = 'poketto' as const
 export type SYSTEM_USER_TYPE = typeof SYSTEM_USER_ID
 
-/**
- * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
- */
-export interface IPokettoChannelMessage {
-	type: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote' | 'notification'
-	content: string
-	id: ID
-	channelId: ID //
-	userId?: ID // 1. 不要存user，这样可以保证批量更新 2. 通知等就没有 userId
-	parentId?: ID
-	
-	createdAt: number
-	interactions: Record<string, number>
-}
 
 export interface IPokettoChannelUser
 	extends IUser {
@@ -121,13 +129,13 @@ export interface IPokettoChannel {
 	latestTime: number
 	poketto: IPokettoBasic
 	users: IPokettoChannelUser[]
-	messages: IPokettoChannelMessage[]
+	messages: IChannelMessage[]
 }
 
 export interface IPokettoChannelListView {
 	id: ID
 	avatar: string
 	title: string
-	latestMessage: IPokettoChannelMessage
+	latestMessage: IChannelMessage
 	latestUser?: IPokettoChannelUser
 }
