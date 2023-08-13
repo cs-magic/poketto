@@ -26,7 +26,7 @@ export interface IChannelUser
 	type:
 		'user'
 		| 'bot' // 预设消息
-		| 'system' // like tg: Mark Shawn joined the group 
+		| 'system' // like tg: Mark Shawn joined the group
 }
 
 export interface IChannel {

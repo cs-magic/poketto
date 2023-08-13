@@ -13,7 +13,7 @@ import { MenuLink } from '@/components/utils/link'
 import { uri } from '@/config/uri'
 import clsx from 'clsx'
 import { Button } from '@/components/ui/button'
-import { useStore } from '@/store'
+import { useAppStore } from '@/store'
 
 
 export const ThemeSwitcher = () => {
@@ -33,7 +33,7 @@ export const ThemeSwitcher = () => {
 }
 
 export const LogoWithName = () => {
-	const { toggleSidebar } = useStore()
+	const { toggleSidebar } = useAppStore()
 	return (
 		<Button variant={'ghost'} className={'justify-start gap-2'} onClick={toggleSidebar}>
 			<Logo height={24} className={clsx(

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
 import _ from 'lodash'
 import React, { type ReactNode } from 'react'
-import { useStore } from '@/store'
+import { useAppStore } from '@/store'
 
 export const MenuLink = ({ field, icon, link, title }: {
 	field: string
@@ -11,7 +11,7 @@ export const MenuLink = ({ field, icon, link, title }: {
 	link?: string
 	title?: string
 }) => {
-	const { sidebarVisible } = useStore()
+	const { sidebarVisible } = useAppStore()
 	
 	return (
 		<Link href={link ?? `/${field}`} className={'w-full transition-all'}>

@@ -16,25 +16,6 @@ import { MarqueeContainer, MasonryContainer } from '@/components/utils/container
 
 export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
 	
-	const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
-		
-		return (
-			<div className={'w-full overflow-hidden whitespace-nowrap p-2 | flex flex-col items-center justify-between gap-1 '}>
-				<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
-				<MarqueeContainer className={'text-2xl'}>{b}</MarqueeContainer>
-				<div className={'flex justify-center items-center text-primary-foreground/50'}>{c}</div>
-			</div>
-		)
-	}
-	
-	const InfoItem = ({ a, b }: { a: string, b: ReactNode }) => {
-		return (
-			<div className={'flex flex-col items-center gap-1'}>
-				<div className={'text-muted-foreground font-bold capitalize'}>{a}</div>
-				<div className={'text-primary-foreground/75'}>{b}</div>
-			</div>
-		)
-	}
 	
 	return (
 		<div className={'w-full overflow-x-hidden h-full overflow-y-auto | flex flex-col gap-4 '}>
@@ -171,6 +152,26 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 				</>
 			)}
 		
+		</div>
+	)
+}
+
+
+const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
+	return (
+		<div className={'w-full overflow-hidden whitespace-nowrap p-2 | flex flex-col items-center justify-between gap-1 '}>
+			<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
+			<MarqueeContainer className={'text-2xl'}>{b}</MarqueeContainer>
+			<div className={'flex justify-center items-center text-primary-foreground/50'}>{c}</div>
+		</div>
+	)
+}
+
+const InfoItem = ({ a, b }: { a: string, b: ReactNode }) => {
+	return (
+		<div className={'flex flex-col items-center gap-1'}>
+			<div className={'text-muted-foreground font-bold capitalize'}>{a}</div>
+			<div className={'text-primary-foreground/75'}>{b}</div>
 		</div>
 	)
 }

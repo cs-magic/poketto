@@ -6,8 +6,8 @@ import Navbar from '@/components/layout/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/config/assets'
 import { useMount } from '@/hooks/use-mount'
-import { useStore } from '@/store'
 import { api } from '@/lib/api'
+import { useAppStore } from '@/store'
 
 
 export function RootLayout(props: PropsWithChildren) {
@@ -16,21 +16,15 @@ export function RootLayout(props: PropsWithChildren) {
 	const mounted = useMount()
 	
 	// !IMPORTANT: (force state direction) always change [only ID] in sub pages/components, and trigger prompt update in root layout when id changes
-	const { pokettoId: id, setPokettoBasic, setPokettoComments } = useStore()
+	const { pokettoId: id, setPokettoBasic, setPokettoComments } = useAppStore()
 	const { data: withConversation } = api.poketto.getPoketto.useQuery({ id })
 	const { data: comments } = api.poketto.listComments.useQuery({ id })
 	
-	console.log({ comments })
-	
 	useEffect(() => {
-		if (withConversation) // 防止闪烁
-			setPokettoBasic(withConversation)
-	}, [withConversation])
-	
-	useEffect(() => {
-		if (comments)  // 防止闪烁
-			setPokettoComments(comments)
-	}, [comments])
+		// 防止闪烁
+		if (withConversation) setPokettoBasic(withConversation)
+		if (comments) setPokettoComments(comments)
+	}, [withConversation, comments])
 	
 	return (
 		<>

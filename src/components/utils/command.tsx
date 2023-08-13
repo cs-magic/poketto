@@ -10,7 +10,7 @@ import { useHotkeys } from '@mantine/hooks'
 import { IconBrandOpenai, IconLayoutDashboard, IconSearch } from '@tabler/icons-react'
 import { Icons } from '@/config/assets'
 import _ from 'lodash'
-import { useStore } from '@/store'
+import { useAppStore } from '@/store'
 
 
 export enum CommandType {
@@ -64,7 +64,7 @@ export const commands: ICommandItem[] = [
 
 export default function CommandDialogDemo() {
 	const [open, setOpen] = React.useState(false)
-	const { history, push } = useStore()
+	const { searchHistory: history, pushSearch: push } = useAppStore()
 	
 	const KEY = 'K'
 	useHotkeys([

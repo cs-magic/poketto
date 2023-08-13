@@ -1,13 +1,13 @@
 import { RootLayout } from '@/layouts/root.layout'
-import { useStore } from '@/store'
 import { PokettoDetail } from '@/components/detail'
 import { ChatConversation } from '@/components/chat/conversation'
 import { PokettoList } from '@/components/chat/list'
+import { useAppStore } from '@/store'
 
 
 export default function WorkspacePage() {
 	
-	const { pokettoBasic, chatListVisible, chatDetailVisible, pokettoComments } = useStore()
+	const { pokettoBasic, chatListVisible, chatDetailVisible, pokettoComments } = useAppStore()
 	
 	return (
 		<RootLayout>

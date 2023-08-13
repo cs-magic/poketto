@@ -1,9 +1,10 @@
-import { CardsLayoutType, useStore } from '@/store'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import React from 'react'
+import { CardsLayoutType } from '@/store/ui.slice'
+import { useAppStore } from '@/store'
 
 export default function SettingsPage() {
-	const { cardsLayout, setCardsLayout } = useStore()
+	const { cardsLayout, setCardsLayout } = useAppStore()
 	
 	// todo: in settings
 	return (

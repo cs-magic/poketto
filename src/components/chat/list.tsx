@@ -3,16 +3,16 @@ import { api } from '@/lib/api'
 import { type PropsWithChildren } from 'react'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useStore } from '@/store'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/utils/responsive-field'
 import clsx from 'clsx'
 import { type IPokettoBasic } from '@/ds/poketto'
+import { useAppStore } from '@/store'
 
 
 export const SearchResultItem = ({ poketto }: { poketto: IPokettoBasic }) => {
 	console.log(poketto)
-	const { setPokettoId } = useStore()
+	const { setPokettoId } = useAppStore()
 	
 	return (
 		<div onClick={() => setPokettoId(poketto.id)} className={clsx(

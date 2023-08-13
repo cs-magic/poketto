@@ -1,32 +1,18 @@
 import React from 'react'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
 import { clsx } from 'clsx'
-import {
-	ChevronRightIcon, EnvelopeOpenIcon,
-	HomeIcon,
-	LightningBoltIcon,
-	MixIcon,
-	RocketIcon,
-	TargetIcon,
-	TextAlignLeftIcon,
-	TextAlignRightIcon,
-	TokensIcon,
-} from '@radix-ui/react-icons'
+import { ChevronRightIcon, EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from '@radix-ui/react-icons'
 import { MenuLink } from '@/components/utils/link'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SelfUserAvatar } from '@/components/user'
 import { user } from '@/config/user'
 import { uri } from '@/config/uri'
 import { InviteCard } from '@/components/utils/invitation'
-import { useStore } from '@/store'
-import { Rocket } from 'lucide-react'
-import { LogoWithName } from '@/components/layout/navbar'
+import { useAppStore } from '@/store'
 
 
 export const Sidebar = () => {
 	
-	const { sidebarVisible, toggleSidebar } = useStore()
+	const { sidebarVisible, toggleSidebar } = useAppStore()
 	
 	return (
 		<div className={clsx(

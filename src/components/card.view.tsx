@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { IconDotsVertical } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import numeral from 'numeral'
-import { CardsLayoutType, useStore } from '@/store'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import Image from 'next/image'
 import _ from 'lodash'
@@ -19,11 +18,13 @@ import { order2icon } from '@/components/utils/assets'
 import { uri } from '@/config/uri'
 import { type IPokettoBasic } from '@/ds/poketto'
 import { getUserUri } from '@/lib/user'
+import { CardsLayoutType } from '@/store/ui.slice'
+import { useAppStore } from '@/store'
 
 
 export const PocketCardView = (app: IPokettoBasic) => {
 	const router = useRouter()
-	const { cardsLayout, sort } = useStore()
+	const { cardsLayout, sortOrder: sort } = useAppStore()
 	const Icon = order2icon[sort]
 	
 	return (

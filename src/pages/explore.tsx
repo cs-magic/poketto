@@ -4,7 +4,6 @@ import { PocketCardView } from '@/components/card.view'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
 import { GridContainer, MasonryContainer } from '@/components/utils/containers'
-import { CardsLayoutType, useStore } from '@/store'
 import { ScrollTrigger } from '@/components/utils/scroll-trigger'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -15,13 +14,15 @@ import { FrameIcon } from '@radix-ui/react-icons'
 import { order2icon } from '@/components/utils/assets'
 
 import { FlowGPTSortOrder } from '@/ds/flowgpt'
+import { CardsLayoutType } from '@/store/ui.slice'
+import { useAppStore } from '@/store'
 
 export default function ExplorePage() {
 	
-	const { cardsLayout, sort, setSortOrder } = useStore()
+	const { cardsLayout, sortOrder, setSortOrder } = useAppStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
-	const query = api.poketto.listPoketto.useInfiniteQuery({ sort }, {
+	const query = api.poketto.listPoketto.useInfiniteQuery({ sort: sortOrder }, {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
 	const items = query.data?.pages.flatMap((item) => item.data) ?? []

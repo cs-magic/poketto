@@ -1,4 +1,3 @@
-import { useStore } from '@/store'
 import clsx from 'clsx'
 import ReactMarkdown from 'react-markdown'
 import { Input } from '@/components/ui/input'
@@ -7,10 +6,11 @@ import { DotsVerticalIcon } from '@radix-ui/react-icons'
 
 import remarkGfm from 'remark-gfm'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useAppStore } from '@/store'
 
 
 export const ChatConversation = () => {
-	const { pokettoBasic, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useStore()
+	const { pokettoBasic, chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
 	
 	return (
 		<section id={'chat-contents'} className={'w-full min-w-[320px] grow h-full overflow-hidden | flex flex-col bg-background'}>
