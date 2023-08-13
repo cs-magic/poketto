@@ -10,6 +10,8 @@ import { type IPokettoBasic, type IPokettoChannelListView } from '@/ds/poketto'
 import { useAppStore } from '@/store'
 import d from '@/lib/datetime'
 import { getChannelListView } from '@/lib/poketto'
+import { toast } from '@/components/ui/use-toast'
+import { Button } from '@/components/ui/button'
 
 
 export const PokettoList = () => {
@@ -86,7 +88,11 @@ const ChannelListView = ({ channelListView }: { channelListView: IPokettoChannel
 	
 	return (
 		
-		<div className={'w-full px-4 py-2 | flex items-center gap-4'} onClick={() => setPokettoId(channelListView.id)}>
+		<Button variant={'ghost'} className={'w-full px-4 py-2 h-fit | flex items-center gap-4'} onClick={() => {
+			setPokettoId(channelListView.id)
+			toast({ title: `changing to ${channelListView.title}` })
+			console.log({ channelListView })
+		}}>
 			<Avatar className={'shrink-0'}>
 				<AvatarImage src={channelListView.avatar}/>
 			</Avatar>
@@ -101,6 +107,6 @@ const ChannelListView = ({ channelListView }: { channelListView: IPokettoChannel
 					<span className={'truncate text-muted-foreground'}>{channelListView.latestMessage.content}</span>
 				</div>
 			</div>
-		</div>
+		</Button>
 	)
 }

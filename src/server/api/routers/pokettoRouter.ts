@@ -6,9 +6,16 @@ import { type IPokettoBasic, type IPokettoComment } from '@/ds/poketto'
 import { flowgpt2poketto, flowgpt2poketto_comment } from '@/lib/transform'
 import { SortOrder } from '@/ds/system'
 import _ from 'lodash'
+import Mustache from 'mustache'
+import { pokettoBasic } from '@/config/poketto'
+import { user } from '@/config/user'
+
+export const Platforms = ['poketto', 'flowgpt'] as const
+export type Platform = typeof Platforms[number]
 
 export const idInput = z.object({
 	id: z.string().optional(),
+	platform: z.enum(Platforms),
 })
 
 const singleFetch = async <T>(props: { path: string, j: object }) => {
@@ -75,8 +82,11 @@ export const pokettoRouter = createTRPCRouter({
 	getPoketto: publicProcedure
 		.input(idInput)
 		.query<IPokettoBasic | undefined>(async (opts) => {
-			const { id } = opts.input
+			const { id, platform } = opts.input
 			if (!id) return
+			if (platform === 'poketto') {
+				return pokettoBasic
+			}
 			
 			const j = { json: id }
 			const data = await singleFetch<IFlowgptPromptBasic>({ path: 'prompt.getById', j })
@@ -86,8 +96,9 @@ export const pokettoRouter = createTRPCRouter({
 	listComments: publicProcedure
 		.input(idInput)
 		.query<IPokettoComment[]>(async (opts) => {
-			const { id } = opts.input
+			const { id, platform } = opts.input
 			if (!id) return []
+			if (platform === 'poketto') return [] // todo: own comments
 			
 			const j = {
 				json: {

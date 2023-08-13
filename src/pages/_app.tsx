@@ -5,6 +5,7 @@ import { api } from '@/lib/api'
 import '@/styles/globals.css'
 import React from 'react'
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from '@/components/ui/toaster'
 
 const MyApp: AppType<{ session: Session | null }> =
 	({
@@ -15,6 +16,7 @@ const MyApp: AppType<{ session: Session | null }> =
 			<ThemeProvider attribute="class" defaultTheme={'dark'}>
 				<SessionProvider session={session}>
 					<Component {...pageProps} />
+					<Toaster/>
 				</SessionProvider>
 			</ThemeProvider>
 		

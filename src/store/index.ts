@@ -38,10 +38,25 @@ export const useAppStore = create<StoreState>()(
 			),
 			{
 				name: 'zustand',
-				version: 0.2,
+				version: 0.8,
 				// @ts-ignore
 				migrate: (persistedState: StoreState, version) => {
-					if (version === 0.1) {
+					if (version === .7) {
+						// @ts-ignore
+						delete persistedState.channels
+					}
+					if (version === .4) {
+						// @ts-ignore
+						delete persistedState.pokettoId
+					}
+					if ([.3, .5, .6].includes(version)) {
+						// @ts-ignore
+						delete persistedState.pokettoBasic
+					}
+					if (version === .2) {
+						persistedState.channels[0]!.poketto.id = persistedState.pokettoBasic.id
+					}
+					if (version === .1) {
 						const data = persistedState.channels[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
 						persistedState.channels[0]!.messages[0] = { ...persistedState.channels[0]!.messages[0]!, ...data }
 					}

@@ -5,7 +5,8 @@ import Mustache from 'mustache'
 import { user } from '@/config/user'
 import { createPokettoChannel } from '@/lib/poketto'
 
-export const POKETTO_CHANNEL_ID = 'poketto' as const
+// aNB-zlvB30vEIS-yuX-5J: uploaded to flowgpt: https://flowgpt.com/p/your-sole-poketto
+export const POKETTO_CHANNEL_ID = 'Your-Sole-Poketto' as const
 export const POKETTO_USER_ID = 'your-sole-poketto' as const
 export const POKETTO_USER_NAME = 'Your Sole Poketto' as const
 export const POKETTO_MODEL_NAME = 'poketto-1.0' as const

@@ -36,7 +36,11 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	setPokettoId: (v) => setState((state) => {state.pokettoId = v}),
 	
 	pokettoBasic,
-	setPokettoBasic: (v) => setState((state) => {state.pokettoBasic = v}),
+	setPokettoBasic: (v) => setState((state) => {
+		state.pokettoBasic = v
+		const channel = state.channels.find((c) => c.poketto.id === v.id)
+		if (channel) channel.poketto = v
+	}),
 	
 	pokettoComments: [],
 	setPokettoComments: (v) => setState((state) => {state.pokettoComments = v}),

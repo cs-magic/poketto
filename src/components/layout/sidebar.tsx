@@ -28,7 +28,7 @@ export const Sidebar = () => {
 				{/*</Button>*/}
 				
 				
-				<MenuLink icon={<HomeIcon/>} field={'workspaces'}/>
+				<MenuLink icon={<HomeIcon/>} field={'workspaces'} link={uri.app.workspace}/>
 				<MenuLink icon={<RocketIcon/>} field={'explore'}/>
 				{/*<MenuLink field={'toolkits'}/>*/}
 			</section>

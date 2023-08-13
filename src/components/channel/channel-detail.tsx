@@ -15,12 +15,14 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MarqueeContainer, MasonryContainer } from '@/components/utils/containers'
 import { useAppStore } from '@/store'
 import { createPokettoChannel } from '@/lib/poketto'
+import { toast } from '@/components/ui/use-toast'
 
 export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
 	const { addChannel, channels } = useAppStore()
 	
 	const onAddPokettoChannel = () => {
 		addChannel(createPokettoChannel(poketto))
+		toast({ title: `Successfully added channel: ${poketto.basic.title}` })
 	}
 	
 	return (

@@ -1,6 +1,7 @@
 export const uri = {
 	app: {
 		home: '/',
+		workspace: '/',
 		explore: '/explore',
 		pocketApp: '/p',
 		docs: {

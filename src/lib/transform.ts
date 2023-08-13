@@ -21,7 +21,7 @@ export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull)
 		},
 		model: {
 			type: prompt.model,
-			manufacturer: 'OpenAI',
+			manufacturer: prompt.User.name,
 			functions: [],
 			initPrompts: [
 				{ role: 'system', content: prompt.initPrompt },
