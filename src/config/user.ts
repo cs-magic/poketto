@@ -29,3 +29,5 @@ export const user = {
 		impact: 1934,
 	},
 }
+
+export const USER_INVITATIONS_COUNT = 5
