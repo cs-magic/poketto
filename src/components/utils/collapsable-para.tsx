@@ -26,7 +26,9 @@ export const CollapsablePara = ({ content }: { content: string }) => {
 			
 			{needMore && (
 				// todo: better show-more effect with harmonious gradient
-				<Button variant={'link'} className={'ml-auto'} onClick={() => setShownMore(!shownMore)}>Less</Button>
+				<Button variant={'link'} className={'ml-auto'} onClick={() => setShownMore(!shownMore)}>
+					{shownMore ? 'Less' : 'More'}
+				</Button>
 			)}
 		</div>
 	)

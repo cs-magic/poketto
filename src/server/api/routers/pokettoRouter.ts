@@ -62,7 +62,7 @@ export const pokettoRouter = createTRPCRouter({
 				.filter(([field, val]) => !val)
 				.map(([field, val]) => field)
 			const meta = _.zipObject(emptyFields, emptyFields.map(() => ['undefined']))
-			console.log({ query: opts.input, meta })
+			// console.log({ query: opts.input, meta })
 			const j = {
 				json: opts.input,
 				meta: { values: meta },
