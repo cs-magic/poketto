@@ -16,15 +16,15 @@ export const flowgpt2poketto = (prompt: IFlowgptPromptBasic | FlowgptPromptFull)
 			category: [prompt.categoryId, prompt.subCategoryId],
 			industry: [],
 			tags: prompt.Tag.map((item) => item.name),
-			createdAt: dayjs(prompt.createdAt).toDate().getUTCSeconds(),
-			updatedAt: dayjs(prompt.updatedAt).toDate().getUTCSeconds(),
+			createdAt: dayjs(prompt.createdAt).toDate(),
+			updatedAt: dayjs(prompt.updatedAt).toDate(),
 		},
 		model: {
 			type: prompt.model,
 			manufacturer: prompt.User.name,
 			functions: [],
 			initPrompts: [
-				{ role: 'system', content: prompt.initPrompt },
+				// { role: 'system', content: prompt.initPrompt },
 			],
 			temperature: prompt.temperature,
 		},

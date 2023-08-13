@@ -2,15 +2,17 @@ import { useCallback, useState } from 'react'
 import clsx from 'clsx'
 import { Button } from '@/components/ui/button'
 import ReactMarkdown from 'react-markdown'
+import { useAppStore } from '@/store'
 
 export const CollapsablePara = ({ content }: { content: string }) => {
+	const { pokettoBasic } = useAppStore()
 	const [shownMore, setShownMore] = useState(false)
 	const [needMore, setNeedMore] = useState(false)
 	
 	const ref = useCallback((node: HTMLParagraphElement) => {
 		if (!node) return
-		setNeedMore(node.scrollHeight > node.clientHeight)
-	}, [])
+		setNeedMore(node.scrollHeight > node.offsetHeight)
+	}, [pokettoBasic.id])
 	
 	
 	return (

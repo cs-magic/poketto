@@ -5,9 +5,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { UsesField, ViewsField } from '@/components/utils/responsive-field'
 import { type IPokettoBasic } from '@/ds/poketto'
 import Link from 'next/link'
-import { getPokettoUri } from '@/lib/poketto'
+import { getChannelUri } from '@/lib/poketto'
 
-export const AppListView = ({ poketto }: { poketto: IPokettoBasic | undefined }) => {
+export const ChannelListView = ({ poketto }: { poketto: IPokettoBasic | undefined }) => {
 	if (!poketto) return (
 		<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
 			<Skeleton className={'wh-12'}/>
@@ -25,7 +25,7 @@ export const AppListView = ({ poketto }: { poketto: IPokettoBasic | undefined })
 	)
 	
 	return (
-		<Link className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'} href={getPokettoUri(poketto)}>
+		<Link className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'} href={getChannelUri(poketto.id)}>
 			<Avatar className={'rounded-sm'}>
 				<AvatarImage src={poketto.basic.avatar}/>
 			</Avatar>

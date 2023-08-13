@@ -47,7 +47,7 @@ export const useAppStore = create<StoreState>()(
 					}
 					if (version === .4) {
 						// @ts-ignore
-						delete persistedState.pokettoId
+						delete persistedState.pokettoBasic.id
 					}
 					if ([.3, .5, .6].includes(version)) {
 						// @ts-ignore

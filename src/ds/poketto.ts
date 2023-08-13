@@ -8,7 +8,8 @@ import { nanoid } from 'nanoid'
  * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
  */
 export interface IChannelMessage extends Message {
-	type: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote' | 'notification'
+	type: 'user' | 'notification'
+	format: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote'
 	
 	channelId: ID //
 	userId?: ID // 1. 不要存user，这样可以保证批量更新 2. 通知等就没有 userId
@@ -18,15 +19,16 @@ export interface IChannelMessage extends Message {
 }
 
 export interface IPokettoConversation {
-	createdAt: number
+	createdAt: Date
 	messages: IChannelMessage[]
 }
 
-export const flowgpt2poketto_conversation = (f: IFlowgptConversation, p: IPokettoBasic): IPokettoConversation => ({
-	createdAt: d(f.createdAt).toDate().getMilliseconds(),
+export const flowgpt2poketto_conversation = (f: IFlowgptConversation): IPokettoConversation => ({
+	createdAt: d(f.createdAt).toDate(),
 	messages: f.messages.map((m) => ({
 		...m,
-		type: 'text',
+		type: 'user',
+		format: 'text',
 		channelId: f.id,
 		userId: undefined,
 		parentId: undefined,
@@ -53,8 +55,8 @@ export interface IPokettoBasic {
 		industry: ID[] // 按级分类（父子关系），e.g. [娱乐, 游戏]
 		category: ID[] // 按级分类（父子关系），e.g. [生产力, 平面设计]
 		tags: string[] // 并列关系，e.g. 法律 | GPT4，用户在创建 tag 的时候，只跟自己的语言有关
-		createdAt: number
-		updatedAt: number
+		createdAt: Date
+		updatedAt: Date
 	}
 	permissions: {
 		visible: boolean | ID[]
@@ -133,7 +135,7 @@ export interface IPokettoChannel {
 }
 
 export interface IPokettoChannelListView {
-	id: ID
+	id: string
 	avatar: string
 	title: string
 	latestMessage: IChannelMessage

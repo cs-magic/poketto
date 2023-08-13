@@ -14,6 +14,8 @@ import { uri } from '@/config/uri'
 import clsx from 'clsx'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
+import Image from 'next/image'
+import CatLogo from '@/../public/images/logo/poketto/Your-Sole-Poketto.png'
 
 
 export const ThemeSwitcher = () => {
@@ -36,9 +38,8 @@ export const LogoWithName = () => {
 	const { toggleSidebar } = useAppStore()
 	return (
 		<Button variant={'ghost'} className={'justify-start gap-2'} onClick={toggleSidebar}>
-			<Logo height={24} className={clsx(
-				// 'rotate-180'
-			)}/>
+			{/*<Logo height={24}/>*/}
+			<Image src={CatLogo} alt={'Cat Logo'} width={24} height={24}/>
 			<span className={'text-lg tracking-widest'}>{app.name}</span>
 		</Button>
 	)

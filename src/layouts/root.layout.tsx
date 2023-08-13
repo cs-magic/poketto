@@ -1,34 +1,16 @@
 import Head from 'next/head'
 import { app } from '@/config/app'
-import React, { type PropsWithChildren, useEffect } from 'react'
+import React, { type PropsWithChildren } from 'react'
 import { Sidebar } from '@/components/layout/sidebar'
 import Navbar from '@/components/layout/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/config/assets'
 import { useMount } from '@/hooks/use-mount'
-import { api } from '@/lib/api'
-import { useAppStore } from '@/store'
-import { POKETTO_CHANNEL_ID } from '@/config/poketto'
 
 
 export function RootLayout(props: PropsWithChildren) {
 	
 	const mounted = useMount()
-	
-	// !IMPORTANT: (force state direction) always change [only ID] in sub pages/components, and trigger prompt update in root layout when id changes
-	const { pokettoId, setPokettoBasic, setPokettoComments } = useAppStore()
-	const id = pokettoId as string
-	const platform = !id || id === POKETTO_CHANNEL_ID ? 'poketto' : 'flowgpt'
-	const { data: withConversation } = api.poketto.getPoketto.useQuery({ id, platform })
-	const { data: comments } = api.poketto.listComments.useQuery({ id, platform })
-	
-	useEffect(() => {
-		// 防止闪烁
-		if (withConversation) setPokettoBasic(withConversation)
-		if (comments) setPokettoComments(comments)
-	}, [withConversation, comments])
-	
-	// console.log('[RootLayout] ', { id, withConversation, comments })
 	
 	return (
 		<>

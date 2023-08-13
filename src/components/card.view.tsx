@@ -20,75 +20,85 @@ import { type IPokettoBasic } from '@/ds/poketto'
 import { getUserUri } from '@/lib/user'
 import { CardsLayoutType } from '@/store/ui.slice'
 import { useAppStore } from '@/store'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { ChannelDetail } from '@/components/channel/channel-detail'
 
 
-export const PocketCardView = (app: IPokettoBasic) => {
+export const PocketCardView = (channel: IPokettoBasic) => {
 	const router = useRouter()
 	const { cardsLayout, sortOrder: sort } = useAppStore()
 	const Icon = order2icon[sort]
 	
+	
 	return (
 		
-		<div
-			className="w-full relative group overflow-hidden rounded-2xl"
-			onClick={() => {
-				void router.push(`${uri.app.pocketApp}/${app.id}`)
-			}}
-		>
-			{
-				cardsLayout === CardsLayoutType.grid
-					? (
-						<AspectRatio ratio={3 / 4} className={'overflow-hidden rounded-2xl'}>
-							<Image src={app.basic.avatar} fill className={'object-fill group-hover:scale-125 transition-all'} alt={app.basic.avatar}/>
-						</AspectRatio>
-					)
-					: (
-						<Image src={app.basic.avatar} width={800} height={600} className={'object-fill group-hover:scale-125 transition-all'} alt={app.basic.avatar}/>
-					)
-			}
-			
-			{/* header desc */}
-			<div className={'absolute top-0 w-full p-4 | flex justify-between'}>
-				<div className={'flex items-center gap-2'}>
-					{app.basic.tags.length && (
-						<Badge variant={'destructive'}>
-							{_.startCase(_.capitalize(app.basic.tags[0]))}
-						</Badge>
-					)}
-				</div>
-				<IconDotsVertical className={'hidden group-hover:flex'}/>
-			</div>
-			
-			{/* footer desc */}
-			<div className={clsx(
-				'absolute bottom-0 w-full p-4 | flex flex-col gap-2',
-				'backdrop-blur',
-				'backdrop-brightness-50',
-			)}>
-				{/* title */}
-				<div className={'text-lg truncate font-normal'}>{app.basic.title}</div>
-				
-				<div className={'text-md hidden group-hover:line-clamp-3 transition-all'}>{app.basic.desc}</div>
-				
-				{/*	user - ranks */}
-				<div className={'flex justify-between | text-xs text-primary-foreground/75'}>
-					{/* user */}
-					<Link className={'w-1/2 | flex items-center gap-2'} href={getUserUri(app.user)}>
-						<Avatar className={'wh-5'}>
-							<AvatarImage src={app.user.avatar}/>
-						</Avatar>
-						<span className={'truncate italic'}>{app.user.name}</span>
-					</Link>
+		<Dialog>
+			<DialogTrigger>
+				<div className="w-full relative group overflow-hidden rounded-2xl">
+					{
+						cardsLayout === CardsLayoutType.grid
+							? (
+								<AspectRatio ratio={3 / 4} className={'overflow-hidden rounded-2xl'}>
+									<Image src={channel.basic.avatar} fill className={'object-fill group-hover:scale-125 transition-all'} alt={channel.basic.avatar}/>
+								</AspectRatio>
+							)
+							: (
+								<Image src={channel.basic.avatar}
+								       width={800}
+								       height={600}
+								       className={'object-fill group-hover:scale-125 transition-all'}
+								       alt={channel.basic.avatar}/>
+							)
+					}
 					
-					{/* ranks */}
-					<div className={'flex items-center gap-1'}>
-						<Icon/>
-						<span>{numeral(app.state.views).format('0a')}</span>
+					{/* header desc */}
+					<div className={'absolute top-0 w-full p-4 | flex justify-between'}>
+						<div className={'flex items-center gap-2'}>
+							{channel.basic.tags.length && (
+								<Badge variant={'destructive'}>
+									{_.startCase(_.capitalize(channel.basic.tags[0]))}
+								</Badge>
+							)}
+						</div>
+						<IconDotsVertical className={'hidden group-hover:flex'}/>
 					</div>
+					
+					{/* footer desc */}
+					<div className={clsx(
+						'absolute bottom-0 w-full p-4 | flex flex-col gap-2',
+						'backdrop-blur',
+						'backdrop-brightness-50',
+					)}>
+						{/* title */}
+						<div className={'text-lg truncate font-normal'}>{channel.basic.title}</div>
+						
+						<div className={'text-md hidden group-hover:line-clamp-3 transition-all'}>{channel.basic.desc}</div>
+						
+						{/*	user - ranks */}
+						<div className={'flex justify-between | text-xs text-primary-foreground/75'}>
+							{/* user */}
+							<Link className={'w-1/2 | flex items-center gap-2'} href={getUserUri(channel.user)}>
+								<Avatar className={'wh-5'}>
+									<AvatarImage src={channel.user.avatar}/>
+								</Avatar>
+								<span className={'truncate italic'}>{channel.user.name}</span>
+							</Link>
+							
+							{/* ranks */}
+							<div className={'flex items-center gap-1'}>
+								<Icon/>
+								<span>{numeral(channel.state.views).format('0a')}</span>
+							</div>
+						</div>
+					</div>
+				
 				</div>
-			</div>
-		
-		</div>
+			</DialogTrigger>
+			
+			<DialogContent className={'max-h-[80vh] overflow-auto'}>
+				<ChannelDetail poketto={channel} comments={[]}/>
+			</DialogContent>
+		</Dialog>
 	)
 }
 export const User = ({ avatarAndName, app, forDetail }: {

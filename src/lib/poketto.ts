@@ -3,20 +3,22 @@ import { nanoid } from 'nanoid'
 import { getTimestampMS } from '@/lib/datetime'
 import { user } from '@/config/user'
 
-export const getPokettoUri = (poketto: IPokettoBasic) => `/p/${poketto.id}`
+export const getChannelUri = (pokettoId: string) => `/p/${pokettoId}`
 
-export const createPokettoChannel = (poketto: IPokettoBasic): IPokettoChannel => ({
+export const createChannel = (poketto: IPokettoBasic): IPokettoChannel => ({
 	messages: [
 		{
 			type: 'notification',
+			format: 'text',
+			role: 'system', // no effect since this is a notification
 			id: nanoid(),
 			channelId: poketto.id,
-			createdAt: getTimestampMS(),
+			createdAt: new Date(),
 			content: `Welcome ${user.name} to join in ${poketto.basic.title} !`,
 			interactions: {},
 			parentId: undefined,
 			userId: undefined,
-			invisible: false,
+			
 		},
 	],
 	poketto: poketto,

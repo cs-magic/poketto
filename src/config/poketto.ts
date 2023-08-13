@@ -3,7 +3,7 @@ import { getRobotAvatar } from '@/lib/string'
 import { getTimestampMS } from '@/lib/datetime'
 import Mustache from 'mustache'
 import { user } from '@/config/user'
-import { createPokettoChannel } from '@/lib/poketto'
+import { nanoid } from 'nanoid'
 
 // aNB-zlvB30vEIS-yuX-5J: uploaded to flowgpt: https://flowgpt.com/p/your-sole-poketto
 export const POKETTO_CHANNEL_ID = 'Your-Sole-Poketto' as const
@@ -65,19 +65,25 @@ export const pokettoBasic: IPokettoBasic = {
 		type: POKETTO_MODEL_NAME,
 		functions: [],
 		initPrompts: [
-			{
-				role: 'system',
-				content: Mustache.render(POKETTO_SYSTEM_PROMPT, { userName: user.name }),
-			},
+			// {
+			// 	role: 'system',
+			// 	content: Mustache.render(POKETTO_SYSTEM_PROMPT, { userName: user.name }),
+			// },
 		],
 		manufacturer: POKETTO_MANUFACTURE_NAME,
 	},
 	conversation: {
-		createdAt: getTimestampMS(),
+		createdAt: new Date(),
 		messages: [
 			{
+				id: nanoid(),
+				channelId: POKETTO_CHANNEL_ID,
+				type: 'user',
+				format: 'text',
+				interactions: {},
 				role: 'assistant',
 				content: Mustache.render(POKETTO_WELCOME_MESSAGE, { userName: user.name }),
+				createdAt: new Date(),
 			},
 		],
 	},

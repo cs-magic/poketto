@@ -6,7 +6,7 @@ import { user } from '@/config/user'
 import { UsersIcon } from 'lucide-react'
 import { ICON_DIMENSION_MD, ICON_DIMENSION_SM } from '@/config/assets'
 import { api } from '@/lib/api'
-import { AppListView } from '@/components/list.view'
+import { ChannelListView } from '@/components/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
@@ -14,9 +14,10 @@ import Link from 'next/link'
 import { uri } from '@/config/uri'
 import { type ReactNode } from 'react'
 import { Grow } from '@/components/utils/grow'
+import { SortOrder } from '@/ds/system'
 
 export default function WorkspacesPage() {
-	const { data: page } = api.poketto.listPoketto.useQuery({})
+	const { data: page } = api.poketto.listPoketto.useQuery({ sort: SortOrder.trending })
 	const uid = user.id
 	
 	const WorkspaceItem = ({ wid, title, avatar, icon }: {
@@ -54,7 +55,7 @@ export default function WorkspacesPage() {
 				<Card id={'explore'} variant={'ghost'} className={'w-full'}>
 					<CardHeader>
 						<div className={'shrink-0 | flex justify-between items-end'}>
-							<CardTitle>Explore popular Poketto Apps</CardTitle>
+							<CardTitle>Explore Trending Poketto Channels</CardTitle>
 							<Link href={uri.app.explore}>
 								<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'}>
 									<span>Explore all</span>
@@ -65,7 +66,7 @@ export default function WorkspacesPage() {
 					</CardHeader>
 					<CardContent className={'w-full flex justify-between'}>
 						<div className={'w-full flex flex-col divide-y'}>
-							{_.range(3).map((i) => <AppListView poketto={page?.data[i]} key={i}/>)}
+							{_.range(3).map((i) => <ChannelListView poketto={page?.data[i]} key={i}/>)}
 						</div>
 					</CardContent>
 				</Card>

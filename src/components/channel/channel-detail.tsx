@@ -14,15 +14,29 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MarqueeContainer, MasonryContainer } from '@/components/utils/containers'
 import { useAppStore } from '@/store'
-import { createPokettoChannel } from '@/lib/poketto'
+import { createChannel, getChannelUri } from '@/lib/poketto'
 import { toast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/router'
+import { POKETTO_CHANNEL_ID } from '@/config/poketto'
+import { useWindowScroll } from '@mantine/hooks'
 
-export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
-	const { addChannel, channels } = useAppStore()
+export const ChannelDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
+	const { addChannel, channels, delChannel } = useAppStore()
+	const router = useRouter()
+	const hasGot = Boolean(channels.find((c) => c.poketto.id === poketto.id))
+	const [scroll, scrollTo] = useWindowScroll()
 	
-	const onAddPokettoChannel = () => {
-		addChannel(createPokettoChannel(poketto))
+	const onAddChannel = () => {
+		addChannel(createChannel(poketto))
+		void router.push(getChannelUri(poketto.id))
 		toast({ title: `Successfully added channel: ${poketto.basic.title}` })
+	}
+	
+	const onDelChannel = () => {
+		delChannel(poketto.id)
+		const nextChannel = channels.find((c) => c.poketto.id !== poketto.id)
+		void router.push(getChannelUri(nextChannel!.poketto.id))
+		scrollTo({ y: 0 })
 	}
 	
 	return (
@@ -44,22 +58,16 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 					</div>
 				</div>
 				{
-					channels.find((c) => c.poketto.id === poketto.id)
-						?
-						<Button
-							disabled
-							className={clsx(
-								'w-20 | rounded-3xl',
-							)} size={'thin'} onClick={onAddPokettoChannel}>Got</Button>
-						:
-						<Button
-							variant={'destructive'}
-							className={clsx(
-								'w-20 | rounded-3xl',
-								// 'bg-destructive/75  hover:bg-destructive',
-								// 'bg-[#027AFF]', // Apple Store get 按钮色
-								// 'bg-[#19abff] bg-[#D70010] bg-[#CCE0BB] bg-[#F3A9CA] bg-[#FFC148] bg-[#94B3EA] bg-[#FAA883]  ', // 哆啦A梦颜色，https://www.pinterest.com/pin/271130840040488009/
-							)} size={'thin'} onClick={onAddPokettoChannel}>Get</Button>
+					<Button
+						disabled={hasGot}
+						variant={hasGot ? 'default' : 'destructive'}
+						className={clsx(
+							'w-20 | rounded-3xl transition-all',
+						)}
+						size={'thin'}
+						onClick={onAddChannel}>
+						{hasGot ? 'Got' : 'Get'}
+					</Button>
 				}
 			</section>
 			
@@ -174,6 +182,15 @@ export const PokettoDetail = ({ poketto, comments }: { poketto: IPokettoBasic, c
 					</section>
 				</>
 			)}
+			
+			{
+				hasGot && (
+					<section id={'management'} className={'w-full flex flex-col gap-4'}>
+						<h2>Management</h2>
+						<Button variant={'destructive'} disabled={poketto.id === POKETTO_CHANNEL_ID} onClick={onDelChannel}>Uninstall</Button>
+					</section>
+				)
+			}
 		
 		</section>
 	)

@@ -9,12 +9,14 @@ import clsx from 'clsx'
 import { type IPokettoBasic, type IPokettoChannelListView } from '@/ds/poketto'
 import { useAppStore } from '@/store'
 import d from '@/lib/datetime'
-import { getChannelListView } from '@/lib/poketto'
+import { getChannelListView, getChannelUri } from '@/lib/poketto'
 import { toast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 
-export const PokettoList = () => {
+export const ChannelList = () => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
 	const { data: searchedPoketto } = api.poketto.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
 	
@@ -59,11 +61,8 @@ export const PokettoList = () => {
 
 
 const SearchResultItem = ({ poketto }: { poketto: IPokettoBasic }) => {
-	console.log(poketto)
-	const { setPokettoId } = useAppStore()
-	
 	return (
-		<div onClick={() => setPokettoId(poketto.id)} className={clsx(
+		<Link href={getChannelUri(poketto.id)} className={clsx(
 			'w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent cursor-pointer',
 		)}>
 			<Avatar className={'shrink-0'}>
@@ -77,21 +76,23 @@ const SearchResultItem = ({ poketto }: { poketto: IPokettoBasic }) => {
 				<ViewsField v={poketto.state.views}/>
 				<p className={'truncate'}>@{poketto.user.name}</p>
 			</div>
-		</div>
+		</Link>
 	)
 }
 
 const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
 
 const ChannelListView = ({ channelListView }: { channelListView: IPokettoChannelListView }) => {
-	const { setPokettoId } = useAppStore()
+	// const { setPokettoId } = useAppStore()
+	const router = useRouter()
 	
 	return (
 		
 		<Button variant={'ghost'} className={'w-full px-4 py-2 h-fit | flex items-center gap-4'} onClick={() => {
-			setPokettoId(channelListView.id)
-			toast({ title: `changing to ${channelListView.title}` })
-			console.log({ channelListView })
+			// setPokettoId(channelListView.id)
+			// console.log({ channelListView })
+			void router.push(getChannelUri(channelListView.id))
+			// toast({ title: `changing to ${channelListView.title}` })
 		}}>
 			<Avatar className={'shrink-0'}>
 				<AvatarImage src={channelListView.avatar}/>

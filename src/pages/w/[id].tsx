@@ -1,6 +1,6 @@
 import { RootLayout } from '@/layouts/root.layout'
-import { PokettoDetail } from '@/components/channel/channel-detail'
-import { PokettoList } from '@/components/channel/channel-list'
+import { ChannelDetail } from '@/components/channel/channel-detail'
+import { ChannelList } from '@/components/channel/channel-list'
 import { useAppStore } from '@/store'
 import { useChat } from 'ai/react'
 import { toast } from 'sonner'
@@ -15,8 +15,8 @@ import { ControlTool } from '@/components/utils/tools'
 export default function ConversationPage() {
 	
 	
-	const { channels, pokettoId, pokettoBasic, chatListVisible, chatDetailVisible, pokettoComments } = useAppStore()
-	const channel = channels.find((c) => c.poketto.id === pokettoId)
+	const { channels, pokettoBasic, chatListVisible, chatDetailVisible, pokettoComments } = useAppStore()
+	const channel = channels.find((c) => c.poketto.id === pokettoBasic.id)
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
 		initialMessages: [
@@ -34,7 +34,7 @@ export default function ConversationPage() {
 		<RootLayout>
 			<div className={'w-full h-full overflow-hidden | flex divide-x'}>
 				
-				{chatListVisible && <PokettoList/>}
+				{chatListVisible && <ChannelList/>}
 				
 				<section id={'chat-contents'} className={clsx(
 					'w-full grow h-full overflow-hidden | flex flex-col',
@@ -83,7 +83,7 @@ export default function ConversationPage() {
 				
 				</section>
 				
-				{chatDetailVisible && pokettoBasic && <PokettoDetail poketto={pokettoBasic} comments={pokettoComments}/>}
+				{chatDetailVisible && pokettoBasic && <ChannelDetail poketto={pokettoBasic} comments={pokettoComments}/>}
 			</div>
 		</RootLayout>
 	)
