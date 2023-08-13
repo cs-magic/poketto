@@ -66,7 +66,7 @@ export default function WorkspacesPage() {
 					</CardHeader>
 					<CardContent className={'w-full flex justify-between'}>
 						<div className={'w-full flex flex-col divide-y'}>
-							{_.range(3).map((i) => <ChannelListView poketto={page?.data[i]} key={i}/>)}
+							{_.sampleSize(_.range(30), 3).map((i) => <ChannelListView poketto={page?.data[i]} key={i}/>)}
 						</div>
 					</CardContent>
 				</Card>

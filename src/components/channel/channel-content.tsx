@@ -8,21 +8,38 @@ import { useChat } from 'ai/react'
 import { toast } from 'sonner'
 import { useAppStore } from '@/store'
 import { useEffect, useRef } from 'react'
+import { nanoid } from 'nanoid'
+import { user } from '@/config/user'
 
-export const ChannelCoontent = () => {
-	const { channels, pokettoBasic, setPokettoBasic, setPokettoComments, chatListVisible, chatDetailVisible, pokettoComments } = useAppStore()
-	
+export const ChannelContent = () => {
+	const questionId = useRef<string>()
+	const { channels, pokettoBasic, pushMessage } = useAppStore()
+	const initMessages = useAppStore((state) => state.messages.filter((m) => m.channelId === pokettoBasic.id))
 	const channel = channels.find((c) => c.poketto.id === pokettoBasic.id)
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
 		initialMessages: [
-			...channel ? [
-				...channel.poketto.model.initPrompts,
-				...channel.poketto.conversation?.messages ?? [],
-			] : pokettoBasic.conversation?.messages ?? [],
+			...pokettoBasic.model?.initPrompts ?? [],
+			...pokettoBasic.conversation?.messages ?? [],
+			...initMessages,
 		],
 		onError: err => {
 			toast.error(err.message)
+		},
+		onFinish: (msg) => {
+			pushMessage({
+				...msg,
+				// id: nanoid(),
+				// createdAt: new Date(),
+				// content: event.currentTarget.value as string,
+				// role: 'user',
+				channelId: pokettoBasic.id,
+				interactions: {},
+				type: 'user',
+				format: 'text',
+				parentId: questionId.current,
+				userId: user.id,
+			})
 		},
 	})
 	
@@ -42,8 +59,11 @@ export const ChannelCoontent = () => {
 			
 			<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
 				{
+					//  todo: use channel messages instead of prompt messages
 					messages
-						.filter((value, index) => channel?.poketto.permissions.openSource || index >= (channel?.poketto.model.initPrompts.length ?? 0))
+						.filter((value, index) =>
+							channel?.poketto.permissions.openSource || index >= (channel?.poketto.model.initPrompts.length ?? 0),
+						)
 						.map((msg, index) => (
 							<div
 								key={index}
@@ -73,7 +93,22 @@ export const ChannelCoontent = () => {
 				<div ref={ref}/>
 			</div>
 			
-			<form className={'w-full p-4 | flex justify-center items-center gap-2'} onSubmit={handleSubmit}>
+			<form className={'w-full p-4 | flex justify-center items-center gap-2'} onSubmit={(event) => {
+				questionId.current = nanoid()
+				pushMessage({
+					id: questionId.current,
+					channelId: pokettoBasic.id,
+					interactions: {},
+					type: 'user',
+					content: event.currentTarget.prompt.value as string,
+					role: 'user',
+					format: 'text',
+					createdAt: new Date(),
+					parentId: undefined,
+					userId: user.id,
+				})
+				handleSubmit(event)
+			}}>
 				<Input name={'prompt'} className={'w-[95%]'} autoFocus value={input} onChange={handleInputChange} id={'input'}/>
 				<Button type={'submit'}>Send</Button>
 			</form>

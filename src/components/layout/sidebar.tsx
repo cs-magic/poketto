@@ -3,31 +3,24 @@ import { Separator } from '@/components/ui/separator'
 import { clsx } from 'clsx'
 import { ChevronRightIcon, EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from '@radix-ui/react-icons'
 import { MenuLink } from '@/components/utils/link'
-import { SelfUserAvatar } from '@/components/user'
 import { user } from '@/config/user'
 import { uri } from '@/config/uri'
 import { InviteCard } from '@/components/utils/invitation'
 import { useAppStore } from '@/store'
+import { SelfUserAvatar } from '@/components/user'
 
 
 export const Sidebar = () => {
 	
-	const { sidebarVisible, toggleSidebar } = useAppStore()
+	const { sidebarVisible } = useAppStore()
+	console.log({ sidebarVisible })
 	
 	return (
 		<div className={clsx(
 			'h-full max-w-[240px] shrink-0 whitespace-nowrap px-4 pt-8 | flex flex-col gap-6 | bg-sidebar text-sm text-primary-foreground',
 		)}>
-			{/*<LogoWithName/>*/}
-			{/*<Separator/>*/}
 			
 			<section className={'flex flex-col'}>
-				
-				{/*<Button variant={'ghost'} className={'justify-start'} onClick={toggleSidebar}>*/}
-				{/*	{sidebarVisible ? <TextAlignRightIcon/> : <TextAlignLeftIcon/>}*/}
-				{/*</Button>*/}
-				
-				
 				<MenuLink icon={<HomeIcon/>} field={'workspaces'} link={uri.app.workspace}/>
 				<MenuLink icon={<RocketIcon/>} field={'explore'}/>
 				{/*<MenuLink field={'toolkits'}/>*/}
@@ -37,7 +30,7 @@ export const Sidebar = () => {
 			<section className={'flex flex-col'}>
 				<MenuLink icon={<MixIcon/>} field={'dashboard'} link={uri.user.dashboard}/>
 				<MenuLink icon={<TargetIcon/>} field={'gallery'} link={uri.user.gallery}/>
-				{/*<MenuLink field={'integrations'} link={uri.user.integrations}/>*/}
+				<MenuLink field={'integrations'} link={uri.user.integrations}/>
 			</section>
 			
 			<Separator/>

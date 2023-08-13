@@ -104,7 +104,8 @@ const ChannelListView = ({ channelListView }: { channelListView: IPokettoChannel
 					<span>{d(channelListView.latestMessage.createdAt).calendar()}</span>
 				</div>
 				<div className={'flex gap-2'}>
-					{channelListView.latestUser && <span>{channelListView.latestUser.name}</span>}
+					{/* 只有 group 才需要打开 */}
+					{/*{channelListView.latestUser && <span className={'shrink-0'}>{channelListView.latestUser.name}</span>}*/}
 					<span className={'truncate text-muted-foreground'}>{channelListView.latestMessage.content}</span>
 				</div>
 			</div>

@@ -21,27 +21,23 @@ export function RootLayout(props: PropsWithChildren) {
 			</Head>
 			
 			<main className={clsx(
-				'h-screen | flex flex-col | font-light text-foreground text-sm',
+				'w-screen h-screen | flex flex-col | font-light text-foreground text-sm',
 				'bg-background',
 				// 'bg-zinc-900',
 				font.className,
 			)}>
-				
 				<Navbar/>
-				
-				<div className={'grow overflow-hidden | flex divide-x'}>
-					<Sidebar/>
-					
-					<div className={'grow overflow-hidden h-full | flex flex-col items-center justify-center gap-2'}>
-						{
-							!mounted
-								? 'Loading...' // !IMPORTANT: avoid persistence ssr
-								: props.children
-						}
-					</div>
-				</div>
+				{
+					!mounted
+						? <div className={'w-full grow | flex justify-center items-center'}>Loading...</div> // !IMPORTANT: avoid persistence ssr
+						: <div className={'grow overflow-hidden | flex divide-x'}>
+							<Sidebar/>
+							<div className={'grow overflow-hidden h-full | flex flex-col items-center justify-center gap-2'}>
+								{props.children}
+							</div>
+						</div>
+				}
 			</main>
-		
 		</>
 	)
 }

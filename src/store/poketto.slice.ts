@@ -1,9 +1,9 @@
 import { SortOrder } from '@/ds/system'
-import { type IPokettoBasic, type IPokettoChannel, type IPokettoComment } from '@/ds/poketto'
+import { type IChannelMessage, type IPokettoBasic, type IPokettoChannel, type IPokettoComment } from '@/ds/poketto'
 
 import { type StoreSlice } from '@/store/index'
 import { type ID } from '@/ds/general'
-import { POKETTO_CHANNEL_ID, pokettoBasic } from '@/config/poketto'
+import { pokettoBasic } from '@/config/poketto'
 import { createChannel } from '@/lib/poketto'
 
 /**
@@ -23,6 +23,9 @@ export interface PokettoState {
 	channels: IPokettoChannel[]
 	addChannel: (pokettoChannel: IPokettoChannel) => void
 	delChannel: (channelId: ID) => void
+	
+	messages: IChannelMessage[]
+	pushMessage: (v: IChannelMessage) => void
 }
 
 export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
@@ -45,4 +48,7 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	delChannel: (v) => setState((state) => {
 		state.channels.splice(state.channels.findIndex((c) => c.poketto.id === v), 1)
 	}),
+	
+	messages: [],
+	pushMessage: (v) => setState((state) => { state.messages.push(v)}),
 })

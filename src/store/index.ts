@@ -38,7 +38,7 @@ export const useAppStore = create<StoreState>()(
 			),
 			{
 				name: 'zustand',
-				version: 0.8,
+				version: 0.9,
 				// @ts-ignore
 				migrate: (persistedState: StoreState, version) => {
 					if (version === .7) {

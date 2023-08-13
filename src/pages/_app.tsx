@@ -7,6 +7,7 @@ import React from 'react'
 import { ThemeProvider } from 'next-themes'
 // import { Toaster } from '@/components/ui/toaster'
 import { Toaster } from 'sonner'
+import ErrorBoundary from '@/components/error-boundary'
 
 const MyApp: AppType<{ session: Session | null }> =
 	({
@@ -16,7 +17,9 @@ const MyApp: AppType<{ session: Session | null }> =
 		return (
 			<ThemeProvider attribute="class" defaultTheme={'dark'}>
 				<SessionProvider session={session}>
-					<Component {...pageProps} />
+					<ErrorBoundary>
+						<Component {...pageProps} />
+					</ErrorBoundary>
 					<Toaster/>
 				</SessionProvider>
 			</ThemeProvider>

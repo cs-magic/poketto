@@ -34,13 +34,13 @@ export const pokettoBasic: IPokettoBasic = {
 	basic: {
 		avatar: getRobotAvatar(POKETTO_CHANNEL_ID),
 		title: POKETTO_CHANNEL_TITLE,
-		createdAt: getTimestampMS(),
+		createdAt: new Date(),
 		language: LANGUAGE,
 		tags: ['poketto', 'companion', 'ChatGPT'],
 		desc: POKETTO_CHANNEL_DESC,
 		category: ['Lifestyle'],
 		industry: [],
-		updatedAt: getTimestampMS(),
+		updatedAt: new Date(),
 		version: '1.0.0',
 	},
 	state: {
@@ -65,10 +65,16 @@ export const pokettoBasic: IPokettoBasic = {
 		type: POKETTO_MODEL_NAME,
 		functions: [],
 		initPrompts: [
-			// {
-			// 	role: 'system',
-			// 	content: Mustache.render(POKETTO_SYSTEM_PROMPT, { userName: user.name }),
-			// },
+			{
+				id: nanoid(),
+				role: 'system',
+				content: Mustache.render(POKETTO_SYSTEM_PROMPT, { userName: user.name }),
+				type: 'user',
+				format: 'text',
+				createdAt: new Date(),
+				channelId: POKETTO_CHANNEL_ID,
+				interactions: {},
+			},
 		],
 		manufacturer: POKETTO_MANUFACTURE_NAME,
 	},
