@@ -4,6 +4,10 @@
  */
 await import("./src/env.mjs");
 
+import sms from 'source-map-support'
+
+sms.install();
+
 /** @type {import("next").NextConfig} */
 const config = {
 	reactStrictMode: true,
@@ -27,8 +31,7 @@ const config = {
 		]
 	},
 	
-	webpack(config) {
-		
+	webpack(config, {isServer}) {
 		config.module.rules.push(
 			// Convert all other *.svg imports to React components
 			{
@@ -38,7 +41,6 @@ const config = {
 				use: ['@svgr/webpack'],
 			},
 		)
-		
 		return config
 	},
 };

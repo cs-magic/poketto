@@ -4,14 +4,17 @@ import _ from 'lodash'
 
 import { USER_INVITATIONS_COUNT } from '@/config/system'
 import { type User } from '.prisma/client'
+import { type UserWithRelations, userWithRelationsInclude } from '@/ds/user'
 
 
 export const userRouter = createTRPCRouter({
 	
 	getExactUser: protectedProcedure
 		.input(z.string().optional())
-		.query(async ({ ctx, input }): Promise<User | undefined> => {
-			return (input && await ctx.prisma.user.findUnique({ where: { id: input } })) || undefined
+		.query(async ({ ctx, input }): Promise<UserWithRelations | undefined> => {
+			if (!input) return undefined
+			const res = await ctx.prisma.user.findUnique({ where: { id: input }, include: userWithRelationsInclude }) as UserWithRelations | null
+			return res || undefined
 		}),
 	
 	getSecretMessage: protectedProcedure.query(() => {

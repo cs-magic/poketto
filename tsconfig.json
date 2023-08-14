@@ -10,6 +10,8 @@
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
+    // ref: https://github.com/vercel/next.js/issues/5307#issuecomment-567166918
+    "sourceMap": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,

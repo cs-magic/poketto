@@ -1,9 +1,13 @@
 import { RootLayout } from '@/layouts/root.layout'
+import { UserProfile } from '@/components/user'
+import { useUser } from '@/hooks/use-user'
 
 export default function DashboardPage() {
+	const user = useUser()
 	return (
 		<RootLayout>
-			From Poketto Official: 很快就会上线，请再耐心等等吧！
+			<UserProfile user={user}/>
 		</RootLayout>
 	)
 }
+

@@ -86,16 +86,7 @@ model User {
   following  User[] @relation("follow")
   followedBy User[] @relation("follow")
 
-  balance Balance?
-}
-
-model Balance {
-  id Int @id @default(autoincrement())
-
-  user   User   @relation(references: [id], fields: [userId])
-  userId String @unique
-
-  current Int @default(0)
+  balance Int @default(0)
 }
 
 model VerificationToken {

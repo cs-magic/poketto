@@ -1,11 +1,12 @@
 import { useSession } from 'next-auth/react'
 import { api } from '@/lib/api'
 import { type User } from '.prisma/client'
+import { type UserWithRelations } from '@/ds/user'
 
 /**
  * 不要写 useUserId，不方便维护
  */
-export const useUser = (): User | undefined => {
+export const useUser = (): UserWithRelations | undefined => {
 	const { data } = useSession()
 	const userId = data?.user.id
 	const { data: user } = api.user.getExactUser.useQuery(userId, { enabled: !!userId })
