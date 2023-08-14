@@ -2,19 +2,10 @@ import { RootLayout } from '@/layouts/root.layout'
 import { ChannelDetail } from '@/components/channel/channel-detail'
 import { ChannelList } from '@/components/channel/channel-list'
 import { useAppStore } from '@/store'
-import { useChat } from 'ai/react'
-import { toast } from 'sonner'
-import clsx from 'clsx'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { ControlTool } from '@/components/utils/tools'
 import { POKETTO_CHANNEL_ID } from '@/config/poketto'
 import { api } from '@/lib/api'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useWindowScroll } from '@mantine/hooks'
 import { ChannelContent } from '@/components/channel/channel-content'
 
 
@@ -36,16 +27,14 @@ export default function ConversationPage() {
 	}, [withConversation, comments])
 	
 	
-	return (
-		<RootLayout>
-			<div className={'w-full h-full overflow-hidden | flex divide-x'}>
-				
-				{chatListVisible && <ChannelList/>}
-				
-				<ChannelContent/>
-				
-				{chatDetailVisible && pokettoBasic && <ChannelDetail poketto={pokettoBasic} comments={pokettoComments}/>}
-			</div>
-		</RootLayout>
-	)
+	return (<RootLayout>
+		<div className={'w-full h-full overflow-hidden | flex divide-x'}>
+			
+			{chatListVisible && <ChannelList/>}
+			
+			<ChannelContent/>
+			
+			{chatDetailVisible && pokettoBasic && <ChannelDetail poketto={pokettoBasic} comments={pokettoComments}/>}
+		</div>
+	</RootLayout>)
 }

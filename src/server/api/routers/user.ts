@@ -4,18 +4,7 @@ import _ from 'lodash'
 import { USER_INVITATIONS_COUNT } from '@/config/user'
 
 
-export const exampleRouter = createTRPCRouter({
-	hello: publicProcedure
-		.input(z.object({ text: z.string() }))
-		.query(({ input }) => {
-			return {
-				greeting: `Hello ${input.text}`,
-			}
-		}),
-	
-	getAll: publicProcedure.query(({ ctx }) => {
-		return ctx.prisma.example.findMany()
-	}),
+export const userRouter = createTRPCRouter({
 	
 	getSecretMessage: protectedProcedure.query(() => {
 		return 'you can now see this secret message!'
@@ -29,4 +18,13 @@ export const exampleRouter = createTRPCRouter({
 		}
 		return await ctx.prisma.invitation.findMany({ where: { fromId: user.id } })
 	}),
+	
+	getAllUser: publicProcedure.query(({ ctx }) => {
+		return ctx.prisma.user.findMany({
+			include: {
+				followedBy: true,
+			},
+		})
+	}),
+	
 })

@@ -70,17 +70,32 @@ model Invitation {
 }
 
 model User {
-  invitedFrom Invitation[] @relation("from")
-  invitdeTo   Invitation[] @relation("to")
-
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  desc          String?
 
   accounts Account[]
   sessions Session[]
+
+  invitedFrom Invitation[] @relation("from")
+  invitdeTo   Invitation[] @relation("to")
+
+  following  User[] @relation("follow")
+  followedBy User[] @relation("follow")
+
+  balance Balance?
+}
+
+model Balance {
+  id Int @id @default(autoincrement())
+
+  user   User   @relation(references: [id], fields: [userId])
+  userId String @unique
+  
+  current Int @default(0)
 }
 
 model VerificationToken {

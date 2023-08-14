@@ -1,8 +1,5 @@
 import { type IPokettoBasic } from '@/ds/poketto'
 import { getRobotAvatar } from '@/lib/string'
-import { getTimestampMS } from '@/lib/datetime'
-import Mustache from 'mustache'
-import { user } from '@/config/user'
 import { nanoid } from 'nanoid'
 
 // aNB-zlvB30vEIS-yuX-5J: uploaded to flowgpt: https://flowgpt.com/p/your-sole-poketto
@@ -30,8 +27,7 @@ export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
 那么，就请接下来多多关照啦！
 `
 export const pokettoBasic: IPokettoBasic = {
-	id: POKETTO_CHANNEL_ID,
-	basic: {
+	id: POKETTO_CHANNEL_ID, basic: {
 		avatar: getRobotAvatar(POKETTO_CHANNEL_ID),
 		title: POKETTO_CHANNEL_TITLE,
 		createdAt: new Date(),
@@ -42,60 +38,34 @@ export const pokettoBasic: IPokettoBasic = {
 		industry: [],
 		updatedAt: new Date(),
 		version: '1.0.0',
-	},
-	state: {
-		ratedStars: 0,
-		comments: 0,
-		forks: 0,
-		shares: 0,
-		stars: 0,
-		tips: 0,
-		tokens: 0,
-		triggers: 0,
-		users: 0,
-		views: 0,
-	},
-	user: {
-		id: POKETTO_USER_ID,
-		name: POKETTO_USER_NAME,
-		avatar: getRobotAvatar(POKETTO_USER_ID),
-	},
-	comments: [],
-	model: {
-		type: POKETTO_MODEL_NAME,
-		functions: [],
-		initPrompts: [
-			{
-				id: nanoid(),
-				role: 'system',
-				content: Mustache.render(POKETTO_SYSTEM_PROMPT, { userName: user.name }),
-				type: 'user',
-				format: 'text',
-				createdAt: new Date(),
-				channelId: POKETTO_CHANNEL_ID,
-				interactions: {},
-			},
-		],
-		manufacturer: POKETTO_MANUFACTURE_NAME,
-	},
-	conversation: {
-		createdAt: new Date(),
-		messages: [
-			{
-				id: nanoid(),
-				channelId: POKETTO_CHANNEL_ID,
-				type: 'user',
-				format: 'text',
-				interactions: {},
-				role: 'assistant',
-				content: Mustache.render(POKETTO_WELCOME_MESSAGE, { userName: user.name }),
-				createdAt: new Date(),
-			},
-		],
-	},
-	permissions: {
-		visible: true,
-		openSource: false,
+	}, state: {
+		ratedStars: 0, comments: 0, forks: 0, shares: 0, stars: 0, tips: 0, tokens: 0, triggers: 0, users: 0, views: 0,
+	}, user: {
+		id: POKETTO_USER_ID, name: POKETTO_USER_NAME, avatar: getRobotAvatar(POKETTO_USER_ID),
+	}, comments: [], model: {
+		type: POKETTO_MODEL_NAME, functions: [], initPrompts: [{
+			id: nanoid(),
+			role: 'system',
+			content: POKETTO_SYSTEM_PROMPT,
+			type: 'user',
+			format: 'text',
+			createdAt: new Date(),
+			channelId: POKETTO_CHANNEL_ID,
+			interactions: {},
+		}], manufacturer: POKETTO_MANUFACTURE_NAME,
+	}, conversation: {
+		createdAt: new Date(), messages: [{
+			id: nanoid(),
+			channelId: POKETTO_CHANNEL_ID,
+			type: 'user',
+			format: 'text',
+			interactions: {},
+			role: 'assistant',
+			content: POKETTO_WELCOME_MESSAGE,
+			createdAt: new Date(),
+		}],
+	}, permissions: {
+		visible: true, openSource: false,
 	},
 }
 

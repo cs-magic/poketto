@@ -4,7 +4,7 @@ import React from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 
 export default function Intro() {
-	const hello = api.example.hello.useQuery({ text: 'from tRPC' })
+	const hello = api.user.hello.useQuery({ text: 'from tRPC' })
 	
 	return (
 		<div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
@@ -49,7 +49,7 @@ export default function Intro() {
 function AuthShowcase() {
 	const { data: sessionData } = useSession()
 	
-	const { data: secretMessage } = api.example.getSecretMessage.useQuery(
+	const { data: secretMessage } = api.user.getSecretMessage.useQuery(
 		undefined, // no input
 		{ enabled: sessionData?.user !== undefined },
 	)

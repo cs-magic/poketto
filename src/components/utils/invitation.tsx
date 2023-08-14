@@ -11,7 +11,7 @@ import { USER_INVITATIONS_COUNT } from '@/config/user'
 import { InvitationStatus } from '.prisma/client'
 
 export const InviteCard = () => {
-	const { data = [] } = api.example.getInvitations.useQuery()
+	const { data = [] } = api.user.getInvitations.useQuery()
 	// todo: include ? on enum type
 	const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
 	

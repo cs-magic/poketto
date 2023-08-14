@@ -2,7 +2,9 @@ import { useSession } from 'next-auth/react'
 
 export const useUser = () => {
 	const { data } = useSession()
-	return data?.user
+	const user = data?.user
+	// console.log('[useUser] ', user)
+	return user
 }
 
 export const useUserId = () => {

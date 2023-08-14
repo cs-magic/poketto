@@ -46,7 +46,7 @@ export const Sidebar = () => {
 			{/* footer */}
 			<div className={'grow'}/>
 			
-			{sidebarVisible && <InviteCard/>}
+			{sidebarVisible && user && <InviteCard/>}
 			
 			<div className={'flex justify-center items-center gap-2 py-4 border-t'}>
 				<Avatar className={ICON_DIMENSION_MD}>

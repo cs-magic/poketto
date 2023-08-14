@@ -1,4 +1,4 @@
-import { exampleRouter } from '@/server/api/routers/example'
+import { userRouter } from '@/server/api/routers/user'
 import { createTRPCRouter } from '@/server/api/helpers'
 import { pokettoRouter } from '@/server/api/routers/pokettoRouter'
 import { chatRouter } from '@/server/api/routers/chat_todo'
@@ -9,7 +9,7 @@ import { chatRouter } from '@/server/api/routers/chat_todo'
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-	example: exampleRouter,
+	user: userRouter,
 	poketto: pokettoRouter,
 	chat: chatRouter,
 })

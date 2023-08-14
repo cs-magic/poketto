@@ -1,11 +1,11 @@
 import { type IPokettoBasic, type IPokettoChannel, type IPokettoChannelListView } from '@/ds/poketto'
 import { nanoid } from 'nanoid'
 import { getTimestampMS } from '@/lib/datetime'
-import { user } from '@/config/user'
+import { type User } from '.prisma/client'
 
 export const getChannelUri = (pokettoId: string) => `/p/${pokettoId}`
 
-export const createChannel = (poketto: IPokettoBasic): IPokettoChannel => ({
+export const createChannel = (poketto: IPokettoBasic, user: User): IPokettoChannel => ({
 	messages: [
 		{
 			type: 'notification',
@@ -14,7 +14,7 @@ export const createChannel = (poketto: IPokettoBasic): IPokettoChannel => ({
 			id: nanoid(),
 			channelId: poketto.id,
 			createdAt: new Date(),
-			content: `Welcome ${user.name} to join in ${poketto.basic.title} !`,
+			content: `Welcome {{userName}} to join in ${poketto.basic.title} !`,
 			interactions: {},
 			parentId: undefined,
 			userId: undefined,

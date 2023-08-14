@@ -9,10 +9,12 @@ import { toast } from 'sonner'
 import { useAppStore } from '@/store'
 import { useEffect, useRef } from 'react'
 import { nanoid } from 'nanoid'
-import { useUserId } from '@/hooks/use-user'
+import { useUser, useUserId } from '@/hooks/use-user'
+import Mustache from 'mustache'
 
 export const ChannelContent = () => {
 	const userId = useUserId()
+	const user = useUser()
 	const questionId = useRef<string>()
 	const { channels, pokettoBasic, pushMessage } = useAppStore()
 	const initMessages = useAppStore((state) => state.messages.filter((m) => m.channelId === pokettoBasic.id))
@@ -84,7 +86,9 @@ export const ChannelContent = () => {
 								)}>
 									
 									<ReactMarkdown remarkPlugins={[remarkGfm]}>
-										{msg.content}
+										{Mustache.render(msg.content, {
+											userName: user?.name,
+										})}
 									</ReactMarkdown>
 								</div>
 							

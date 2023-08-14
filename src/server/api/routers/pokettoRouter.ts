@@ -5,16 +5,13 @@ import partialSearch from '../../../data/partial-search.agg.json'
 import { type IPokettoBasic, type IPokettoComment, SortOrder } from '@/ds/poketto'
 import { flowgpt2poketto, flowgpt2poketto_comment } from '@/lib/transform'
 import _ from 'lodash'
-import Mustache from 'mustache'
 import { pokettoBasic } from '@/config/poketto'
-import { user } from '@/config/user'
 
 export const Platforms = ['poketto', 'flowgpt'] as const
 export type Platform = typeof Platforms[number]
 
 export const idInput = z.object({
-	id: z.string().optional(),
-	platform: z.enum(Platforms),
+	id: z.string().optional(), platform: z.enum(Platforms),
 })
 
 const singleFetch = async <T>(props: { path: string, j: object }) => {
@@ -35,12 +32,8 @@ export const pokettoRouter = createTRPCRouter({
 	
 	searchPoketto: publicProcedure
 		.input(z.object({
-				query: z.string(),
-				language: z.string().default('zh'),
-				threshold: z.number().default(.8),
-				hideNsfw: z.boolean().default(true),
-			}),
-		)
+			query: z.string(), language: z.string().default('zh'), threshold: z.number().default(.8), hideNsfw: z.boolean().default(true),
+		}))
 		.query<IPokettoBasic[]>(async (opts) => {
 			partialSearch[0]!.$search!.phrase.query = opts.input.query // <-- mongodb partial search
 			let result
@@ -50,18 +43,16 @@ export const pokettoRouter = createTRPCRouter({
 		}),
 	
 	listPoketto: publicProcedure
-		.input(
-			z.object({
-				cursor: z.number().nullish(),
-				sort: z.nativeEnum(SortOrder).optional(),
-				q: z.string().optional(),
-				categoryId: z.string().optional(),
-				subCategoryId: z.string().optional(),
-				language: z.string().default('zh'),
-				skip: z.number().default(0),
-				tag: z.string().optional(),
-			}),
-		)
+		.input(z.object({
+			cursor: z.number().nullish(),
+			sort: z.nativeEnum(SortOrder).optional(),
+			q: z.string().optional(),
+			categoryId: z.string().optional(),
+			subCategoryId: z.string().optional(),
+			language: z.string().default('zh'),
+			skip: z.number().default(0),
+			tag: z.string().optional(),
+		}))
 		.query<{ data: IPokettoBasic[], nextCursor: number | undefined }>(async (opts) => {
 			// 所有空的要填 ["undefined"]
 			const emptyFields = Object.entries(opts.input)
@@ -70,8 +61,7 @@ export const pokettoRouter = createTRPCRouter({
 			const meta = _.zipObject(emptyFields, emptyFields.map(() => ['undefined']))
 			// console.log({ query: opts.input, meta })
 			const j = {
-				json: opts.input,
-				meta: { values: meta },
+				json: opts.input, meta: { values: meta },
 			}
 			const data = await singleFetch<IFlowgptPromptBasic[]>({ path: 'prompt.getPrompts', j })
 			const nextCursor = data.length < GET_PROMPTS_BATCH_SIZE ? undefined : opts.input.skip + GET_PROMPTS_BATCH_SIZE
@@ -101,8 +91,7 @@ export const pokettoRouter = createTRPCRouter({
 			
 			const j = {
 				json: {
-					type: 'prompt',
-					id,
+					type: 'prompt', id,
 				},
 			}
 			const data = await singleFetch<IFlowGPTComment[]>({ path: 'comment.getComments', j })

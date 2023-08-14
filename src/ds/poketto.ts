@@ -3,6 +3,7 @@ import { FlowGPTSortOrder, type IFlowGPTComment, type IFlowgptConversation } fro
 import d from '@/lib/datetime'
 import { type Message } from 'ai'
 import { nanoid } from 'nanoid'
+import { type User } from '.prisma/client'
 
 /**
  * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
@@ -118,7 +119,7 @@ export type SYSTEM_USER_TYPE = typeof SYSTEM_USER_ID
 
 
 export interface IPokettoChannelUser
-	extends IUser {
+	extends User {
 	state: 'active' | 'leave'
 	type:
 		'user'
