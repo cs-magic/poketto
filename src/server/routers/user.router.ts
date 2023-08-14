@@ -3,11 +3,23 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/
 import _ from 'lodash'
 
 import { USER_INVITATIONS_COUNT } from '@/config/system'
-import { type User } from '.prisma/client'
+import { $Enums, type User } from '.prisma/client'
 import { type UserWithRelations, userWithRelationsInclude } from '@/ds/user'
+import User2AppType = $Enums.User2AppType
 
 
 export const userRouter = createTRPCRouter({
+	listApps: protectedProcedure
+		.input(z.object({
+			type: z.enum(User2AppType),
+		}))
+		.query(async ({ ctx }) => {
+			const { user } = ctx.session
+			if (!user) return []
+			return ctx.prisma.user2App
+				.findMany({ where: { userId: user.id }, include: { app: true } })
+				.map((v) => v.app)
+		}),
 	
 	getExactUser: protectedProcedure
 		.input(z.string().optional())

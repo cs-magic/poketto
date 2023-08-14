@@ -1,7 +1,7 @@
 import { uri } from '@/config/uri'
 
 
-export const app = {
+export const product = {
 	name: '口袋 A I',
 	// name: 'Poketto.AI',
 	currency: '甜甜圈',

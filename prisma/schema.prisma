@@ -63,17 +63,59 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  invitedFrom Invitation[] @relation("from")
-  invitdeTo   Invitation[] @relation("to")
+  invitedFrom InvitationRelation[] @relation("from")
+  invitdeTo   InvitationRelation[] @relation("to")
 
-  following  User[] @relation("follow")
-  followedBy User[] @relation("follow")
+  followedBy FollowRelation[] @relation("from")
+  following  FollowRelation[] @relation("to")
 
-  balance     Int              @default(0)
-  usingApps   PokettoApp[]     @relation("use")
-  starredApps PokettoApp[]     @relation("star")
-  forkedApps  PokettoApp[]     @relation("fork")
-  comments    PokettoComment[]
+  balance Int @default(0)
+
+  appComments AppComment[]
+  appActions  AppAction[]
+
+  chatMessages       ChatMessage[]
+  chatMessageActions ChatMessageAction[]
+
+  user_space UserSpaceRelation[]
+  tags       AppTag[]
+}
+
+model FollowRelation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  from   User   @relation("from", fields: [fromId], references: [id])
+  to     User   @relation("to", fields: [toId], references: [id])
+  fromId String
+  toId   String
+}
+
+model Space {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user_space UserSpaceRelation[]
+}
+
+enum RoleType {
+  admin
+  manager
+  normal
+}
+
+model UserSpaceRelation {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  space     Space    @relation(fields: [spaceId], references: [id])
+  userId    String
+  spaceId   String
+  role      RoleType @default(normal)
+
+  @@id([userId, spaceId])
 }
 
 // -----------------------------------------------------------------------------
@@ -86,7 +128,7 @@ enum InvitationStatus {
   Expired
 }
 
-model Invitation {
+model InvitationRelation {
   id        String           @id @default(cuid())
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
@@ -103,7 +145,7 @@ model Invitation {
 // -----------------------------------------------------------------------------
 // poketto app
 // -----------------------------------------------------------------------------
-enum Platform {
+enum PlatformType {
   Poketto
   FlowGPT
   OpenAI
@@ -113,35 +155,177 @@ enum Platform {
 }
 
 model UniversalUser {
-  id            String       @id
-  name          String?
-  email         String?      @unique
-  emailVerified DateTime?
-  image         String?
-  desc          String?
-  PokettoApp    PokettoApp[]
+  id       String  @id
+  username String
+  name     String?
+  email    String? @unique
+  avatar   String?
+  desc     String?
+  app      App[]
 }
 
-model PokettoApp {
-  id           String           @id @default(cuid())
-  version      String           @default("1.0.0")
-  platform     Platform
-  CreatedAt    DateTime         @default(now())
-  UpdatedAt    DateTime         @updatedAt
-  owner        UniversalUser    @relation(references: [id], fields: [ownerId])
-  ownerId      String
-  users        User[]           @relation("use")
-  starredUsers User[]           @relation("star")
-  forkedUsers  User[]           @relation("fork")
-  comments     PokettoComment[]
+model App {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  avatar   String
+  language String       @default("en")
+  version  String       @default("1.0.0")
+  platform PlatformType
+
+  creator    UniversalUser @relation(references: [id], fields: [creatorId])
+  creatorId  String
+  AppComment AppComment[]
+
+  tags AppTag[]
+  desc String
+
+  category   AppCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  actions AppAction[]
+  state   AppState?
+
+  model AppModel?
 }
 
-model PokettoComment {
-  id           String     @id @default(cuid())
-  CreatedAt    DateTime   @default(now())
-  UpdatedAt    DateTime   @updatedAt
-  owner        User       @relation(fields: [ownerId], references: [id])
-  ownerId      String
-  pokettoApp   PokettoApp @relation(fields: [pokettoAppId], references: [id])
-  pokettoAppId String
+model AppModel {
+  id        String    @id @default(cuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // 为了减少理解成本，就不加 name 了（默认为app.title）
+  type         String
+  initPrompts  PrommptMessage[]
+  isOpenSource Boolean          @default(true)
+
+  app   App    @relation(fields: [appId], references: [id])
+  appId String @unique
+
+  temperature Float @default(0.7)
+}
+
+model AppState {
+  id        String    @id @default(cuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  views  Int   @default(0)
+  stars  Int   @default(0)
+  forks  Int   @default(0)
+  tips   Float @default(0)
+  calls  Int   @default(0)
+  shares Int   @default(0)
+
+  app   App    @relation(fields: [appId], references: [id])
+  appId String @unique
+}
+
+enum PromptRoleType {
+  system
+  user
+  assistant
+}
+
+model PrommptMessage {
+  /// or user message
+  id      String         @id @default(cuid())
+  role    PromptRoleType
+  content String
+
+  AppModel   AppModel? @relation(fields: [appModelId], references: [id])
+  appModelId String?
+}
+
+enum ChatMessageFormatType {
+  text
+  image
+  voice
+  video
+  map
+  realtimeVoice
+  realtimeVideo
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  content             String
+  format              ChatMessageFormatType @default(text)
+  userActionOnMessage ChatMessageAction[]
+}
+
+model AppCategory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  main String
+  sub  String?
+  App  App[]
+}
+
+model AppTag {
+  id String @id @default(cuid())
+
+  /// 这几个主要是 flowgpt 没有
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  creator   User?     @relation(fields: [creatorId], references: [id])
+  creatorId String?
+
+  name String
+  apps App[]
+}
+
+// -----------------------------------------------------------------------------
+// actions
+// -----------------------------------------------------------------------------
+
+model AppAction {
+  id        String    @id @default(cuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+  app    App     @relation(fields: [appId], references: [id])
+  appId  String
+
+  action String
+}
+
+model ChatMessageAction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  message   ChatMessage @relation(fields: [messageId], references: [id])
+  messageId String
+
+  action String
+}
+
+model AppComment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  aApp   App    @relation(fields: [appId], references: [id])
+  appId  String
+
+  title   String?
+  content String
+  rate    Int?    @default(0)
 }

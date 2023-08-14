@@ -3,12 +3,12 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import React from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UsesField, ViewsField } from '@/components/utils/responsive-field'
-import { type IPokettoBasic } from '@/ds/poketto'
 import Link from 'next/link'
-import { getChannelUri } from '@/lib/poketto'
+import { getAppLink } from '@/lib/poketto'
+import { type AppWithRelation } from '@/ds/poketto'
 
-export const ChannelListView = ({ poketto }: { poketto: IPokettoBasic | undefined }) => {
-	if (!poketto) return (
+export const AppListView = ({ app }: { app: AppWithRelation | undefined }) => {
+	if (!app) return (
 		<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
 			<Skeleton className={'wh-12'}/>
 			
@@ -25,24 +25,24 @@ export const ChannelListView = ({ poketto }: { poketto: IPokettoBasic | undefine
 	)
 	
 	return (
-		<Link className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'} href={getChannelUri(poketto.id)}>
+		<Link className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'} href={getAppLink(app.id)}>
 			<Avatar className={'rounded-sm'}>
-				<AvatarImage src={poketto.basic.avatar}/>
+				<AvatarImage src={app.avatar}/>
 			</Avatar>
 			
 			<div className={'flex flex-col gap-2 grow'}>
-				<p className={'text-primary-foreground font-semibold'}>{poketto.basic.title}</p>
-				<p className={'line-clamp-2 text-primary-foreground/75'}>{poketto.basic.desc}</p>
+				<p className={'text-primary-foreground font-semibold'}>{app.name}</p>
+				<p className={'line-clamp-2 text-primary-foreground/75'}>{app.desc}</p>
 				
 				<div className={'inline-flex gap-4'}>
-					<p>By {poketto.user.name}</p>
-					<p>Updated on {dayjs(poketto.basic.updatedAt).format('DD MMM, YYYY')}</p>
+					<p>By {app.name}</p>
+					<p>Updated on {dayjs(app.updatedAt).format('DD MMM, YYYY')}</p>
 				</div>
 			</div>
 			
 			<div className={'inline-flex gap-2 shrink-0'}>
-				<UsesField v={poketto.state.users}/>
-				<ViewsField v={poketto.state.views}/>
+				<UsesField v={app.state?.calls ?? 0}/>
+				<ViewsField v={app.state?.views ?? 0}/>
 			</div>
 		</Link>
 	)

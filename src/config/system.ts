@@ -1,3 +1,4 @@
 export const POKETTO_DETAIL_RATINGS_ENABLED = false
 export const POKETTO_DETAIL_FEATURES_ENABLED = false
 export const USER_INVITATIONS_COUNT = 5
+export const DEFAULT_APP_VERSION = '1.0.0'

@@ -1,7 +1,1 @@
-import { type IUser } from '@/ds/general'
-
-/**
- * todo: distinguish platform
- * @param {IUser} user
- */
-export const getUserUri = (user: IUser) => `https://flowgpt.com/user/${user.id}`
+export const getUserLink = (userId: string) => `https://flowgpt.com/user/${userId}`

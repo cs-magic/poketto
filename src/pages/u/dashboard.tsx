@@ -3,7 +3,7 @@ import { UserProfile } from '@/components/user'
 import { useUser } from '@/hooks/use-user'
 import { useSearchParams } from 'next/navigation'
 import { useAppStore } from '@/store'
-import { ChannelViewInProfile } from '@/components/channelInProfile.view'
+import { AppViewInProfile } from '@/components/appInProfile.view'
 
 import { ProfileTab } from '@/ds/website'
 
@@ -14,7 +14,7 @@ export default function DashboardPage() {
 	const v = (sp?.get('created') || '') as ProfileTab
 	const tab = Object.values(ProfileTab).includes(v) ? v : ProfileTab.used
 	
-	const { channels } = useAppStore()
+	const { apps } = useAppStore()
 	
 	return (
 		<RootLayout>
@@ -24,7 +24,7 @@ export default function DashboardPage() {
 				<div className={'grow | flex flex-col '}>
 					{
 						tab === ProfileTab.used && (
-							channels.map((c) => <ChannelViewInProfile c={c} key={c.poketto.id}/>)
+							apps.map((c) => <AppViewInProfile c={c} key={c.poketto.id}/>)
 						)
 					}
 				</div>

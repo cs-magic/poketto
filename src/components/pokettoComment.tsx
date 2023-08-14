@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { type IPokettoComment } from '@/ds/poketto'
+import { type IAppComment } from '@/ds/poketto'
 import d from '@/lib/datetime'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ResponsiveField } from '@/components/utils/responsive-field'
@@ -9,7 +9,7 @@ import { IconThumbDown, IconThumbUp } from '@tabler/icons-react'
 export const PokettoComment = (
 	{
 		comment,
-	}: { comment: IPokettoComment }) => {
+	}: { comment: IAppComment }) => {
 	
 	return (
 		<Card variant={'default'}>

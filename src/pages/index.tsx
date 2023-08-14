@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { UsersIcon } from 'lucide-react'
 import { ICON_DIMENSION_SM } from '@/config/assets'
 import { api } from '@/lib/api'
-import { ChannelListView } from '@/components/list.view'
+import { AppListView } from '@/components/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
@@ -39,7 +39,7 @@ export default function WorkspacesPage() {
 			<Card id={'explore'} variant={'ghost'} className={'w-full'}>
 				<CardHeader>
 					<div className={'shrink-0 | flex justify-between items-end'}>
-						<CardTitle>Explore Trending Poketto Channels</CardTitle>
+						<CardTitle>Explore Trending Poketto Apps</CardTitle>
 						<Link href={uri.app.explore}>
 							<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'}>
 								<span>Explore all</span>
@@ -50,7 +50,7 @@ export default function WorkspacesPage() {
 				</CardHeader>
 				<CardContent className={'w-full flex justify-between'}>
 					<div className={'w-full flex flex-col divide-y'}>
-						{_.sampleSize(_.range(30), 3).map((i) => <ChannelListView poketto={page?.data[i]} key={i}/>)}
+						{_.sampleSize(_.range(30), 3).map((i) => <AppListView app={page?.data[i]} key={i}/>)}
 					</div>
 				</CardContent>
 			</Card>

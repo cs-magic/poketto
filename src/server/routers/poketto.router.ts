@@ -2,16 +2,14 @@ import { z } from 'zod'
 import { GET_PROMPTS_BATCH_SIZE, type IFlowGPTComment, type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { type IPokettoBasic, type IPokettoComment, SortOrder } from '@/ds/poketto'
-import { flowgpt2poketto, flowgpt2poketto_comment } from '@/lib/transform'
+import { type AppWithRelation, flowgpt2poketto_comment, flowgpt2pokettoApp, type IAppComment, SortOrder } from '@/ds/poketto'
 import _ from 'lodash'
-import { pokettoBasic } from '@/config/poketto'
+import { YourSolePoketto } from '@/config/poketto'
+import { PlatformType } from '.prisma/client'
 
-export const Platforms = ['poketto', 'flowgpt'] as const
-export type Platform = typeof Platforms[number]
 
 export const idInput = z.object({
-	id: z.string().optional(), platform: z.enum(Platforms),
+	id: z.string().optional(), platform: z.nativeEnum(PlatformType),
 })
 
 const singleFetch = async <T>(props: { path: string, j: object }) => {
@@ -34,12 +32,12 @@ export const pokettoRouter = createTRPCRouter({
 		.input(z.object({
 			query: z.string(), language: z.string().default('zh'), threshold: z.number().default(.8), hideNsfw: z.boolean().default(true),
 		}))
-		.query<IPokettoBasic[]>(async (opts) => {
+		.query<AppWithRelation[]>(async (opts) => {
 			partialSearch[0]!.$search!.phrase.query = opts.input.query // <-- mongodb partial search
 			let result
 			result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<IFlowgptPromptBasic>(partialSearch).toArray()
 			// result = await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.searchPrompts', { json: opts.input } })
-			return result.map(flowgpt2poketto)
+			return result.map(flowgpt2pokettoApp)
 		}),
 	
 	listPoketto: publicProcedure
@@ -53,7 +51,7 @@ export const pokettoRouter = createTRPCRouter({
 			skip: z.number().default(0),
 			tag: z.string().optional(),
 		}))
-		.query<{ data: IPokettoBasic[], nextCursor: number | undefined }>(async (opts) => {
+		.query<{ data: AppWithRelation[], nextCursor: number | undefined }>(async (opts) => {
 			// 所有空的要填 ["undefined"]
 			const emptyFields = Object.entries(opts.input)
 				.filter(([field, val]) => !val)
@@ -65,29 +63,29 @@ export const pokettoRouter = createTRPCRouter({
 			}
 			const data = await singleFetch<IFlowgptPromptBasic[]>({ path: 'prompt.getPrompts', j })
 			const nextCursor = data.length < GET_PROMPTS_BATCH_SIZE ? undefined : opts.input.skip + GET_PROMPTS_BATCH_SIZE
-			return { data: data.map(flowgpt2poketto), nextCursor }
+			return { data: data.map(flowgpt2pokettoApp), nextCursor }
 		}),
 	
 	getPoketto: publicProcedure
 		.input(idInput)
-		.query<IPokettoBasic | undefined>(async (opts) => {
+		.query<AppWithRelation | undefined>(async (opts) => {
 			const { id, platform } = opts.input
 			if (!id) return
-			if (platform === 'poketto') {
-				return pokettoBasic
+			if (platform === PlatformType.Poketto) {
+				return YourSolePoketto
 			}
 			
 			const j = { json: id }
 			const data = await singleFetch<IFlowgptPromptBasic>({ path: 'prompt.getById', j })
-			return flowgpt2poketto(data)
+			return flowgpt2pokettoApp(data)
 		}),
 	
 	listComments: publicProcedure
 		.input(idInput)
-		.query<IPokettoComment[]>(async (opts) => {
+		.query<IAppComment[]>(async (opts) => {
 			const { id, platform } = opts.input
 			if (!id) return []
-			if (platform === 'poketto') return [] // todo: own comments
+			if (platform === PlatformType.Poketto) return [] // todo: own comments
 			
 			const j = {
 				json: {

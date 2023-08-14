@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
-import { app } from '@/config/app'
+import { product } from '@/config/product'
 import { uri } from '@/config/uri'
 import { Button } from '@/components/ui/button'
 import React from 'react'
@@ -29,9 +29,9 @@ export const InviteCard = () => {
 							{
 								cnt: USER_INVITATIONS_COUNT,
 								surplus,
-								appName: app.name,
+								appName: product.name,
 								appDoc: uri.app.docs.intro,
-								currencyName: app.currency,
+								currencyName: product.currency,
 								currencyDoc: uri.app.docs.currency,
 							})
 					}

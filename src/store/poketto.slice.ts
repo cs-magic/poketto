@@ -1,9 +1,9 @@
-import { type IChannelMessage, type IPokettoBasic, type IPokettoChannel, type IPokettoComment, SortOrder } from '@/ds/poketto'
+import { type IAppMessage, type IApp, type IAppComment, SortOrder, type AppWithRelation } from '@/ds/poketto'
 
 import { type StoreSlice } from '@/store/index'
 import { type ID } from '@/ds/general'
-import { pokettoBasic } from '@/config/poketto'
-import { createChannel } from '@/lib/poketto'
+import { YourSolePoketto } from '@/config/poketto'
+import { createApp } from '@/lib/poketto'
 
 /**
  * poketto
@@ -12,42 +12,42 @@ export interface PokettoState {
 	sortOrder: SortOrder
 	setSortOrder: (v: SortOrder) => void
 	
-	pokettoBasic: IPokettoBasic
-	setPokettoBasic: (v: IPokettoBasic) => void
+	app: AppWithRelation
+	setApp: (v: AppWithRelation) => void
 	
-	pokettoComments: IPokettoComment[]
-	setPokettoComments: (v: IPokettoComment[]) => void
-	pushPokettoComments: (v: IPokettoComment[]) => void
+	appComments: IAppComment[]
+	setAppComments: (v: IAppComment[]) => void
+	pushAppComments: (v: IAppComment[]) => void
 	
-	channels: IPokettoChannel[]
-	addChannel: (pokettoChannel: IPokettoChannel) => void
-	delChannel: (channelId: ID) => void
+	apps: IApp[]
+	addApp: (v: IApp) => void
+	delApp: (v: ID) => void
 	
-	messages: IChannelMessage[]
-	pushMessage: (v: IChannelMessage) => void
+	appMessages: IAppMessage[]
+	pushAppMessage: (v: IAppMessage) => void
 }
 
 export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	sortOrder: SortOrder.recommended,
 	setSortOrder: (v) => setState((state) => {state.sortOrder = v}),
 	
-	pokettoBasic,
-	setPokettoBasic: (v) => setState((state) => {
-		state.pokettoBasic = v
-		const channel = state.channels.find((c) => c.poketto.id === v.id)
-		if (channel) channel.poketto = v
+	app: YourSolePoketto,
+	setApp: (v) => setState((state) => {
+		state.app = v
+		const app = state.apps.find((c) => c.poketto.id === v.id)
+		if (app) app.poketto = v
 	}),
 	
-	pokettoComments: [],
-	setPokettoComments: (v) => setState((state) => {state.pokettoComments = v}),
-	pushPokettoComments: (v) => setState((state) => {state.pokettoComments.push(...v)}),
+	appComments: [],
+	setAppComments: (v) => setState((state) => {state.appComments = v}),
+	pushAppComments: (v) => setState((state) => {state.appComments.push(...v)}),
 	
-	channels: [createChannel(pokettoBasic)],
-	addChannel: (v) => setState((state) => {state.channels.push(v)}),
-	delChannel: (v) => setState((state) => {
-		state.channels.splice(state.channels.findIndex((c) => c.poketto.id === v), 1)
+	apps: [createApp(YourSolePoketto)],
+	addApp: (v) => setState((state) => {state.apps.push(v)}),
+	delApp: (v) => setState((state) => {
+		state.apps.splice(state.apps.findIndex((c) => c.poketto.id === v), 1)
 	}),
 	
-	messages: [],
-	pushMessage: (v) => setState((state) => { state.messages.push(v)}),
+	appMessages: [],
+	pushAppMessage: (v) => setState((state) => { state.appMessages.push(v)}),
 })

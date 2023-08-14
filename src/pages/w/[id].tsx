@@ -1,6 +1,6 @@
 import { RootLayout } from '@/layouts/root.layout'
-import { ChannelDetail } from '@/components/channel/channel-detail'
-import { ChannelList } from '@/components/channel/channel-list'
+import { AppDetail } from '@/components/app/app-detail'
+import { AppList } from '@/components/app/app-list'
 import { useAppStore } from '@/store'
 import { useChat } from 'ai/react'
 import { toast } from 'sonner'
@@ -15,39 +15,37 @@ import { ControlTool } from '@/components/utils/tools'
 export default function ConversationPage() {
 	
 	
-	const { channels, pokettoBasic, chatListVisible, chatDetailVisible, pokettoComments } = useAppStore()
-	const channel = channels.find((c) => c.poketto.id === pokettoBasic.id)
+	const { apps, app: x, chatListVisible, chatDetailVisible, appComments } = useAppStore()
+	const app = apps.find((c) => c.poketto.id === x.id)
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
 		initialMessages: [
-			...channel?.poketto.model.initPrompts ?? [],
-			...channel?.poketto.conversation?.messages ?? [],
+			...app?.poketto.model!.initPrompts ?? [],
+			// ...app?.poketto.conversation?.messages ?? [], // todo
 		],
 		onError: err => {
 			toast.error(err.message)
 		},
 	})
 	
-	console.log({ messages })
-	
 	return (
 		<RootLayout>
 			<div className={'w-full h-full overflow-hidden | flex divide-x'}>
 				
-				{chatListVisible && <ChannelList/>}
+				{chatListVisible && <AppList/>}
 				
 				<section id={'chat-contents'} className={clsx(
 					'w-full grow h-full overflow-hidden | flex flex-col',
 				)}>
 					<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
-						<div>{channel?.poketto?.basic.title}</div>
+						<div>{app?.poketto?.name}</div>
 						<ControlTool/>
 					</div>
 					
 					<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
 						{
 							messages
-								.filter((value, index) => channel?.poketto.permissions.openSource || index >= (channel?.poketto.model.initPrompts.length ?? 0))
+								.filter((value, index) => app?.poketto.model!.isOpenSource || index >= (app?.poketto.model!.initPrompts.length ?? 0))
 								.map((msg, index) => (
 									<div
 										key={index}
@@ -83,7 +81,7 @@ export default function ConversationPage() {
 				
 				</section>
 				
-				{chatDetailVisible && pokettoBasic && <ChannelDetail poketto={pokettoBasic} comments={pokettoComments}/>}
+				{chatDetailVisible && app && <AppDetail app={app.poketto} comments={appComments}/>}
 			</div>
 		</RootLayout>
 	)

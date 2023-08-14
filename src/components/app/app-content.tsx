@@ -12,30 +12,31 @@ import { nanoid } from 'nanoid'
 import { useUser } from '@/hooks/use-user'
 import Mustache from 'mustache'
 
-export const ChannelContent = () => {
+export const AppContent = () => {
 	const user = useUser()
 	const questionId = useRef<string>()
-	const { channels, pokettoBasic, pushMessage } = useAppStore()
-	const initMessages = useAppStore((state) => state.messages.filter((m) => m.channelId === pokettoBasic.id))
-	const channel = channels.find((c) => c.poketto.id === pokettoBasic.id)
+	// todo: app vs apps
+	const { apps, app: x, pushAppMessage } = useAppStore()
+	const initMessages = useAppStore((state) => state.appMessages.filter((m) => m.appId === x.id))
+	const app = apps.find((c) => c.poketto.id === x.id)
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
 		initialMessages: [
-			...pokettoBasic.model?.initPrompts ?? [],
-			...pokettoBasic.conversation?.messages ?? [],
+			...app.model?.initPrompts ?? [],
+			// ...pokettoBasic.conversation?.messages ?? [],
 			...initMessages,
 		],
 		onError: err => {
 			toast.error(err.message)
 		},
 		onFinish: (msg) => {
-			pushMessage({
+			pushAppMessage({
 				...msg,
 				// id: nanoid(),
 				// createdAt: new Date(),
 				// content: event.currentTarget.value as string,
 				// role: 'user',
-				channelId: pokettoBasic.id,
+				appId: app.id,
 				interactions: {},
 				type: 'user',
 				format: 'text',
@@ -48,23 +49,23 @@ export const ChannelContent = () => {
 	const ref = useRef<HTMLDivElement>(null)
 	useEffect(() => {
 		ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-	}, [pokettoBasic.id])
+	}, [app.id])
 	
 	return (
 		<section id={'chat-contents'} className={clsx(
 			'w-full grow h-full overflow-hidden | flex flex-col',
 		)}>
 			<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
-				<div>{channel?.poketto?.basic.title}</div>
+				<div>{app?.poketto?.name}</div>
 				<ControlTool/>
 			</div>
 			
 			<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
 				{
-					//  todo: use channel messages instead of prompt messages
+					//  todo: use app messages instead of prompt messages
 					messages
 						.filter((value, index) =>
-							channel?.poketto.permissions.openSource || index >= (channel?.poketto.model.initPrompts.length ?? 0),
+							app?.poketto.model!.isOpenSource || index >= (app?.poketto.model!.initPrompts.length ?? 0),
 						)
 						.map((msg, index) => (
 							<div
@@ -99,9 +100,9 @@ export const ChannelContent = () => {
 			
 			<form className={'w-full p-4 | flex justify-center items-center gap-2'} onSubmit={(event) => {
 				questionId.current = nanoid()
-				pushMessage({
+				pushAppMessage({
 					id: questionId.current,
-					channelId: pokettoBasic.id,
+					appId: app.id,
 					interactions: {},
 					type: 'user',
 					content: event.currentTarget.prompt.value as string,

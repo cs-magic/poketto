@@ -1,16 +1,23 @@
-import { type IPokettoBasic } from '@/ds/poketto'
-import { getRobotAvatar } from '@/lib/string'
+import { PromptRoleType } from '.prisma/client'
+import { type AppWithRelation } from '@/ds/poketto'
 import { nanoid } from 'nanoid'
 
-// aNB-zlvB30vEIS-yuX-5J: uploaded to flowgpt: https://flowgpt.com/p/your-sole-poketto
-export const POKETTO_CHANNEL_ID = 'Your-Sole-Poketto' as const
-export const POKETTO_USER_ID = 'your-sole-poketto' as const
-export const POKETTO_USER_NAME = 'Your Sole Poketto' as const
+export const POKETTO_PLATFORM = 'Poketto' as const
+export const POKETTO_VERSION = '1.0.0' as const
+export const POKETTO_APP_ID = 'Your-Sole-Poketto' as const
+export const POKETTO_APP_CREATED_AT = new Date(2023, 8, 13)
+export const POKETTO_APP_UPDATED_AT = new Date(2023, 8, 13)
+export const POKETTO_APP_AVATAR = '/images/logo/poketto/Your-Sole-Poketto.png'
+export const POKETTO_APP_NAME = 'Your Sole Poketto' as const
+export const POKETTO_APP_DESC = 'The sole **Poketto** you need, at your service, anytime, anywhere, developed by Poketto Official.' as const
+export const POKETTO_CREATOR_ID = 'poketto-official' as const
+export const POKETTO_CREATOR_NAME = 'Poketto Official' as const
+export const POKETTO_CREATOR_DESC = 'This is Poketto Official !' as const
+export const POKETTO_CREATOR_AVATAR = '/images/logo/m/1280.png'
+export const POKETTO_CREATOR_EMAIL = 'pr@cs-magic.com'
 export const POKETTO_MODEL_NAME = 'poketto-1.0' as const
-export const POKETTO_MANUFACTURE_NAME = 'Poketto Official' as const
-export const POKETTO_CHANNEL_TITLE = 'Your Sole Poketto' as const
-export const POKETTO_CHANNEL_DESC = 'The sole **Poketto** you need, at your service, anytime, anywhere, developed by Poketto Official.' as const
-export const LANGUAGE = 'zh'
+export const POKETTO_LANGUAGE = 'zh'
+export const POKETTO_TAGS = ['poketto', 'companion', 'ChatGPT']
 export const POKETTO_SYSTEM_PROMPT = `You are a loyal companion by the name of Poketto, developed by the official Poketto team led by MarkShawn, and my name is {{userName}}.
 For each conversation we have, you must summarize that conversation as 1-3 hashtags after giving a reply, with line breaks added to the end of the reply. Each hashtag should be as short as possible, prefixed with a "#" sign. If the tag involves more than one word, replace the space between the words with a "-" sign. Every two tags need to be separated by a space.`
 export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
@@ -26,46 +33,50 @@ export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
 
 那么，就请接下来多多关照啦！
 `
-export const pokettoBasic: IPokettoBasic = {
-	id: POKETTO_CHANNEL_ID, basic: {
-		avatar: getRobotAvatar(POKETTO_CHANNEL_ID),
-		title: POKETTO_CHANNEL_TITLE,
-		createdAt: new Date(),
-		language: LANGUAGE,
-		tags: ['poketto', 'companion', 'ChatGPT'],
-		desc: POKETTO_CHANNEL_DESC,
-		category: ['Lifestyle'],
-		industry: [],
-		updatedAt: new Date(),
-		version: '1.0.0',
-	}, state: {
-		ratedStars: 0, comments: 0, forks: 0, shares: 0, stars: 0, tips: 0, tokens: 0, triggers: 0, users: 0, views: 0,
-	}, user: {
-		id: POKETTO_USER_ID, name: POKETTO_USER_NAME, avatar: getRobotAvatar(POKETTO_USER_ID),
-	}, comments: [], model: {
-		type: POKETTO_MODEL_NAME, functions: [], initPrompts: [{
-			id: nanoid(),
-			role: 'system',
-			content: POKETTO_SYSTEM_PROMPT,
-			type: 'user',
-			format: 'text',
-			createdAt: new Date(),
-			channelId: POKETTO_CHANNEL_ID,
-			interactions: {},
-		}], manufacturer: POKETTO_MANUFACTURE_NAME,
-	}, conversation: {
-		createdAt: new Date(), messages: [{
-			id: nanoid(),
-			channelId: POKETTO_CHANNEL_ID,
-			type: 'user',
-			format: 'text',
-			interactions: {},
-			role: 'assistant',
-			content: POKETTO_WELCOME_MESSAGE,
-			createdAt: new Date(),
+export const POKETTO_CATEGORY_ID = 0
+
+export const YourSolePoketto: AppWithRelation = {
+	id: POKETTO_APP_ID,
+	createdAt: POKETTO_APP_CREATED_AT,
+	updatedAt: POKETTO_APP_UPDATED_AT,
+	platform: POKETTO_PLATFORM,
+	version: POKETTO_VERSION,
+	desc: POKETTO_APP_DESC,
+	name: POKETTO_APP_NAME,
+	language: POKETTO_LANGUAGE,
+	categoryId: POKETTO_CATEGORY_ID,
+	avatar: POKETTO_APP_AVATAR,
+	model: {
+		id: POKETTO_APP_ID, appId: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT,
+		
+		type: POKETTO_MODEL_NAME, isOpenSource: false, temperature: .7, initPrompts: [{
+			id: nanoid(), appModelId: POKETTO_APP_ID, role: PromptRoleType.system, content: POKETTO_SYSTEM_PROMPT,
 		}],
-	}, permissions: {
-		visible: true, openSource: false,
+	},
+	actions: [],
+	creator: {
+		id: POKETTO_CREATOR_ID,
+		username: POKETTO_CREATOR_ID,
+		name: POKETTO_CREATOR_NAME,
+		desc: POKETTO_CREATOR_DESC,
+		avatar: POKETTO_CREATOR_AVATAR,
+		email: POKETTO_CREATOR_EMAIL,
+	},
+	creatorId: POKETTO_CREATOR_ID,
+	tags: POKETTO_TAGS.map((t) => ({
+		id: t, name: t, creatorId: POKETTO_CREATOR_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT,
+	})),
+	state: {
+		id: POKETTO_APP_ID,
+		createdAt: POKETTO_APP_CREATED_AT,
+		updatedAt: POKETTO_APP_UPDATED_AT,
+		appId: POKETTO_APP_ID,
+		shares: 0,
+		tips: 0,
+		stars: 0,
+		forks: 0,
+		calls: 0,
+		views: 0,
 	},
 }
 

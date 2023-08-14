@@ -38,27 +38,38 @@ export const useAppStore = create<StoreState>()(
 			),
 			{
 				name: 'zustand',
-				version: 0.9,
+				version: 1.0,
 				// @ts-ignore
 				migrate: (persistedState: StoreState, version) => {
+					if (version === .9) {
+						// 大版本重构 (prisma)
+						// @ts-ignore
+						delete persistedState.app
+						// @ts-ignore
+						delete persistedState.apps
+						// @ts-ignore
+						delete persistedState.appComments
+						// @ts-ignore
+						delete persistedState.appMessages
+					}
 					if (version === .7) {
 						// @ts-ignore
-						delete persistedState.channels
+						delete persistedState.apps
 					}
 					if (version === .4) {
 						// @ts-ignore
-						delete persistedState.pokettoBasic.id
+						delete persistedState.app.id
 					}
 					if ([.3, .5, .6].includes(version)) {
 						// @ts-ignore
-						delete persistedState.pokettoBasic
+						delete persistedState.app
 					}
 					if (version === .2) {
-						persistedState.channels[0]!.poketto.id = persistedState.pokettoBasic.id
+						persistedState.apps[0]!.poketto.id = persistedState.app.id
 					}
 					if (version === .1) {
-						const data = persistedState.channels[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
-						persistedState.channels[0]!.messages[0] = { ...persistedState.channels[0]!.messages[0]!, ...data }
+						const data = persistedState.apps[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
+						persistedState.apps[0]!.messages[0] = { ...persistedState.apps[0]!.messages[0]!, ...data }
 					}
 					return persistedState
 				},

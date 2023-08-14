@@ -1,18 +1,21 @@
 import { type ID, type IUser } from '@/ds/general'
-import { FlowGPTSortOrder, type IFlowGPTComment, type IFlowgptConversation } from '@/ds/flowgpt'
+import { type FlowgptPromptFull, FlowGPTSortOrder, type IFlowGPTComment, type IFlowgptConversation, type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import d from '@/lib/datetime'
 import { type Message } from 'ai'
 import { nanoid } from 'nanoid'
-import { type User } from '.prisma/client'
+import { PlatformType, Prisma, PromptRoleType, type User } from '.prisma/client'
+import dayjs from 'dayjs'
+import { DEFAULT_APP_VERSION } from '@/config/system'
+import AppGetPayload = Prisma.AppGetPayload
 
 /**
  * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
  */
-export interface IChannelMessage extends Message {
+export interface IAppMessage extends Message {
 	type: 'user' | 'notification'
 	format: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote'
 	
-	channelId: ID //
+	appId: ID //
 	userId?: ID // 1. 不要存user，这样可以保证批量更新 2. 通知等就没有 userId
 	parentId?: ID
 	
@@ -21,7 +24,7 @@ export interface IChannelMessage extends Message {
 
 export interface IPokettoConversation {
 	createdAt: Date
-	messages: IChannelMessage[]
+	messages: IAppMessage[]
 }
 
 export const flowgpt2poketto_conversation = (f: IFlowgptConversation): IPokettoConversation => ({
@@ -30,7 +33,7 @@ export const flowgpt2poketto_conversation = (f: IFlowgptConversation): IPokettoC
 		...m,
 		type: 'user',
 		format: 'text',
-		channelId: f.id,
+		appId: f.id,
 		userId: undefined,
 		parentId: undefined,
 		interactions: {},
@@ -41,62 +44,7 @@ export const flowgpt2poketto_conversation = (f: IFlowgptConversation): IPokettoC
 })
 
 
-export interface IPokettoBasic {
-	id: string
-	user: IUser
-	conversation?: IPokettoConversation,
-	comments?: IPokettoComment[]
-	basic: {
-		version: string // !important: 用户打开的时候默认拉取最新版
-		language: string
-		title: string
-		desc: string
-		avatar: string
-		// todo: industry 和 category 有啥区别，两者有必要并存吗
-		industry: ID[] // 按级分类（父子关系），e.g. [娱乐, 游戏]
-		category: ID[] // 按级分类（父子关系），e.g. [生产力, 平面设计]
-		tags: string[] // 并列关系，e.g. 法律 | GPT4，用户在创建 tag 的时候，只跟自己的语言有关
-		createdAt: Date
-		updatedAt: Date
-	}
-	permissions: {
-		visible: boolean | ID[]
-		openSource: boolean // 用户是否可以看到 initPrompts，以及支持 fork
-	}
-	model: {
-		manufacturer: string // ChatGPT | Claude | OpenChat | ...
-		type: string // 具体的模型号：gpt-3.5-xxx | gpt-4-xx | ...
-		initPrompts: IChannelMessage[] // 不直接用 systemPrompt 是因为要支持 few-shot
-		functions: IPokettoFunction[] // todo: support plugins
-		// ... other args
-		temperature?: number
-	}
-	state: {
-		/**
-		 * [before see] view(visible)
-		 * --> [see] interactions / star / fork / share
-		 * --> [used] comment(rate) / tip(付小费) / share
-		 */
-		views: number
-		stars: number // 收藏（也就可以使用了）
-		forks: number // 前提要开源
-		shares: number
-		
-		comments: number
-		ratedStars: number // 基于评论平均出来（考虑要不要基于用户声望加权）
-		tips: number
-		
-		// 用户使用相关
-		users: number // 统计总用户数
-		triggers: number // 统计用户总的交互次数
-		tokens: number // 统计所有会话的词量
-		// ... 其他统计指标（比如频率……）
-	} & Record<string, number> // interactions 统计类似 discord 的表情回复
-	
-}
-
-
-export interface IPokettoComment
+export interface IAppComment
 	extends Omit<IFlowGPTComment, 'user'> {
 	ratedStars: number
 	content: string // !important: support markdown
@@ -108,17 +56,11 @@ export interface IPokettoFunction /* extends ChatGPTFunction */
 	
 }
 
-
-export interface IPokettoMessageContent {
-	type: 'text' | 'image' | 'audio' | 'video' | 'link' | 'quote' | 'notification'
-	content: string
-}
-
 export const SYSTEM_USER_ID = 'poketto' as const
 export type SYSTEM_USER_TYPE = typeof SYSTEM_USER_ID
 
 
-export interface IPokettoChannelUser
+export interface IAppUser
 	extends User {
 	state: 'active' | 'leave'
 	type:
@@ -127,21 +69,93 @@ export interface IPokettoChannelUser
 		| SYSTEM_USER_TYPE // like tg: Mark Shawn joined the group
 }
 
-export interface IPokettoChannel {
+export interface IApp {
 	joinTime: number
 	latestTime: number
-	poketto: IPokettoBasic
-	users: IPokettoChannelUser[]
-	messages: IChannelMessage[]
+	poketto: AppWithRelation
+	users: IAppUser[]
+	messages: IAppMessage[]
 }
 
-export interface IPokettoChannelListView {
+export interface IAppListView {
 	id: string
 	avatar: string
 	title: string
-	latestMessage: IChannelMessage
-	latestUser?: IPokettoChannelUser
+	latestMessage: IAppMessage
+	latestUser?: IAppUser
 }
 
 export const SortOrder = { ...FlowGPTSortOrder }
 export type SortOrder = FlowGPTSortOrder
+
+export type AppWithRelation = AppGetPayload<{
+	include: {
+		creator: true
+		// note: unnecessary to track appActions
+		actions: true
+		tags: true
+		state: true
+// {
+// 			include: {
+// 				id: false
+// 				appId: false
+// 				createdAt: false
+// 				updatedAt: false
+// 			}
+// 		}
+		model: {
+			include: { // nested includes: https://stackoverflow.com/a/62053744
+				initPrompts: true
+			}
+		}
+		// todo: category
+	}
+}>
+
+export const flowgpt2pokettoApp = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppWithRelation => {
+	
+	return {
+		id: p.id,
+		name: p.title,
+		avatar: p.thumbnailURL,
+		categoryId: p.categoryId,
+		language: p.language,
+		desc: p.description,
+		updatedAt: dayjs(p.updatedAt).toDate(),
+		createdAt: dayjs(p.createdAt).toDate(),
+		platform: PlatformType.FlowGPT,
+		version: DEFAULT_APP_VERSION,
+		creatorId: p.userId,
+		creator: {
+			id: p.User.id, name: p.User.name, avatar: p.User.image, username: p.User.uri, desc: null, email: null,
+		},
+		tags: p.Tag.map((t) => ({
+			id: t.name, name: t.name, createdAt: null, updatedAt: null, creatorId: null,
+		})),
+		state: {
+			id: p.id, createdAt: null, updatedAt: null, appId: p.id, views: p.views, calls: p.uses, forks: 0, tips: p.tip, stars: p.saves, shares: p.shares,
+		},
+		actions: [],
+		model: {
+			id: p.id,
+			createdAt: null,
+			updatedAt: null,
+			appId: p.id,
+			type: p.model,
+			isOpenSource: true,
+			temperature: p.temperature,
+			initPrompts: [
+				{
+					id: nanoid(), appModelId: p.id,
+					role: PromptRoleType.system, content: p.initPrompt,
+				},
+			],
+		},
+		
+	}
+}
+export const flowgpt2poketto_comment = (comment: IFlowGPTComment): IAppComment => ({
+	...comment, ratedStars: 0, content: comment.body, user: {
+		...comment.user, avatar: comment.user.image,
+	},
+})

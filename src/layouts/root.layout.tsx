@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { app } from '@/config/app'
+import { product } from '@/config/product'
 import React, { type PropsWithChildren } from 'react'
 import { Sidebar } from '@/components/layout/sidebar'
 import Navbar from '@/components/layout/navbar'
@@ -14,9 +14,9 @@ export function RootLayout(props: PropsWithChildren) {
 	
 	return (<>
 		<Head>
-			<title>{app.name}</title>
-			<meta name="description" content={app.desc}/>
-			<link rel="icon" href={app.icon}/>
+			<title>{product.name}</title>
+			<meta name="description" content={product.desc}/>
+			<link rel="icon" href={product.icon}/>
 		</Head>
 		
 		<main className={clsx('w-screen h-screen | flex flex-col | font-light text-foreground text-sm', 'bg-background', // 'bg-zinc-900',

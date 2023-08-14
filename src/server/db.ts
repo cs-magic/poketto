@@ -13,6 +13,7 @@ function getExtendedClient() {
 			: ['error'],
 	})
 		.$extends({
+			
 			result: {
 				user: {
 					// todo: for-production-use index design

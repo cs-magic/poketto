@@ -1,5 +1,5 @@
 import Logo from '../../../public/images/logo/m/1280.svg'
-import { app } from '@/config/app'
+import { product } from '@/config/product'
 import React, { type PropsWithChildren } from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrightnessHalf, IconMoon, IconSun } from '@tabler/icons-react'
@@ -40,7 +40,7 @@ export const LogoWithName = () => {
 		<Button variant={'ghost'} className={'justify-start gap-2'} onClick={toggleSidebar}>
 			{/*<Logo height={24}/>*/}
 			<Image src={CatLogo} alt={'Cat Logo'} width={24} height={24}/>
-			<span className={'text-lg tracking-widest'}>{app.name}</span>
+			<span className={'text-lg tracking-widest'}>{product.name}</span>
 		</Button>
 	)
 }
