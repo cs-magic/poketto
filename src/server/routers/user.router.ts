@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/api/helpers'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import _ from 'lodash'
 
 import { USER_INVITATIONS_COUNT } from '@/config/system'

@@ -38,6 +38,7 @@ const config = {
 		'@typescript-eslint/no-empty-interface': ['off'],
 		'prefer-const': ['warn'],
 		'@typescript-eslint/prefer-nullish-coalescing': ['off'], // 有些时候，是需要 || 的
+		'react/no-unescaped-entities': ['off'],
 	},
 };
 

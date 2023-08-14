@@ -14,13 +14,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Necessary for Next auth
+// -----------------------------------------------------------------------------
+// next-auth
+// -----------------------------------------------------------------------------
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -48,6 +44,41 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  desc          String?
+
+  accounts Account[]
+  sessions Session[]
+
+  invitedFrom Invitation[] @relation("from")
+  invitdeTo   Invitation[] @relation("to")
+
+  following  User[] @relation("follow")
+  followedBy User[] @relation("follow")
+
+  balance     Int              @default(0)
+  usingApps   PokettoApp[]     @relation("use")
+  starredApps PokettoApp[]     @relation("star")
+  forkedApps  PokettoApp[]     @relation("fork")
+  comments    PokettoComment[]
+}
+
+// -----------------------------------------------------------------------------
+// invitation
+// -----------------------------------------------------------------------------
 enum InvitationStatus {
   Idle
   Pending
@@ -69,30 +100,48 @@ model Invitation {
   toId String? @unique
 }
 
-model User {
-  id            String    @id @default(cuid())
+// -----------------------------------------------------------------------------
+// poketto app
+// -----------------------------------------------------------------------------
+enum Platform {
+  Poketto
+  FlowGPT
+  OpenAI
+  MidJourney
+  StableDiffusion
+  OpenChat
+}
+
+model UniversalUser {
+  id            String       @id
   name          String?
-  email         String?   @unique
+  email         String?      @unique
   emailVerified DateTime?
   image         String?
   desc          String?
-
-  accounts Account[]
-  sessions Session[]
-
-  invitedFrom Invitation[] @relation("from")
-  invitdeTo   Invitation[] @relation("to")
-
-  following  User[] @relation("follow")
-  followedBy User[] @relation("follow")
-
-  balance Int @default(0)
+  PokettoApp    PokettoApp[]
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model PokettoApp {
+  id           String           @id @default(cuid())
+  version      String           @default("1.0.0")
+  platform     Platform
+  CreatedAt    DateTime         @default(now())
+  UpdatedAt    DateTime         @updatedAt
+  owner        UniversalUser    @relation(references: [id], fields: [ownerId])
+  ownerId      String
+  users        User[]           @relation("use")
+  starredUsers User[]           @relation("star")
+  forkedUsers  User[]           @relation("fork")
+  comments     PokettoComment[]
+}
 
-  @@unique([identifier, token])
+model PokettoComment {
+  id           String     @id @default(cuid())
+  CreatedAt    DateTime   @default(now())
+  UpdatedAt    DateTime   @updatedAt
+  owner        User       @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  pokettoApp   PokettoApp @relation(fields: [pokettoAppId], references: [id])
+  pokettoAppId String
 }

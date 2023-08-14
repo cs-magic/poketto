@@ -1,7 +1,7 @@
-import { userRouter } from '@/server/api/routers/user'
-import { createTRPCRouter } from '@/server/api/helpers'
-import { pokettoRouter } from '@/server/api/routers/pokettoRouter'
-import { chatRouter } from '@/server/api/routers/chat_todo'
+import { userRouter } from '@/server/routers/user.router'
+import { createTRPCRouter } from '@/server/routers/trpc.helpers'
+import { pokettoRouter } from '@/server/routers/poketto.router'
+import { chatRouter } from '@/server/routers/chat.router'
 
 /**
  * This is the primary router for your server.

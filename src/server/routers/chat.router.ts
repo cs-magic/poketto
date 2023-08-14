@@ -3,7 +3,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 	protectedProcedure,
-} from '@/server/api/helpers'
+} from '@/server/routers/trpc.helpers'
 
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { Configuration, OpenAIApi } from 'openai-edge'
