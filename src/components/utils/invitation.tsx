@@ -13,7 +13,7 @@ import { InvitationStatus } from '.prisma/client'
 export const InviteCard = () => {
 	const { data = [] } = api.example.getInvitations.useQuery()
 	// todo: include ? on enum type
-	const surplus = data.filter((item) => item.status !== InvitationStatus.Idle).length
+	const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
 	
 	return (
 		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>

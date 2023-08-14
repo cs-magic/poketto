@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { MongoClient } from 'mongodb'
+import { type MongoClient } from 'mongodb'
 import { env } from '@/env.mjs'
 
 const globalForDB = globalThis as unknown as {
@@ -16,7 +16,7 @@ export const prisma =
 
 
 export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI, {
-	connectTimeoutMS: 20000,
+	// connectTimeoutMS: 20000,
 })
 
 if (env.NODE_ENV !== 'production') {
