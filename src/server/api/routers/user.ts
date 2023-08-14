@@ -3,13 +3,14 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/
 import _ from 'lodash'
 
 import { USER_INVITATIONS_COUNT } from '@/config/system'
+import { type User } from '.prisma/client'
 
 
 export const userRouter = createTRPCRouter({
 	
 	getExactUser: protectedProcedure
 		.input(z.string().optional())
-		.query(async ({ ctx, input }) => {
+		.query(async ({ ctx, input }): Promise<User | undefined> => {
 			return (input && await ctx.prisma.user.findUnique({ where: { id: input } })) || undefined
 		}),
 	
