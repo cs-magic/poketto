@@ -6,11 +6,15 @@ import Navbar from '@/components/layout/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/config/assets'
 import { useMount } from '@/hooks/use-mount'
+import logger from '@/lib/log'
 
 
 export function RootLayout(props: PropsWithChildren) {
 	
 	const mounted = useMount()
+	
+	logger.info('hello world', { foo: 'bar' }, ['wow', 'hhh'], 100.1, 'xxxx')
+	logger.warn('hello world', { foo: 'bar' }, ['wow', 'hhh'], 100.1, 'xxxx')
 	
 	return (
 		<>
