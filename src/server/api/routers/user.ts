@@ -7,6 +7,12 @@ import { USER_INVITATIONS_COUNT } from '@/config/system'
 
 export const userRouter = createTRPCRouter({
 	
+	getExactUser: protectedProcedure
+		.input(z.string().optional())
+		.query(({ ctx, input }) => {
+			return input ? ctx.prisma.user.findUnique({ where: { id: input } }) : undefined
+		}),
+	
 	getSecretMessage: protectedProcedure.query(() => {
 		return 'you can now see this secret message!'
 	}),
