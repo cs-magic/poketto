@@ -44,7 +44,7 @@ export const authOptions: NextAuthOptions = {
 	adapter: PrismaAdapter(prisma as unknown as PrismaClient),
 	providers: [
 		GithubProvider({
-			clientId: env.GITHUB_ID, clientSecret: env.GITHUB_SECRET,
+			clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET,
 		}),
 		DiscordProvider({
 			clientId: env.DISCORD_CLIENT_ID, clientSecret: env.DISCORD_CLIENT_SECRET,
