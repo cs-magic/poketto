@@ -34,7 +34,7 @@ export const Sidebar = () => {
 			<section className={'flex flex-col'}>
 				<MenuLink icon={<MixIcon/>} field={'dashboard'} link={uri.user.dashboard}/>
 				<MenuLink icon={<TargetIcon/>} field={'gallery'} link={uri.user.gallery}/>
-				<MenuLink field={'integrations'} link={uri.user.integrations}/>
+				{/*<MenuLink field={'integrations'} link={uri.user.integrations}/>*/}
 			</section>
 			
 			<Separator/>
@@ -49,10 +49,12 @@ export const Sidebar = () => {
 			{sidebarVisible && user && <InviteCard/>}
 			
 			<div className={'flex justify-center items-center gap-2 py-4 border-t'}>
-				<Avatar className={ICON_DIMENSION_MD}>
-					<AvatarImage src={user?.image ?? undefined}/>
-					<AvatarFallback><UserIcon/></AvatarFallback>
-				</Avatar>
+				{user && (
+					<Avatar className={ICON_DIMENSION_MD}>
+						<AvatarImage src={user?.image ?? undefined}/>
+						<AvatarFallback><UserIcon/></AvatarFallback>
+					</Avatar>
+				)}
 				
 				{sidebarVisible && (
 					user ? (
