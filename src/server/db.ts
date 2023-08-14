@@ -26,7 +26,7 @@ function getExtendedClient() {
 	return c
 }
 
-type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>
+export type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>
 
 
 const globalForDB = globalThis as unknown as {
