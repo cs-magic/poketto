@@ -1,11 +1,10 @@
 import { type IPokettoBasic, type IPokettoChannel, type IPokettoChannelListView } from '@/ds/poketto'
 import { nanoid } from 'nanoid'
 import { getTimestampMS } from '@/lib/datetime'
-import { type User } from '.prisma/client'
 
 export const getChannelUri = (pokettoId: string) => `/p/${pokettoId}`
 
-export const createChannel = (poketto: IPokettoBasic, user: User): IPokettoChannel => ({
+export const createChannel = (poketto: IPokettoBasic): IPokettoChannel => ({
 	messages: [
 		{
 			type: 'notification',
@@ -23,7 +22,8 @@ export const createChannel = (poketto: IPokettoBasic, user: User): IPokettoChann
 	],
 	poketto: poketto,
 	users: [
-		{ ...user, state: 'active', type: 'user' },
+		// todo: add User
+		// { ...user, state: 'active', type: 'user' },
 	],
 	latestTime: getTimestampMS(),
 	joinTime: getTimestampMS(),

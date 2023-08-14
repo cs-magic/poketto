@@ -15,21 +15,24 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MarqueeContainer, MasonryContainer } from '@/components/utils/containers'
 import { useAppStore } from '@/store'
 import { createChannel, getChannelUri } from '@/lib/poketto'
-import { toast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/router'
 import { POKETTO_CHANNEL_ID } from '@/config/poketto'
 import { useWindowScroll } from '@mantine/hooks'
+import { useUser } from '@/hooks/use-user'
+import { toast } from 'sonner'
 
 export const ChannelDetail = ({ poketto, comments }: { poketto: IPokettoBasic, comments: IPokettoComment[] }) => {
 	const { addChannel, channels, delChannel } = useAppStore()
 	const router = useRouter()
 	const hasGot = Boolean(channels.find((c) => c.poketto.id === poketto.id))
 	const [scroll, scrollTo] = useWindowScroll()
+	const user = useUser()
 	
 	const onAddChannel = () => {
+		if (!user) return toast.error('您需要先登陆才能加入该频道，否则我们无法为您保存这些记录 :(')
 		addChannel(createChannel(poketto))
 		void router.push(getChannelUri(poketto.id))
-		toast({ title: `Successfully added channel: ${poketto.basic.title}` })
+		toast.success(`Successfully added channel: ${poketto.basic.title}`)
 	}
 	
 	const onDelChannel = () => {
