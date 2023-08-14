@@ -94,7 +94,7 @@ model Balance {
 
   user   User   @relation(references: [id], fields: [userId])
   userId String @unique
-  
+
   current Int @default(0)
 }
 

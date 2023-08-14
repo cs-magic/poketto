@@ -1,15 +1,10 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { MongoClient } from 'mongodb'
 import { env } from '@/env.mjs'
+import { type UserWithRelations } from '@/ds/user'
 
-const globalForDB = globalThis as unknown as {
-	prisma: PrismaClient | undefined;
-	mongo: MongoClient | undefined;
-}
-
-export const prisma =
-	globalForDB.prisma ??
-	new PrismaClient({
+function getExtendedClient() {
+	const c = new PrismaClient({
 		log:
 			env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 	})
@@ -20,20 +15,26 @@ export const prisma =
 					impact: {
 						needs: {
 							name: true,
-							followedBy: true, // needs: findMany({include: {followedBy: true}})
 						},
-						compute(user) {
-							return user.followedBy.length * 100 + (user.name ?? '').length
-						},
+						// ref:
+						compute: (user: UserWithRelations) => user.followedBy.length * 100 + (user.name ?? '').length,
 					},
 				},
 			},
 		})
+	globalForDB.prisma = c
+	return c
+}
+
+type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>
 
 
-export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI, {
-	// connectTimeoutMS: 20000,
-})
+const globalForDB = globalThis as unknown as {
+	prisma: ExtendedPrismaClient | undefined;
+	mongo: MongoClient | undefined;
+}
+export const prisma = globalForDB.prisma ?? getExtendedClient()
+export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI, {})
 
 if (env.NODE_ENV !== 'production') {
 	globalForDB.prisma = prisma

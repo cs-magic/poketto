@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import { Cross1Icon } from '@radix-ui/react-icons'
 import { api } from '@/lib/api'
-import { USER_INVITATIONS_COUNT } from '@/config/user'
 import { InvitationStatus } from '.prisma/client'
+import { USER_INVITATIONS_COUNT } from '@/config/system'
 
 export const InviteCard = () => {
 	const { data = [] } = api.user.getInvitations.useQuery()
