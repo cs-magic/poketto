@@ -9,8 +9,8 @@ export const userRouter = createTRPCRouter({
 	
 	getExactUser: protectedProcedure
 		.input(z.string().optional())
-		.query(({ ctx, input }) => {
-			return input ? ctx.prisma.user.findUnique({ where: { id: input } }) : undefined
+		.query(async ({ ctx, input }) => {
+			return (input && await ctx.prisma.user.findUnique({ where: { id: input } })) || undefined
 		}),
 	
 	getSecretMessage: protectedProcedure.query(() => {
