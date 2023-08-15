@@ -53,7 +53,11 @@ export default function ConversationPage({ user, conversationStr }: {
 	return (<RootLayout>
 		<div className={'w-full h-full overflow-hidden | flex divide-x'}>
 			
-			{chatListVisible && user && <AppList user={user}/>}
+			{chatListVisible && user && (
+				<section className={'relative w-full md:w-[375px] shrink-0 | flex flex-col items-center'}>
+					<AppList user={user}/>
+				</section>
+			)}
 			
 			<section className={clsx('relative w-full grow h-full overflow-hidden | flex flex-col')}>
 				{user && conversation && <AppConversation u={user} c={conversation}/>}
@@ -186,8 +190,7 @@ const AppList = ({ user }: {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
 	const { data: searchedApps } = api.flowgpt.searchApps.useQuery({ query: search }, { enabled: search.length > 0 })
 	
-	return (<section id={'chat-list'} className={clsx('w-full md:w-[375px] shrink-0 | flex flex-col items-center', // 'bg-slate-800'
-	)}>
+	return (<>
 		
 		<Input defaultValue={search}
 		       placeholder={'Search: Title / Description / Init Prompt'}
@@ -210,35 +213,32 @@ const AppList = ({ user }: {
 			</>)}
 		
 		{/*<SectionTitle>No messages found</SectionTitle>*/}
-	</section>)
+	</>)
 }
 
-const SearchResultItem = ({ convs, app }: {
-	convs: ConversationWithRelation[],
+const SearchResultItem = ({ app }: {
 	app: AppWithRelation
 }) => {
-	const router = useRouter()
-	const sid = router.query.sid as string
 	
-	return (<Dialog>
-		<DialogTrigger>
-			
-			<Avatar className={'shrink-0'}>
-				<AvatarImage src={app.avatar}/>
-			</Avatar>
-			<div className={'grow overflow-hidden | flex flex-col gap-1'}>
-				<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{app.name}</p>
-				<p className={'truncate | '}>{app.desc}</p>
-			</div>
-			<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
-				<ViewsField v={app.state?.views ?? 0}/>
-				<p className={'truncate'}>@{app.creator.name}</p>
-			</div>
-		</DialogTrigger>
-		<DialogContent className={'max-h-[80vh] overflow-auto'}>
-			<AppDetail app={app} comments={[]}/>
-		</DialogContent>
-	</Dialog>)
+	return (
+		<Dialog>
+			<DialogTrigger className={'w-full flex items-center p-2 gap-2 hover:bg-accent'}>
+				<Avatar className={'shrink-0'}>
+					<AvatarImage src={app.avatar}/>
+				</Avatar>
+				<div className={'grow overflow-hidden | flex flex-col gap-1'}>
+					<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{app.name}</p>
+					<p className={'truncate | '}>{app.desc}</p>
+				</div>
+				<div className={'w-20 shrink-0 whitespace-nowrap overflow-hidden | flex flex-col gap-1'}>
+					<ViewsField v={app.state?.views ?? 0}/>
+					<p className={'truncate'}>@{app.creator.name}</p>
+				</div>
+			</DialogTrigger>
+			<DialogContent className={'max-h-[80vh] overflow-auto'}>
+				<AppDetail app={app} comments={[]}/>
+			</DialogContent>
+		</Dialog>)
 }
 
 const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>

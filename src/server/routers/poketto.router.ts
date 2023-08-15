@@ -2,8 +2,11 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
 import { ChatMessageFormatType, PromptRoleType } from '.prisma/client'
-import { type AppWithRelation, conversationInclude, type ConversationWithRelation, type IFlowgptPromptBasic } from '@/ds'
+import { appInclude, type AppWithRelation, conversationInclude, type ConversationWithRelation, type IFlowgptPromptBasic } from '@/ds'
 import { flowgpt2pokettoApp } from '@/lib/flowgpt'
+import { addAppIntoConversation } from '@/server/auth'
+import { mockSession } from 'next-auth/client/__tests__/helpers/mocks'
+import user = mockSession.user
 
 
 export const pokettoRouter = createTRPCRouter({
@@ -59,14 +62,10 @@ export const pokettoRouter = createTRPCRouter({
 		.input(z.object({
 			appId: z.string(),
 		}))
-		.mutation(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
-				const result = await prisma.conversation.create({
-					data: {
-						userId: user.id,
-						appId,
-					},
-				})
-				return result
+		.mutation(async ({ ctx: { prisma, session }, input: { appId } }) => {
+				const user = await prisma.user.findUniqueOrThrow({ where: { id: session.user.id } })
+				const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, include: appInclude })
+				return addAppIntoConversation(user, app)
 			},
 		),
 	

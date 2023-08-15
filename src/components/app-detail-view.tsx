@@ -26,6 +26,7 @@ import { api } from '@/lib/api'
 import { getAppLink, getConversationLink } from '@/lib/string'
 import { type AppWithRelation, type IAppComment } from '@/ds'
 import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from '@/config'
+import log from '@/lib/log'
 
 export const AppDetail = ({ app, comments }: {
 	app: AppWithRelation,
@@ -35,12 +36,15 @@ export const AppDetail = ({ app, comments }: {
 	const [scroll, scrollTo] = useWindowScroll()
 	const user = useUser()
 	
+	// todo: 数据库里要先有 app 才能加入的问题怎么解决 ？ 
 	const { mutate: addApp, data: addedConv } = api.poketto.addAppIntoConversation.useMutation()
 	const onAddApp = () => {
 		if (!user) return toast.error('您需要先登陆才能加入该频道，否则我们无法为您保存这些记录 :(')
 		addApp({ appId: app.id })
 		toast.success(`Successfully added app: ${app.name}`)
 	}
+	
+	log.info({ addedConv })
 	
 	useEffect(() => {
 		if (addedConv) void router.push(getConversationLink(addedConv.id))
