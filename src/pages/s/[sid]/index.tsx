@@ -13,10 +13,21 @@ import { ControlTool } from '@/components/utils/tools'
 import { api } from '@/lib/api'
 import { useRouter } from 'next/router'
 import { UserAppRelationType } from '@/ds/website'
-import { type AppWithRelation } from '@/ds/poketto'
+import { type AppWithRelation, type UsingAppWithRelation } from '@/ds/poketto'
 import { type ChatMessage } from '.prisma/client'
 import { useUser } from '@/hooks/use-user'
 import log from '@/lib/log'
+import { type PrommptMessage, type User } from '@prisma/client'
+import { nanoid } from 'nanoid'
+
+export const prompt2chatMessage = (u: User, c: UsingAppWithRelation, m: PrommptMessage): ChatMessage => ({
+	...m,
+	userId: u.id,
+	createdAt: new Date(),
+	updatedAt: new Date(),
+	format: 'text',
+	usingAppId: c.id,
+})
 
 
 export default function ConversationPage() {
@@ -24,8 +35,10 @@ export default function ConversationPage() {
 	const spaceId = router.query.sid as string
 	
 	const { chatListVisible, convId, chatDetailVisible } = useAppStore()
-	const { data: conversations = [] } = api.poketto.listConversations.useQuery({ spaceId, relationType: UserAppRelationType.used })
-	const conv = conversations.find((a) => a.id === convId) ?? conversations[0]!
+	const { data: conversations_ = [] } = api.poketto.listConversations.useQuery({ spaceId, relationType: UserAppRelationType.used })
+	const conversations = conversations_
+	const conv = conversations.find((a) => a.id === convId) ?? conversations[0]
+	const user = useUser()
 	
 	log.info({ apps: conversations, conv })
 	
@@ -35,12 +48,13 @@ export default function ConversationPage() {
 			{chatListVisible && <AppList apps={conversations}/>}
 			
 			<section id={'chat-contents'} className={clsx('w-full grow h-full overflow-hidden | flex flex-col')}>
-				{conv && <AppConversation app={conv.app} msgs={[]}/>}
+				{user && conv && <AppConversation app={conv.app} msgs={(conv.app.model?.initPrompts ?? [])
+					.map((p) => prompt2chatMessage(user, conv, p))}/>}
 			</section>
 			
 			<section id={'poketto-app-detail'}
 			         className={clsx('w-full md:w-[375px] shrink-0 overflow-x-hidden', 'h-full overflow-y-auto p-4 gap-4', 'flex flex-col ')}>
-				{chatDetailVisible && <AppDetail app={conv.app} comments={conv.app.comments}/>}
+				{chatDetailVisible && conv && <AppDetail convs={conversations} app={conv.app} comments={conv.app.comments}/>}
 			</section>
 		
 		</div>
@@ -52,7 +66,7 @@ const AppConversation = ({ app, msgs }: { app: AppWithRelation, msgs: ChatMessag
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
 		initialMessages: [...app.model!.initPrompts ?? [], // ...app?.poketto.conversation?.messages ?? [], // todo
-			// ...msgs,
+		                  ...msgs,
 		], onError: err => {
 			toast.error(err.message)
 		},
@@ -65,9 +79,11 @@ const AppConversation = ({ app, msgs }: { app: AppWithRelation, msgs: ChatMessag
 		</div>
 		
 		<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
-			{[] // messages
-				.filter((value, index) => app.model!.isOpenSource || index >= (app.model!.initPrompts.length ?? 0))
-				.map((msg, index) => <ChatMessageComp msg={msg} key={index}/>)}
+			{
+				messages
+					.filter((value, index) => app.model!.isOpenSource || index >= (app.model!.initPrompts.length ?? 0))
+					.map((msg, index) => <ChatMessageComp msg={msg} key={index}/>)
+			}
 		</div>
 		
 		<form className={'w-full p-4 | flex justify-center items-center gap-2'} onSubmit={handleSubmit}>

@@ -40,6 +40,7 @@ const config = {
 		'@typescript-eslint/prefer-nullish-coalescing': ['off'], // 有些时候，是需要 || 的
 		'react/no-unescaped-entities': ['off'],
 		'@typescript-eslint/require-await': ['off'],
+		'@typescript-eslint/no-unnecessary-type-assertion': ['warn'],
 	},
 };
 

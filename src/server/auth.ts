@@ -14,6 +14,41 @@ import { type Adapter } from 'next-auth/adapters'
 import RoleType = $Enums.RoleType
 import { POKETTO_APP_ID, YourSolePoketto, YourSolePokettoApp } from '@/config/poketto'
 
+const initUser = async (user: User) => {
+	log.info(`initializing user(id=${user.id}, name=${user.name})`)
+	
+	// init space
+	const spaceId = user.id
+	await prisma.space.createMany({
+		data: [{ id: user.id, name: user.name ?? user.id }],
+	})
+	await prisma.userSpaceRelation.createMany({
+		data: [{ role: RoleType.admin, userId: user.id, spaceId }],
+	})
+	
+	// init space-app
+	const app = YourSolePokettoApp
+	const usingApp = await prisma.usingApp.create({ data: { appId: app.id, spaceId } })
+	
+	// init app-chatMessage
+	await prisma.chatMessage.create({
+		data: {
+			content: `Welcome ${user.name} to join the ${app.name}`,
+			usingAppId: usingApp.id, // 不是 app 的 id，而是 usingApp 的 id
+			format: 'systemNotification',
+		},
+	})
+	
+	// init invitation tickets
+	await prisma.invitationRelation.createMany({
+		data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })),
+	})
+	
+	// finished initialization
+	log.info(`initialized user(id=${user.id}, name=${user.name})`)
+}
+
+
 const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 
 const adapter: Adapter = {
@@ -47,37 +82,6 @@ declare module 'next-auth' {
 	// }
 }
 
-const initUser = async (user: User) => {
-	log.info(`initializing user(id=${user.id}, name=${user.name})`)
-	
-	// init space
-	const spaceId = user.id
-	await prisma.space.createMany({
-		data: [{ id: user.id, name: user.name ?? user.id }],
-	})
-	await prisma.userSpaceRelation.createMany({
-		data: [{ role: RoleType.admin, userId: user.id, spaceId }],
-	})
-
-	// init space-app
-	const app = YourSolePokettoApp
-	const usingApp = await prisma.usingApp.create({data: {appId: app.id, spaceId }})
-
-	// init app-chatMessage
-	await prisma.chatMessage.create({data: {
-		content: `Welcome ${user.name} to join the ${app.name}`,
-		usingAppId: usingApp.id, // 不是 app 的 id，而是 usingApp 的 id
-		format: "systemNotification",
-	}})
-	
-	// init invitation tickets
-	await prisma.invitationRelation.createMany({
-		data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })),
-	})
-	
-	// finished initialization
-	log.info(`initialized user(id=${user.id}, name=${user.name})`)
-}
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.

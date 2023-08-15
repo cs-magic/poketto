@@ -67,25 +67,29 @@ const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-ful
 const AppListView = ({ appListView }: { appListView: IAppListView }) => {
 	// const { setPokettoId } = useAppStore()
 	const router = useRouter()
+	const sid = router.query.sid as string
+	console.log({ sid, appListView })
 	
 	return (
 		
-		<Button variant={'ghost'} className={'w-full px-4 py-2 h-fit | flex items-center gap-4'} onClick={() => {
-			void router.push(getAppLink(appListView.id))
-		}}>
-			<Avatar className={'shrink-0'}>
-				<AvatarImage src={appListView.avatar}/>
-			</Avatar>
-			
-			<div className={'grow overflow-hidden | flex flex-col gap-2'}>
-				<div className={'w-full | flex gap-2 justify-between'}>
-					<span className={'truncate '}>{appListView.title}</span>
-					<span>{d(appListView.latestMessage.createdAt).calendar()}</span>
+		<Link href={getAppLink(sid, appListView.id)} className={'w-full'}>
+			<Button variant={'ghost'} className={'w-full px-4 py-2 h-fit | flex items-center gap-4'}>
+				<Avatar className={'shrink-0'}>
+					<AvatarImage src={appListView.avatar}/>
+				</Avatar>
+				
+				<div className={'grow overflow-hidden | flex flex-col gap-2'}>
+					<div className={'w-full | flex gap-2 justify-between'}>
+						<span className={'truncate '}>{appListView.title}</span>
+						<span>{d(appListView.latestMessage.createdAt).calendar()}</span>
+					</div>
+					<div className={'flex gap-2'}>
+						{/* 只有 group 才需要打开 */}
+						<span className={'truncate text-muted-foreground'}>{appListView.latestMessage.content}</span>
+					</div>
 				</div>
-				<div className={'flex gap-2'}>
-					{/* 只有 group 才需要打开 */}
-					<span className={'truncate text-muted-foreground'}>{appListView.latestMessage.content}</span>
-				</div>
-			</div>
-		</Button>)
+			</Button>
+		</Link>
+	
+	)
 }

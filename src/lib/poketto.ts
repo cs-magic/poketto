@@ -1,13 +1,21 @@
 import { type AppWithRelation, type IAppListView, type IPoketto, type UsingAppWithRelation } from '@/ds/poketto'
 import { nanoid } from 'nanoid'
 
-export const getAppLink = (appId: string) => `/p/${appId}`
+export const getAppLink = (sid: string, pid: string) => `/s/${sid}/${pid}`
 
 export const createApp = (poketto: AppWithRelation): IPoketto => ({
 	messages: [{
-		type: 'notification', format: 'text', role: 'system', // no effect since this is a notification
-		id: nanoid(), appId: poketto.id, createdAt: new Date(), content: `Welcome {{userName}} to join in ${poketto.name} !`, interactions: {}, parentId: undefined, userId: undefined,
-
+		type: 'notification',
+		format: 'text',
+		role: 'system', // no effect since this is a notification
+		id: nanoid(),
+		appId: poketto.id,
+		createdAt: new Date(),
+		content: `Welcome {{userName}} to join in ${poketto.name} !`,
+		interactions: {},
+		parentId: undefined,
+		userId: undefined,
+		
 	}], app: poketto, users: [// todo: add User
 		// { ...user, state: 'active', type: 'user' },
 	], latestTime: new Date(), joinTime: new Date(),
