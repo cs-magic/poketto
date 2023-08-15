@@ -15,7 +15,7 @@ import { InvitationStatus } from '.prisma/client'
 import { Badge } from '@/components/ui/badge'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
-import { PRODUCT, URI, USER_INVITATIONS_COUNT } from '@/config'
+import { product, URI, USER_INVITATIONS_COUNT } from '@/config'
 
 
 export const Sidebar = () => {
@@ -101,9 +101,9 @@ const InviteCard = () => {
 							{
 								cnt: USER_INVITATIONS_COUNT,
 								surplus,
-								appName: PRODUCT.name,
+								appName: product.name,
 								appDoc: URI.app.docs.intro,
-								currencyName: PRODUCT.currency,
+								currencyName: product.currency,
 								currencyDoc: URI.app.docs.currency,
 							})
 					}

@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { PlatformType } from '.prisma/client'
 import { type AppWithRelation, GET_PROMPTS_BATCH_SIZE, type IAppComment, type IFlowGPTComment, type IFlowgptPromptBasic, SortOrder } from '@/ds'
 import { flowgpt2poketto_comment, flowgpt2pokettoApp } from '@/lib/flowgpt'
-import { YourSolePokettoAppWithRelation } from '@/config'
+import { POKETTO_APP_WITH_RELATION } from '@/config'
 
 
 export const idInput = z.object({
@@ -78,7 +78,7 @@ export const flowgptRouter = createTRPCRouter({
 			const { id, platform } = opts.input
 			if (!id) return
 			if (platform === PlatformType.Poketto) {
-				return YourSolePokettoAppWithRelation
+				return POKETTO_APP_WITH_RELATION
 			}
 			
 			const j = { json: id }

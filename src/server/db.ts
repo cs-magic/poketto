@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import { MongoClient } from 'mongodb'
 import { env } from '@/env.mjs'
 import log from '@/lib/log'
-import { PokettoOfficial, YourSolePokettoApp, YourSolePokettoAppWithRelation, YourSolePokettoModel, YourSolePokettoModelInitPrompts } from '@/config'
+import { POKETTO_USER, POKETTO_APP, POKETTO_APP_WITH_RELATION, POKETTO_APP_MODEL, POKETTO_APP_MODEL_INIT_PROMPTS } from '@/config'
 
 
 export const initDB = async (prisma: ExtendedPrismaClient) => {
@@ -17,24 +17,24 @@ export const initDB = async (prisma: ExtendedPrismaClient) => {
 	}
 	
 	if (!(await prisma.user.count())) {
-		log.info('initializing default user(i.e. PokketoOfficial)')
-		await prisma.user.create({ data: PokettoOfficial })
+		log.info('initializing default user(i.e. PokettoOfficial)')
+		await prisma.user.create({ data: POKETTO_USER })
 	}
 	
 	if (!(await prisma.app.count())) {
 		log.info('initializing default app(i.e. YourPokettoApp)')
-		await prisma.app.create({ data: YourSolePokettoApp })
+		await prisma.app.create({ data: POKETTO_APP })
 	}
 	
 	if (!(await prisma.appModel.count())) {
 		log.info('initializing default app(i.e. YourPokettoApp)')
-		await prisma.appModel.create({ data: YourSolePokettoModel })
+		await prisma.appModel.create({ data: POKETTO_APP_MODEL })
 	}
 	
 	
 	if (!(await prisma.prommptMessage.count())) {
 		log.info('initializing default app(i.e. YourPokettoApp)')
-		await prisma.prommptMessage.createMany({ data: YourSolePokettoModelInitPrompts })
+		await prisma.prommptMessage.createMany({ data: POKETTO_APP_MODEL_INIT_PROMPTS })
 	}
 	log.info('Succesfully initialized !')
 }

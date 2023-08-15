@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { useRouter } from 'next/router'
-import { type ChatMessage, PromptRoleType } from '.prisma/client'
+import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from '.prisma/client'
 import log from '@/lib/log'
 import { type User } from '@prisma/client'
 import { useDebouncedState } from '@mantine/hooks'
@@ -97,17 +97,16 @@ const AppConversation = ({ u, c }: {
 	u: User,
 	c: ConversationWithRelation
 }) => {
-	const promptMessages = (c.app.model!.initPrompts ?? []).map((p) => prompt2chatMessage(u, c.id, p))
 	const { data: persistedMessages = [] } = api.poketto.listMessages.useQuery({ cid: c.id })
 	const { mutate: pushMessage } = api.poketto.pushMessage.useMutation()
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
-		initialMessages: [...promptMessages, ...persistedMessages],
+		initialMessages: persistedMessages,
 		onError: err => toast.error(err.message),
 		onFinish: (msg) => pushMessage({ ...msg, cid: c.id }),
 	})
 	
-	log.info({ promptMessages, persistedMessages, messages })
+	log.info({ persistedMessages, messages })
 	
 	return (<>
 		<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
@@ -140,18 +139,23 @@ const ChatMessageComp = ({ msg, user }: {
 	msg: ChatMessage
 }) => {
 	const { role } = msg
-	return (<div
-		className={clsx('chat tracking-normal text-sm', role === PromptRoleType.assistant ? 'chat-start' : 'chat-end')}>
-		
-		<div className={clsx('w-full overflow-auto | chat-bubble prose dark:prose-invert prose-sm', {
-			'system': 'bg-slate-700', 'function': 'bg-destructive', 'user': 'bg-green-600 text-black', 'assistant': 'bg-sidebar text-primary-foreground/75',
-		}[role])}>
-			
-			<ReactMarkdown remarkPlugins={[remarkGfm]}>
-				{Mustache.render(msg.content, { userName: user.name })}
-			</ReactMarkdown>
-		</div>
-	</div>)
+	return msg.format === ChatMessageFormatType.systemNotification
+		? <span className={'mx-auto my-2 text-muted-foreground'}>{msg.content}</span>
+		: (
+			<div className={clsx('chat tracking-normal text-sm', role === PromptRoleType.assistant ? 'chat-start' : 'chat-end')}>
+				
+				<div className={clsx('w-full overflow-auto | chat-bubble prose dark:prose-invert prose-sm', {
+					'system': 'bg-slate-700', 'function': 'bg-destructive', 'user': 'bg-green-600 text-black', 'assistant': 'bg-sidebar text-primary-foreground/75',
+				}[role])}>
+					
+					<ReactMarkdown remarkPlugins={[remarkGfm]}>
+						{Mustache.render(msg.content, { userName: user.name })}
+					</ReactMarkdown>
+				
+				</div>
+			</div>
+		)
+	
 }
 
 

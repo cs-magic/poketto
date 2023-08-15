@@ -8,11 +8,11 @@ import { prisma } from '@/server/db'
 import { type PrismaClient } from '@prisma/client'
 import log from '@/lib/log'
 import _ from 'lodash'
-import { ChatMessageFormatType, type User } from '.prisma/client'
+import { ChatMessageFormatType, PromptRoleType, type User } from '.prisma/client'
 import { type Adapter } from 'next-auth/adapters'
 import { prompt2chatMessage } from '@/lib/prompt'
 import { type AppWithRelation, ConversationWithRelation } from '@/ds'
-import { POKETTO_APP_ID, POKETTO_APP_NAME, USER_INVITATIONS_COUNT, YourSolePokettoApp, YourSolePokettoAppWithRelation } from '@/config'
+import { POKETTO_APP_ID, POKETTO_APP_NAME, USER_INVITATIONS_COUNT, POKETTO_APP, POKETTO_APP_WITH_RELATION, POKETTO_WELCOME_MESSAGE } from '@/config'
 
 export const addAppIntoConversation = async (u: User, app: AppWithRelation) => {
 	// init conversation
@@ -34,11 +34,21 @@ export const addAppIntoConversation = async (u: User, app: AppWithRelation) => {
 			...(app.model?.initPrompts ?? []).map((p) => prompt2chatMessage(u, c.id, p)),
 		],
 	})
+	return c
 }
 
 const initUser = async (user: User) => {
 	log.info(`initializing user(id=${user.id}, name=${user.name})`)
-	await addAppIntoConversation(user, YourSolePokettoAppWithRelation)
+	const conversation = await addAppIntoConversation(user, POKETTO_APP_WITH_RELATION)
+	// welcome message
+	await prisma.chatMessage.create({
+		data: {
+			content: POKETTO_WELCOME_MESSAGE,
+			conversationId: conversation.id,
+			format: ChatMessageFormatType.text,
+			role: PromptRoleType.assistant,
+		},
+	})
 	
 	// init invitation tickets
 	await prisma.invitationRelation.createMany({

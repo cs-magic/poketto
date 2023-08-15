@@ -15,7 +15,7 @@ import { useHotkeys } from '@mantine/hooks'
 import { Input } from '@/components/ui/input'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
 import _ from 'lodash'
-import { PRODUCT, URI } from '@/config'
+import { product, URI } from '@/config'
 
 
 export const ThemeSwitcher = () => {
@@ -37,7 +37,7 @@ export const LogoWithName = () => {
 	return (<Button variant={'ghost'} className={'justify-start gap-2'} onClick={toggleSidebar}>
 		{/*<Logo height={24}/>*/}
 		<Image src={CatLogo} alt={'Cat Logo'} width={24} height={24}/>
-		<span className={'text-lg tracking-widest'}>{PRODUCT.name}</span>
+		<span className={'text-lg tracking-widest'}>{product.name}</span>
 	</Button>)
 }
 

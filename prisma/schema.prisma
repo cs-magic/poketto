@@ -182,7 +182,7 @@ model Conversation {
 
   messages ChatMessage[]
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 }
 

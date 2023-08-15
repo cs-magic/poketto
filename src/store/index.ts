@@ -52,25 +52,6 @@ export const useAppStore = create<StoreState>()(
 						// @ts-ignore
 						delete persistedState.appMessages
 					}
-					if (version === .7) {
-						// @ts-ignore
-						delete persistedState.pokettos
-					}
-					if (version === .4) {
-						// @ts-ignore
-						delete persistedState.app.id
-					}
-					if ([.3, .5, .6].includes(version)) {
-						// @ts-ignore
-						delete persistedState.app
-					}
-					if (version === .2) {
-						persistedState.pokettos[0]!.flowgpt.id = persistedState.app.id
-					}
-					if (version === .1) {
-						const data = persistedState.pokettos[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
-						persistedState.pokettos[0]!.messages[0] = { ...persistedState.pokettos[0]!.messages[0]!, ...data }
-					}
 					return persistedState
 				},
 			}),

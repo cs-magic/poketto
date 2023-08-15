@@ -5,7 +5,7 @@ import Navbar from '@/layouts/navbar'
 import { clsx } from 'clsx'
 import { font } from '@/lib/assets'
 import { useMount } from '@/hooks/use-mount'
-import { PRODUCT } from '@/config'
+import { product } from '@/config'
 
 
 export function RootLayout(props: PropsWithChildren) {
@@ -14,9 +14,9 @@ export function RootLayout(props: PropsWithChildren) {
 	
 	return (<>
 		<Head>
-			<title>{PRODUCT.name}</title>
-			<meta name="description" content={PRODUCT.desc}/>
-			<link rel="icon" href={PRODUCT.icon}/>
+			<title>{product.name}</title>
+			<meta name="description" content={product.desc}/>
+			<link rel="icon" href={product.icon}/>
 		</Head>
 		
 		<main className={clsx('w-screen h-screen | flex flex-col | font-light text-foreground text-sm', 'bg-background', // 'bg-zinc-900',

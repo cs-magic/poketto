@@ -75,7 +75,7 @@ export const DEFAULT_APP_VERSION = '1.0.0'
 export const DEFAULT_USER_NAME = '游客'
 export const DEFAULT_USER_ID = 'guest'
 export const DEFAULT_USER_AVATAR = getRobotAvatar(DEFAULT_USER_ID)
-export const PRODUCT = {
+export const product = {
 	name: '口袋 A I', // name: 'Poketto.AI',
 	currency: '甜甜圈', // currency: 'Dora',
 	desc: '每一个人的哆啦A梦', // '每个人都是魔法师',
@@ -115,24 +115,14 @@ export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
 那么，就请接下来多多关照啦！
 `
 export const POKETTO_CATEGORY_ID = 0
-export const PokettoOfficial: User = {
-	id: POKETTO_CREATOR_ID, name: POKETTO_CREATOR_NAME, desc: POKETTO_CREATOR_DESC, email: POKETTO_CREATOR_EMAIL, balance: 0, image: POKETTO_CREATOR_AVATAR, emailVerified: POKETTO_APP_CREATED_AT,
-}
-export const YourSolePokettoApp: App = {
-	id: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT, creatorId: POKETTO_CREATOR_ID, platform: POKETTO_PLATFORM, version: POKETTO_VERSION, desc: POKETTO_APP_DESC, name: POKETTO_APP_NAME, language: POKETTO_LANGUAGE, categoryId: POKETTO_CATEGORY_ID, avatar: POKETTO_APP_AVATAR,
-}
-export const YourSolePokettoModel: AppModel = {
-	id: POKETTO_MODEL_ID, appId: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT,
-	
-	type: POKETTO_MODEL_NAME, isOpenSource: false, temperature: .7,
-}
-export const YourSolePokettoModelInitPrompts: PrommptMessage[] = [{
-	id: nanoid(), appModelId: POKETTO_MODEL_ID, role: PromptRoleType.system, content: POKETTO_SYSTEM_PROMPT,
-}]
-export const YourSolePokettoAppWithRelation: AppWithRelation = {
-	...YourSolePokettoApp, model: {
-		...YourSolePokettoModel, initPrompts: YourSolePokettoModelInitPrompts,
-	}, actions: [], creator: PokettoOfficial, tags: POKETTO_TAGS.map((t) => ({
+export const POKETTO_USER: User = { id: POKETTO_CREATOR_ID, name: POKETTO_CREATOR_NAME, desc: POKETTO_CREATOR_DESC, email: POKETTO_CREATOR_EMAIL, balance: 0, image: POKETTO_CREATOR_AVATAR, emailVerified: POKETTO_APP_CREATED_AT }
+export const POKETTO_APP: App = { id: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT, creatorId: POKETTO_CREATOR_ID, platform: POKETTO_PLATFORM, version: POKETTO_VERSION, desc: POKETTO_APP_DESC, name: POKETTO_APP_NAME, language: POKETTO_LANGUAGE, categoryId: POKETTO_CATEGORY_ID, avatar: POKETTO_APP_AVATAR }
+export const POKETTO_APP_MODEL: AppModel = { id: POKETTO_MODEL_ID, appId: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT, type: POKETTO_MODEL_NAME, isOpenSource: false, temperature: .7 }
+export const POKETTO_APP_MODEL_INIT_PROMPTS: PrommptMessage[] = [{ id: nanoid(), appModelId: POKETTO_MODEL_ID, role: PromptRoleType.system, content: POKETTO_SYSTEM_PROMPT }]
+export const POKETTO_APP_WITH_RELATION: AppWithRelation = {
+	...POKETTO_APP, model: {
+		...POKETTO_APP_MODEL, initPrompts: POKETTO_APP_MODEL_INIT_PROMPTS,
+	}, actions: [], creator: POKETTO_USER, tags: POKETTO_TAGS.map((t) => ({
 		id: t, name: t, creatorId: POKETTO_CREATOR_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT,
 	})), state: {
 		id: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT, appId: POKETTO_APP_ID, shares: 0, tips: 0, stars: 0, forks: 0, calls: 0, views: 0,
