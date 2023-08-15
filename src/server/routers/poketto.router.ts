@@ -22,6 +22,21 @@ export const pokettoRouter = createTRPCRouter({
 			return result as ConversationWithRelation[]
 		}),
 	
+	addAppIntoConversation: protectedProcedure
+		.input(z.object({
+			appId: z.string(),
+		}))
+		.mutation(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
+				const result = await prisma.conversation.create({
+					data: {
+						userId: user.id,
+						appId,
+					},
+				})
+				return result
+			},
+		),
+	
 	searchPoketto: publicProcedure
 		.input(z.object({
 			query: z.string(), language: z.string().default('zh'), threshold: z.number().default(.8), hideNsfw: z.boolean().default(true),

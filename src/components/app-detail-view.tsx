@@ -23,29 +23,24 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import d from '@/lib/datetime'
 import { ResponsiveField } from '@/components/field'
 import { IconThumbDown, IconThumbUp } from '@tabler/icons-react'
+import { api } from '@/lib/api'
+import { getAppLink } from '@/lib/poketto'
 
 export const AppDetail = ({ app, comments }: {
 	app: AppWithRelation, comments: AppComment[]
 }) => {
-	const { convId } = useAppStore()
 	const router = useRouter()
 	const [scroll, scrollTo] = useWindowScroll()
 	const user = useUser()
 	
+	const addApp = api.poketto.addAppIntoConversation.useMutation()
+	
 	const onAddApp = () => {
 		if (!user) return toast.error('您需要先登陆才能加入该频道，否则我们无法为您保存这些记录 :(')
-		if (!convId) return toast.error('您当前并不在工作区内')
-		// addApp(createApp(user, app))
-		// void router.push(getAppLink(convId, app.id))
+		addApp.mutate({ appId: app.id })
+		// todo: mutate result
 		toast.success(`Successfully added app: ${app.name}`)
-	}
-	
-	const onDelApp = () => {
-		if (!convId) return toast.error('您当前并不在工作区内')
-		// delApp(app.id)
-		// const nextApp = convs.find((c) => c.appId !== app.id)!
-		// void router.push(getAppLink(convId, nextApp.appId))
-		scrollTo({ y: 0 })
+		void router.push(getAppLink(app.id))
 	}
 	
 	return (<>
@@ -61,12 +56,11 @@ export const AppDetail = ({ app, comments }: {
 				</div>
 			</div>
 			{
-				<Button
-					className={clsx('w-20 | rounded-3xl transition-all')}
-					size={'thin'}
+				<Badge
+					className={clsx('px-4 rounded-3xl transition-all cursor-pointer')}
 					onClick={onAddApp}>
 					Try
-				</Button>
+				</Badge>
 			}
 		</section>
 		
