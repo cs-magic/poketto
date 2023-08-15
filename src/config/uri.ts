@@ -1,8 +1,7 @@
 export const uri = {
 	app: {
 		home: '/',
-		workspace: '/',
-		explore: '/explore',
+		explore: '/poketto/explore',
 		pocketApp: '/p',
 		docs: {
 			intro: '/docs/whats-poketto',
@@ -12,9 +11,9 @@ export const uri = {
 		},
 	},
 	user: {
-		dashboard: '/u/dashboard',
-		gallery: '/u/gallery',
-		integrations: '/u/integrations',
+		dashboard: '/poketto/user/dashboard',
+		gallery: '/poketto/user/gallery',
+		integrations: '/poketto/user/integrations',
 		
 		auth: {
 			login: '/auth/login',
@@ -22,8 +21,8 @@ export const uri = {
 		},
 		
 		seek: {
-			waitlist: '/seek/waitlist',
-			enterprise: '/seek/enterprise',
+			waitlist: '/poketto/seek/waitlist',
+			enterprise: '/poketto/seek/enterprise',
 		},
 	},
 	images: {

@@ -25,8 +25,8 @@ export const Sidebar = () => {
 		)}>
 			
 			<section className={'flex flex-col'}>
-				<MenuLink icon={<HomeIcon/>} field={'workspaces'} link={uri.app.workspace}/>
-				<MenuLink icon={<RocketIcon/>} field={'explore'}/>
+				<MenuLink icon={<HomeIcon/>} field={'workspaces'} link={uri.app.home}/>
+				<MenuLink icon={<RocketIcon/>} field={'explore'} link={uri.app.explore}/>
 				{/*<MenuLink field={'toolkits'}/>*/}
 			</section>
 			
