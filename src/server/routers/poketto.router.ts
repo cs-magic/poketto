@@ -3,7 +3,7 @@ import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
 import { type AppWithRelation, flowgpt2pokettoApp } from '@/ds/poketto'
-import { Prisma } from '.prisma/client'
+import { Prisma, type Space } from '.prisma/client'
 import SpaceGetPayload = Prisma.SpaceGetPayload
 
 export const pokettoRouter = createTRPCRouter({
@@ -12,7 +12,7 @@ export const pokettoRouter = createTRPCRouter({
 		.input(z.object({
 			userId: z.string(),
 		}))
-		.query<SpaceGetPayload<any>[]>(async ({ ctx, input }) => {
+		.query<Space[]>(async ({ ctx, input }) => {
 			const result = await ctx.prisma.userSpaceRelation.findMany({
 				where: {
 					userId: input.userId,

@@ -1,8 +1,8 @@
 import { RootLayout } from '@/layouts/root.layout'
 import { ArrowRightIcon, PersonIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
-import { UsersIcon } from 'lucide-react'
-import { ICON_DIMENSION_SM } from '@/config/assets'
+import { UserIcon, UsersIcon } from 'lucide-react'
+import { ICON_DIMENSION_MD, ICON_DIMENSION_SM } from '@/config/assets'
 import { api } from '@/lib/api'
 import { AppViewInHomePage } from '@/components/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,6 +14,11 @@ import { Grow } from '@/components/utils/grow'
 
 import { SortOrder } from '@/ds/poketto'
 import { useUser } from '@/hooks/use-user'
+import log from '@/lib/log'
+import { Fragment } from 'react'
+import { type User } from '.prisma/client'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getSpaceLink } from '@/lib/string'
 
 export default function WorkspacesPage() {
 	const user = useUser()
@@ -26,8 +31,8 @@ export default function WorkspacesPage() {
 						Recently visited workspaces
 					</CardTitle>
 				</CardHeader>
-				<CardContent className={'w-full | flex flex-col divide-y'}>
-					{user?.id ? <Workspaces userId={user.id}/> : 'You have no workspaces currently !'}
+				<CardContent className={'w-full | flex flex-col'}>
+					{user ? <Spaces user={user}/> : 'You have no workspaces currently !'}
 				</CardContent>
 			</Card>
 			
@@ -38,26 +43,57 @@ export default function WorkspacesPage() {
 	</RootLayout>)
 }
 
-const Workspaces = ({ userId }: { userId: string }) => {
-	const { data: workspaces = [] } = api.poketto.listSpaces.useQuery({ userId })
+const Spaces = ({ user }: { user: User }) => {
+	const { data: spaces = [] } = api.poketto.listSpaces.useQuery({ userId: user.id })
+	log.info('spaces: ', spaces)
 	return <>
-		{workspaces.map((w) => (<Link href={`/w/${w.id}`} className={'w-full p-2'} key={w.id}>
-				<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
-					{w.isPrivate ? <PersonIcon/> : <UsersIcon className={ICON_DIMENSION_SM}/>}
-					<p>{w.name}</p>
-					<Grow/>
-					{/*<Avatar className={ICON_DIMENSION_MD}>*/}
-					{/*	<AvatarImage src={avatar}/>*/}
-					{/*</Avatar>*/}
-				</Button>
-			</Link>
-			// <WorkspaceItem key={w.id} wid={w.id} title={w.name} icon={w.isPrivate ? <PersonIcon/> : <UsersIcon className={ICON_DIMENSION_SM}/>}/>
-		))}
+		<h2>Personal Space</h2>
+		<div className={'flex flex-col divide-y'}>
+			{spaces.filter((s) => s.isPrivate).map((s) => (
+				<Link key={s.id} href={getSpaceLink(s.id)} className={'w-full p-2'}>
+					<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
+						<PersonIcon/>
+						<p>{s.name}</p>
+						<Grow/>
+						<Avatar className={ICON_DIMENSION_MD}>
+							<AvatarImage src={user.image ?? undefined}/>
+							<AvatarFallback><UserIcon/></AvatarFallback>
+						</Avatar>
+					</Button>
+				</Link>
+			))}
+		</div>
+		
+		<h2>Team Spaces <span className={'text-sm text-muted-foreground'}>({spaces.filter((s) => !s.isPrivate).length})</span></h2>
+		
+		<div className={'flex flex-col divide-y'}>
+			{
+				spaces.filter((s) => !s.isPrivate).length === 0 && (
+					<div className={'text-muted-foreground'}>
+						You haven't one team space now, don't you wanna <Button className={'px-0'} variant={'link'}>join one</Button> ?
+					</div>
+				)
+			}
+			{spaces.filter((s) => !s.isPrivate).map((s) => (
+				<Link key={s.id} href={getSpaceLink(s.id)} className={'w-full p-2'}>
+					<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
+						<PersonIcon/>
+						<p>{s.name}</p>
+						<Grow/>
+						<Avatar className={ICON_DIMENSION_MD}>
+							<AvatarImage src={user.image ?? undefined}/>
+							<AvatarFallback><UserIcon/></AvatarFallback>
+						</Avatar>
+					</Button>
+				</Link>
+			))}
+		</div>
 	</>
 }
 
 const ExploreAppInHomePage = () => {
 	const { data: page } = api.flowgpt.listPoketto.useQuery({ sort: SortOrder.trending })
+	
 	return (<Card id={'explore'} variant={'ghost'} className={'w-full'}>
 		<CardHeader>
 			<div className={'shrink-0 | flex justify-between items-end'}>

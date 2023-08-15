@@ -61,7 +61,7 @@ export const Sidebar = () => {
 						<>
 							<div className={'flex flex-col gap-0'} onClick={() => void signOut()}>
 								<span className={'text-xs'}>{user.name}</span>
-								<span className={'text-xs'}>{user.id}</span>
+								<span className={'text-xs text-muted-foreground'}>{user.id}</span>
 							</div>
 							<div className={'grow'}/>
 							<ChevronRightIcon/>

@@ -18,8 +18,10 @@ const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as Prism
 const adapter: Adapter = {
 	createUser: async (user) => {
 		const createdUser = await createUser(user)
+		
 		// init extra relations when user created here
 		await initUser(createdUser as User) // todo: avoid as ?
+		
 		return createdUser
 	}, ...adapterExtra,
 }
@@ -48,7 +50,6 @@ const initUser = async (user: User) => {
 	log.info(`initializing user(id=${user.id}, name=${user.name})`)
 	
 	// init space
-	
 	await prisma.space.createMany({
 		data: [{ id: user.id, name: user.name ?? user.id }],
 	})

@@ -24,3 +24,5 @@ export const getRobotAvatar = (key: string, { width = 256, height = 256, mode = 
 } = {}) => {
 	return `https://robohash.org/${key}?set=set${mode}&size=${width}x${height}`
 }
+
+export const getSpaceLink = (spaceId: string) => `/s/${spaceId}`
