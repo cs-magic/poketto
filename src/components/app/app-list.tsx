@@ -14,7 +14,9 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 
-export const AppList = ({ apps }: { apps: UsingAppWithRelation[] }) => {
+export const AppList = ({ apps }: {
+	apps: UsingAppWithRelation[]
+}) => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
 	const { data: searchedPoketto } = api.flowgpt.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
 	
@@ -46,25 +48,34 @@ export const AppList = ({ apps }: { apps: UsingAppWithRelation[] }) => {
 }
 
 
-const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
-	return (<Link href={getAppLink(app.id)} className={clsx('w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent cursor-pointer')}>
-		<Avatar className={'shrink-0'}>
-			<AvatarImage src={app.avatar}/>
-		</Avatar>
-		<div className={'grow overflow-hidden | flex flex-col gap-1'}>
-			<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{app.name}</p>
-			<p className={'truncate | '}>{app.desc}</p>
-		</div>
-		<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
-			<ViewsField v={app.state?.views ?? 0}/>
-			<p className={'truncate'}>@{app.creator.name}</p>
-		</div>
-	</Link>)
+const SearchResultItem = ({ app }: {
+	app: AppWithRelation
+}) => {
+	const router = useRouter()
+	const sid = router.query.sid as string
+	
+	return (
+		<Link href={getAppLink(sid, app.id)} className={clsx('w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent' +
+			' cursor-pointer')}>
+			<Avatar className={'shrink-0'}>
+				<AvatarImage src={app.avatar}/>
+			</Avatar>
+			<div className={'grow overflow-hidden | flex flex-col gap-1'}>
+				<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{app.name}</p>
+				<p className={'truncate | '}>{app.desc}</p>
+			</div>
+			<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
+				<ViewsField v={app.state?.views ?? 0}/>
+				<p className={'truncate'}>@{app.creator.name}</p>
+			</div>
+		</Link>)
 }
 
 const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>
 
-const AppListView = ({ appListView }: { appListView: IAppListView }) => {
+const AppListView = ({ appListView }: {
+	appListView: IAppListView
+}) => {
 	// const { setPokettoId } = useAppStore()
 	const router = useRouter()
 	const sid = router.query.sid as string

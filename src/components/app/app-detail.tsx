@@ -25,10 +25,10 @@ import { vIsNumber } from '@/lib/number'
 
 export const AppDetail = ({ convs, app, comments }: {
 	convs: UsingApp[],
-	app: AppWithRelation, comments: AppComment[]
+	app: AppWithRelation,
+	comments: AppComment[]
 }) => {
 	const { convId } = useAppStore()
-	const { addApp, delApp } = useAppStore()
 	const router = useRouter()
 	const hasGot = Boolean(convs.find((c) => c.appId === app.id))
 	const [scroll, scrollTo] = useWindowScroll()
@@ -37,16 +37,16 @@ export const AppDetail = ({ convs, app, comments }: {
 	const onAddApp = () => {
 		if (!user) return toast.error('您需要先登陆才能加入该频道，否则我们无法为您保存这些记录 :(')
 		if (!convId) return toast.error('您当前并不在工作区内')
-		addApp(createApp(app))
-		void router.push(getAppLink(convId, app.id))
+		// addApp(createApp(user, app))
+		// void router.push(getAppLink(convId, app.id))
 		toast.success(`Successfully added app: ${app.name}`)
 	}
 	
 	const onDelApp = () => {
 		if (!convId) return toast.error('您当前并不在工作区内')
-		delApp(app.id)
-		const nextApp = convs.find((c) => c.appId !== app.id)!
-		void router.push(getAppLink(convId, nextApp.appId))
+		// delApp(app.id)
+		// const nextApp = convs.find((c) => c.appId !== app.id)!
+		// void router.push(getAppLink(convId, nextApp.appId))
 		scrollTo({ y: 0 })
 	}
 	
@@ -175,7 +175,11 @@ export const AppDetail = ({ convs, app, comments }: {
 }
 
 
-const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
+const StatusItem = ({ a, b, c }: {
+	a: string,
+	b: ReactNode,
+	c: ReactNode
+}) => {
 	return (<div className={'w-full overflow-hidden whitespace-nowrap py-2 | flex flex-col items-center justify-between gap-1'}>
 		<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
 		<MarqueeContainer className={'text-lg'}>{b}</MarqueeContainer>
@@ -183,7 +187,10 @@ const StatusItem = ({ a, b, c }: { a: string, b: ReactNode, c: ReactNode }) => {
 	</div>)
 }
 
-const InfoItem = ({ a, b }: { a: string, b: ReactNode }) => {
+const InfoItem = ({ a, b }: {
+	a: string,
+	b: ReactNode
+}) => {
 	return (<div className={'flex flex-col items-center gap-1'}>
 		<div className={'text-muted-foreground font-bold capitalize'}>{a}</div>
 		<div className={'text-primary-foreground/75'}>{b}</div>

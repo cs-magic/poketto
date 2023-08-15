@@ -80,7 +80,7 @@ model User {
   appComments AppComment[]
   appActions  AppAction[]
   StarringApp StarringApp[]
-  createdApps         App[]
+  createdApps App[]
 }
 
 model FollowRelation {
@@ -184,9 +184,9 @@ model App {
   using    UsingApp[]
   starring StarringApp[]
   comments AppComment[]
-  
-  model      AppModel?
-  state    AppState?
+
+  model AppModel?
+  state AppState?
 }
 
 /// use 和 star 是一个持久的、可来回变化的属性
@@ -295,6 +295,7 @@ model ChatMessage {
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String? // system notification
 
+  role                PromptRoleType        @default(user)
   content             String
   format              ChatMessageFormatType @default(text)
   userActionOnMessage ChatMessageAction[]

@@ -16,11 +16,12 @@ import { SortOrder } from '@/ds/poketto'
 import { useUser } from '@/hooks/use-user'
 import log from '@/lib/log'
 import { Fragment } from 'react'
-import { type User } from '.prisma/client'
+import { type Space, type User } from '.prisma/client'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getSpaceLink } from '@/lib/string'
+import { getConversationLink, getSpaceLink } from '@/lib/string'
 import { signIn } from 'next-auth/react'
 import { todo } from '@/lib/helpers'
+import { UserAppRelationType } from '@/ds/website'
 
 export default function WorkspacesPage() {
 	const user = useUser()
@@ -48,25 +49,36 @@ export default function WorkspacesPage() {
 	</RootLayout>)
 }
 
-const Spaces = ({ user }: { user: User }) => {
+const SpaceLink = ({ s, user }: {
+	s: Space,
+	user: User
+}) => {
+	const { data: convs = [] } = api.poketto.listConversations.useQuery({ spaceId: s.id, relationType: UserAppRelationType.used })
+	return (
+		<Link key={s.id} href={getConversationLink(s.id, convs[0]?.id ?? '')} className={'w-full p-2'}>
+			<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
+				<PersonIcon/>
+				<p>{s.name}</p>
+				<Grow/>
+				<Avatar className={ICON_DIMENSION_MD}>
+					<AvatarImage src={user.image ?? undefined}/>
+					<AvatarFallback><UserIcon/></AvatarFallback>
+				</Avatar>
+			</Button>
+		</Link>
+	)
+}
+
+const Spaces = ({ user }: {
+	user: User
+}) => {
 	const { data: spaces = [] } = api.poketto.listSpaces.useQuery({ userId: user.id })
 	log.info('spaces: ', spaces)
 	return <>
 		<h2>Personal Space</h2>
 		<div className={'flex flex-col divide-y'}>
-			{spaces.filter((s) => s.isPrivate).map((s) => (
-				<Link key={s.id} href={getSpaceLink(s.id)} className={'w-full p-2'}>
-					<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
-						<PersonIcon/>
-						<p>{s.name}</p>
-						<Grow/>
-						<Avatar className={ICON_DIMENSION_MD}>
-							<AvatarImage src={user.image ?? undefined}/>
-							<AvatarFallback><UserIcon/></AvatarFallback>
-						</Avatar>
-					</Button>
-				</Link>
-			))}
+			{spaces.filter((s) => s.isPrivate).map((s) =>
+				<SpaceLink s={s} user={user} key={s.id}/>)}
 		</div>
 		
 		<h2>Team Spaces <span className={'text-sm text-muted-foreground'}>({spaces.filter((s) => !s.isPrivate).length})</span></h2>

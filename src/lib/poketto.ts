@@ -1,22 +1,23 @@
-import { type AppWithRelation, type IAppListView, type IPoketto, type UsingAppWithRelation } from '@/ds/poketto'
+import { type AppWithRelation, type IAppListView, type IConversation, type UsingAppWithRelation } from '@/ds/poketto'
 import { nanoid } from 'nanoid'
+import { ChatMessageFormatType, type User } from '@prisma/client'
 
 export const getAppLink = (sid: string, pid: string) => `/s/${sid}/${pid}`
 
-export const createApp = (poketto: AppWithRelation): IPoketto => ({
+export const createApp = (user: User, app: AppWithRelation): IConversation => ({
 	messages: [{
-		type: 'notification',
-		format: 'text',
+		format: ChatMessageFormatType.systemNotification,
 		role: 'system', // no effect since this is a notification
 		id: nanoid(),
-		appId: poketto.id,
+		content: `Welcome {{userName}} to join in ${app.name} !`,
+		userId: user.id,
+		usingAppId: app.id,
 		createdAt: new Date(),
-		content: `Welcome {{userName}} to join in ${poketto.name} !`,
-		interactions: {},
-		parentId: undefined,
-		userId: undefined,
+		updatedAt: new Date(),
 		
-	}], app: poketto, users: [// todo: add User
+	}],
+	app: app,
+	users: [// todo: add User
 		// { ...user, state: 'active', type: 'user' },
 	], latestTime: new Date(), joinTime: new Date(),
 })

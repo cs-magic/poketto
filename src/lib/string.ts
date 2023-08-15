@@ -26,3 +26,5 @@ export const getRobotAvatar = (key: string, { width = 256, height = 256, mode = 
 }
 
 export const getSpaceLink = (spaceId: string) => `/s/${spaceId}`
+
+export const getConversationLink = (spaceId: string, conversationId: string) => `/s/${spaceId}/${conversationId}`
