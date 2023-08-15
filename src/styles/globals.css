@@ -25,6 +25,9 @@ colors:
     tsinghua:
         #82318E; 292 49% 37%; 维基百科清华校色
 
+    github:
+        132 59% 33%; github create repo
+
     general:
         yellow: 60, 100%, 50%;
  */
@@ -78,7 +81,8 @@ colors:
         --primary: 0 0% 28%;
         --primary-foreground: 0 100% 100%;
 
-        --secondary: 217.2 32.6% 17.5%;
+        /*--secondary: 217.2 32.6% 17.5%;*/
+        --secondary: 132 59% 33%;
         /*--secondary-foreground: 210 40% 98%;*/
         --secondary-foreground: 60, 60%, 40%;
 

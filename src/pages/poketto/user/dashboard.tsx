@@ -6,6 +6,9 @@ import { useAppStore } from '@/store'
 import { AppViewInDashboard } from '@/components/appInProfile.view'
 
 import { ProfileTab } from '@/ds/website'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { ChevronDownIcon, Pencil2Icon } from '@radix-ui/react-icons'
 
 
 export default function DashboardPage() {
@@ -22,6 +25,15 @@ export default function DashboardPage() {
 				<UserProfile user={user}/>
 				
 				<div className={'grow | flex flex-col '}>
+					
+					<div className={'flex gap-2 items-center my-4 h-8'}>
+						<Input className={'grow h-full'} placeholder={'Find an app...'}/>
+						<Button className={'h-full gap-2'}>Category <ChevronDownIcon/></Button>
+						<Button className={'h-full gap-2'}>Language <ChevronDownIcon/></Button>
+						<Button className={'h-full gap-2'}>Sort <ChevronDownIcon/></Button>
+						<Button className={'h-full gap-2 bg-green-700'}><Pencil2Icon/> New</Button>
+					</div>
+					
 					{
 						tab === ProfileTab.used && (
 							apps.map((c) => <AppViewInDashboard c={c} key={c.poketto.id}/>)

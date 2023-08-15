@@ -4,14 +4,16 @@ import dayjs from 'dayjs'
 import { Button } from '@/components/ui/button'
 import { ChevronDownIcon, StarIcon } from '@radix-ui/react-icons'
 import { Separator } from '@/components/ui/separator'
+import { POKETTO_CREATOR_ID, POKETTO_CREATOR_NAME } from '@/config/poketto'
 
 export const AppViewInDashboard = ({ c }: { c: IApp }) => {
 	
 	return (
 		<div className={'w-full p-4 | flex justify-between gap-4 | border-y'} key={c.poketto.id}>
 			<div className={'flex flex-col gap-2'}>
-				<div className={'flex gap-2 items-start'}>
+				<div className={'flex gap-2 items-center'}>
 					<h2>{c.poketto.name}</h2>
+					{c.poketto.creatorId === POKETTO_CREATOR_ID && <Badge className={'bg-blue-500'}>{POKETTO_CREATOR_NAME}</Badge>}
 					<Badge variant={'outline'}>{c.poketto.model!.isOpenSource ? 'Open Source' : 'Close Source'}</Badge>
 				</div>
 				<div className={'text-muted-foreground'}>

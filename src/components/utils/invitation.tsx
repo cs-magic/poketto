@@ -37,7 +37,7 @@ export const InviteCard = () => {
 					}
 				</ReactMarkdown>
 			</article>
-			<Button variant={'destructive'}>Invite</Button>
+			<Button className={'bg-blue-500/75 hover:bg-blue-500'}>Invite</Button>
 		
 		</div>
 	)
