@@ -12,15 +12,15 @@ import { useRouter } from 'next/router'
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from '.prisma/client'
 import log from '@/lib/log'
 import { type User } from '@prisma/client'
-import { useDebouncedState } from '@mantine/hooks'
+import { useDebouncedState, useScrollIntoView } from '@mantine/hooks'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/field'
-import React, { type PropsWithChildren } from 'react'
+import React, { type PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
 import d from '@/lib/datetime'
-import { DotsVerticalIcon } from '@radix-ui/react-icons'
+import { ChevronDownIcon, DotsVerticalIcon } from '@radix-ui/react-icons'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { AppDetail } from '@/components/app-detail-view'
 import { type GetServerSideProps } from 'next'
@@ -40,6 +40,7 @@ import {
 	userWithRelationsInclude,
 } from '@/ds'
 import { URI } from '@/config'
+import { Badge } from '@/components/ui/badge'
 
 
 export default function ConversationPage({ user, conversationStr }: {
@@ -54,7 +55,7 @@ export default function ConversationPage({ user, conversationStr }: {
 			
 			{chatListVisible && user && <AppList user={user}/>}
 			
-			<section className={clsx('w-full grow h-full overflow-hidden | flex flex-col')}>
+			<section className={clsx('relative w-full grow h-full overflow-hidden | flex flex-col')}>
 				{user && conversation && <AppConversation u={user} c={conversation}/>}
 			</section>
 			
@@ -99,22 +100,40 @@ const AppConversation = ({ u, c }: {
 }) => {
 	const { data: persistedMessages = [] } = api.poketto.listMessages.useQuery({ cid: c.id })
 	const { mutate: pushMessage } = api.poketto.pushMessage.useMutation()
+	const [scrolled, setScrolled] = useState(false)
+	const [unread, setUnread] = useState(false)
 	
 	const { messages, handleSubmit, input, handleInputChange } = useChat({
 		initialMessages: persistedMessages,
 		onError: err => toast.error(err.message),
 		onFinish: (msg) => pushMessage({ ...msg, cid: c.id }),
+		onResponse: (response) => {
+			if (scrolled && response.status === 200) setUnread(true)
+		},
 	})
 	
-	log.info({ persistedMessages, messages })
+	// log.info({ persistedMessages, messages })
+	const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<HTMLDivElement>({
+		offset: 60,
+	})
+	
+	useEffect(() => {
+		if (!scrolled) {
+			setUnread(false)
+			scrollIntoView({ alignment: 'end' })
+		}
+	})
 	
 	return (<>
-		<div className={'w-full p-4 truncate bg-muted | flex items-center justify-between gap-2'}>
+		<div className={'w-full py-6 px-4 truncate bg-muted | flex items-center justify-between gap-2'}>
 			<div>{c.app.name}</div>
 			<ControlTool/>
 		</div>
 		
-		<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'}>
+		<div className={'w-full p-2 grow overflow-auto | flex flex-col gap-1'} ref={scrollableRef} onScroll={(event) => {
+			const { scrollHeight, scrollTop, clientHeight } = event.currentTarget
+			setScrolled(scrollHeight >= scrollTop + clientHeight + 1 /*有误差*/)
+		}}>
 			{messages
 				// .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
 				.map((msg, index) => <ChatMessageComp user={u} msg={{
@@ -122,8 +141,10 @@ const AppConversation = ({ u, c }: {
 					conversationId: c.id,
 					id: nanoid(),
 				}} key={index}/>)}
+			<div ref={targetRef}/>
 		</div>
 		
+		{unread && <Badge variant={'default'} className={'absolute bottom-[80px] right-4'} onClick={() => scrollIntoView()}>New Message <ChevronDownIcon/></Badge>}
 		<form className={'w-full p-4 | flex justify-center items-center gap-2'} onSubmit={(event) => {
 			handleSubmit(event)
 			pushMessage({ content: input, role: PromptRoleType.user, cid: c.id })
@@ -156,14 +177,6 @@ const ChatMessageComp = ({ msg, user }: {
 			</div>
 		)
 	
-}
-
-
-const getAppListView = (conversation: ConversationWithRelation): IAppListView => {
-	const latestMessage = conversation.messages[conversation.messages.length - 1]!
-	return ({
-		id: conversation.app.id, avatar: conversation.app.avatar, title: conversation.app.name, latestMessage, latestUser: latestMessage.user,
-	})
 }
 
 const AppList = ({ user }: {
@@ -199,7 +212,6 @@ const AppList = ({ user }: {
 		{/*<SectionTitle>No messages found</SectionTitle>*/}
 	</section>)
 }
-
 
 const SearchResultItem = ({ convs, app }: {
 	convs: ConversationWithRelation[],
