@@ -3,7 +3,7 @@ import { UserProfile } from '@/components/user'
 import { useUser } from '@/hooks/use-user'
 import { useSearchParams } from 'next/navigation'
 import { useAppStore } from '@/store'
-import { AppViewInProfile } from '@/components/appInProfile.view'
+import { AppViewInDashboard } from '@/components/appInProfile.view'
 
 import { ProfileTab } from '@/ds/website'
 
@@ -24,7 +24,7 @@ export default function DashboardPage() {
 				<div className={'grow | flex flex-col '}>
 					{
 						tab === ProfileTab.used && (
-							apps.map((c) => <AppViewInProfile c={c} key={c.poketto.id}/>)
+							apps.map((c) => <AppViewInDashboard c={c} key={c.poketto.id}/>)
 						)
 					}
 				</div>
