@@ -12,6 +12,7 @@ import { USER_INVITATIONS_COUNT } from '@/config/system'
 import { type User } from '.prisma/client'
 import { type Adapter } from 'next-auth/adapters'
 import RoleType = $Enums.RoleType
+import { POKETTO_APP_ID, YourSolePoketto, YourSolePokettoApp } from '@/config/poketto'
 
 const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 
@@ -50,12 +51,24 @@ const initUser = async (user: User) => {
 	log.info(`initializing user(id=${user.id}, name=${user.name})`)
 	
 	// init space
+	const spaceId = user.id
 	await prisma.space.createMany({
 		data: [{ id: user.id, name: user.name ?? user.id }],
 	})
 	await prisma.userSpaceRelation.createMany({
-		data: [{ role: RoleType.admin, userId: user.id, spaceId: user.id }],
+		data: [{ role: RoleType.admin, userId: user.id, spaceId }],
 	})
+
+	// init space-app
+	const app = YourSolePokettoApp
+	const usingApp = await prisma.usingApp.create({data: {appId: app.id, spaceId }})
+
+	// init app-chatMessage
+	await prisma.chatMessage.create({data: {
+		content: `Welcome ${user.name} to join the ${app.name}`,
+		usingAppId: usingApp.id, // 不是 app 的 id，而是 usingApp 的 id
+		format: "systemNotification",
+	}})
 	
 	// init invitation tickets
 	await prisma.invitationRelation.createMany({

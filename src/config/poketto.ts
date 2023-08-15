@@ -1,10 +1,13 @@
 import { PromptRoleType } from '.prisma/client'
 import { type AppWithRelation } from '@/ds/poketto'
+import { App, AppModel, PrommptMessage, User } from '@prisma/client'
 import { nanoid } from 'nanoid'
+
 
 export const POKETTO_PLATFORM = 'Poketto' as const
 export const POKETTO_VERSION = '1.0.0' as const
 export const POKETTO_APP_ID = 'Your-Sole-Poketto' as const
+export const POKETTO_MODEL_ID = "poketto-1.0" as const
 export const POKETTO_APP_CREATED_AT = new Date(2023, 8, 13)
 export const POKETTO_APP_UPDATED_AT = new Date(2023, 8, 13)
 export const POKETTO_APP_AVATAR = '/images/logo/poketto/Your-Sole-Poketto.png'
@@ -35,10 +38,21 @@ export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
 `
 export const POKETTO_CATEGORY_ID = 0
 
-export const YourSolePoketto: AppWithRelation = {
+export const PokettoOfficial: User = {
+	id: POKETTO_CREATOR_ID,
+	name: POKETTO_CREATOR_NAME,
+	desc: POKETTO_CREATOR_DESC,
+	email: POKETTO_CREATOR_EMAIL,
+	balance: 0,
+	image: POKETTO_CREATOR_AVATAR,
+	emailVerified: POKETTO_APP_CREATED_AT,
+}
+
+export const YourSolePokettoApp: App = {
 	id: POKETTO_APP_ID,
 	createdAt: POKETTO_APP_CREATED_AT,
 	updatedAt: POKETTO_APP_UPDATED_AT,
+	creatorId: POKETTO_CREATOR_ID,
 	platform: POKETTO_PLATFORM,
 	version: POKETTO_VERSION,
 	desc: POKETTO_APP_DESC,
@@ -46,23 +60,35 @@ export const YourSolePoketto: AppWithRelation = {
 	language: POKETTO_LANGUAGE,
 	categoryId: POKETTO_CATEGORY_ID,
 	avatar: POKETTO_APP_AVATAR,
+}
+
+export const YourSolePokettoModel: AppModel = {
+	id: POKETTO_MODEL_ID,
+	appId: POKETTO_APP_ID,
+	createdAt: POKETTO_APP_CREATED_AT,
+	updatedAt: POKETTO_APP_UPDATED_AT,
+
+	type: POKETTO_MODEL_NAME,
+	isOpenSource: false,
+	temperature: .7,
+}
+
+export const YourSolePokettoModelInitPrompts: PrommptMessage[] = [
+	{
+		id: nanoid(),
+		appModelId: POKETTO_MODEL_ID,
+		role: PromptRoleType.system,
+		content: POKETTO_SYSTEM_PROMPT,
+	}]
+
+export const YourSolePoketto: AppWithRelation = {
+	...YourSolePokettoApp,
 	model: {
-		id: POKETTO_APP_ID, appId: POKETTO_APP_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT,
-		
-		type: POKETTO_MODEL_NAME, isOpenSource: false, temperature: .7, initPrompts: [{
-			id: nanoid(), appModelId: POKETTO_APP_ID, role: PromptRoleType.system, content: POKETTO_SYSTEM_PROMPT,
-		}],
+		...YourSolePokettoModel,
+		initPrompts: YourSolePokettoModelInitPrompts,
 	},
 	actions: [],
-	creator: {
-		id: POKETTO_CREATOR_ID,
-		username: POKETTO_CREATOR_ID,
-		name: POKETTO_CREATOR_NAME,
-		desc: POKETTO_CREATOR_DESC,
-		avatar: POKETTO_CREATOR_AVATAR,
-		email: POKETTO_CREATOR_EMAIL,
-	},
-	creatorId: POKETTO_CREATOR_ID,
+	creator: PokettoOfficial,
 	tags: POKETTO_TAGS.map((t) => ({
 		id: t, name: t, creatorId: POKETTO_CREATOR_ID, createdAt: POKETTO_APP_CREATED_AT, updatedAt: POKETTO_APP_UPDATED_AT,
 	})),
@@ -78,5 +104,17 @@ export const YourSolePoketto: AppWithRelation = {
 		calls: 0,
 		views: 0,
 	},
+	comments: [
+		{
+			id: nanoid(),
+			createdAt: POKETTO_APP_CREATED_AT,
+			updatedAt: POKETTO_APP_UPDATED_AT,
+			userId: POKETTO_CREATOR_ID,
+			content: 'This is a dedicated and developing app, hope helped you. Best wishes, Poketto Team.',
+			title: 'Your Sole Poketto !',
+			rate: 5,
+			appId: POKETTO_APP_ID,
+		},
+	],
 }
 

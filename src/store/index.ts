@@ -46,7 +46,7 @@ export const useAppStore = create<StoreState>()(
 						// @ts-ignore
 						delete persistedState.app
 						// @ts-ignore
-						delete persistedState.apps
+						delete persistedState.pokettos
 						// @ts-ignore
 						delete persistedState.appComments
 						// @ts-ignore
@@ -54,7 +54,7 @@ export const useAppStore = create<StoreState>()(
 					}
 					if (version === .7) {
 						// @ts-ignore
-						delete persistedState.apps
+						delete persistedState.pokettos
 					}
 					if (version === .4) {
 						// @ts-ignore
@@ -65,11 +65,11 @@ export const useAppStore = create<StoreState>()(
 						delete persistedState.app
 					}
 					if (version === .2) {
-						persistedState.apps[0]!.flowgpt.id = persistedState.app.id
+						persistedState.pokettos[0]!.flowgpt.id = persistedState.app.id
 					}
 					if (version === .1) {
-						const data = persistedState.apps[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
-						persistedState.apps[0]!.messages[0] = { ...persistedState.apps[0]!.messages[0]!, ...data }
+						const data = persistedState.pokettos[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }
+						persistedState.pokettos[0]!.messages[0] = { ...persistedState.pokettos[0]!.messages[0]!, ...data }
 					}
 					return persistedState
 				},

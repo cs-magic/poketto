@@ -6,20 +6,17 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ViewsField } from '@/components/utils/responsive-field'
 import clsx from 'clsx'
-import { type AppWithRelation, type IAppListView } from '@/ds/poketto'
-import { useAppStore } from '@/store'
+import { type AppWithRelation, type IAppListView, type UsingAppWithRelation } from '@/ds/poketto'
 import d from '@/lib/datetime'
-import { getAppListView, getAppLink } from '@/lib/poketto'
+import { getAppLink, getAppListView } from '@/lib/poketto'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 
-export const AppList = () => {
+export const AppList = ({ apps }: { apps: UsingAppWithRelation[] }) => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
 	const { data: searchedPoketto } = api.flowgpt.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
-	
-	const { apps } = useAppStore()
 	
 	return (<section id={'chat-list'} className={clsx('w-full md:w-[375px] shrink-0 | flex flex-col items-center', // 'bg-slate-800'
 	)}>
@@ -40,8 +37,8 @@ export const AppList = () => {
 				<SectionTitle>Poketto Apps</SectionTitle>
 				{apps
 					.slice()
-					.sort((a, b) => a.latestTime > b.latestTime ? -1 : 1)
-					.map((app) => <AppListView key={app.poketto.id} appListView={getAppListView(app)}/>)}
+					.sort((a, b) => a.updatedAt > b.updatedAt ? -1 : 1)
+					.map((app) => <AppListView key={app.id} appListView={getAppListView(app)}/>)}
 			</>)}
 		
 		{/*<SectionTitle>No messages found</SectionTitle>*/}
@@ -50,20 +47,19 @@ export const AppList = () => {
 
 
 const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
-	return (
-		<Link href={getAppLink(app.id)} className={clsx('w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent cursor-pointer')}>
-			<Avatar className={'shrink-0'}>
-				<AvatarImage src={app.avatar}/>
-			</Avatar>
-			<div className={'grow overflow-hidden | flex flex-col gap-1'}>
-				<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{app.name}</p>
-				<p className={'truncate | '}>{app.desc}</p>
-			</div>
-			<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
-				<ViewsField v={app.state?.views ?? 0}/>
-				<p className={'truncate'}>@{app.creator.name}</p>
-			</div>
-		</Link>)
+	return (<Link href={getAppLink(app.id)} className={clsx('w-full p-2 | flex gap-2 | text-primary-foreground/50 text-xs | hocus:bg-accent cursor-pointer')}>
+		<Avatar className={'shrink-0'}>
+			<AvatarImage src={app.avatar}/>
+		</Avatar>
+		<div className={'grow overflow-hidden | flex flex-col gap-1'}>
+			<p className={'truncate | text-sm text-primary-foreground/75 font-semibold'}>{app.name}</p>
+			<p className={'truncate | '}>{app.desc}</p>
+		</div>
+		<div className={'w-20 shrink-0 overflow-hidden | flex flex-col gap-1'}>
+			<ViewsField v={app.state?.views ?? 0}/>
+			<p className={'truncate'}>@{app.creator.name}</p>
+		</div>
+	</Link>)
 }
 
 const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-full px-4 py-2 | bg-muted'}>{children}</div>

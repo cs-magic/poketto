@@ -63,8 +63,7 @@ model User {
   image         String?
   desc          String?
 
-  initialized Boolean @default(false)
-  balance     Int     @default(0)
+  balance Int @default(0)
 
   invitedFrom InvitationRelation[] @relation("from")
   invitdeTo   InvitationRelation[] @relation("to")
@@ -72,14 +71,16 @@ model User {
   followedBy FollowRelation[] @relation("from")
   following  FollowRelation[] @relation("to")
 
-  appComments AppComment[]
-  appActions  AppAction[]
-
   chatMessages       ChatMessage[]
   chatMessageActions ChatMessageAction[]
 
   user_space UserSpaceRelation[]
   tags       AppTag[]
+
+  appComments AppComment[]
+  appActions  AppAction[]
+  StarringApp StarringApp[]
+  createdApps         App[]
 }
 
 model FollowRelation {
@@ -101,6 +102,8 @@ model Space {
   name       String
   isPrivate  Boolean             @default(true)
   user_space UserSpaceRelation[]
+
+  UsingApp UsingApp[]
 }
 
 enum RoleType {
@@ -160,41 +163,68 @@ enum PlatformType {
   OpenChat
 }
 
-model UniversalUser {
-  id       String  @id
-  username String
-  name     String?
-  email    String? @unique
-  avatar   String?
-  desc     String?
-  app      App[]
-}
-
 model App {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name     String
-  avatar   String
-  language String       @default("en")
-  version  String       @default("1.0.0")
-  platform PlatformType
-
-  creator    UniversalUser @relation(references: [id], fields: [creatorId], onUpdate: Cascade, onDelete: Cascade)
+  creator    User         @relation(references: [id], fields: [creatorId], onUpdate: Cascade, onDelete: Cascade)
   creatorId  String
-  AppComment AppComment[]
-
-  tags AppTag[]
-  desc String
-
-  category   AppCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  name       String
+  avatar     String
+  desc       String
+  language   String       @default("en")
+  version    String       @default("1.0.0")
+  platform   PlatformType
+  tags       AppTag[]
+  category   AppCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   categoryId Int
 
-  actions AppAction[]
-  state   AppState?
+  actions  AppAction[]
+  using    UsingApp[]
+  starring StarringApp[]
+  comments AppComment[]
+  
+  model      AppModel?
+  state    AppState?
+}
 
-  model AppModel?
+/// use 和 star 是一个持久的、可来回变化的属性
+/// 与 view 等无脑递增的还是有区别
+/// 之所以独立设计model，主要是方便在 trpc 里去获取
+/// 这样 app 的返回结果就始终是固定的数据结构，只需要 AppWithRelation 就可以
+/// 区别就在于数据表不一样
+
+/// space -- use --> app
+model UsingApp {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  appId String
+
+  isActive Boolean @default(true)
+
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  spaceId String
+
+  messages ChatMessage[]
+}
+
+/// user -- star --> app
+model StarringApp {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  appId String
+
+  isActive Boolean @default(true)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
 }
 
 model AppModel {
@@ -253,6 +283,8 @@ enum ChatMessageFormatType {
   map
   realtimeVoice
   realtimeVideo
+
+  systemNotification
 }
 
 model ChatMessage {
@@ -260,12 +292,15 @@ model ChatMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String? // system notification
 
   content             String
   format              ChatMessageFormatType @default(text)
   userActionOnMessage ChatMessageAction[]
+
+  UsingApp   UsingApp @relation(fields: [usingAppId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  usingAppId String   @unique
 }
 
 model AppCategory {
@@ -276,6 +311,8 @@ model AppCategory {
   main String
   sub  String?
   App  App[]
+
+  @@unique([main, sub])
 }
 
 model AppTag {
@@ -300,9 +337,9 @@ model AppAction {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  user   User?   @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId String?
-  app    App     @relation(fields: [appId], references: [id], onUpdate: Cascade)
+  app    App     @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   appId  String
 
   action String

@@ -1,8 +1,8 @@
 import { RootLayout } from '@/layouts/root.layout'
 import { ArrowRightIcon, PersonIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
-import { UserIcon, UsersIcon } from 'lucide-react'
-import { ICON_DIMENSION_MD, ICON_DIMENSION_SM } from '@/config/assets'
+import { UserIcon } from 'lucide-react'
+import { ICON_DIMENSION_MD } from '@/config/assets'
 import { api } from '@/lib/api'
 import { AppViewInHomePage } from '@/components/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,6 +19,8 @@ import { Fragment } from 'react'
 import { type User } from '.prisma/client'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getSpaceLink } from '@/lib/string'
+import { signIn } from 'next-auth/react'
+import { todo } from '@/lib/helpers'
 
 export default function WorkspacesPage() {
 	const user = useUser()
@@ -32,7 +34,10 @@ export default function WorkspacesPage() {
 					</CardTitle>
 				</CardHeader>
 				<CardContent className={'w-full | flex flex-col'}>
-					{user ? <Spaces user={user}/> : 'You have no workspaces currently !'}
+					{user ? <Spaces user={user}/> :
+						<p className={'text-muted-foreground'}>
+							<Button variant={'link'} onClick={() => void signIn()}>登录</Button>后就能拥有专属工作区哦！
+						</p>}
 				</CardContent>
 			</Card>
 			
@@ -70,7 +75,8 @@ const Spaces = ({ user }: { user: User }) => {
 			{
 				spaces.filter((s) => !s.isPrivate).length === 0 && (
 					<div className={'text-muted-foreground'}>
-						You haven't one team space now, don't you wanna <Button className={'px-0'} variant={'link'}>join one</Button> ?
+						You haven't one team space now, don't you wanna
+						<Button onClick={todo} variant={'link'}>join one</Button> ?
 					</div>
 				)
 			}

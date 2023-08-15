@@ -2,28 +2,48 @@ import { z } from 'zod'
 import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { type AppWithRelation, flowgpt2pokettoApp } from '@/ds/poketto'
+import { type AppWithRelation, flowgpt2pokettoApp, type UsingAppWithRelation, conversationInclude } from '@/ds/poketto'
 import { Prisma, type Space } from '.prisma/client'
-import SpaceGetPayload = Prisma.SpaceGetPayload
+import { UserAppRelationType } from '@/ds/website'
+import UsingAppWhereInput = Prisma.UsingAppWhereInput
+
 
 export const pokettoRouter = createTRPCRouter({
-	
+
+	listConversations: protectedProcedure
+		.input(z.object({
+			spaceId: z.string().optional(),
+			relationType: z.nativeEnum(UserAppRelationType),
+		}))
+		.query<UsingAppWithRelation[]>(async ({ ctx: { prisma }, input: { spaceId, relationType } }) => {
+			// todo: dict
+			const where: UsingAppWhereInput = { isActive: true }
+			if (spaceId && relationType === UserAppRelationType.used) where.spaceId = spaceId
+			const result = await prisma.usingApp
+				.findMany({
+					where,
+					include: conversationInclude
+				})
+			return result
+		}),
+
 	listSpaces: protectedProcedure
 		.input(z.object({
 			userId: z.string(),
 		}))
-		.query<Space[]>(async ({ ctx, input }) => {
-			const result = await ctx.prisma.userSpaceRelation.findMany({
+		.query(async ({ ctx: { prisma }, input: { userId } }) => {
+			const result = await prisma.userSpaceRelation.findMany({
 				where: {
-					userId: input.userId,
+					userId,
 				},
 				include: {
 					space: true,
+					// 	user: undefined,
 				},
 			})
 			return result.map((s) => s.space)
 		}),
-	
+
 	searchPoketto: publicProcedure
 		.input(z.object({
 			query: z.string(), language: z.string().default('zh'), threshold: z.number().default(.8), hideNsfw: z.boolean().default(true),
@@ -35,6 +55,6 @@ export const pokettoRouter = createTRPCRouter({
 			// result = await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.searchPrompts', { json: opts.input } })
 			return result.map(flowgpt2pokettoApp)
 		}),
-	
+
 })
 

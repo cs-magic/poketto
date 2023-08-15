@@ -17,7 +17,7 @@ const buttonVariants = cva(
 				secondary:
 					'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost: 'text-primary-foreground/80 hover:bg-accent hover:text-accent-foreground',
-				link: 'text-link underline-offset-4 hover:underline',
+				link: '!px-1 whitespace-nowrap text-link underline-offset-4 hover:underline',
 				muted:
 					'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground',
 			},
@@ -27,7 +27,6 @@ const buttonVariants = cva(
 				lg: 'h-11 rounded-md px-8',
 				icon: 'h-10 w-10',
 				thin: 'py-1 px-6',
-				
 			},
 		},
 		defaultVariants: {
