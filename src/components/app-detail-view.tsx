@@ -1,4 +1,3 @@
-import { type AppWithRelation, type IAppComment } from '@/ds/poketto'
 import { type AppComment } from '.prisma/client'
 import { useAppStore } from '@/store'
 import { useRouter } from 'next/router'
@@ -9,7 +8,6 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import clsx from 'clsx'
 import { Separator } from '@/components/ui/separator'
-import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from '@/config/system'
 import numeral from 'numeral'
 import _ from 'lodash'
 import { StarFilledIcon, StarIcon } from '@radix-ui/react-icons'
@@ -17,31 +15,36 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MarqueeContainer, MasonryContainer } from '@/components/containers'
 import { vIsNumber } from '@/lib/number'
-import React, { type ReactNode, useCallback, useState } from 'react'
+import React, { type ReactNode, useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import d from '@/lib/datetime'
 import { ResponsiveField } from '@/components/field'
 import { IconThumbDown, IconThumbUp } from '@tabler/icons-react'
 import { api } from '@/lib/api'
-import { getAppLink } from '@/lib/poketto'
+
+import { getAppLink, getConversationLink } from '@/lib/string'
+import { type AppWithRelation, type IAppComment } from '@/ds'
+import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from '@/config'
 
 export const AppDetail = ({ app, comments }: {
-	app: AppWithRelation, comments: AppComment[]
+	app: AppWithRelation,
+	comments: AppComment[]
 }) => {
 	const router = useRouter()
 	const [scroll, scrollTo] = useWindowScroll()
 	const user = useUser()
 	
-	const addApp = api.poketto.addAppIntoConversation.useMutation()
-	
+	const { mutate: addApp, data: addedConv } = api.poketto.addAppIntoConversation.useMutation()
 	const onAddApp = () => {
 		if (!user) return toast.error('您需要先登陆才能加入该频道，否则我们无法为您保存这些记录 :(')
-		addApp.mutate({ appId: app.id })
-		// todo: mutate result
+		addApp({ appId: app.id })
 		toast.success(`Successfully added app: ${app.name}`)
-		void router.push(getAppLink(app.id))
 	}
+	
+	useEffect(() => {
+		if (addedConv) void router.push(getConversationLink(addedConv.id))
+	}, [addedConv])
 	
 	return (<>
 		<section id={'basic'} className={'w-full | flex items-center gap-2'}>
@@ -188,7 +191,9 @@ const CollapsablePara = ({ content }: {
 
 
 const StatusItem = ({ a, b, c }: {
-	a: string, b: ReactNode, c: ReactNode
+	a: string,
+	b: ReactNode,
+	c: ReactNode
 }) => {
 	return (<div className={'w-full overflow-hidden whitespace-nowrap py-2 | flex flex-col items-center justify-between gap-1'}>
 		<div className={'uppercase text-muted-foreground font-bold'}>{a}</div>
@@ -198,7 +203,8 @@ const StatusItem = ({ a, b, c }: {
 }
 
 const InfoItem = ({ a, b }: {
-	a: string, b: ReactNode
+	a: string,
+	b: ReactNode
 }) => {
 	return (<div className={'flex flex-col items-center gap-1'}>
 		<div className={'text-muted-foreground font-bold capitalize'}>{a}</div>

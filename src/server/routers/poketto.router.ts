@@ -1,25 +1,58 @@
 import { z } from 'zod'
-import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { type AppWithRelation, conversationInclude, type ConversationWithRelation, flowgpt2pokettoApp } from '@/ds/poketto'
+import { ChatMessageFormatType, PromptRoleType } from '.prisma/client'
+import { type AppWithRelation, conversationInclude, type ConversationWithRelation, type IFlowgptPromptBasic } from '@/ds'
+import { flowgpt2pokettoApp } from '@/lib/flowgpt'
 
 
 export const pokettoRouter = createTRPCRouter({
 	
 	/**
-	 * 这个 api 应该是公开的，只要目标用户没有设置权限即可
+	 * todo: public with permission control
 	 */
-	listConversations: publicProcedure
-		.input(z.object({
-			userId: z.string(),
-		}))
-		.query(async ({ ctx: { prisma }, input: { userId } }) => {
+	
+	listConversations: protectedProcedure
+		.input(z.object({}))
+		.query(async ({ ctx: { prisma, session: { user } }, input: {} }) => {
 			const result = await prisma.conversation
 				.findMany({
-					where: { userId }, include: conversationInclude,
+					where: { userId: user.id }, include: conversationInclude,
 				})
 			return result as ConversationWithRelation[]
+		}),
+	
+	getConversation: protectedProcedure
+		.input(z.object({
+			cid: z.string(),
+		}))
+		.query(async ({ ctx: { prisma, session: { user } }, input: { cid } }) => {
+			const result = await prisma.conversation.findUnique({ where: { userId: user.id, id: cid }, include: conversationInclude })
+			return result
+		}),
+	
+	listMessages: protectedProcedure
+		.input(z.object({
+			cid: z.string(),
+		}))
+		.query(async ({ ctx: { prisma, session: { user } }, input: { cid } }) => {
+			const result = await prisma.chatMessage.findMany({ where: { conversationId: cid } })
+			return result
+		}),
+	
+	pushMessage: protectedProcedure
+		.input(z.object({
+			content: z.string(),
+			role: z.nativeEnum(PromptRoleType),
+			cid: z.string(),
+		}))
+		.mutation(async ({ ctx: { prisma, session: { user } }, input: { cid, content, role } }) => {
+			const result = await prisma.chatMessage.create({
+				data: {
+					conversationId: cid, content, role, userId: user.id, format: ChatMessageFormatType.text,
+				},
+			})
+			return result
 		}),
 	
 	addAppIntoConversation: protectedProcedure

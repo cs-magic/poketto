@@ -1,6 +1,6 @@
 import React, { type HTMLProps, type ReactNode } from 'react'
 import { IconEye, IconGitFork } from '@tabler/icons-react'
-import { ICON_DIMENSION_SM } from '@/config/assets'
+import { ICON_DIMENSION_SM } from '@/lib/assets'
 import numeral from 'numeral'
 import { clsx } from 'clsx'
 
@@ -20,9 +20,13 @@ export const ResponsiveField = ({
 	)
 }
 
-export const UsesField = ({ v }: { v: number }) => <ResponsiveField icon={<IconGitFork className={ICON_DIMENSION_SM}/>}
-                                                                    title={`${numeral(v).format('0a')} Uses`}
-                                                                    titleSm={numeral(v).format('0a')}/>
-export const ViewsField = ({ v }: { v: number }) => <ResponsiveField icon={<IconEye className={ICON_DIMENSION_SM}/>}
-                                                                     title={`${numeral(v).format('0a')} Views`}
-                                                                     titleSm={numeral(v).format('0a')}/>
+export const UsesField = ({ v }: {
+	v: number
+}) => <ResponsiveField icon={<IconGitFork className={ICON_DIMENSION_SM}/>}
+                       title={`${numeral(v).format('0a')} Uses`}
+                       titleSm={numeral(v).format('0a')}/>
+export const ViewsField = ({ v }: {
+	v: number
+}) => <ResponsiveField icon={<IconEye className={ICON_DIMENSION_SM}/>}
+                       title={`${numeral(v).format('0a')} Views`}
+                       titleSm={numeral(v).format('0a')}/>

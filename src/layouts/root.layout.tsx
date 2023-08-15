@@ -1,11 +1,11 @@
 import Head from 'next/head'
-import { product } from '@/config/product'
 import React, { type PropsWithChildren } from 'react'
 import { Sidebar } from '@/layouts/sidebar'
 import Navbar from '@/layouts/navbar'
 import { clsx } from 'clsx'
-import { font } from '@/config/assets'
+import { font } from '@/lib/assets'
 import { useMount } from '@/hooks/use-mount'
+import { PRODUCT } from '@/config'
 
 
 export function RootLayout(props: PropsWithChildren) {
@@ -14,9 +14,9 @@ export function RootLayout(props: PropsWithChildren) {
 	
 	return (<>
 		<Head>
-			<title>{product.name}</title>
-			<meta name="description" content={product.desc}/>
-			<link rel="icon" href={product.icon}/>
+			<title>{PRODUCT.name}</title>
+			<meta name="description" content={PRODUCT.desc}/>
+			<link rel="icon" href={PRODUCT.icon}/>
 		</Head>
 		
 		<main className={clsx('w-screen h-screen | flex flex-col | font-light text-foreground text-sm', 'bg-background', // 'bg-zinc-900',

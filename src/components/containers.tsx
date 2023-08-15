@@ -1,6 +1,6 @@
 import { type HTMLProps, type PropsWithChildren, useCallback, useState } from 'react'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
-import { type DEVICE_TYPE, DEVICES } from '@/config/external/const'
+import { type DEVICE_TYPE, DEVICES } from '@/config'
 import clsx from 'clsx'
 
 export const GridContainer = ({ children }: PropsWithChildren) => {

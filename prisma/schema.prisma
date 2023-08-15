@@ -237,6 +237,7 @@ enum PromptRoleType {
   system
   user
   assistant
+  function
 }
 
 model PrommptMessage {
@@ -275,7 +276,7 @@ model ChatMessage {
   userActionOnMessage ChatMessageAction[]
 
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  conversationId String       @unique
+  conversationId String
 }
 
 model AppCategory {

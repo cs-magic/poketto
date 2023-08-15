@@ -1,42 +1,42 @@
 import { PrismaClient } from '@prisma/client'
 import { MongoClient } from 'mongodb'
 import { env } from '@/env.mjs'
-import { PokettoOfficial, YourSolePoketto, YourSolePokettoApp, YourSolePokettoModel, YourSolePokettoModelInitPrompts } from '@/config/poketto'
 import log from '@/lib/log'
+import { PokettoOfficial, YourSolePokettoApp, YourSolePokettoAppWithRelation, YourSolePokettoModel, YourSolePokettoModelInitPrompts } from '@/config'
 
 
 export const initDB = async (prisma: ExtendedPrismaClient) => {
-
+	
 	if (!(await prisma.appCategory.count())) {
-		log.info("initializing categories")
+		log.info('initializing categories')
 		await prisma.appCategory.createMany({
 			data: [
-				{ main: "Lifestyle", sub: "Growth", id: 0 }
-			]
+				{ main: 'Lifestyle', sub: 'Growth', id: 0 },
+			],
 		})
 	}
-
+	
 	if (!(await prisma.user.count())) {
-		log.info("initializing default user(i.e. PokketoOfficial)")
+		log.info('initializing default user(i.e. PokketoOfficial)')
 		await prisma.user.create({ data: PokettoOfficial })
 	}
-
+	
 	if (!(await prisma.app.count())) {
-		log.info("initializing default app(i.e. YourPokettoApp)")
+		log.info('initializing default app(i.e. YourPokettoApp)')
 		await prisma.app.create({ data: YourSolePokettoApp })
 	}
-
+	
 	if (!(await prisma.appModel.count())) {
-		log.info("initializing default app(i.e. YourPokettoApp)")
+		log.info('initializing default app(i.e. YourPokettoApp)')
 		await prisma.appModel.create({ data: YourSolePokettoModel })
 	}
-
-
+	
+	
 	if (!(await prisma.prommptMessage.count())) {
-		log.info("initializing default app(i.e. YourPokettoApp)")
+		log.info('initializing default app(i.e. YourPokettoApp)')
 		await prisma.prommptMessage.createMany({ data: YourSolePokettoModelInitPrompts })
 	}
-	log.info("Succesfully initialized !")
+	log.info('Succesfully initialized !')
 }
 
 function getExtendedClient() {
@@ -58,11 +58,11 @@ function getExtendedClient() {
 				},
 			},
 		})
-
+	
 	globalForDB.prisma = c
-
+	
 	initDB(c)
-
+	
 	return c
 }
 

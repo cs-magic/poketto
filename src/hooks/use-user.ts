@@ -1,7 +1,8 @@
 import { useSession } from 'next-auth/react'
 import { api } from '@/lib/api'
 import { type User } from '.prisma/client'
-import { type UserWithRelations } from '@/ds/user'
+
+import { type UserWithRelations } from '@/ds'
 
 /**
  * 不要写 useUserId，不方便维护

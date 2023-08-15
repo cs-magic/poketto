@@ -1,7 +1,6 @@
-import { type AppWithRelation, type ConversationWithRelation, type IAppComment, type IAppMessage, SortOrder } from '@/ds/poketto'
-
 import { type StoreSlice } from '@/store/index'
-import { YourSolePoketto } from '@/config/poketto'
+import { type AppWithRelation, type ConversationWithRelation, type IAppComment, type IAppMessage, SortOrder } from '@/ds'
+import { YourSolePokettoAppWithRelation } from '@/config'
 
 /**
  * poketto
@@ -33,7 +32,7 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	
 	convs: [], setConvs: (v) => setState((state) => {state.convs = v}),
 	
-	app: YourSolePoketto,
+	app: YourSolePokettoAppWithRelation,
 	
 	appComments: [], setAppComments: (v) => setState((state) => {state.appComments = v}), pushAppComments: (v) => setState((state) => {state.appComments.push(...v)}),
 	

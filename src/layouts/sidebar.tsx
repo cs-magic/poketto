@@ -3,11 +3,10 @@ import { Separator } from '@/components/ui/separator'
 import { clsx } from 'clsx'
 import { ChevronRightIcon, Cross1Icon, EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from '@radix-ui/react-icons'
 import { MenuLink } from '@/components/link'
-import { uri } from '@/config/uri'
 import { useAppStore } from '@/store'
 import { useUser } from '@/hooks/use-user'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ICON_DIMENSION_MD } from '@/config/assets'
+import { ICON_DIMENSION_MD } from '@/lib/assets'
 import { UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { signIn, signOut } from 'next-auth/react'
@@ -16,8 +15,7 @@ import { InvitationStatus } from '.prisma/client'
 import { Badge } from '@/components/ui/badge'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
-import { USER_INVITATIONS_COUNT } from '@/config/system'
-import { product } from '@/config/product'
+import { PRODUCT, URI, USER_INVITATIONS_COUNT } from '@/config'
 
 
 export const Sidebar = () => {
@@ -31,22 +29,22 @@ export const Sidebar = () => {
 		)}>
 			
 			<section className={'flex flex-col'}>
-				<MenuLink icon={<HomeIcon/>} field={'home'} link={uri.app.home}/>
-				<MenuLink icon={<RocketIcon/>} field={'explore'} link={uri.app.explore}/>
+				<MenuLink icon={<HomeIcon/>} field={'home'} link={URI.app.home}/>
+				<MenuLink icon={<RocketIcon/>} field={'explore'} link={URI.app.explore}/>
 				{/*<MenuLink field={'toolkits'}/>*/}
 			</section>
 			
 			<Separator/>
 			<section className={'flex flex-col'}>
-				<MenuLink icon={<MixIcon/>} field={'dashboard'} link={uri.user.dashboard}/>
-				<MenuLink icon={<TargetIcon/>} field={'gallery'} link={uri.user.gallery}/>
+				<MenuLink icon={<MixIcon/>} field={'dashboard'} link={URI.user.dashboard}/>
+				<MenuLink icon={<TargetIcon/>} field={'gallery'} link={URI.user.gallery}/>
 				{/*<MenuLink field={'integrations'} link={uri.user.integrations}/>*/}
 			</section>
 			
 			<Separator/>
 			<section className={'flex flex-col'}>
-				<MenuLink icon={<LightningBoltIcon/>} field={'Join Platform Waitlist'} link={uri.user.seek.waitlist}/>
-				<MenuLink icon={<EnvelopeOpenIcon/>} field={'poketto-enterprise'} link={uri.user.seek.enterprise}/>
+				<MenuLink icon={<LightningBoltIcon/>} field={'Join Platform Waitlist'} link={URI.user.seek.waitlist}/>
+				<MenuLink icon={<EnvelopeOpenIcon/>} field={'poketto-enterprise'} link={URI.user.seek.enterprise}/>
 			</section>
 			
 			{/* footer */}
@@ -103,10 +101,10 @@ const InviteCard = () => {
 							{
 								cnt: USER_INVITATIONS_COUNT,
 								surplus,
-								appName: product.name,
-								appDoc: uri.app.docs.intro,
-								currencyName: product.currency,
-								currencyDoc: uri.app.docs.currency,
+								appName: PRODUCT.name,
+								appDoc: URI.app.docs.intro,
+								currencyName: PRODUCT.currency,
+								currencyDoc: URI.app.docs.currency,
 							})
 					}
 				</ReactMarkdown>

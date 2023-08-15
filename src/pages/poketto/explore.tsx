@@ -9,20 +9,19 @@ import _ from 'lodash'
 import { FrameIcon } from '@radix-ui/react-icons'
 
 
-import { FlowGPTSortOrder } from '@/ds/flowgpt'
 import { CardsLayoutType } from '@/store/ui.slice'
 import { useAppStore } from '@/store'
 import { Carousel } from 'react-responsive-carousel'
-import { carousals } from '@/config/product'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import Image from 'next/image'
-import { type AppWithRelation } from '@/ds/poketto'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import { order2icon } from '@/config/assets'
+import { order2icon } from '@/lib/assets'
 import { useIntersection } from '@mantine/hooks'
 import { AppCardView } from '@/components/app-card-view'
 import log from '@/lib/log'
 import { AppDetail } from '@/components/app-detail-view'
+import { AppWithRelation, FlowGPTSortOrder } from '@/ds'
+import { carousals } from '@/config'
 
 
 export default function ExplorePage() {

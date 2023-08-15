@@ -2,21 +2,18 @@ import { RootLayout } from '@/layouts/root.layout'
 import { useUser } from '@/hooks/use-user'
 import { useSearchParams } from 'next/navigation'
 
-import { UserAppRelationType } from '@/ds/website'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ChevronDownIcon, Pencil2Icon, StarIcon } from '@radix-ui/react-icons'
 import { api } from '@/lib/api'
 import React, { useState } from 'react'
-import { type AppWithRelation } from '@/ds/poketto'
-import { POKETTO_CREATOR_ID, POKETTO_CREATOR_NAME } from '@/config/poketto'
 import { Badge } from '@/components/ui/badge'
 import dayjs from 'dayjs'
-import { type UserWithRelations } from '@/ds/user'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { DEFAULT_USRE_AVATAR, DEFAULT_USRE_ID, DEFAULT_USRE_NAME } from '@/config/system'
 import { IconUser } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
+import { type AppWithRelation, UserAppRelationType, type UserWithRelations } from '@/ds'
+import { DEFAULT_USER_AVATAR, DEFAULT_USER_ID, DEFAULT_USER_NAME, POKETTO_CREATOR_ID, POKETTO_CREATOR_NAME } from '@/config'
 
 
 export default function DashboardPage() {
@@ -43,7 +40,7 @@ const AppsView = ({ userId, relationType }: {
 	relationType: UserAppRelationType
 }) => {
 	
-	const { data: apps = [] } = api.poketto.listConversations.useQuery({ userId, relationType })
+	const { data: apps = [] } = api.poketto.listConversations.useQuery({ userId: uid, relationType })
 	return (<>
 		<div className={'flex gap-2 items-center my-4 h-8'}>
 			<Input className={'grow h-full'} placeholder={'Find an app...'}/>
@@ -101,14 +98,14 @@ const UserProfile = ({ user }: {
 	return (<div className={'w-full md:w-[375px] h-fit overflow-x-hidden overflow-y-auto | p-4 | flex flex-col justify-around gap-4 | rounded-2xl'}>
 		
 		<Avatar className={'wh-[256px] mx-auto'}>
-			<AvatarImage src={user?.image ?? DEFAULT_USRE_AVATAR} className={''}/>
+			<AvatarImage src={user?.image ?? DEFAULT_USER_AVATAR} className={''}/>
 			<AvatarFallback><IconUser/></AvatarFallback>
 		</Avatar>
 		
 		{/* avatar info*/}
 		<div className={'flex flex-col  overflow-hidden'}>
-			<h2 className={'text-2xl'}>{user?.name ?? DEFAULT_USRE_NAME}</h2>
-			<p className={'truncate text-muted-foreground'}>@{user?.id ?? DEFAULT_USRE_ID}</p>
+			<h2 className={'text-2xl'}>{user?.name ?? DEFAULT_USER_NAME}</h2>
+			<p className={'truncate text-muted-foreground'}>@{user?.id ?? DEFAULT_USER_ID}</p>
 			<p className={'my-2 lines-clamp-2 text-primary-foreground/75'}>{user?.desc ?? 'You haven\'t said anything about yourself ~'}</p>
 		</div>
 		

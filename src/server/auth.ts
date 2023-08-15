@@ -8,31 +8,37 @@ import { prisma } from '@/server/db'
 import { type PrismaClient } from '@prisma/client'
 import log from '@/lib/log'
 import _ from 'lodash'
-import { USER_INVITATIONS_COUNT } from '@/config/system'
-import { type User } from '.prisma/client'
+import { ChatMessageFormatType, type User } from '.prisma/client'
 import { type Adapter } from 'next-auth/adapters'
-import { POKETTO_APP_ID, POKETTO_APP_NAME } from '@/config/poketto'
+import { prompt2chatMessage } from '@/lib/prompt'
+import { type AppWithRelation, ConversationWithRelation } from '@/ds'
+import { POKETTO_APP_ID, POKETTO_APP_NAME, USER_INVITATIONS_COUNT, YourSolePokettoApp, YourSolePokettoAppWithRelation } from '@/config'
+
+export const addAppIntoConversation = async (u: User, app: AppWithRelation) => {
+	// init conversation
+	const c = await prisma.conversation.create({
+		data: {
+			userId: u.id,
+			appId: app.id,
+		},
+	})
+	
+	// init chatMessage
+	await prisma.chatMessage.createMany({
+		data: [
+			{
+				content: `Welcome ${u.name} to join the ${app.name}`,
+				conversationId: c.id,
+				format: ChatMessageFormatType.systemNotification,
+			},
+			...(app.model?.initPrompts ?? []).map((p) => prompt2chatMessage(u, c.id, p)),
+		],
+	})
+}
 
 const initUser = async (user: User) => {
 	log.info(`initializing user(id=${user.id}, name=${user.name})`)
-	
-	// init app
-	const conversation = await prisma.conversation.create({
-		data: {
-			userId: user.id,
-			appId: POKETTO_APP_ID,
-		},
-	})
-	
-	// init app-chatMessage
-	await prisma.chatMessage.create({
-		data: {
-			content: `Welcome ${user.name} to join the ${POKETTO_APP_NAME}`,
-			conversationId: conversation.id,
-			format: 'systemNotification',
-			
-		},
-	})
+	await addAppIntoConversation(user, YourSolePokettoAppWithRelation)
 	
 	// init invitation tickets
 	await prisma.invitationRelation.createMany({
@@ -130,7 +136,8 @@ export const authOptions: NextAuthOptions = {
  * @see https://next-auth.js.org/configuration/nextjs
  */
 export const getServerAuthSession = (ctx: {
-	req: GetServerSidePropsContext['req']; res: GetServerSidePropsContext['res'];
+	req: GetServerSidePropsContext['req'];
+	res: GetServerSidePropsContext['res'];
 }) => {
 	return getServerSession(ctx.req, ctx.res, authOptions)
 }

@@ -6,22 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
 
-import { uri } from '@/config/uri'
-
-import { type AppWithRelation, SortOrder } from '@/ds/poketto'
 import { useUser } from '@/hooks/use-user'
 import React, { Fragment } from 'react'
 import { type User } from '.prisma/client'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { todo } from '@/lib/helpers'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getAppLink } from '@/lib/poketto'
 import dayjs from 'dayjs'
 import { UsesField, ViewsField } from '@/components/field'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { AppCardView } from '@/components/app-card-view'
 import { CardsLayoutType } from '@/store/ui.slice'
+import { getAppLink, getConversationLink } from '@/lib/string'
+import { type AppWithRelation, SortOrder } from '@/ds'
+import { URI } from '@/config'
 
 export default function WorkspacesPage() {
 	const user = useUser()
@@ -63,14 +62,14 @@ export default function WorkspacesPage() {
 const RecentConversations = ({ user }: {
 	user: User
 }) => {
-	const { data: conversations = [] } = api.poketto.listConversations.useQuery({ userId: user.id })
+	const { data: conversations = [] } = api.poketto.listConversations.useQuery({ uid: user.id })
 	return (
 		<>
 			{conversations.map((c) => {
 				return (
-					<div className={'w-48'} key={c.id}>
+					<Link className={'w-48'} key={c.id} href={getConversationLink(c.id)}>
 						<AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={SortOrder.new} key={c.id}/>
-					</div>
+					</Link>
 				)
 			})}
 		</>
@@ -85,7 +84,7 @@ const ExploreApps = () => {
 			<CardHeader>
 				<div className={'shrink-0 | flex justify-between items-end'}>
 					<CardTitle>Explore trending apps</CardTitle>
-					<Link href={uri.app.explore}>
+					<Link href={URI.app.explore}>
 						<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'}>
 							<span>Explore all</span>
 							<ArrowRightIcon/>

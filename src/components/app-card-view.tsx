@@ -1,6 +1,5 @@
-import { type AppWithRelation, type SortOrder } from '@/ds/poketto'
 import { CardsLayoutType } from '@/store/ui.slice'
-import { order2icon } from '@/config/assets'
+import { order2icon } from '@/lib/assets'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +11,7 @@ import { getUserLink } from '@/lib/user'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import numeral from 'numeral'
 import React from 'react'
+import { type AppWithRelation, type SortOrder } from '@/ds'
 
 export const AppCardView = ({ app, cardsLayout, sort }: {
 	app: AppWithRelation,

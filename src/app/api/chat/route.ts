@@ -4,6 +4,7 @@ import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { kv } from '@vercel/kv'
 import { Ratelimit } from '@upstash/ratelimit'
 import { env } from '@/env.mjs'
+import { type PromptRoleType } from '.prisma/client'
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
 	const response = await openai.createChatCompletion({
 		model: 'gpt-3.5-turbo',
 		stream: true,
-		messages: messages.map((message: any) => ({
+		messages: messages.map((message: { content: string, role: PromptRoleType }) => ({
 			content: message.content,
 			role: message.role,
 		})),

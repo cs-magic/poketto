@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
-import { type UserWithRelations, userWithRelationsInclude } from '@/ds/user'
+import { type UserWithRelations, userWithRelationsInclude } from '@/ds'
 
 
 export const userRouter = createTRPCRouter({
@@ -12,7 +12,7 @@ export const userRouter = createTRPCRouter({
 			const { user } = ctx.session
 			if (!user) return []
 			const result = await ctx.prisma.appAction
-				.findMany({ where: { userId: user.id, action: input.action }, include: { app: true } })
+				.findMany({ where: { uid: user.id, action: input.action }, include: { app: true } })
 			return result.map((v) => v.app)
 		}),
 	

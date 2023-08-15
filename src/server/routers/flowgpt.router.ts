@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { GET_PROMPTS_BATCH_SIZE, type IFlowGPTComment, type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { type AppWithRelation, flowgpt2poketto_comment, flowgpt2pokettoApp, type IAppComment, SortOrder } from '@/ds/poketto'
 import _ from 'lodash'
-import { YourSolePoketto } from '@/config/poketto'
 import { PlatformType } from '.prisma/client'
+import { type AppWithRelation, GET_PROMPTS_BATCH_SIZE, type IAppComment, type IFlowGPTComment, type IFlowgptPromptBasic, SortOrder } from '@/ds'
+import { flowgpt2poketto_comment, flowgpt2pokettoApp } from '@/lib/flowgpt'
+import { YourSolePokettoAppWithRelation } from '@/config'
 
 
 export const idInput = z.object({
@@ -78,7 +78,7 @@ export const flowgptRouter = createTRPCRouter({
 			const { id, platform } = opts.input
 			if (!id) return
 			if (platform === PlatformType.Poketto) {
-				return YourSolePoketto
+				return YourSolePokettoAppWithRelation
 			}
 			
 			const j = { json: id }

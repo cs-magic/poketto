@@ -1,15 +1,16 @@
 import React, { type ElementType, type HTMLProps } from 'react'
 
-import CSCoin from '@/../public/images/cs-coin.svg'
+import CSCoin from '../../public/images/cs-coin.svg'
 import Logo from '../../public/images/logo/m/1280.svg'
-import OpenchatIcon from '@/../public/brands/openchat.svg'
-import MidjourneyIcon from '@/../public/brands/midjourney.svg'
+import OpenchatIcon from '../../public/brands/openchat.svg'
+import MidjourneyIcon from '../../public/brands/midjourney.svg'
 import localFont from 'next/font/local'
 
 import { Inter } from 'next/font/google'
 import { IconCalendarFilled, IconDownload, IconStackPush, IconTelescope, IconThumbUp, IconTrendingUp, type TablerIconsProps } from '@tabler/icons-react'
 import { clsx } from 'clsx'
-import { FlowGPTSortOrder } from '@/ds/flowgpt'
+
+import { FlowGPTSortOrder } from '@/ds'
 
 export const ICON_DIMENSION_SM = 'wh-4'
 export const ICON_DIMENSION_MD = 'wh-8'

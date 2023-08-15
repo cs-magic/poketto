@@ -1,14 +1,12 @@
-import { product } from '@/config/product'
 import React, { Fragment, type PropsWithChildren, type ReactNode } from 'react'
 import { useTheme } from 'next-themes'
 import { IconBrandOpenai, IconBrightnessHalf, IconLayoutDashboard, IconMoon, IconSearch, IconSun } from '@tabler/icons-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMount } from '@/hooks/use-mount'
 import { BellIcon, GearIcon, PersonIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons'
-import { ICON_DIMENSION_SM, Icons } from '@/config/assets'
+import { ICON_DIMENSION_SM, Icons } from '@/lib/assets'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { MenuLink } from '@/components/link'
-import { uri } from '@/config/uri'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
 import Image from 'next/image'
@@ -17,6 +15,7 @@ import { useHotkeys } from '@mantine/hooks'
 import { Input } from '@/components/ui/input'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
 import _ from 'lodash'
+import { PRODUCT, URI } from '@/config'
 
 
 export const ThemeSwitcher = () => {
@@ -38,7 +37,7 @@ export const LogoWithName = () => {
 	return (<Button variant={'ghost'} className={'justify-start gap-2'} onClick={toggleSidebar}>
 		{/*<Logo height={24}/>*/}
 		<Image src={CatLogo} alt={'Cat Logo'} width={24} height={24}/>
-		<span className={'text-lg tracking-widest'}>{product.name}</span>
+		<span className={'text-lg tracking-widest'}>{PRODUCT.name}</span>
 	</Button>)
 }
 
@@ -64,10 +63,10 @@ export default function Navbar() {
 			
 			<PopoverContent>
 				<section className={'flex flex-col'}>
-					<MenuLink field={'whats-poketto'} title={'What\'s Poketto.AI ?'} link={uri.app.docs.intro}/>
-					<MenuLink field={'whats-dora'} title={'What\'s Dora ?'} link={uri.app.docs.currency}/>
-					<MenuLink field={'learning-center'} link={uri.app.docs.learn}/>
-					<MenuLink field={'support-center'} link={uri.app.docs.support}/>
+					<MenuLink field={'whats-poketto'} title={'What\'s Poketto.AI ?'} link={URI.app.docs.intro}/>
+					<MenuLink field={'whats-dora'} title={'What\'s Dora ?'} link={URI.app.docs.currency}/>
+					<MenuLink field={'learning-center'} link={URI.app.docs.learn}/>
+					<MenuLink field={'support-center'} link={URI.app.docs.support}/>
 				</section>
 			
 			</PopoverContent>
