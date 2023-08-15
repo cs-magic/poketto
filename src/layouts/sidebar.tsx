@@ -1,10 +1,9 @@
 import React from 'react'
 import { Separator } from '@/components/ui/separator'
 import { clsx } from 'clsx'
-import { ChevronRightIcon, EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from '@radix-ui/react-icons'
-import { MenuLink } from '@/components/utils/link'
+import { ChevronRightIcon, Cross1Icon, EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from '@radix-ui/react-icons'
+import { MenuLink } from '@/components/link'
 import { uri } from '@/config/uri'
-import { InviteCard } from '@/components/utils/invitation'
 import { useAppStore } from '@/store'
 import { useUser } from '@/hooks/use-user'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -12,6 +11,13 @@ import { ICON_DIMENSION_MD } from '@/config/assets'
 import { UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { signIn, signOut } from 'next-auth/react'
+import { api } from '@/lib/api'
+import { InvitationStatus } from '.prisma/client'
+import { Badge } from '@/components/ui/badge'
+import ReactMarkdown from 'react-markdown'
+import Mustache from 'mustache'
+import { USER_INVITATIONS_COUNT } from '@/config/system'
+import { product } from '@/config/product'
 
 
 export const Sidebar = () => {
@@ -73,6 +79,40 @@ export const Sidebar = () => {
 					)
 				)}
 			</div>
+		</div>
+	)
+}
+
+
+const InviteCard = () => {
+	const { data = [] } = api.user.getInvitations.useQuery()
+	// todo: include ? on enum type
+	const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
+	
+	return (
+		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>
+			<div className={'flex items-center justify-between'}>
+				<Badge className={'w-fit'}>Tips</Badge>
+				<Cross1Icon className={'wh-4 text-muted-foreground'}/>
+			</div>
+			<article className={'prose dark:prose-invert'}>
+				<ReactMarkdown>
+					{
+						Mustache.render('每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})' +
+							' 赠送哦！当前剩余：[{{surplus}}](/dashboard)',
+							{
+								cnt: USER_INVITATIONS_COUNT,
+								surplus,
+								appName: product.name,
+								appDoc: uri.app.docs.intro,
+								currencyName: product.currency,
+								currencyDoc: uri.app.docs.currency,
+							})
+					}
+				</ReactMarkdown>
+			</article>
+			<Button className={'bg-blue-500/75 hover:bg-blue-500'}>Invite</Button>
+		
 		</div>
 	)
 }

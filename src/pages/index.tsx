@@ -4,24 +4,26 @@ import { Button } from '@/components/ui/button'
 import { UserIcon } from 'lucide-react'
 import { ICON_DIMENSION_MD } from '@/config/assets'
 import { api } from '@/lib/api'
-import { AppViewInHomePage } from '@/components/list.view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
 import Link from 'next/link'
 
 import { uri } from '@/config/uri'
-import { Grow } from '@/components/utils/grow'
 
-import { SortOrder } from '@/ds/poketto'
+import { type AppWithRelation, SortOrder } from '@/ds/poketto'
 import { useUser } from '@/hooks/use-user'
 import log from '@/lib/log'
-import { Fragment } from 'react'
+import React, { Fragment } from 'react'
 import { type Space, type User } from '.prisma/client'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getConversationLink, getSpaceLink } from '@/lib/string'
 import { signIn } from 'next-auth/react'
 import { todo } from '@/lib/helpers'
 import { UserAppRelationType } from '@/ds/website'
+import { Skeleton } from '@/components/ui/skeleton'
+import { getAppLink } from '@/lib/poketto'
+import dayjs from 'dayjs'
+import { UsesField, ViewsField } from '@/components/field'
 
 export default function WorkspacesPage() {
 	const user = useUser()
@@ -35,10 +37,9 @@ export default function WorkspacesPage() {
 					</CardTitle>
 				</CardHeader>
 				<CardContent className={'w-full | flex flex-col'}>
-					{user ? <Spaces user={user}/> :
-						<p className={'text-muted-foreground'}>
-							<Button variant={'link'} onClick={() => void signIn()}>登录</Button>后就能拥有专属工作区哦！
-						</p>}
+					{user ? <Spaces user={user}/> : <p className={'text-muted-foreground'}>
+						<Button variant={'link'} onClick={() => void signIn()}>登录</Button>后就能拥有专属工作区哦！
+					</p>}
 				</CardContent>
 			</Card>
 			
@@ -54,19 +55,17 @@ const SpaceLink = ({ s, user }: {
 	user: User
 }) => {
 	const { data: convs = [] } = api.poketto.listConversations.useQuery({ spaceId: s.id, relationType: UserAppRelationType.used })
-	return (
-		<Link key={s.id} href={getConversationLink(s.id, convs[0]?.id ?? '')} className={'w-full p-2'}>
-			<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
-				<PersonIcon/>
-				<p>{s.name}</p>
-				<Grow/>
-				<Avatar className={ICON_DIMENSION_MD}>
-					<AvatarImage src={user.image ?? undefined}/>
-					<AvatarFallback><UserIcon/></AvatarFallback>
-				</Avatar>
-			</Button>
-		</Link>
-	)
+	return (<Link key={s.id} href={getConversationLink(s.id, convs[0]?.id ?? '')} className={'w-full p-2'}>
+		<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
+			<PersonIcon/>
+			<p>{s.name}</p>
+			<div className={'grow'}/>
+			<Avatar className={ICON_DIMENSION_MD}>
+				<AvatarImage src={user.image ?? undefined}/>
+				<AvatarFallback><UserIcon/></AvatarFallback>
+			</Avatar>
+		</Button>
+	</Link>)
 }
 
 const Spaces = ({ user }: {
@@ -77,34 +76,27 @@ const Spaces = ({ user }: {
 	return <>
 		<h2>Personal Space</h2>
 		<div className={'flex flex-col divide-y'}>
-			{spaces.filter((s) => s.isPrivate).map((s) =>
-				<SpaceLink s={s} user={user} key={s.id}/>)}
+			{spaces.filter((s) => s.isPrivate).map((s) => <SpaceLink s={s} user={user} key={s.id}/>)}
 		</div>
 		
 		<h2>Team Spaces <span className={'text-sm text-muted-foreground'}>({spaces.filter((s) => !s.isPrivate).length})</span></h2>
 		
 		<div className={'flex flex-col divide-y'}>
-			{
-				spaces.filter((s) => !s.isPrivate).length === 0 && (
-					<div className={'text-muted-foreground'}>
-						You haven't one team space now, don't you wanna
-						<Button onClick={todo} variant={'link'}>join one</Button> ?
-					</div>
-				)
-			}
-			{spaces.filter((s) => !s.isPrivate).map((s) => (
-				<Link key={s.id} href={getSpaceLink(s.id)} className={'w-full p-2'}>
-					<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
-						<PersonIcon/>
-						<p>{s.name}</p>
-						<Grow/>
-						<Avatar className={ICON_DIMENSION_MD}>
-							<AvatarImage src={user.image ?? undefined}/>
-							<AvatarFallback><UserIcon/></AvatarFallback>
-						</Avatar>
-					</Button>
-				</Link>
-			))}
+			{spaces.filter((s) => !s.isPrivate).length === 0 && (<div className={'text-muted-foreground'}>
+				You haven't one team space now, don't you wanna
+				<Button onClick={todo} variant={'link'}>join one</Button> ?
+			</div>)}
+			{spaces.filter((s) => !s.isPrivate).map((s) => (<Link key={s.id} href={getSpaceLink(s.id)} className={'w-full p-2'}>
+				<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
+					<PersonIcon/>
+					<p>{s.name}</p>
+					<div className={'grow'}/>
+					<Avatar className={ICON_DIMENSION_MD}>
+						<AvatarImage src={user.image ?? undefined}/>
+						<AvatarFallback><UserIcon/></AvatarFallback>
+					</Avatar>
+				</Button>
+			</Link>))}
 		</div>
 	</>
 }
@@ -130,4 +122,44 @@ const ExploreAppInHomePage = () => {
 			</div>
 		</CardContent>
 	</Card>)
+}
+
+
+const AppViewInHomePage = ({ app }: {
+	app: AppWithRelation | undefined
+}) => {
+	if (!app) return (<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
+		<Skeleton className={'wh-12'}/>
+		
+		<div className={'flex flex-col gap-2 grow'}>
+			<Skeleton className={'h-4'}/>
+			<Skeleton className={'h-8'}/>
+			<Skeleton className={'h-4'}/>
+		</div>
+		
+		<div className={'inline-flex gap-2 shrink-0'}>
+			<Skeleton className={'w-40 h-8'}/>
+		</div>
+	</div>)
+	
+	return (<Link className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'} href={getAppLink(app.id)}>
+		<Avatar className={'rounded-sm'}>
+			<AvatarImage src={app.avatar}/>
+		</Avatar>
+		
+		<div className={'flex flex-col gap-2 grow'}>
+			<p className={'text-primary-foreground font-semibold'}>{app.name}</p>
+			<p className={'line-clamp-2 text-primary-foreground/75'}>{app.desc}</p>
+			
+			<div className={'inline-flex gap-4'}>
+				<p>By {app.name}</p>
+				<p>Updated on {dayjs(app.updatedAt).format('DD MMM, YYYY')}</p>
+			</div>
+		</div>
+		
+		<div className={'inline-flex gap-2 shrink-0'}>
+			<UsesField v={app.state?.calls ?? 0}/>
+			<ViewsField v={app.state?.views ?? 0}/>
+		</div>
+	</Link>)
 }
