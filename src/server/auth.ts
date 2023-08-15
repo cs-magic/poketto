@@ -5,14 +5,13 @@ import DiscordProvider from 'next-auth/providers/discord'
 import GithubProvider from 'next-auth/providers/github'
 import { env } from '@/env.mjs'
 import { prisma } from '@/server/db'
-import { $Enums, type PrismaClient } from '@prisma/client'
+import { type PrismaClient } from '@prisma/client'
 import log from '@/lib/log'
 import _ from 'lodash'
 import { USER_INVITATIONS_COUNT } from '@/config/system'
 import { type User } from '.prisma/client'
 import { type Adapter } from 'next-auth/adapters'
-import RoleType = $Enums.RoleType
-import { POKETTO_APP_ID, POKETTO_APP_NAME, YourSolePoketto, YourSolePokettoApp } from '@/config/poketto'
+import { POKETTO_APP_ID, POKETTO_APP_NAME } from '@/config/poketto'
 
 const initUser = async (user: User) => {
 	log.info(`initializing user(id=${user.id}, name=${user.name})`)

@@ -28,6 +28,9 @@ colors:
     github:
         132 59% 33%; github create repo
 
+    apple:
+        blue: #0076F5; 211.102 100% 48%; apple store get
+
     general:
         yellow: 60, 100%, 50%;
  */
@@ -78,13 +81,13 @@ colors:
         --popover-foreground: 210 40% 98%;
 
         /*--primary: 0 0% 18%;*/
-        --primary: 0 0% 28%;
+        /*--primary: 0 0% 28%;*/
+        --primary: 211.102 100% 48%;
+
         --primary-foreground: 0 100% 100%;
 
-        /*--secondary: 217.2 32.6% 17.5%;*/
-        --secondary: 132 59% 33%;
-        /*--secondary-foreground: 210 40% 98%;*/
-        --secondary-foreground: 60, 60%, 40%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
 
         /*--muted: 217.2 32.6% 17.5%;*/
         --muted: 0 0% 9%;
