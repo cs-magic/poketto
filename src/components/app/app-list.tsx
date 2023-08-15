@@ -17,7 +17,7 @@ import Link from 'next/link'
 
 export const AppList = () => {
 	const [search, setSearch] = useDebouncedState('', 200, { leading: false })
-	const { data: searchedPoketto } = api.poketto.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
+	const { data: searchedPoketto } = api.flowgpt.searchPoketto.useQuery({ query: search }, { enabled: search.length > 0 })
 	
 	const { apps } = useAppStore()
 	

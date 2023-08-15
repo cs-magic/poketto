@@ -1,7 +1,8 @@
 import { userRouter } from '@/server/routers/user.router'
 import { createTRPCRouter } from '@/server/routers/trpc.helpers'
-import { pokettoRouter } from '@/server/routers/poketto.router'
+import { flowgptRouter } from '@/server/routers/flowgpt.router'
 import { chatRouter } from '@/server/routers/chat.router'
+import { pokettoRouter } from '@/server/routers/poketto.router'
 
 /**
  * This is the primary router for your server.
@@ -10,8 +11,9 @@ import { chatRouter } from '@/server/routers/chat.router'
  */
 export const appRouter = createTRPCRouter({
 	user: userRouter,
-	poketto: pokettoRouter,
+	flowgpt: flowgptRouter,
 	chat: chatRouter,
+	poketto: pokettoRouter,
 })
 
 

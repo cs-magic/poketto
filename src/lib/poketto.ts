@@ -17,7 +17,9 @@ export const createApp = (poketto: AppWithRelation): IApp => ({
 		parentId: undefined,
 		userId: undefined,
 		
-	}], poketto, users: [// todo: add User
+	}],
+	poketto,
+	users: [// todo: add User
 		// { ...user, state: 'active', type: 'user' },
 	], latestTime: getTimestampMS(), joinTime: getTimestampMS(),
 })

@@ -16,8 +16,8 @@ export default function ConversationPage() {
 	const router = useRouter()
 	const id = router.query.id as string | undefined ?? POKETTO_APP_ID   // force not to be empty
 	const platform = !id || id === POKETTO_APP_ID ? PlatformType.Poketto : PlatformType.FlowGPT
-	const { data: withConversation } = api.poketto.getPoketto.useQuery({ id, platform })
-	const { data: comments } = api.poketto.listComments.useQuery({ id, platform })
+	const { data: withConversation } = api.flowgpt.getPoketto.useQuery({ id, platform })
+	const { data: comments } = api.flowgpt.listComments.useQuery({ id, platform })
 	
 	
 	useEffect(() => {

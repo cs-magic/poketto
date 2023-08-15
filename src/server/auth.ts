@@ -5,7 +5,24 @@ import DiscordProvider from 'next-auth/providers/discord'
 import GithubProvider from 'next-auth/providers/github'
 import { env } from '@/env.mjs'
 import { prisma } from '@/server/db'
-import { type PrismaClient } from '@prisma/client'
+import { $Enums, type PrismaClient } from '@prisma/client'
+import log from '@/lib/log'
+import _ from 'lodash'
+import { USER_INVITATIONS_COUNT } from '@/config/system'
+import { type User } from '.prisma/client'
+import { type Adapter } from 'next-auth/adapters'
+import RoleType = $Enums.RoleType
+
+const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
+
+const adapter: Adapter = {
+	createUser: async (user) => {
+		const createdUser = await createUser(user)
+		// init extra relations when user created here
+		await initUser(createdUser as User) // todo: avoid as ?
+		return createdUser
+	}, ...adapterExtra,
+}
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -27,6 +44,27 @@ declare module 'next-auth' {
 	// }
 }
 
+const initUser = async (user: User) => {
+	log.info(`initializing user(id=${user.id}, name=${user.name})`)
+	
+	// init space
+	
+	await prisma.space.createMany({
+		data: [{ id: user.id, name: user.name ?? user.id }],
+	})
+	await prisma.userSpaceRelation.createMany({
+		data: [{ role: RoleType.admin, userId: user.id, spaceId: user.id }],
+	})
+	
+	// init invitation tickets
+	await prisma.invitationRelation.createMany({
+		data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })),
+	})
+	
+	// finished initialization
+	log.info(`initialized user(id=${user.id}, name=${user.name})`)
+}
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -34,21 +72,23 @@ declare module 'next-auth' {
  */
 export const authOptions: NextAuthOptions = {
 	callbacks: {
-		session: ({ session, user }) => ({
-			...session, user: {
-				...session.user, id: user.id,
-			},
-		}),
-	},
-	// ref: https://github.com/nextauthjs/next-auth/issues/6078
-	adapter: PrismaAdapter(prisma as unknown as PrismaClient),
-	providers: [
-		GithubProvider({
-			clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET,
-		}),
-		DiscordProvider({
-			clientId: env.DISCORD_CLIENT_ID, clientSecret: env.DISCORD_CLIENT_SECRET,
-		}) // ref: https://next-auth.js.org/providers/google
+		signIn: async ({ profile, user, email, account, credentials }) => {
+			return true
+		},
+		
+		session: async ({ session, user, newSession, trigger, token }) => {
+			return {
+				...session, user: {
+					...session.user, id: user.id,
+				},
+			}
+		},
+	}, // ref: https://github.com/nextauthjs/next-auth/issues/6078
+	adapter, providers: [GithubProvider({
+		clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET,
+	}), DiscordProvider({
+		clientId: env.DISCORD_CLIENT_ID, clientSecret: env.DISCORD_CLIENT_SECRET,
+	}) // ref: https://next-auth.js.org/providers/google
 		// GoogleProvider({
 		// 	clientId: process.env.GOOGLE_ID,
 		// 	clientSecret: process.env.GOOGLE_SECRET,

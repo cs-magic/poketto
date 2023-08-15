@@ -22,7 +22,7 @@ export default function ExplorePage() {
 	const { cardsLayout, sortOrder, setSortOrder } = useAppStore()
 	const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 	
-	const query = api.poketto.listPoketto.useInfiniteQuery({ sort: sortOrder }, {
+	const query = api.flowgpt.listPoketto.useInfiniteQuery({ sort: sortOrder }, {
 		getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
 	})
 	const items = query.data?.pages.flatMap((item) => item.data) ?? []

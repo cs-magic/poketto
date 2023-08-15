@@ -65,7 +65,7 @@ export const useAppStore = create<StoreState>()(
 						delete persistedState.app
 					}
 					if (version === .2) {
-						persistedState.apps[0]!.poketto.id = persistedState.app.id
+						persistedState.apps[0]!.flowgpt.id = persistedState.app.id
 					}
 					if (version === .1) {
 						const data = persistedState.apps[0]!.messages[0]!.content as unknown as { type: 'notification', content: string }

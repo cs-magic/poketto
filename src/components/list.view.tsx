@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { getAppLink } from '@/lib/poketto'
 import { type AppWithRelation } from '@/ds/poketto'
 
-export const AppListView = ({ app }: { app: AppWithRelation | undefined }) => {
+export const AppViewInHomePage = ({ app }: { app: AppWithRelation | undefined }) => {
 	if (!app) return (
 		<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>
 			<Skeleton className={'wh-12'}/>

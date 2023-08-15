@@ -34,7 +34,7 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	app: YourSolePoketto,
 	setApp: (v) => setState((state) => {
 		state.app = v
-		const app = state.apps.find((c) => c.poketto.id === v.id)
+		const app = state.apps.find((c) => c.flowgpt.id === v.id)
 		if (app) app.poketto = v
 	}),
 	
@@ -45,7 +45,7 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	apps: [createApp(YourSolePoketto)],
 	addApp: (v) => setState((state) => {state.apps.push(v)}),
 	delApp: (v) => setState((state) => {
-		state.apps.splice(state.apps.findIndex((c) => c.poketto.id === v), 1)
+		state.apps.splice(state.apps.findIndex((c) => c.flowgpt.id === v), 1)
 	}),
 	
 	appMessages: [],

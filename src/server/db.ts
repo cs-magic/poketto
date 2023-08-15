@@ -1,16 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import { MongoClient } from 'mongodb'
 import { env } from '@/env.mjs'
-import logger from '@/lib/log'
 
 function getExtendedClient() {
 	const c = new PrismaClient({
-		log: env.NODE_ENV === 'development' ? [
-				// 'query',
-				'warn',
-				'error',
-			]
-			: ['error'],
+		log: env.NODE_ENV === 'development' ? [// 'query',
+			'warn', 'error'] : ['error'],
 	})
 		.$extends({
 			

@@ -1,8 +1,5 @@
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
-import _ from 'lodash'
-
-import { USER_INVITATIONS_COUNT } from '@/config/system'
 import { type UserWithRelations, userWithRelationsInclude } from '@/ds/user'
 
 
@@ -34,9 +31,9 @@ export const userRouter = createTRPCRouter({
 	getInvitations: protectedProcedure.query(async ({ ctx }) => {
 		const user = ctx.session.user
 		if (!user) return []
-		const invitationsCount = await ctx.prisma.invitationRelation.count({ where: { fromId: user.id } })
-		if (invitationsCount === 0) await ctx.prisma.invitationRelation.createMany({ data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })) })
-		return ctx.prisma.invitationRelation.findMany({ where: { fromId: user.id } })
+		return ctx.prisma.invitationRelation.findMany({
+			where: { fromId: user.id },
+		})
 	}),
 	
 	getAllUser: publicProcedure.query(({ ctx }) => {
