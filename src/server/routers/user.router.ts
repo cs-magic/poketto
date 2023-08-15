@@ -36,9 +36,9 @@ export const userRouter = createTRPCRouter({
 	getInvitations: protectedProcedure.query(async ({ ctx }) => {
 		const user = ctx.session.user
 		if (!user) return []
-		const invitationsCount = await ctx.prisma.invitation.count({ where: { fromId: user.id } })
-		if (invitationsCount === 0) await ctx.prisma.invitation.createMany({ data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })) })
-		return ctx.prisma.invitation.findMany({ where: { fromId: user.id } })
+		const invitationsCount = await ctx.prisma.invitationRelation.count({ where: { fromId: user.id } })
+		if (invitationsCount === 0) await ctx.prisma.invitationRelation.createMany({ data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })) })
+		return ctx.prisma.invitationRelation.findMany({ where: { fromId: user.id } })
 	}),
 	
 	getAllUser: publicProcedure.query(({ ctx }) => {
