@@ -8,7 +8,7 @@ import localFont from 'next/font/local'
 
 import { Inter } from 'next/font/google'
 import { IconCalendarFilled, IconDownload, IconStackPush, IconTelescope, IconThumbUp, IconTrendingUp, type TablerIconsProps } from '@tabler/icons-react'
-import { clsx } from 'clsx/clsx'
+import { clsx } from 'clsx'
 import { FlowGPTSortOrder } from '@/ds/flowgpt'
 
 export const ICON_DIMENSION_SM = 'wh-4'

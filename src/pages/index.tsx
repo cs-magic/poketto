@@ -1,8 +1,6 @@
 import { RootLayout } from '@/layouts/root.layout'
-import { ArrowRightIcon, PersonIcon } from '@radix-ui/react-icons'
+import { ArrowRightIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
-import { UserIcon } from 'lucide-react'
-import { ICON_DIMENSION_MD } from '@/config/assets'
 import { api } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import _ from 'lodash'
@@ -12,120 +10,99 @@ import { uri } from '@/config/uri'
 
 import { type AppWithRelation, SortOrder } from '@/ds/poketto'
 import { useUser } from '@/hooks/use-user'
-import log from '@/lib/log'
 import React, { Fragment } from 'react'
-import { type Space, type User } from '.prisma/client'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getConversationLink, getSpaceLink } from '@/lib/string'
-import { signIn } from 'next-auth/react'
+import { type User } from '.prisma/client'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { todo } from '@/lib/helpers'
-import { UserAppRelationType } from '@/ds/website'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getAppLink } from '@/lib/poketto'
 import dayjs from 'dayjs'
 import { UsesField, ViewsField } from '@/components/field'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import { AppCardView } from '@/components/app-card-view'
+import { CardsLayoutType } from '@/store/ui.slice'
 
 export default function WorkspacesPage() {
 	const user = useUser()
+	const router = useRouter()
 	
 	return (<RootLayout>
 		<div className={'w-full h-full'}>
-			<Card id={'recent'} variant={'ghost'} className={'flex flex-col gap-4'}>
+			
+			<Card id={'recent-apps'} variant={'ghost'} className={'w-full'}>
 				<CardHeader>
-					<CardTitle>
-						Recently visited workspaces
-					</CardTitle>
+					<div className={'shrink-0 | flex justify-between items-end'}>
+						<CardTitle>Recently used apps</CardTitle>
+						<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'} onClick={() => {
+							if (!user) return void signIn()
+							todo()
+						}}>
+							<span>See all</span>
+							<ArrowRightIcon/>
+						</Button>
+					</div>
 				</CardHeader>
-				<CardContent className={'w-full | flex flex-col'}>
-					{user ? <Spaces user={user}/> : <p className={'text-muted-foreground'}>
-						<Button variant={'link'} onClick={() => void signIn()}>登录</Button>后就能拥有专属工作区哦！
-					</p>}
+				<CardContent className={'w-full flex overflow-auto gap-2'}>
+					{user ? <RecentConversations user={user}/> : (
+						<div>
+							<Button variant={'link'} onClick={() => void signIn()}>登录</Button>后才能查看最近使用的 App 哦！
+						</div>
+					)}
 				</CardContent>
 			</Card>
 			
-			<ExploreAppInHomePage/>
+			<ExploreApps/>
 		
 		</div>
 	
 	</RootLayout>)
 }
 
-const SpaceLink = ({ s, user }: {
-	s: Space,
+
+const RecentConversations = ({ user }: {
 	user: User
 }) => {
-	const { data: convs = [] } = api.poketto.listConversations.useQuery({ spaceId: s.id, relationType: UserAppRelationType.used })
-	return (<Link key={s.id} href={getConversationLink(s.id, convs[0]?.id ?? '')} className={'w-full p-2'}>
-		<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
-			<PersonIcon/>
-			<p>{s.name}</p>
-			<div className={'grow'}/>
-			<Avatar className={ICON_DIMENSION_MD}>
-				<AvatarImage src={user.image ?? undefined}/>
-				<AvatarFallback><UserIcon/></AvatarFallback>
-			</Avatar>
-		</Button>
-	</Link>)
+	const { data: conversations = [] } = api.poketto.listConversations.useQuery({ userId: user.id })
+	return (
+		<>
+			{conversations.map((c) => {
+				return (
+					<div className={'w-48'} key={c.id}>
+						<AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={SortOrder.new} key={c.id}/>
+					</div>
+				)
+			})}
+		</>
+	)
 }
 
-const Spaces = ({ user }: {
-	user: User
-}) => {
-	const { data: spaces = [] } = api.poketto.listSpaces.useQuery({ userId: user.id })
-	log.info('spaces: ', spaces)
-	return <>
-		<h2>Personal Space</h2>
-		<div className={'flex flex-col divide-y'}>
-			{spaces.filter((s) => s.isPrivate).map((s) => <SpaceLink s={s} user={user} key={s.id}/>)}
-		</div>
-		
-		<h2>Team Spaces <span className={'text-sm text-muted-foreground'}>({spaces.filter((s) => !s.isPrivate).length})</span></h2>
-		
-		<div className={'flex flex-col divide-y'}>
-			{spaces.filter((s) => !s.isPrivate).length === 0 && (<div className={'text-muted-foreground'}>
-				You haven't one team space now, don't you wanna
-				<Button onClick={todo} variant={'link'}>join one</Button> ?
-			</div>)}
-			{spaces.filter((s) => !s.isPrivate).map((s) => (<Link key={s.id} href={getSpaceLink(s.id)} className={'w-full p-2'}>
-				<Button variant={'ghost'} className={'w-full inline-flex items-center gap-2'}>
-					<PersonIcon/>
-					<p>{s.name}</p>
-					<div className={'grow'}/>
-					<Avatar className={ICON_DIMENSION_MD}>
-						<AvatarImage src={user.image ?? undefined}/>
-						<AvatarFallback><UserIcon/></AvatarFallback>
-					</Avatar>
-				</Button>
-			</Link>))}
-		</div>
-	</>
-}
-
-const ExploreAppInHomePage = () => {
+const ExploreApps = () => {
 	const { data: page } = api.flowgpt.listPoketto.useQuery({ sort: SortOrder.trending })
 	
-	return (<Card id={'explore'} variant={'ghost'} className={'w-full'}>
-		<CardHeader>
-			<div className={'shrink-0 | flex justify-between items-end'}>
-				<CardTitle>Explore Trending Poketto Apps</CardTitle>
-				<Link href={uri.app.explore}>
-					<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'}>
-						<span>Explore all</span>
-						<ArrowRightIcon/>
-					</Button>
-				</Link>
-			</div>
-		</CardHeader>
-		<CardContent className={'w-full flex justify-between'}>
-			<div className={'w-full flex flex-col divide-y'}>
-				{_.sampleSize(_.range(30), 3).map((i) => <AppViewInHomePage app={page?.data[i]} key={i}/>)}
-			</div>
-		</CardContent>
-	</Card>)
+	return (
+		<Card id={'explore'} variant={'ghost'} className={'w-full'}>
+			<CardHeader>
+				<div className={'shrink-0 | flex justify-between items-end'}>
+					<CardTitle>Explore trending apps</CardTitle>
+					<Link href={uri.app.explore}>
+						<Button variant={'link'} className={'py-0 h-fit | flex items-center gap-2 text-xs'}>
+							<span>Explore all</span>
+							<ArrowRightIcon/>
+						</Button>
+					</Link>
+				</div>
+			</CardHeader>
+			<CardContent className={'w-full flex justify-between'}>
+				<div className={'w-full flex flex-col divide-y'}>
+					{_.sampleSize(_.range(30), 3).map((i) => <AppView app={page?.data[i]} key={i}/>)}
+				</div>
+			</CardContent>
+		</Card>
+	)
 }
 
-
-const AppViewInHomePage = ({ app }: {
+const AppView = ({ app }: {
 	app: AppWithRelation | undefined
 }) => {
 	if (!app) return (<div className={'w-full pt-6 pb-3 | flex gap-8 text-muted-foreground'}>

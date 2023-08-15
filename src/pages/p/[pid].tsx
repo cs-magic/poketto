@@ -17,7 +17,7 @@ import log from '@/lib/log'
 import { type PrommptMessage, type User } from '@prisma/client'
 import { useDebouncedState, useWindowScroll } from '@mantine/hooks'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getAppLink, getAppListView } from '@/lib/poketto'
+import { getAppLink } from '@/lib/poketto'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { ResponsiveField, ViewsField } from '@/components/field'
@@ -98,6 +98,7 @@ const ControlTool = () => {
 		</Popover>
 	)
 }
+
 const AppConversation = ({ user, conv, msgs }: {
 	user: User,
 	conv: ConversationWithRelation,
@@ -151,6 +152,17 @@ const ChatMessageComp = ({ msg }: {
 	</div>)
 }
 
+
+const getAppListView = (conversation: ConversationWithRelation): IAppListView => {
+	const latestMessage = conversation.messages[conversation.messages.length - 1]!
+	return ({
+		id: conversation.app.id,
+		avatar: conversation.app.avatar,
+		title: conversation.app.name,
+		latestMessage,
+		latestUser: latestMessage.user,
+	})
+}
 
 const AppList = ({ convs }: {
 	convs: ConversationWithRelation[]
@@ -228,7 +240,7 @@ const AppListView = ({ appListView }: {
 	
 	return (
 		
-		<Link href={getAppLink(sid, appListView.id)} className={'w-full'}>
+		<Link href={getAppLink(appListView.id)} className={'w-full'}>
 			<Button variant={'ghost'} className={'w-full px-4 py-2 h-fit | flex items-center gap-4'}>
 				<Avatar className={'shrink-0'}>
 					<AvatarImage src={appListView.avatar}/>

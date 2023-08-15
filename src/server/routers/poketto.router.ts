@@ -2,44 +2,24 @@ import { z } from 'zod'
 import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { type AppWithRelation, conversationInclude, flowgpt2pokettoApp, type ConversationWithRelation } from '@/ds/poketto'
-import { Prisma } from '.prisma/client'
-import { UserAppRelationType } from '@/ds/website'
-import UsingAppWhereInput = Prisma.UsingAppWhereInput
+import { type AppWithRelation, conversationInclude, type ConversationWithRelation, flowgpt2pokettoApp } from '@/ds/poketto'
 
 
 export const pokettoRouter = createTRPCRouter({
 	
-	listConversations: protectedProcedure
-		.input(z.object({
-			spaceId: z.string().optional(),
-			relationType: z.nativeEnum(UserAppRelationType),
-		}))
-		.query(async ({ ctx: { prisma }, input: { spaceId, relationType } }) => {
-			// todo: dict
-			const where: UsingAppWhereInput = { isActive: true }
-			if (spaceId && relationType === UserAppRelationType.used) where.spaceId = spaceId
-			const result = await prisma.usingApp
-				.findMany({
-					where,
-					include: conversationInclude,
-				})
-			return result as ConversationWithRelation[]
-		}),
-	
-	listSpaces: protectedProcedure
+	/**
+	 * 这个 api 应该是公开的，只要目标用户没有设置权限即可
+	 */
+	listConversations: publicProcedure
 		.input(z.object({
 			userId: z.string(),
 		}))
 		.query(async ({ ctx: { prisma }, input: { userId } }) => {
-			const result = await prisma.userSpaceRelation.findMany({
-				where: {
-					userId,
-				}, include: {
-					space: true, // 	user: undefined,
-				},
-			})
-			return result.map((s) => s.space)
+			const result = await prisma.conversation
+				.findMany({
+					where: { userId }, include: conversationInclude,
+				})
+			return result as ConversationWithRelation[]
 		}),
 	
 	searchPoketto: publicProcedure
