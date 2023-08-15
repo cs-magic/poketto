@@ -13,7 +13,7 @@ import { toast } from '@/components/ui/use-toast'
 import { getShortName } from '@/lib/string'
 import { Button } from '@/components/ui/button'
 import { order2icon } from '@/components/utils/assets'
-import { type AppWithRelation } from '@/ds/poketto'
+import { type AppWithRelation, type ConversationWithRelation } from '@/ds/poketto'
 import { getUserLink } from '@/lib/user'
 import { CardsLayoutType } from '@/store/ui.slice'
 import { useAppStore } from '@/store'
@@ -21,7 +21,10 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { AppDetail } from '@/components/app/app-detail'
 
 
-export const PocketCardView = (app: AppWithRelation) => {
+export const AppCardViewInExplore = ({ convs, app }: {
+	convs: ConversationWithRelation[]
+	app: AppWithRelation
+}) => {
 	const { cardsLayout, sortOrder: sort } = useAppStore()
 	const Icon = order2icon[sort]
 	
@@ -77,7 +80,7 @@ export const PocketCardView = (app: AppWithRelation) => {
 			</DialogTrigger>
 			
 			<DialogContent className={'max-h-[80vh] overflow-auto'}>
-				<AppDetail app={app} comments={[]}/>
+				<AppDetail convs={convs} app={app} comments={[]}/>
 			</DialogContent>
 		</Dialog>)
 }

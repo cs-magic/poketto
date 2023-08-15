@@ -13,14 +13,14 @@ import { ControlTool } from '@/components/utils/tools'
 import { api } from '@/lib/api'
 import { useRouter } from 'next/router'
 import { UserAppRelationType } from '@/ds/website'
-import { type AppWithRelation, type UsingAppWithRelation } from '@/ds/poketto'
-import { type ChatMessage } from '.prisma/client'
+import { type AppWithRelation, type ConversationWithRelation } from '@/ds/poketto'
+import { type ChatMessage, PlatformType } from '.prisma/client'
 import { useUser } from '@/hooks/use-user'
 import log from '@/lib/log'
 import { type PrommptMessage, type User } from '@prisma/client'
 import { nanoid } from 'nanoid'
 
-export const prompt2chatMessage = (u: User, c: UsingAppWithRelation, m: PrommptMessage): ChatMessage => ({
+export const prompt2chatMessage = (u: User, c: ConversationWithRelation, m: PrommptMessage): ChatMessage => ({
 	...m,
 	userId: u.id,
 	createdAt: new Date(),
@@ -33,11 +33,13 @@ export const prompt2chatMessage = (u: User, c: UsingAppWithRelation, m: PrommptM
 export default function ConversationPage() {
 	const router = useRouter()
 	const spaceId = router.query.sid as string
+	const convId = router.query.cid as string
 	
-	const { chatListVisible, convId, chatDetailVisible } = useAppStore()
+	const { chatListVisible, chatDetailVisible } = useAppStore()
 	const { data: conversations_ = [] } = api.poketto.listConversations.useQuery({ spaceId, relationType: UserAppRelationType.used })
 	const conversations = conversations_
-	const conv = conversations.find((a) => a.id === convId) ?? conversations[0]
+	// const {data: conversation} = api.flowgpt.getPoketto.useQuery({id: convId, platform: PlatformType.FlowGPT})
+	const conv = conversations.find((a) => a.id === convId) ?? conversations[0] // conversation
 	const user = useUser()
 	
 	log.info({ apps: conversations, conv })
@@ -45,15 +47,14 @@ export default function ConversationPage() {
 	return (<RootLayout>
 		<div className={'w-full h-full overflow-hidden | flex divide-x'}>
 			
-			{chatListVisible && <AppList apps={conversations}/>}
+			{chatListVisible && <AppList convs={conversations}/>}
 			
-			<section id={'chat-contents'} className={clsx('w-full grow h-full overflow-hidden | flex flex-col')}>
+			<section className={clsx('w-full grow h-full overflow-hidden | flex flex-col')}>
 				{user && conv && <AppConversation user={user} conv={conv} msgs={(conv.app.model?.initPrompts ?? [])
 					.map((p) => prompt2chatMessage(user, conv, p))}/>}
 			</section>
 			
-			<section id={'poketto-app-detail'}
-			         className={clsx('w-full md:w-[375px] shrink-0 overflow-x-hidden', 'h-full overflow-y-auto p-4 gap-4', 'flex flex-col ')}>
+			<section className={clsx('w-full md:w-[375px] shrink-0 overflow-x-hidden', 'h-full overflow-y-auto p-4 gap-4', 'flex flex-col ')}>
 				{chatDetailVisible && conv && <AppDetail convs={conversations} app={conv.app} comments={conv.app.comments}/>}
 			</section>
 		
@@ -63,7 +64,7 @@ export default function ConversationPage() {
 
 const AppConversation = ({ user, conv, msgs }: {
 	                         user: User,
-	                         conv: UsingAppWithRelation,
+	                         conv: ConversationWithRelation,
 	                         msgs: ChatMessage[]
                          },
 ) => {
@@ -100,7 +101,9 @@ const AppConversation = ({ user, conv, msgs }: {
 	</>)
 }
 
-const ChatMessageComp = ({ msg }: { msg: ChatMessage }) => {
+const ChatMessageComp = ({ msg }: {
+	msg: ChatMessage
+}) => {
 	const user = useUser()!
 	const role = msg.userId === user.id ? 'user' : 'assistant'
 	return (<div

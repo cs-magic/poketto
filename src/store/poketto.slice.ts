@@ -1,4 +1,4 @@
-import { type IAppMessage, type IConversation, type IAppComment, SortOrder, type AppWithRelation } from '@/ds/poketto'
+import { type IAppMessage, type IConversation, type IAppComment, SortOrder, type AppWithRelation, type ConversationWithRelation } from '@/ds/poketto'
 
 import { type StoreSlice } from '@/store/index'
 import { type ID } from '@/ds/general'
@@ -13,7 +13,6 @@ export interface PokettoState {
 	setSortOrder: (v: SortOrder) => void
 	
 	app: AppWithRelation
-	setApp: (v: AppWithRelation) => void
 	
 	appComments: IAppComment[]
 	setAppComments: (v: IAppComment[]) => void
@@ -21,6 +20,9 @@ export interface PokettoState {
 	
 	convId?: string
 	setConvId: (v: string) => void
+	
+	convs: ConversationWithRelation[]
+	setConvs: (v: ConversationWithRelation[]) => void
 	
 	appMessages: IAppMessage[]
 	pushAppMessage: (v: IAppMessage) => void
@@ -33,12 +35,10 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
 	convId: undefined,
 	setConvId: (v) => setState((state) => {state.convId = v}),
 	
+	convs: [],
+	setConvs: (v) => setState((state) => {state.convs = v}),
+	
 	app: YourSolePoketto,
-	setApp: (v) => setState((state) => {
-		state.app = v
-		const app = state.pokettos.find((c) => c.app.id === v.id)
-		if (app) app.app = v
-	}),
 	
 	appComments: [],
 	setAppComments: (v) => setState((state) => {state.appComments = v}),

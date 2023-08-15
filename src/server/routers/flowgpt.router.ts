@@ -12,7 +12,10 @@ export const idInput = z.object({
 	id: z.string().optional(), platform: z.nativeEnum(PlatformType),
 })
 
-const singleFetch = async <T>(props: { path: string, j: object }) => {
+const singleFetch = async <T>(props: {
+	path: string,
+	j: object
+}) => {
 	// await sleep(3000)
 	
 	const input = encodeURI(JSON.stringify({ '0': props.j }))
@@ -28,7 +31,7 @@ const singleFetch = async <T>(props: { path: string, j: object }) => {
 
 export const flowgptRouter = createTRPCRouter({
 	
-	searchPoketto: publicProcedure
+	searchApps: publicProcedure
 		.input(z.object({
 			query: z.string(), language: z.string().default('zh'), threshold: z.number().default(.8), hideNsfw: z.boolean().default(true),
 		}))
@@ -51,7 +54,10 @@ export const flowgptRouter = createTRPCRouter({
 			skip: z.number().default(0),
 			tag: z.string().optional(),
 		}))
-		.query<{ data: AppWithRelation[], nextCursor: number | undefined }>(async (opts) => {
+		.query<{
+			data: AppWithRelation[],
+			nextCursor: number | undefined
+		}>(async (opts) => {
 			// 所有空的要填 ["undefined"]
 			const emptyFields = Object.entries(opts.input)
 				.filter(([field, val]) => !val)

@@ -1,4 +1,4 @@
-import { type AppWithRelation, type IAppListView, type IConversation, type UsingAppWithRelation } from '@/ds/poketto'
+import { type AppWithRelation, type IAppListView, type IConversation, type ConversationWithRelation } from '@/ds/poketto'
 import { nanoid } from 'nanoid'
 import { ChatMessageFormatType, type User } from '@prisma/client'
 
@@ -22,7 +22,7 @@ export const createApp = (user: User, app: AppWithRelation): IConversation => ({
 	], latestTime: new Date(), joinTime: new Date(),
 })
 
-export const getAppListView = (conversation: UsingAppWithRelation): IAppListView => {
+export const getAppListView = (conversation: ConversationWithRelation): IAppListView => {
 	const latestMessage = conversation.messages[conversation.messages.length - 1]!
 	return ({
 		id: conversation.app.id,

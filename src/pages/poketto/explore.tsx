@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { clsx } from 'clsx'
-import { PocketCardView } from '@/components/card.view'
+import { AppCardViewInExplore } from '@/components/card.view'
 import { RootLayout } from '@/layouts/root.layout'
 import { api } from '@/lib/api'
 import { GridContainer, MasonryContainer } from '@/components/utils/containers'
@@ -69,7 +69,7 @@ export default function ExplorePage() {
 				{/* content (carousel - cards)*/}
 				
 				<Container>
-					{items.map((item) => <PocketCardView {...item} key={item.id}/>)}
+					{items.map((item) => <AppCardViewInExplore convs={} app={app} key={item.id}/>)}
 				</Container>
 				
 				{/* load more*/}

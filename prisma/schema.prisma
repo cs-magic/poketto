@@ -103,7 +103,7 @@ model Space {
   isPrivate  Boolean             @default(true)
   user_space UserSpaceRelation[]
 
-  UsingApp UsingApp[]
+  conversations Conversation[]
 }
 
 enum RoleType {
@@ -181,7 +181,7 @@ model App {
   categoryId Int
 
   actions  AppAction[]
-  using    UsingApp[]
+  using    Conversation[]
   starring StarringApp[]
   comments AppComment[]
 
@@ -196,7 +196,7 @@ model App {
 /// 区别就在于数据表不一样
 
 /// space -- use --> app
-model UsingApp {
+model Conversation {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -300,8 +300,8 @@ model ChatMessage {
   format              ChatMessageFormatType @default(text)
   userActionOnMessage ChatMessageAction[]
 
-  UsingApp   UsingApp @relation(fields: [usingAppId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  usingAppId String   @unique
+  UsingApp   Conversation @relation(fields: [usingAppId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  usingAppId String       @unique
 }
 
 model AppCategory {

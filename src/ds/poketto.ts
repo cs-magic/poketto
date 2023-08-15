@@ -7,7 +7,7 @@ import { PlatformType, Prisma, PromptRoleType, type User } from '.prisma/client'
 import dayjs from 'dayjs'
 import { DEFAULT_APP_VERSION } from '@/config/system'
 import AppGetPayload = Prisma.AppGetPayload
-import UsingAppGetPayload = Prisma.UsingAppGetPayload
+import ConversationGetPayload = Prisma.ConversationGetPayload
 import { type ChatMessage } from '@prisma/client'
 
 /**
@@ -116,9 +116,13 @@ export const conversationInclude = {
 type IAppInclude = typeof appInclude
 type IConversationInclude = typeof conversationInclude
 
-export type AppWithRelation = AppGetPayload<{ include: IAppInclude }>
+export type AppWithRelation = AppGetPayload<{
+	include: IAppInclude
+}>
 
-export type UsingAppWithRelation = UsingAppGetPayload<{ include: IConversationInclude }>
+export type ConversationWithRelation = ConversationGetPayload<{
+	include: IConversationInclude
+}>
 
 export const flowgpt2pokettoApp = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppWithRelation => {
 	
@@ -136,7 +140,7 @@ export const flowgpt2pokettoApp = (p: IFlowgptPromptBasic | FlowgptPromptFull): 
 		version: DEFAULT_APP_VERSION,
 		creatorId: p.userId,
 		creator: {
-			id: p.User.id, name: p.User.name, avatar: p.User.image, username: p.User.uri, desc: null, email: null,
+			id: p.User.id, name: p.User.name, image: p.User.image, desc: null, email: null, balance: 0, emailVerified: null,
 		},
 		tags: p.Tag.map((t) => ({
 			id: t.name, name: t.name, createdAt: null, updatedAt: null, creatorId: null,

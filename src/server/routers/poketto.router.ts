@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { type IFlowgptPromptBasic } from '@/ds/flowgpt'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { type AppWithRelation, conversationInclude, flowgpt2pokettoApp, type UsingAppWithRelation } from '@/ds/poketto'
+import { type AppWithRelation, conversationInclude, flowgpt2pokettoApp, type ConversationWithRelation } from '@/ds/poketto'
 import { Prisma } from '.prisma/client'
 import { UserAppRelationType } from '@/ds/website'
 import UsingAppWhereInput = Prisma.UsingAppWhereInput
@@ -24,7 +24,7 @@ export const pokettoRouter = createTRPCRouter({
 					where,
 					include: conversationInclude,
 				})
-			return result as UsingAppWithRelation[]
+			return result as ConversationWithRelation[]
 		}),
 	
 	listSpaces: protectedProcedure
