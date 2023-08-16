@@ -11,7 +11,7 @@ import clsx from "clsx"
 import "@/styles/globals.css"
 import Head from "next/head"
 import { product } from "@/config"
-import { font } from "@/lib/assets"
+// import { font } from "@/lib/assets"
 
 const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
@@ -27,8 +27,8 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
           <main
             className={clsx(
               "| | flex h-screen w-screen flex-col text-sm font-light text-foreground",
-              "bg-background", // 'bg-zinc-900',
-              font.className
+              "bg-background" // 'bg-zinc-900',
+              // font.className
             )}
           >
             <Component {...pageProps} />

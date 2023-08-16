@@ -135,21 +135,26 @@ const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
 
   return (
     <Link
-      href={getConversationLink(c.id)}
-      className={clsx("flex h-fit w-full items-center gap-4 px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
+      href={c.id}
+      // href={"[id]"}
+      // as={c.id}
+      //{getConversationLink(c.id)}
+      className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
     >
-      <Avatar className={"shrink-0"}>
-        <AvatarImage src={c.app.avatar} />
-      </Avatar>
+      <div className={"flex h-fit w-full items-center  gap-4"}>
+        <Avatar className={"shrink-0"}>
+          <AvatarImage src={c.app.avatar} />
+        </Avatar>
 
-      <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
-        <div className={"| flex w-full justify-between gap-2"}>
-          <span className={"truncate "}>{c.app.name}</span>
-          <span>{d(c.latestMessage.updatedAt).calendar()}</span>
-        </div>
-        <div className={"flex gap-2"}>
-          {/* 只有 group 才需要打开 */}
-          <span className={"truncate text-muted-foreground"}>{m(c.latestMessage.content)}</span>
+        <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
+          <div className={"| flex w-full justify-between gap-2"}>
+            <span className={"truncate "}>{c.app.name}</span>
+            <span>{d(c.latestMessage.updatedAt).calendar()}</span>
+          </div>
+          <div className={"flex gap-2"}>
+            {/* 只有 group 才需要打开 */}
+            <span className={"truncate text-muted-foreground"}>{m(c.latestMessage.content)}</span>
+          </div>
         </div>
       </div>
     </Link>
@@ -287,7 +292,6 @@ const ConversationMessages = ({ messages, u, c }: { messages: (Message | ChatMes
 const ConversationMessage = ({ msg, user }: { user: User; msg: ChatMessage }) => {
   const { role } = msg
   const m = useMustache()
-  logger.info({ msg })
 
   return msg.format === ChatMessageFormatType.systemNotification ? (
     <p className={"mx-auto my-2 text-center text-muted-foreground"}>{m(msg.content)}</p>
@@ -356,10 +360,12 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
   const cid = ctx.query.cid as string
+  // logger.info({ time: new Date(), fetching: cid })
   const conversation = await prisma.conversation.findUnique({
     where: { id: cid },
     include: conversationInclude,
   })
+  // logger.info({ time: new Date(), fetched: conversation })
   if (!conversation) {
     return {
       redirect: {
@@ -370,14 +376,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   if (session) {
+    const conversationStr = superjson.stringify(conversation)
+    // logger.info({ time: new Date(), parsed: conversationStr })
+
     const user = (await prisma.user.findUnique({
       where: { id: session.user.id },
       include: userWithRelationsInclude,
     })) as UserWithRelations
+
     return {
       props: {
         user,
-        conversationStr: superjson.stringify(conversation),
+        conversationStr,
       },
     }
   }

@@ -22,10 +22,10 @@ function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
 	if (typeof window === 'undefined') return false
 	if (!(error instanceof TRPCClientError)) return false
 	if (error.data?.code !== 'UNAUTHORIZED') return false
-	
+
 	console.warn('Redirecting to /sign-in since user is not authorized')
 	// Router.push('/sign-in') // todo: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528
-	
+
 	return true
 }
 
@@ -33,7 +33,7 @@ function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
 export const api = createTRPCNext<AppRouter>({
 	config() {
 		return {
-			
+
 			queryClientConfig: {
 				defaultOptions: {
 					queries: {
@@ -50,14 +50,14 @@ export const api = createTRPCNext<AppRouter>({
 					},
 				},
 			},
-			
+
 			/**
 			 * Transformer used for data de-serialization from the server.
 			 *
 			 * @see https://trpc.io/docs/data-transformers
 			 */
 			transformer: superjson,
-			
+
 			/**
 			 * Links used to determine request flow from client to server.
 			 *

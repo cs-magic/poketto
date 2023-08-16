@@ -71,11 +71,15 @@ export const Sidebar = () => {
             </AvatarFallback>
           </Avatar>
 
-          <div className={"flex grow flex-col gap-0 overflow-hidden"}>
-            <span className={"text-xs"}>{user.name}</span>
-            <span className={"truncate text-xs text-muted-foreground"}>{user.id}</span>
-          </div>
-          <ChevronRightIcon className="shrink-0" />
+          {sidebarVisible && (
+            <>
+              <div className={"flex grow flex-col gap-0 overflow-hidden"}>
+                <span className={"text-xs"}>{user.name}</span>
+                <span className={"truncate text-xs text-muted-foreground"}>{user.id}</span>
+              </div>
+              <ChevronRightIcon className="shrink-0" />
+            </>
+          )}
         </Link>
       ) : (
         <Button variant={"destructive"} className="my-2" onClick={() => void signIn()}>
