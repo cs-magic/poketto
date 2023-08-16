@@ -28,7 +28,9 @@ export default function DashboardPage() {
       <div className={"| flex h-full w-full gap-4 p-4"}>
         <UserProfile user={user} />
 
-        <div className={"| flex grow flex-col "}>{user && <ConversationsView userId={user.id} relationType={relationType} />}</div>
+        <div className={"| flex grow flex-col overflow-auto"}>
+          {user && <ConversationsView userId={user.id} relationType={relationType} />}
+        </div>
       </div>
     </RootLayout>
   )
@@ -68,7 +70,7 @@ const AppView = ({ app }: { app: AppWithRelation }) => {
           {app.creatorId === POKETTO_CREATOR_ID && <Badge className={"bg-blue-500"}>{POKETTO_CREATOR_NAME}</Badge>}
           <Badge variant={"outline"}>{app.model?.isOpenSource ? "Open Source" : "Close Source"}</Badge>
         </div>
-        <div className={"text-muted-foreground"}>{app.desc}</div>
+        <div className={"line-clamp-3 text-muted-foreground"}>{app.desc}</div>
         <div className={"| flex items-center gap-4 text-muted-foreground"}>
           <div className={"inline-flex items-center gap-2"}>
             <div className={"rounded-full bg-blue-500 wh-3"} />
