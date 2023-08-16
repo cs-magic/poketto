@@ -131,12 +131,8 @@ const ConversationList = ({ user }: { user: User }) => {
 }
 
 const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
-  const { latestMessage} = c
-  const {updatedAt} = latestMessage
-  const targetDatetime = d(updatedAt).calendar()
-  logger.info({latestMessage, updatedAt, targetDatetime})
-
   const m = useMustache()
+  
   return (
     <Link
       href={getConversationLink(c.id)}
@@ -149,7 +145,7 @@ const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
       <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
         <div className={"| flex w-full justify-between gap-2"}>
           <span className={"truncate "}>{c.app.name}</span>
-          <span>{targetDatetime}</span>
+          <span>{d(c.latestMessage.updatedAt).calendar()}</span>
         </div>
         <div className={"flex gap-2"}>
           {/* 只有 group 才需要打开 */}

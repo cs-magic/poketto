@@ -26,6 +26,7 @@ import ReactMarkdown from "react-markdown"
 import Mustache from "mustache"
 import { product, URI, USER_INVITATIONS_COUNT } from "@/config"
 import { useMustache } from "@/hooks/use-mustache"
+import Link from "next/link"
 
 export const Sidebar = () => {
   const { sidebarVisible } = useAppStore()
@@ -61,32 +62,26 @@ export const Sidebar = () => {
 
       {sidebarVisible && user && <InviteCard />}
 
-      <div className={"flex items-center justify-center gap-2 border-t py-4"}>
-        {user && (
+      {user ? (
+        <Link href={URI.user.dashboard} className={"flex items-center justify-center gap-2 border-t py-4"}>
           <Avatar className={ICON_DIMENSION_MD}>
             <AvatarImage src={user?.image ?? undefined} />
             <AvatarFallback>
               <UserIcon />
             </AvatarFallback>
           </Avatar>
-        )}
 
-        {sidebarVisible &&
-          (user ? (
-            <>
-              <div className={"flex flex-col gap-0"} onClick={() => void signOut()}>
-                <span className={"text-xs"}>{user.name}</span>
-                <span className={"text-xs text-muted-foreground"}>{user.id}</span>
-              </div>
-              <div className={"grow"} />
-              <ChevronRightIcon />
-            </>
-          ) : (
-            <Button className={"grow"} variant={"destructive"} onClick={() => void signIn()}>
-              登录
-            </Button>
-          ))}
-      </div>
+          <div className={"flex grow flex-col gap-0 overflow-hidden"}>
+            <span className={"text-xs"}>{user.name}</span>
+            <span className={"truncate text-xs text-muted-foreground"}>{user.id}</span>
+          </div>
+          <ChevronRightIcon className="shrink-0" />
+        </Link>
+      ) : (
+        <Button variant={"destructive"} className="my-2" onClick={() => void signIn()}>
+          登录
+        </Button>
+      )}
     </div>
   )
 }

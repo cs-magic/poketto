@@ -15,6 +15,7 @@ import { type AppWithRelation, UserAppRelationType, type UserWithRelations } fro
 import { DEFAULT_USER_AVATAR, DEFAULT_USER_ID, DEFAULT_USER_NAME, POKETTO_CREATOR_ID, POKETTO_CREATOR_NAME } from "@/config"
 import d from "@/lib/datetime"
 import { todo } from "@/lib/helpers"
+import { signOut } from "next-auth/react"
 
 export default function DashboardPage() {
   const user = useUser()
@@ -113,10 +114,6 @@ const UserProfile = ({ user }: { user?: UserWithRelations }) => {
         <p className={"lines-clamp-2 my-2 text-primary-foreground/75"}>{user?.desc ?? "You haven't said anything about yourself ~"}</p>
       </div>
 
-      <Button variant={"outline"} disabled={!user} onClick={todo}>
-        Edit your profile
-      </Button>
-
       {/*	stat */}
       <div className={"flex items-center justify-around gap-2"}>
         <Button disabled={!user} className={"flex h-fit grow flex-col items-center gap-2 p-2"} variant={"ghost"}>
@@ -141,10 +138,16 @@ const UserProfile = ({ user }: { user?: UserWithRelations }) => {
       </div>
 
       {/*	collections */}
-      {/*<div className={"grid grid-cols-2 gap-4"}>*/}
-      {/*  <Button disabled={!user}>作品</Button>*/}
-      {/*  <Button disabled={!user}>收藏</Button>*/}
-      {/*</div>*/}
+      <div className={"grid grid-cols-2 gap-4"}>
+        <Button variant={"outline"} disabled={!user} onClick={todo}>
+          编辑简介
+        </Button>
+
+        <Button disabled={!user} variant={"ghost"} onClick={() => void signOut()}>
+          退出登录
+        </Button>
+        {/* <Button disabled={!user}>收藏</Button> */}
+      </div>
     </div>
   )
 }
