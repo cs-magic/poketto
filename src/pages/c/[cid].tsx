@@ -120,7 +120,7 @@ const ConversationList = ({ user }: { user: User }) => {
         ) : (
           <>
             <SectionTitle>Poketto Apps</SectionTitle>
-            {_.orderBy(convs, ['pinned', 'updatedAt'], ['desc', 'desc']).map((c) => (
+            {_.orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
               <ConversationListView key={c.id} c={c} />
             ))}
           </>
@@ -132,7 +132,7 @@ const ConversationList = ({ user }: { user: User }) => {
 
 const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
   const m = useMustache()
-  
+
   return (
     <Link
       href={getConversationLink(c.id)}
@@ -239,7 +239,7 @@ const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationW
   )
 }
 
-const ConversationMessages = ({ messages, u, c }: { messages: Message[]; u: User; c: Conversation }) => {
+const ConversationMessages = ({ messages, u, c }: { messages: (Message | ChatMessage)[]; u: User; c: Conversation }) => {
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
@@ -268,7 +268,7 @@ const ConversationMessages = ({ messages, u, c }: { messages: Message[]; u: User
                 id: nanoid(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                format: ChatMessageFormatType.text,
+                format: "format" in msg ? msg.format : ChatMessageFormatType.text,
                 userId: msg.role === PromptRoleType.user ? u.id : "OpenAI",
               }}
               key={index}
@@ -287,8 +287,10 @@ const ConversationMessages = ({ messages, u, c }: { messages: Message[]; u: User
 const ConversationMessage = ({ msg, user }: { user: User; msg: ChatMessage }) => {
   const { role } = msg
   const m = useMustache()
+  logger.info({ msg })
+
   return msg.format === ChatMessageFormatType.systemNotification ? (
-    <span className={"mx-auto my-2 text-muted-foreground"}>{msg.content}</span>
+    <p className={"mx-auto my-2 text-center text-muted-foreground"}>{m(msg.content)}</p>
   ) : (
     <div className={clsx("chat text-sm tracking-normal", role === PromptRoleType.assistant ? "chat-start" : "chat-end")}>
       <div
@@ -298,7 +300,7 @@ const ConversationMessage = ({ msg, user }: { user: User; msg: ChatMessage }) =>
             system: "bg-slate-700",
             function: "bg-destructive",
             user: "bg-green-600 text-black",
-            assistant: "bg-sidebar text-primary-foreground/75",
+            assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
           }[role]
         )}
       >

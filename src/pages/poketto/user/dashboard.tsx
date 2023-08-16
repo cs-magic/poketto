@@ -52,7 +52,7 @@ const ConversationsView = ({ userId, relationType }: { userId: string; relationT
         <Button variant={"outline"} className={"h-full gap-2"}>
           Sort <ChevronDownIcon />
         </Button>
-        <Button className={"h-full gap-2 bg-green-700"}>
+        <Button className={"h-full gap-2 bg-primary"}>
           <Pencil2Icon /> New
         </Button>
       </div>
