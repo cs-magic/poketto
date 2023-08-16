@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import ReactMarkdown from 'react-markdown'
 import Mustache from 'mustache'
 import { product, URI, USER_INVITATIONS_COUNT } from '@/config'
+import { useMustache } from '@/hooks/use-mustache'
 
 
 export const Sidebar = () => {
@@ -86,6 +87,7 @@ const InviteCard = () => {
 	const { data = [] } = api.user.getInvitations.useQuery()
 	// todo: include ? on enum type
 	const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
+	const m = useMustache()
 	
 	return (
 		<div className={'flex flex-col gap-2 whitespace-normal | text-sm border p-4 rounded-xl'}>
@@ -96,7 +98,7 @@ const InviteCard = () => {
 			<article className={'prose dark:prose-invert'}>
 				<ReactMarkdown>
 					{
-						Mustache.render('每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})' +
+						m('每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})' +
 							' 赠送哦！当前剩余：[{{surplus}}](/dashboard)',
 							{
 								cnt: USER_INVITATIONS_COUNT,

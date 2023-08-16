@@ -7,12 +7,13 @@ import { type AppWithRelation, GET_PROMPTS_BATCH_SIZE, type IAppComment, type IF
 import { flowgpt2poketto_comment, flowgpt2pokettoApp } from '@/lib/flowgpt'
 import { POKETTO_APP_WITH_RELATION } from '@/config'
 
-
-export const idInput = z.object({
-	id: z.string().optional(), platform: z.nativeEnum(PlatformType),
+const idInput = z.object({
+	id: z.string().optional(),
+	platform: z.nativeEnum(PlatformType),
 })
 
-const singleFetch = async <T>(props: {
+
+export const singleFetch = async <T>(props: {
 	path: string,
 	j: object
 }) => {
@@ -28,6 +29,10 @@ const singleFetch = async <T>(props: {
 	return result[0].result.data.json as T
 }
 
+export const fetchFlowGPTApp = async (appId: string): Promise<AppWithRelation> => {
+	const flowgptApp = await singleFetch<IFlowgptPromptBasic>({ path: 'prompt.getById', j: { json: appId } })
+	return flowgpt2pokettoApp(flowgptApp)
+}
 
 export const flowgptRouter = createTRPCRouter({
 	
@@ -108,4 +113,5 @@ export const flowgptRouter = createTRPCRouter({
 	// 	return
 	// }),
 })
+
 

@@ -8,9 +8,7 @@ import remarkGfm from 'remark-gfm'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
-import { useRouter } from 'next/router'
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from '.prisma/client'
-import log from '@/lib/log'
 import { type User } from '@prisma/client'
 import { useDebouncedState, useScrollIntoView } from '@mantine/hooks'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -30,17 +28,10 @@ import { getConversationLink } from '@/lib/string'
 import superjson from 'superjson'
 import Mustache from 'mustache'
 import { nanoid } from 'nanoid'
-import { prompt2chatMessage } from '@/lib/prompt'
-import {
-	type AppWithRelation,
-	conversationInclude,
-	type ConversationWithRelation,
-	type IAppListView,
-	type UserWithRelations,
-	userWithRelationsInclude,
-} from '@/ds'
+import { type AppWithRelation, conversationInclude, type ConversationWithRelation, type UserWithRelations, userWithRelationsInclude } from '@/ds'
 import { URI } from '@/config'
 import { Badge } from '@/components/ui/badge'
+import { useMustache } from '@/hooks/use-mustache'
 
 
 export default function ConversationPage({ user, conversationStr }: {
@@ -164,6 +155,7 @@ const ChatMessageComp = ({ msg, user }: {
 	msg: ChatMessage
 }) => {
 	const { role } = msg
+	const m = useMustache()
 	return msg.format === ChatMessageFormatType.systemNotification
 		? <span className={'mx-auto my-2 text-muted-foreground'}>{msg.content}</span>
 		: (
@@ -174,7 +166,7 @@ const ChatMessageComp = ({ msg, user }: {
 				}[role])}>
 					
 					<ReactMarkdown remarkPlugins={[remarkGfm]}>
-						{Mustache.render(msg.content, { userName: user.name })}
+						{m(msg.content)}
 					</ReactMarkdown>
 				
 				</div>
@@ -199,7 +191,7 @@ const AppList = ({ user }: {
 		{search ? (// 搜索时
 			searchedApps ? <>
 				<SectionTitle>Global search results {searchedApps.length ? '' : ' (0)'}</SectionTitle>
-				{searchedApps.slice(0, 10).map((prompt) => <SearchResultItem convs={conversations} app={prompt} key={prompt.id}/>)}
+				{searchedApps.slice(0, 10).map((prompt) => <SearchResultItem app={prompt} key={prompt.id}/>)}
 			</> : <>
 				<SectionTitle>Global search results</SectionTitle>
 				<Skeleton className={'h-8'}/>
@@ -246,7 +238,7 @@ const SectionTitle = ({ children }: PropsWithChildren) => <div className={'w-ful
 const ConversationListView = ({ c }: {
 	c: ConversationWithRelation
 }) => {
-	
+	const m = useMustache()
 	return (
 		
 		<Link href={getConversationLink(c.id)} className={'w-full'}>
@@ -262,7 +254,7 @@ const ConversationListView = ({ c }: {
 					</div>
 					<div className={'flex gap-2'}>
 						{/* 只有 group 才需要打开 */}
-						<span className={'truncate text-muted-foreground'}>{c.messages[c.messages.length - 1]!.content}</span>
+						<span className={'truncate text-muted-foreground'}>{m(c.messages[c.messages.length - 1]!.content)}</span>
 					</div>
 				</div>
 			</Button>
@@ -270,7 +262,6 @@ const ConversationListView = ({ c }: {
 	
 	)
 }
-
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
 	const session = await getSession(ctx)

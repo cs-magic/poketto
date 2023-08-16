@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useWindowScroll } from '@mantine/hooks'
 import { useUser } from '@/hooks/use-user'
 import { toast } from 'sonner'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import clsx from 'clsx'
 import { Separator } from '@/components/ui/separator'
@@ -27,6 +27,7 @@ import { getAppLink, getConversationLink } from '@/lib/string'
 import { type AppWithRelation, type IAppComment } from '@/ds'
 import { POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from '@/config'
 import log from '@/lib/log'
+import { UserIcon } from 'lucide-react'
 
 export const AppDetail = ({ app, comments }: {
 	app: AppWithRelation,
@@ -36,7 +37,7 @@ export const AppDetail = ({ app, comments }: {
 	const [scroll, scrollTo] = useWindowScroll()
 	const user = useUser()
 	
-	// todo: 数据库里要先有 app 才能加入的问题怎么解决 ？ 
+	// todo: 数据库里要先有 app 才能加入的问题怎么解决 ？
 	const { mutate: addApp, data: addedConv } = api.poketto.addAppIntoConversation.useMutation()
 	const onAddApp = () => {
 		if (!user) return toast.error('您需要先登陆才能加入该频道，否则我们无法为您保存这些记录 :(')
@@ -233,7 +234,8 @@ const PokettoComment = ({
 					<p>@{comment.user.name}</p>
 				</div>
 				<Avatar className={'shrink-0'}>
-					<AvatarImage src={comment.user.avatar}/>
+					<AvatarImage src={comment.user.image ?? ''}/>
+					<AvatarFallback><UserIcon/></AvatarFallback>
 				</Avatar>
 			</div>
 		</CardHeader>

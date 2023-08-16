@@ -8,11 +8,33 @@ import { prisma } from '@/server/db'
 import { type PrismaClient } from '@prisma/client'
 import log from '@/lib/log'
 import _ from 'lodash'
-import { ChatMessageFormatType, PromptRoleType, type User } from '.prisma/client'
+import { ChatMessageFormatType, PlatformType, PromptRoleType, type User } from '.prisma/client'
 import { type Adapter } from 'next-auth/adapters'
 import { prompt2chatMessage } from '@/lib/prompt'
-import { type AppWithRelation, ConversationWithRelation } from '@/ds'
-import { POKETTO_APP_ID, POKETTO_APP_NAME, USER_INVITATIONS_COUNT, POKETTO_APP, POKETTO_APP_WITH_RELATION, POKETTO_WELCOME_MESSAGE } from '@/config'
+import { type AppWithRelation } from '@/ds'
+import { allowDangerousEmailAccountLinking, POKETTO_APP_WITH_RELATION, POKETTO_WELCOME_MESSAGE, USER_INVITATIONS_COUNT } from '@/config'
+
+/**
+ * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
+ * object and keep type safety.
+ *
+ * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
+ */
+declare module 'next-auth' {
+	interface Session extends DefaultSession {
+		user: DefaultSession['user'] & {
+			id: string; // ...other properties
+			// role: UserRole;
+		};
+	}
+	
+	interface User {
+		// ...other properties
+		// role: UserRole;
+		platformUserId: string
+		platformType: PlatformType
+	}
+}
 
 export const addAppIntoConversation = async (u: User, app: AppWithRelation) => {
 	// init conversation
@@ -67,32 +89,11 @@ const adapter: Adapter = {
 		const createdUser = await createUser(user)
 		
 		// init extra relations when user created here
-		await initUser(createdUser as User) // todo: avoid as ?
+		await initUser(createdUser as unknown as User) // todo: avoid as ?
 		
 		return createdUser
 	}, ...adapterExtra,
 }
-
-/**
- * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
- * object and keep type safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
-declare module 'next-auth' {
-	interface Session extends DefaultSession {
-		user: DefaultSession['user'] & {
-			id: string; // ...other properties
-			// role: UserRole;
-		};
-	}
-	
-	// interface User {
-	//   // ...other properties
-	//   // role: UserRole;
-	// }
-}
-
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -102,21 +103,28 @@ declare module 'next-auth' {
 export const authOptions: NextAuthOptions = {
 	callbacks: {
 		signIn: async ({ profile, user, email, account, credentials }) => {
+			log.info({ 'profile': profile, 'user': user, 'email': email, 'account': account, 'credentials': credentials })
+			user.platformUserId = user.id
+			user.platformType = PlatformType.Poketto
 			return true
 		},
 		
 		session: async ({ session, user, newSession, trigger, token }) => {
 			return {
-				...session, user: {
-					...session.user, id: user.id,
+				...session,
+				user: {
+					...session.user,
+					id: user.id,
+					platformUserId: user.id,
+					platformType: PlatformType.Poketto,
 				},
 			}
 		},
 	}, // ref: https://github.com/nextauthjs/next-auth/issues/6078
 	adapter, providers: [GithubProvider({
-		clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET,
+		clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET, allowDangerousEmailAccountLinking,
 	}), DiscordProvider({
-		clientId: env.DISCORD_CLIENT_ID, clientSecret: env.DISCORD_CLIENT_SECRET,
+		clientId: env.DISCORD_CLIENT_ID, clientSecret: env.DISCORD_CLIENT_SECRET, allowDangerousEmailAccountLinking,
 	}) // ref: https://next-auth.js.org/providers/google
 		// GoogleProvider({
 		// 	clientId: process.env.GOOGLE_ID,

@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/routers/trpc.helpers'
 import partialSearch from '../../data/partial-search.agg.json'
-import { ChatMessageFormatType, PromptRoleType } from '.prisma/client'
+import { ChatMessageFormatType, PlatformType, PromptRoleType } from '.prisma/client'
 import { appInclude, type AppWithRelation, conversationInclude, type ConversationWithRelation, type IFlowgptPromptBasic } from '@/ds'
 import { flowgpt2pokettoApp } from '@/lib/flowgpt'
 import { addAppIntoConversation } from '@/server/auth'
 import { mockSession } from 'next-auth/client/__tests__/helpers/mocks'
 import user = mockSession.user
+import { fetchFlowGPTApp } from '@/server/routers/flowgpt.router'
 
 
 export const pokettoRouter = createTRPCRouter({
@@ -61,9 +62,20 @@ export const pokettoRouter = createTRPCRouter({
 	addAppIntoConversation: protectedProcedure
 		.input(z.object({
 			appId: z.string(),
+			appPlatform: z.nativeEnum(PlatformType).default(PlatformType.Poketto),
 		}))
-		.mutation(async ({ ctx: { prisma, session }, input: { appId } }) => {
+		.mutation(async ({ ctx: { prisma, session }, input: { appId, appPlatform } }) => {
 				const user = await prisma.user.findUniqueOrThrow({ where: { id: session.user.id } })
+				
+				if (appPlatform === PlatformType.FlowGPT) {
+					// 1. get app with relation
+					const flowgptApp = await fetchFlowGPTApp(appId)
+					const creatorId = flowgptApp.creator.id
+					// 2. store user, ..
+					
+					// 3. store app
+					
+				}
 				const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, include: appInclude })
 				return addAppIntoConversation(user, app)
 			},
