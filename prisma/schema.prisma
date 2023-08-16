@@ -185,13 +185,17 @@ model Conversation {
   updatedAt DateTime @updatedAt
 
   isActive Boolean       @default(true)
-  messages ChatMessage[]
+  messages ChatMessage[] 
 
   userId String
   appId  String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   app  App  @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  pinned Boolean @default(false)
+  // lastMessage ChatMessage? @relation("latest")
+  // lastMessageId String?
 }
 
 /// user -- star --> app

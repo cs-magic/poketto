@@ -159,10 +159,27 @@ export const pokettoRouter = createTRPCRouter({
             format: ChatMessageFormatType.text,
           },
         })
+        await prisma.conversation.update({
+          where: { id: cid },
+          data: { updatedAt: new Date() },
+        })
         return result
       }
     ),
 
+  pinConv: protectedProcedure
+    .input(
+      z.object({
+        cid: z.string(),
+        toStatus: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { cid, toStatus } }) => {
+      const user = await prisma.conversation.update({
+        where: { id: cid },
+        data: { pinned: toStatus },
+      })
+    }),
   addAppIntoConversation: protectedProcedure
     .input(
       z.object({

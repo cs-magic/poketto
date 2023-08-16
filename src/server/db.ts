@@ -80,6 +80,14 @@ function getExtendedClient() {
           compute: (user) => user.followedBy.length * 100 + (user.name ?? "").length,
         },
       },
+      conversation: {
+        latestMessage: {
+          needs: { // @ts-ignore
+            messages: true
+          },
+          compute: (conv) => conv.messages[conv.messages.length-1]
+        }
+      }
     },
   })
 

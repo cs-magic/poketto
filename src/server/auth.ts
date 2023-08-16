@@ -50,6 +50,7 @@ export const addAppIntoConversation = async (u: User, app: AppWithRelation): Pro
     data: {
       userId: u.id,
       appId: app.id,
+      pinned: true,
     },
   })
 

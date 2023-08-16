@@ -87,7 +87,7 @@ export const conversationInclude = {
     include: {
       user: true, // 获取每条信息的用户
     },
-  },
+  }
 }
 type IAppInclude = typeof appInclude
 type IConversationInclude = typeof conversationInclude
@@ -96,7 +96,7 @@ export type AppWithRelation = AppGetPayload<{
 }>
 export type ConversationWithRelation = ConversationGetPayload<{
   include: IConversationInclude
-}>
+}> & {latestMessage: ChatMessage}
 
 // -----------------------------------------------------------------------------
 // poketto

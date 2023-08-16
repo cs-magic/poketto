@@ -34,13 +34,15 @@ import {
   type UserWithRelations,
   userWithRelationsInclude,
 } from "@/ds"
-import { URI } from "@/config"
+import { POKETTO_APP_ID, URI } from "@/config"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
 import { XIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
+import _ from "lodash"
+import logger from "@/lib/logger"
 
 export default function ConversationPage({ user, conversationStr }: { user: UserWithRelations; conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
@@ -50,7 +52,7 @@ export default function ConversationPage({ user, conversationStr }: { user: User
     <RootLayout>
       <div className={"| flex h-full w-full divide-x overflow-hidden"}>
         {chatListVisible && user && (
-          <section className={"| relative flex w-full shrink-0 flex-col items-center md:w-[375px]"}>
+          <section className={"| | relative flex w-full shrink-0 flex-col items-center overflow-hidden md:w-[375px]"}>
             <ConversationList user={user} />
           </section>
         )}
@@ -74,7 +76,7 @@ export default function ConversationPage({ user, conversationStr }: { user: User
  */
 
 const ConversationList = ({ user }: { user: User }) => {
-  const { data: conversations = [] } = api.poketto.listConversations.useQuery({})
+  const { data: convs = [] } = api.poketto.listConversations.useQuery({})
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)
   // todo: avoid empty call of trpc
@@ -82,6 +84,7 @@ const ConversationList = ({ user }: { user: User }) => {
 
   return (
     <>
+      {/* 搜索框 */}
       <div className={"relative w-full"}>
         <Input
           value={searchKey}
@@ -97,41 +100,48 @@ const ConversationList = ({ user }: { user: User }) => {
           </Button>
         )}
       </div>
-      {searchKey ? ( // 搜索时
-        searchedApps ? (
-          <>
-            <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
-            {searchedApps.slice(0, 10).map((prompt) => (
-              <SearchResultItem app={prompt} key={prompt.id} />
-            ))}
-          </>
+
+      <div className={"flex w-full grow flex-col overflow-y-auto overflow-x-hidden"}>
+        {/* 列表 */}
+        {searchKey ? ( // 搜索时
+          searchedApps ? (
+            <>
+              <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
+              {searchedApps.slice(0, 10).map((prompt) => (
+                <SearchResultItem app={prompt} key={prompt.id} />
+              ))}
+            </>
+          ) : (
+            <>
+              <SectionTitle>Global search results</SectionTitle>
+              <Skeleton className={"h-8"} />
+            </>
+          ) // 	没有搜索时显示最近聊天列表
         ) : (
           <>
-            <SectionTitle>Global search results</SectionTitle>
-            <Skeleton className={"h-8"} />
-          </>
-        ) // 	没有搜索时显示最近聊天列表
-      ) : (
-        <>
-          <SectionTitle>Poketto Apps</SectionTitle>
-          {conversations
-            .slice()
-            .sort((a, b) => (a.updatedAt > b.updatedAt ? -1 : 1))
-            .map((c) => (
+            <SectionTitle>Poketto Apps</SectionTitle>
+            {_.orderBy(convs, ['pinned', 'updatedAt'], ['desc', 'desc']).map((c) => (
               <ConversationListView key={c.id} c={c} />
             ))}
-        </>
-      )}
-
-      {/*<SectionTitle>No messages found</SectionTitle>*/}
+          </>
+        )}
+      </div>
     </>
   )
 }
 
 const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
+  const { latestMessage} = c
+  const {updatedAt} = latestMessage
+  const targetDatetime = d(updatedAt).calendar()
+  logger.info({latestMessage, updatedAt, targetDatetime})
+
   const m = useMustache()
   return (
-    <Link href={getConversationLink(c.id)} className={"flex h-fit w-full items-center gap-4 px-4 py-2 hover:bg-accent"}>
+    <Link
+      href={getConversationLink(c.id)}
+      className={clsx("flex h-fit w-full items-center gap-4 px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
+    >
       <Avatar className={"shrink-0"}>
         <AvatarImage src={c.app.avatar} />
       </Avatar>
@@ -139,11 +149,11 @@ const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
       <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
         <div className={"| flex w-full justify-between gap-2"}>
           <span className={"truncate "}>{c.app.name}</span>
-          <span>{d(c.messages[c.messages.length - 1]!.createdAt).calendar()}</span>
+          <span>{targetDatetime}</span>
         </div>
         <div className={"flex gap-2"}>
           {/* 只有 group 才需要打开 */}
-          <span className={"truncate text-muted-foreground"}>{m(c.messages[c.messages.length - 1]!.content)}</span>
+          <span className={"truncate text-muted-foreground"}>{m(c.latestMessage.content)}</span>
         </div>
       </div>
     </Link>
@@ -181,7 +191,10 @@ const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
 const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationWithRelation; initialMessages: ChatMessage[] }) => {
   const refForm = useRef<HTMLFormElement>(null)
 
-  const { mutate: pushMessage } = api.poketto.pushMessage.useMutation()
+  const utils = api.useContext()
+  const { mutate: pushMessage } = api.poketto.pushMessage.useMutation({
+    onSuccess: () => void utils.poketto.listConversations.invalidate(),
+  })
 
   const post = (event: FormEvent<HTMLFormElement>) => {
     handleSubmit(event)
@@ -205,7 +218,7 @@ const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationW
     <>
       <div className={"| flex w-full items-center justify-between gap-2 truncate bg-muted px-4 py-6"}>
         <div>{c.app.name}</div>
-        <ControlTool />
+        <ControlTool c={c} />
       </div>
 
       <ScrollToBottom className={"w-full grow overflow-auto p-2"} initialScrollBehavior={"auto"}>
@@ -305,8 +318,12 @@ const ConversationMessage = ({ msg, user }: { user: User; msg: ChatMessage }) =>
 
 const SectionTitle = ({ children }: PropsWithChildren) => <div className={"| w-full bg-muted px-4 py-2"}>{children}</div>
 
-const ControlTool = () => {
+const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
   const { chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
+  const utils = api.useContext()
+  const { mutate: pinConv } = api.poketto.pinConv.useMutation({
+    onSuccess: void utils.poketto.listConversations.invalidate(),
+  })
 
   return (
     <Popover>
@@ -314,6 +331,9 @@ const ControlTool = () => {
         <DotsVerticalIcon />
       </PopoverTrigger>
       <PopoverContent className={"flex flex-col gap-2"}>
+        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={() => pinConv({ cid: c.id, toStatus: !c.pinned })}>
+          {c.pinned ? "Unpin" : "Pin"}
+        </Button>
         <Button className={"justify-start pl-4"} variant={"ghost"} onClick={toggleSidebar}>
           {(sidebarVisible ? "Hide" : "Show") + " Sidebar"}
         </Button>

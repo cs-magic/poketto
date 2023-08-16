@@ -134,7 +134,7 @@ const AppView = ({ app }: { app: AppWithRelation | undefined }) => {
         <AvatarImage src={app.avatar} />
       </Avatar>
 
-      <div className={"flex grow flex-col gap-2"}>
+      <div className={"flex grow flex-col items-start gap-2"}>
         <p className={"font-semibold text-primary-foreground"}>{app.name}</p>
         <p className={"line-clamp-2 text-primary-foreground/75"}>{app.desc}</p>
 
