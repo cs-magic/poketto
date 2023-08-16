@@ -74,9 +74,7 @@ export default function ConversationPage({ user, conversationStr }: { user: User
  */
 
 const ConversationList = ({ user }: { user: User }) => {
-  const { data: conversations = [] } = api.poketto.listConversations.useQuery({
-    uid: user.id,
-  })
+  const { data: conversations = [] } = api.poketto.listConversations.useQuery({})
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)
   // todo: avoid empty call of trpc
@@ -133,23 +131,21 @@ const ConversationList = ({ user }: { user: User }) => {
 const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
   const m = useMustache()
   return (
-    <Link href={getConversationLink(c.id)} className={"w-full"}>
-      <Button variant={"ghost"} className={"| flex h-fit w-full items-center gap-4 px-4 py-2"}>
-        <Avatar className={"shrink-0"}>
-          <AvatarImage src={c.app.avatar} />
-        </Avatar>
+    <Link href={getConversationLink(c.id)} className={"flex h-fit w-full items-center gap-4 px-4 py-2 hover:bg-accent"}>
+      <Avatar className={"shrink-0"}>
+        <AvatarImage src={c.app.avatar} />
+      </Avatar>
 
-        <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
-          <div className={"| flex w-full justify-between gap-2"}>
-            <span className={"truncate "}>{c.app.name}</span>
-            <span>{d(c.messages[c.messages.length - 1]!.createdAt).calendar()}</span>
-          </div>
-          <div className={"flex gap-2"}>
-            {/* 只有 group 才需要打开 */}
-            <span className={"truncate text-muted-foreground"}>{m(c.messages[c.messages.length - 1]!.content)}</span>
-          </div>
+      <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
+        <div className={"| flex w-full justify-between gap-2"}>
+          <span className={"truncate "}>{c.app.name}</span>
+          <span>{d(c.messages[c.messages.length - 1]!.createdAt).calendar()}</span>
         </div>
-      </Button>
+        <div className={"flex gap-2"}>
+          {/* 只有 group 才需要打开 */}
+          <span className={"truncate text-muted-foreground"}>{m(c.messages[c.messages.length - 1]!.content)}</span>
+        </div>
+      </div>
     </Link>
   )
 }

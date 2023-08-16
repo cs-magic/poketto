@@ -6,32 +6,30 @@ import {
   type IFlowgptConversation,
   type IFlowgptPromptBasic,
   type IPokettoConversation,
-} from "@/ds";
-import d from "@/lib/datetime";
-import { nanoid } from "nanoid";
-import dayjs from "dayjs";
-import { PlatformType } from ".prisma/client";
+} from "@/ds"
+import d from "@/lib/datetime"
+import { nanoid } from "nanoid"
+import dayjs from "dayjs"
+import { PlatformType } from ".prisma/client"
 
-import { DEFAULT_APP_VERSION } from "@/config";
-import { App, AppModel, AppState, AppTag, User } from "@prisma/client";
+import { DEFAULT_APP_VERSION } from "@/config"
+import { App, AppModel, AppState, AppTag, User } from "@prisma/client"
 
-export const transFlowgptConversation = (
-  f: IFlowgptConversation
-): IPokettoConversation => ({
+export const transFlowgptConversation = (f: IFlowgptConversation): IPokettoConversation => ({
   createdAt: d(f.createdAt).toDate(),
   messages: f.messages.map((m) => ({
     ...m,
     type: "user",
     format: "text",
     appId: f.id,
-    uid: undefined,
+    userId: undefined,
     parentId: undefined,
     interactions: {},
     id: nanoid(),
     createdAt: new Date(),
     role: m.role as "system" | "user" | "assistant" | "function",
   })),
-});
+})
 
 export const transFlowgptPrompt2app = (p: IFlowgptPromptBasic): App => ({
   platformType: PlatformType.FlowGPT,
@@ -47,7 +45,7 @@ export const transFlowgptPrompt2app = (p: IFlowgptPromptBasic): App => ({
   creatorId: p.userId,
   categoryMain: p.categoryId,
   categorySub: p.subCategoryId,
-});
+})
 
 export const transFlowgptPrompt2creator = (p: IFlowgptPromptBasic): User => ({
   // ...p.User,
@@ -61,7 +59,7 @@ export const transFlowgptPrompt2creator = (p: IFlowgptPromptBasic): User => ({
   emailVerified: null,
   platformType: PlatformType.FlowGPT,
   platformUserId: p.id,
-});
+})
 
 export const transFlowgptPrompt2model = (p: IFlowgptPromptBasic): AppModel => ({
   id: p.id,
@@ -71,7 +69,7 @@ export const transFlowgptPrompt2model = (p: IFlowgptPromptBasic): AppModel => ({
   isOpenSource: p.visibility,
   temperature: p.temperature,
   type: p.model,
-});
+})
 
 export const transFlowgptPrompt2state = (p: IFlowgptPromptBasic): AppState => ({
   id: p.id,
@@ -84,7 +82,7 @@ export const transFlowgptPrompt2state = (p: IFlowgptPromptBasic): AppState => ({
   tips: p.tip,
   stars: p.saves,
   shares: p.shares,
-});
+})
 
 export const transFlowgptPrompt2tags = (p: IFlowgptPromptBasic): AppTag[] =>
   p.Tag.map((t) => ({
@@ -93,11 +91,9 @@ export const transFlowgptPrompt2tags = (p: IFlowgptPromptBasic): AppTag[] =>
     createdAt: null,
     updatedAt: null,
     creatorId: null,
-  }));
+  }))
 
-export const transformFlowgptPrompt2AppWithRelation = (
-  p: IFlowgptPromptBasic | FlowgptPromptFull
-): AppWithRelation => {
+export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppWithRelation => {
   return {
     comments: [], // todo: add comments
     id: p.id,
@@ -117,11 +113,9 @@ export const transformFlowgptPrompt2AppWithRelation = (
     actions: [],
     categoryMain: p.categoryId,
     categorySub: p.subCategoryId,
-  };
-};
-export const transFlowgptComments = (
-  comment: IFlowGPTComment
-): IAppComment => ({
+  }
+}
+export const transFlowgptComments = (comment: IFlowGPTComment): IAppComment => ({
   ...comment,
   ratedStars: 0,
   content: comment.body,
@@ -137,4 +131,4 @@ export const transFlowgptComments = (
     platformType: PlatformType.FlowGPT,
     platformUserId: comment.userId,
   },
-});
+})

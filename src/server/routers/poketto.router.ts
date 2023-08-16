@@ -1,7 +1,7 @@
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers";
-import partialSearch from "../../data/partial-search.agg.json";
-import { appInclude, type AppWithRelation, conversationInclude, type ConversationWithRelation, type IFlowgptPromptBasic } from "@/ds";
+import { z } from "zod"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
+import partialSearch from "../../data/partial-search.agg.json"
+import { appInclude, type AppWithRelation, conversationInclude, type ConversationWithRelation, type IFlowgptPromptBasic } from "@/ds"
 import {
   transFlowgptPrompt2app,
   transFlowgptPrompt2creator,
@@ -9,18 +9,18 @@ import {
   transFlowgptPrompt2state,
   transFlowgptPrompt2tags,
   transformFlowgptPrompt2AppWithRelation as transFlowgptPrompt2AppWithRelation,
-} from "@/lib/flowgpt";
-import { addAppIntoConversation } from "@/server/auth";
-import { fetchFlowgptPrompt } from "@/server/routers/flowgpt.router";
-import { ChatMessageFormatType, PlatformType, PromptRoleType } from ".prisma/client";
-import { prisma } from "@/server/db";
+} from "@/lib/flowgpt"
+import { addAppIntoConversation } from "@/server/auth"
+import { fetchFlowgptPrompt } from "@/server/routers/flowgpt.router"
+import { ChatMessageFormatType, PlatformType, PromptRoleType } from ".prisma/client"
+import { prisma } from "@/server/db"
 
 export const initFlowgptApp = async (appId: string): Promise<AppWithRelation> => {
-  const p = await fetchFlowgptPrompt(appId);
+  const p = await fetchFlowgptPrompt(appId)
   // drop foreign keys for nested create/upsert
-  const { creatorId, categoryMain, categorySub, ...app_ } = transFlowgptPrompt2app(p);
-  const { appId: appIdInModel, ...model } = transFlowgptPrompt2model(p);
-  const { appId: appIdInState, ...state } = transFlowgptPrompt2state(p);
+  const { creatorId, categoryMain, categorySub, ...app_ } = transFlowgptPrompt2app(p)
+  const { appId: appIdInModel, ...model } = transFlowgptPrompt2model(p)
+  const { appId: appIdInState, ...state } = transFlowgptPrompt2state(p)
   return prisma.app.upsert({
     include: appInclude,
     where: { id: p.id },
@@ -67,8 +67,8 @@ export const initFlowgptApp = async (appId: string): Promise<AppWithRelation> =>
         },
       },
     },
-  });
-};
+  })
+}
 
 export const pokettoRouter = createTRPCRouter({
   /**
@@ -86,8 +86,8 @@ export const pokettoRouter = createTRPCRouter({
       const result = await prisma.conversation.findMany({
         where: { userId: user.id },
         include: conversationInclude,
-      });
-      return result as ConversationWithRelation[];
+      })
+      return result as ConversationWithRelation[]
     }
   ),
 
@@ -108,8 +108,8 @@ export const pokettoRouter = createTRPCRouter({
         const result = await prisma.conversation.findUnique({
           where: { userId: user.id, id: cid },
           include: conversationInclude,
-        });
-        return result;
+        })
+        return result as ConversationWithRelation
       }
     ),
 
@@ -129,8 +129,8 @@ export const pokettoRouter = createTRPCRouter({
       }) => {
         const result = await prisma.chatMessage.findMany({
           where: { conversationId: cid },
-        });
-        return result;
+        })
+        return result
       }
     ),
 
@@ -158,8 +158,8 @@ export const pokettoRouter = createTRPCRouter({
             userId: user.id,
             format: ChatMessageFormatType.text,
           },
-        });
-        return result;
+        })
+        return result
       }
     ),
 
@@ -173,7 +173,7 @@ export const pokettoRouter = createTRPCRouter({
     .mutation(async ({ ctx: { prisma, session }, input: { appId, appPlatform } }) => {
       const user = await prisma.user.findUniqueOrThrow({
         where: { id: session.user.id },
-      });
+      })
 
       const app =
         appPlatform === PlatformType.FlowGPT
@@ -181,8 +181,8 @@ export const pokettoRouter = createTRPCRouter({
               where: { id: appId },
               include: appInclude,
             })
-          : await initFlowgptApp(appId);
-      return addAppIntoConversation(user, app);
+          : await initFlowgptApp(appId)
+      return addAppIntoConversation(user, app)
     }),
 
   delConversation: protectedProcedure
@@ -192,7 +192,7 @@ export const pokettoRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx: { prisma, session }, input: { id } }) => {
-      return await prisma.conversation.delete({ where: { id } });
+      return await prisma.conversation.delete({ where: { id } })
     }),
 
   searchPoketto: publicProcedure
@@ -205,10 +205,10 @@ export const pokettoRouter = createTRPCRouter({
       })
     )
     .query<AppWithRelation[]>(async (opts) => {
-      partialSearch[0]!.$search!.phrase.query = opts.input.query; // <-- mongodb partial search
-      let result;
-      result = await opts.ctx.mongo.db("flowgpt").collection("basic").aggregate<IFlowgptPromptBasic>(partialSearch).toArray();
+      partialSearch[0]!.$search!.phrase.query = opts.input.query // <-- mongodb partial search
+      let result
+      result = await opts.ctx.mongo.db("flowgpt").collection("basic").aggregate<IFlowgptPromptBasic>(partialSearch).toArray()
       // result = await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.searchPrompts', { json: opts.input } })
-      return result.map(transFlowgptPrompt2AppWithRelation);
+      return result.map(transFlowgptPrompt2AppWithRelation)
     }),
-});
+})
