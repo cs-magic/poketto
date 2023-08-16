@@ -23,7 +23,6 @@ const config = {
 				fixStyle: "inline-type-imports",
 			},
 		],
-		"@typescript-eslint/no-unused-vars": ["warn", {argsIgnorePattern: "^_"}],
 		"@typescript-eslint/ban-ts-comment": ["warn"],
 		'@typescript-eslint/no-explicit-any': ['warn'],
 		'react/display-name': ['warn'],
@@ -41,6 +40,7 @@ const config = {
 		'react/no-unescaped-entities': ['off'],
 		'@typescript-eslint/require-await': ['off'],
 		'@typescript-eslint/no-unnecessary-type-assertion': ['warn'],
+		'@typescript-eslint/no-unused-vars': ['off'],
 	},
 };
 

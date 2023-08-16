@@ -21,6 +21,9 @@ import { CardsLayoutType } from '@/store/ui.slice'
 import { getAppLink, getConversationLink } from '@/lib/string'
 import { type AppWithRelation, SortOrder } from '@/ds'
 import { URI } from '@/config'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { AppDetail } from '@/components/app-detail-view'
+import { AppContainer } from '@/components/containers'
 
 export default function WorkspacesPage() {
 	const user = useUser()
@@ -118,24 +121,28 @@ const AppView = ({ app }: {
 		</div>
 	</div>)
 	
-	return (<Link className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'} href={getAppLink(app.id)}>
-		<Avatar className={'rounded-sm'}>
-			<AvatarImage src={app.avatar}/>
-		</Avatar>
-		
-		<div className={'flex flex-col gap-2 grow'}>
-			<p className={'text-primary-foreground font-semibold'}>{app.name}</p>
-			<p className={'line-clamp-2 text-primary-foreground/75'}>{app.desc}</p>
+	const view = (
+		<div className={'w-full p-3 pt-6 | flex gap-8 text-muted-foreground | hocus:bg-accent cursor-pointer'}>
+			<Avatar className={'rounded-sm'}>
+				<AvatarImage src={app.avatar}/>
+			</Avatar>
 			
-			<div className={'inline-flex gap-4'}>
-				<p>By {app.name}</p>
-				<p>Updated on {dayjs(app.updatedAt).format('DD MMM, YYYY')}</p>
+			<div className={'flex flex-col gap-2 grow'}>
+				<p className={'text-primary-foreground font-semibold'}>{app.name}</p>
+				<p className={'line-clamp-2 text-primary-foreground/75'}>{app.desc}</p>
+				
+				<div className={'inline-flex gap-4'}>
+					<p>By {app.name}</p>
+					<p>Updated on {dayjs(app.updatedAt).format('DD MMM, YYYY')}</p>
+				</div>
+			</div>
+			
+			<div className={'inline-flex gap-2 shrink-0'}>
+				<UsesField v={app.state?.calls ?? 0}/>
+				<ViewsField v={app.state?.views ?? 0}/>
 			</div>
 		</div>
-		
-		<div className={'inline-flex gap-2 shrink-0'}>
-			<UsesField v={app.state?.calls ?? 0}/>
-			<ViewsField v={app.state?.views ?? 0}/>
-		</div>
-	</Link>)
+	)
+	
+	return <AppContainer app={app} view={view}/>
 }

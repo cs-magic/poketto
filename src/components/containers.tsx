@@ -1,7 +1,10 @@
-import { type HTMLProps, type PropsWithChildren, useCallback, useState } from 'react'
+import React, { type HTMLProps, type PropsWithChildren, type ReactNode, useCallback, useState } from 'react'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { type DEVICE_TYPE, DEVICES } from '@/config'
 import clsx from 'clsx'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { AppDetail } from '@/components/app-detail-view'
+import { type AppWithRelation } from '@/ds'
 
 export const GridContainer = ({ children }: PropsWithChildren) => {
 	return (
@@ -90,5 +93,17 @@ export const DeviceContainer = ({ device = 'iphone-14-pro', ratio = 1, children 
 				<div className="device-power "></div>
 			</div>
 		</DeviceContainerInner>
+	)
+}
+
+
+export const AppContainer = ({ app, view }: { app: AppWithRelation, view: ReactNode }) => {
+	return (
+		<Dialog>
+			<DialogTrigger asChild>{view}</DialogTrigger>
+			<DialogContent>
+				<AppDetail app={app} comments={[]}/>
+			</DialogContent>
+		</Dialog>
 	)
 }

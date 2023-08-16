@@ -13,6 +13,8 @@
     // ref: https://github.com/vercel/next.js/issues/5307#issuecomment-567166918
     "sourceMap": true,
     "strict": true,
+    // 太烦了
+    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -46,5 +48,5 @@
   ],
   "exclude": [
     "node_modules"
-  ],
+  ]
 }

@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  // output   = "../node_modules/@prisma/client/generated" // support for webstorm autocompletion
 }
 
 datasource db {
@@ -87,7 +88,7 @@ model User {
 
   Conversation Conversation[]
 
-  @@unique([platformType, platformUserId])
+  @@unique([platformType, platformUserId], name: "platform")
 }
 
 model FollowRelation {
@@ -150,16 +151,17 @@ model App {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  creator    User        @relation(references: [id], fields: [creatorId], onUpdate: Cascade, onDelete: Cascade)
-  creatorId  String
-  name       String
-  avatar     String
-  desc       String
-  language   String      @default("en")
-  version    String      @default("1.0.0")
-  tags       AppTag[]
-  category   AppCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  categoryId Int
+  creator      User        @relation(fields: [creatorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  creatorId    String
+  name         String
+  avatar       String
+  desc         String
+  language     String      @default("en")
+  version      String      @default("1.0.0")
+  tags         AppTag[]
+  category     AppCategory @relation(fields: [categoryMain, categorySub], references: [main, sub], onDelete: Cascade, onUpdate: Cascade)
+  categoryMain Int
+  categorySub  Int
 
   actions  AppAction[]
   using    Conversation[]
@@ -286,15 +288,14 @@ model ChatMessage {
 }
 
 model AppCategory {
-  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  main String
-  sub  String?
+  main Int
+  sub  Int
   App  App[]
 
-  @@unique([main, sub])
+  @@id([main, sub], name: "id")
 }
 
 model AppTag {

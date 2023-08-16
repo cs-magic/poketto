@@ -4,8 +4,9 @@ import partialSearch from '../../data/partial-search.agg.json'
 import _ from 'lodash'
 import { PlatformType } from '.prisma/client'
 import { type AppWithRelation, GET_PROMPTS_BATCH_SIZE, type IAppComment, type IFlowGPTComment, type IFlowgptPromptBasic, SortOrder } from '@/ds'
-import { flowgpt2poketto_comment, flowgpt2pokettoApp } from '@/lib/flowgpt'
+import { transFlowgptPrompt2app, transFlowgptComments, transformFlowgptPrompt2AppWithRelation } from '@/lib/flowgpt'
 import { POKETTO_APP_WITH_RELATION } from '@/config'
+import { App } from '@prisma/client'
 
 const idInput = z.object({
 	id: z.string().optional(),
@@ -29,9 +30,8 @@ export const singleFetch = async <T>(props: {
 	return result[0].result.data.json as T
 }
 
-export const fetchFlowGPTApp = async (appId: string): Promise<AppWithRelation> => {
-	const flowgptApp = await singleFetch<IFlowgptPromptBasic>({ path: 'prompt.getById', j: { json: appId } })
-	return flowgpt2pokettoApp(flowgptApp)
+export const fetchFlowgptPrompt = async (appId: string): Promise<IFlowgptPromptBasic> => {
+	return singleFetch<IFlowgptPromptBasic>({ path: 'prompt.getById', j: { json: appId } })
 }
 
 export const flowgptRouter = createTRPCRouter({
@@ -45,7 +45,7 @@ export const flowgptRouter = createTRPCRouter({
 			let result
 			result = await opts.ctx.mongo.db('flowgpt').collection('basic').aggregate<IFlowgptPromptBasic>(partialSearch).toArray()
 			// result = await singleFetch<FlowgptPromptBasic[]>({ path: 'prompt.searchPrompts', { json: opts.input } })
-			return result.map(flowgpt2pokettoApp)
+			return result.map(transformFlowgptPrompt2AppWithRelation)
 		}),
 	
 	listPoketto: publicProcedure
@@ -74,7 +74,7 @@ export const flowgptRouter = createTRPCRouter({
 			}
 			const data = await singleFetch<IFlowgptPromptBasic[]>({ path: 'prompt.getPrompts', j })
 			const nextCursor = data.length < GET_PROMPTS_BATCH_SIZE ? undefined : opts.input.skip + GET_PROMPTS_BATCH_SIZE
-			return { data: data.map(flowgpt2pokettoApp), nextCursor }
+			return { data: data.map(transformFlowgptPrompt2AppWithRelation), nextCursor }
 		}),
 	
 	getPoketto: publicProcedure
@@ -88,7 +88,7 @@ export const flowgptRouter = createTRPCRouter({
 			
 			const j = { json: id }
 			const data = await singleFetch<IFlowgptPromptBasic>({ path: 'prompt.getById', j })
-			return flowgpt2pokettoApp(data)
+			return transformFlowgptPrompt2AppWithRelation(data)
 		}),
 	
 	listComments: publicProcedure
@@ -104,7 +104,7 @@ export const flowgptRouter = createTRPCRouter({
 				},
 			}
 			const data = await singleFetch<IFlowGPTComment[]>({ path: 'comment.getComments', j })
-			return data.map(flowgpt2poketto_comment)
+			return data.map(transFlowgptComments)
 		}),
 	
 	// getSimilarPrompts: procedure
