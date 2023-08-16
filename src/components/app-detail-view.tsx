@@ -35,6 +35,7 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "./ui/alert-dialog"
+import { useMustache } from "@/hooks/use-mustache"
 
 export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; comments: AppComment[]; setOpen?: (v: boolean) => void }) => {
   const router = useRouter()
@@ -230,6 +231,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
 const CollapsablePara = ({ content }: { content: string }) => {
   const [shownMore, setShownMore] = useState(false)
   const [needMore, setNeedMore] = useState(false)
+  const m = useMustache()
 
   const ref = useCallback((node: HTMLParagraphElement) => {
     if (!node) return
@@ -238,8 +240,8 @@ const CollapsablePara = ({ content }: { content: string }) => {
 
   return (
     <div className={"flex w-full flex-col"}>
-      <article className={clsx("prose dark:prose-invert", !shownMore && "line-clamp-4")} ref={ref}>
-        <ReactMarkdown>{content}</ReactMarkdown>
+      <article className={clsx("prose prose-sm prose-slate dark:prose-invert", !shownMore && "line-clamp-4")} ref={ref}>
+        <ReactMarkdown>{m(content)}</ReactMarkdown>
       </article>
 
       {needMore && ( // todo: better show-more effect with harmonious gradient

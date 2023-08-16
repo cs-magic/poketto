@@ -212,7 +212,7 @@ const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationW
 
   return (
     <>
-      <div className={"| flex w-full items-center justify-between gap-2 truncate bg-muted px-4 py-6"}>
+      <div className={"| flex w-full items-center justify-between gap-2 truncate bg-muted px-4 py-5"}>
         <div>{c.app.name}</div>
         <ControlTool c={c} />
       </div>
