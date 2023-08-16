@@ -1,6 +1,6 @@
 import { RootLayout } from "@/layouts/root.layout"
 import { useAppStore } from "@/store"
-import { useChat } from "ai/react"
+import { type Message, useChat } from "ai/react"
 import { toast } from "sonner"
 import clsx from "clsx"
 import ReactMarkdown from "react-markdown"
@@ -9,13 +9,13 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from ".prisma/client"
-import { type User } from "@prisma/client"
-import { getHotkeyHandler, useDebouncedState, useDebouncedValue, useScrollIntoView } from "@mantine/hooks"
+import { type Conversation, type User } from "@prisma/client"
+import { getHotkeyHandler, useDebouncedValue } from "@mantine/hooks"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { ViewsField } from "@/components/field"
-import React, { type PropsWithChildren, useCallback, useEffect, useRef, useState, FormEvent } from "react"
+import React, { type FormEvent, type PropsWithChildren, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import d from "@/lib/datetime"
 import { ChevronDownIcon, DotsVerticalIcon } from "@radix-ui/react-icons"
@@ -26,7 +26,6 @@ import { getSession } from "next-auth/react"
 import { prisma } from "@/server/db"
 import { getConversationLink } from "@/lib/string"
 import superjson from "superjson"
-import Mustache from "mustache"
 import { nanoid } from "nanoid"
 import {
   type AppWithRelation,
@@ -38,11 +37,10 @@ import {
 import { URI } from "@/config"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
-import { useRouter } from "next/router"
-import logger from "@/lib/logger"
-import _ from "lodash"
 import { XIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
+
+import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 
 export default function ConversationPage({ user, conversationStr }: { user: UserWithRelations; conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
@@ -58,7 +56,7 @@ export default function ConversationPage({ user, conversationStr }: { user: User
         )}
 
         <section className={clsx("| relative flex h-full w-full grow flex-col overflow-hidden transition-all")}>
-          {user && c && <ConversationMessages u={user} c={c} initialMessages={persistedMessages} />}
+          {user && c && <ConversationMain u={user} c={c} initialMessages={persistedMessages} />}
         </section>
 
         {chatDetailVisible && (
@@ -184,56 +182,29 @@ const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
  * [middle] conversation messages
  */
 
-const ConversationMessages = ({ u, c, initialMessages }: { u: User; c: ConversationWithRelation; initialMessages: ChatMessage[] }) => {
+const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationWithRelation; initialMessages: ChatMessage[] }) => {
+  const refForm = useRef<HTMLFormElement>(null)
+
   const { mutate: pushMessage } = api.poketto.pushMessage.useMutation()
-  const [scrolled, setScrolled] = useState(false)
-  const [unread, setUnread] = useState(false)
+
+  const post = (event: FormEvent<HTMLFormElement>) => {
+    handleSubmit(event)
+    pushMessage({ content: input, role: PromptRoleType.user, cid: c.id })
+  }
 
   const { messages, handleSubmit, input, handleInputChange, setMessages } = useChat({
     initialMessages,
     onError: (err) => toast.error(err.message),
     onFinish: (msg) => pushMessage({ ...msg, cid: c.id }),
     onResponse: (response) => {
-      if (scrolled && response.status === 200) setUnread(true)
+      // if (scrolled && response.status === 200) setUnread(true) // 有必要的话，这里可以做更精细地控制
     },
   })
-
-  logger.info({ messages })
-  // const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<HTMLDivElement>({
-  //   offset: 60,
-  // })
-
-  // const ref = useRef<HTMLDivElement>(null)
-  //
-  // useEffect(() => {
-  //   // scrollIntoView()
-  //   // targetRef.current.focus()
-  //   ref.current?.scrollIntoView({})
-  // }, [c.id])
-
-  const refScroll = useCallback(
-    (node: HTMLDivElement) => {
-      if (node) node.scrollIntoView()
-    },
-    [c.id]
-  )
 
   useEffect(() => {
     setMessages(initialMessages)
   }, [initialMessages])
 
-  useEffect(() => {
-    if (!scrolled) {
-      setUnread(false)
-      // scrollIntoView({ alignment: "end" })
-    }
-  })
-
-  const refForm = useRef<HTMLFormElement>(null)
-  const post = (event: FormEvent<HTMLFormElement>) => {
-    handleSubmit(event)
-    pushMessage({ content: input, role: PromptRoleType.user, cid: c.id })
-  }
   return (
     <>
       <div className={"| flex w-full items-center justify-between gap-2 truncate bg-muted px-4 py-6"}>
@@ -241,47 +212,10 @@ const ConversationMessages = ({ u, c, initialMessages }: { u: User; c: Conversat
         <ControlTool />
       </div>
 
-      <div
-        className={"| flex w-full grow flex-col gap-1 overflow-auto p-2"}
-        // ref={scrollableRef}
-        onScroll={(event) => {
-          const { scrollHeight, scrollTop, clientHeight } = event.currentTarget
-          setScrolled(scrollHeight >= scrollTop + clientHeight + 1 /*有误差*/)
-        }}
-      >
-        {
-          // todo: using ourself messages
-          // _.reverse(messages)
-          messages
-            // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
-            .map((msg, index) => (
-              <ConversationMessage
-                user={u}
-                msg={{
-                  ...msg,
-                  conversationId: c.id,
-                  id: nanoid(),
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  format: ChatMessageFormatType.text,
-                  userId: msg.role === PromptRoleType.user ? u.id : "OpenAI",
-                }}
-                key={index}
-              />
-            ))
-        }
-        <div ref={refScroll} className={"mb-auto"} />
-      </div>
+      <ScrollToBottom className={"w-full grow overflow-auto p-2"} initialScrollBehavior={"auto"}>
+        <ConversationMessages messages={messages} u={u} c={c} />
+      </ScrollToBottom>
 
-      {unread && (
-        <Badge
-          variant={"default"}
-          className={"absolute bottom-[80px] right-4"}
-          // onClick={() => scrollIntoView()}
-        >
-          New Message <ChevronDownIcon />
-        </Badge>
-      )}
       <form ref={refForm} className={"| flex w-full items-center justify-center gap-2 p-4"} onSubmit={post}>
         <Textarea
           name={"prompt"}
@@ -296,6 +230,51 @@ const ConversationMessages = ({ u, c, initialMessages }: { u: User; c: Conversat
           ])}
         />
       </form>
+    </>
+  )
+}
+
+const ConversationMessages = ({ messages, u, c }: { messages: Message[]; u: User; c: Conversation }) => {
+  const scrollToBottom = useScrollToBottom()
+  const [sticky] = useSticky()
+  const [hasUnread, setHasUnread] = useState(false)
+
+  useEffect(() => {
+    if (!sticky) setHasUnread(true)
+  }, [messages.length])
+
+  useEffect(() => {
+    if (sticky) setHasUnread(false)
+  }, [sticky])
+
+  return (
+    <>
+      {
+        // todo: using ourself messages
+        // _.reverse(messages)
+        messages
+          // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
+          .map((msg, index) => (
+            <ConversationMessage
+              user={u}
+              msg={{
+                ...msg,
+                conversationId: c.id,
+                id: nanoid(),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                format: ChatMessageFormatType.text,
+                userId: msg.role === PromptRoleType.user ? u.id : "OpenAI",
+              }}
+              key={index}
+            />
+          ))
+      }
+      {hasUnread && !sticky && (
+        <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>
+          New Message <ChevronDownIcon />
+        </Badge>
+      )}
     </>
   )
 }
