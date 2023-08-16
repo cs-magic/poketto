@@ -98,7 +98,7 @@ export const DeviceContainer = ({
 export const AppContainer = ({ app, view }: { app: AppWithRelation; view: ReactNode }) => {
   return (
     <Dialog>
-      <DialogTrigger>{view}</DialogTrigger>
+      <DialogTrigger className={"w-full"}>{view}</DialogTrigger>
       <DialogContent>
         <AppDetail app={app} comments={[]} />
       </DialogContent>
