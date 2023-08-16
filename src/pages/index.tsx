@@ -25,9 +25,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { AppDetail } from "@/components/app-detail-view"
 import { AppContainer } from "@/components/containers"
 
-export default function WorkspacesPage() {
+export default function HomePage() {
   const user = useUser()
-  const router = useRouter()
 
   return (
     <RootLayout>
@@ -73,9 +72,9 @@ const RecentConversations = ({ user }: { user: User }) => {
   const { data: conversations = [] } = api.poketto.listConversations.useQuery({})
   return (
     <>
-      {conversations.map((c) => {
+      {conversations.slice(0, 10).map((c) => {
         return (
-          <Link className={"w-48"} key={c.id} href={getConversationLink(c.id)}>
+          <Link className={"w-48 shrink-0"} key={c.id} href={getConversationLink(c.id)}>
             <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={SortOrder.new} key={c.id} />
           </Link>
         )

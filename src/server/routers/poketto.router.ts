@@ -51,8 +51,8 @@ export const initFlowgptApp = async (appId: string): Promise<AppWithRelation> =>
         connectOrCreate: {
           where: { id: { main: p.categoryId, sub: p.subCategoryId } },
           create: {
-            main: p.categoryId,
-            sub: p.subCategoryId,
+            main: p.categoryId ?? -1,
+            sub: p.subCategoryId ?? -1,
           },
         },
       },
