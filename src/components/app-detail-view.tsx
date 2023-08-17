@@ -41,20 +41,20 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
   const router = useRouter()
   const utils = api.useContext()
 
-  const { data: conversations = [] } = api.poketto.listConversations.useQuery({})
+  const { data: conversations = [] } = api.conv.listConversations.useQuery({})
   const conv = conversations.find((c) => c.appId === app.id)!
 
-  const { mutate: addApp } = api.poketto.addAppIntoConversation.useMutation({
+  const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
     onSuccess: (data) => {
-      void utils.poketto.listConversations.invalidate()
+      void utils.conv.listConversations.invalidate()
       toast.success(`Successfully added app: ${app.name}`)
       void router.push(getConversationLink(data.id))
       setOpen && setOpen(false)
     },
   })
-  const { mutate: delConv, data: delResult } = api.poketto.delConversation.useMutation({
+  const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
     onSuccess: (input) => {
-      void utils.poketto.listConversations.invalidate()
+      void utils.conv.listConversations.invalidate()
       void router.push(getConversationLink(conversations.find((c) => c.id !== conv.id)!.id))
     },
   })

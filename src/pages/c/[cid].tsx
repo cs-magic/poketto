@@ -42,12 +42,13 @@ import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import _ from "lodash"
-import logger from "@/lib/logger"
+import log from "@/lib/log"
+import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
 
 export default function ConversationPage({ user, conversationStr }: { user: UserWithRelations; conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
   const { chatListVisible, chatDetailVisible } = useAppStore()
-  const { data: persistedMessages = [] } = api.poketto.listMessages.useQuery({ cid: c.id })
+  const { data: persistedMessages = [] } = api.conv.listMessages.useQuery({ cid: c.id })
   return (
     <RootLayout>
       <div className={"| flex h-full w-full divide-x overflow-hidden"}>
@@ -76,11 +77,18 @@ export default function ConversationPage({ user, conversationStr }: { user: User
  */
 
 const ConversationList = ({ user }: { user: User }) => {
-  const { data: convs = [] } = api.poketto.listConversations.useQuery({})
+  const { data: convs = [] } = api.conv.listConversations.useQuery({})
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)
   // todo: avoid empty call of trpc
-  const { data: searchedApps } = api.flowgpt.searchApps.useQuery({ query: toSearch }, { enabled: toSearch !== "" })
+  const queryApps = api.app.listApps.useInfiniteQuery(
+    { searchKey: toSearch },
+    {
+      enabled: toSearch !== "",
+      getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
+    }
+  )
+  const searchedApps = queryApps.data?.pages.flatMap((item) => item.data) ?? []
 
   return (
     <>
@@ -143,7 +151,7 @@ const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
     >
       <div className={"flex h-fit w-full items-center  gap-4"}>
         <Avatar className={"shrink-0"}>
-          <AvatarImage src={c.app.avatar} />
+          <AvatarImage src={getLocalFlowgptImageUri(c.app.avatar, "md")} />
         </Avatar>
 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
@@ -167,7 +175,7 @@ const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className={"flex w-full items-center gap-2 p-2 hover:bg-accent"}>
         <Avatar className={"shrink-0"}>
-          <AvatarImage src={app.avatar} />
+          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
         </Avatar>
         <div className={"| flex grow flex-col gap-1 overflow-hidden"}>
           <p className={"| truncate text-sm font-semibold text-primary-foreground/75"}>{app.name}</p>
@@ -193,8 +201,8 @@ const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationW
   const refForm = useRef<HTMLFormElement>(null)
 
   const utils = api.useContext()
-  const { mutate: pushMessage } = api.poketto.pushMessage.useMutation({
-    onSuccess: () => void utils.poketto.listConversations.invalidate(),
+  const { mutate: pushMessage } = api.conv.pushMessage.useMutation({
+    onSuccess: () => void utils.conv.listConversations.invalidate(),
   })
 
   const post = (event: FormEvent<HTMLFormElement>) => {
@@ -323,8 +331,8 @@ const SectionTitle = ({ children }: PropsWithChildren) => <div className={"| w-f
 const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
   const { chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
   const utils = api.useContext()
-  const { mutate: pinConv } = api.poketto.pinConv.useMutation({
-    onSuccess: void utils.poketto.listConversations.invalidate(),
+  const { mutate: pinConv } = api.conv.pinConv.useMutation({
+    onSuccess: void utils.conv.listConversations.invalidate(),
   })
 
   return (

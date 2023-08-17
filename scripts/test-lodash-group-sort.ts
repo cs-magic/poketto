@@ -1,5 +1,5 @@
 import _ from "lodash"
-import logger from "@/lib/logger"
+import log from "@/lib/log"
 
 const data = [
   { a: 1, k: false },
@@ -14,4 +14,4 @@ const data_ = _(data)
   })
   .value()
 
-logger.info({ data, data_ })
+log.info({ data, data_ })

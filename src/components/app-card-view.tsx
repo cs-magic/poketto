@@ -12,9 +12,10 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import numeral from "numeral"
 import React from "react"
 import { type AppWithRelation, type SortOrder } from "@/ds"
+import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
+import { UsesField, ViewsField } from "@/components/field"
 
 export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; cardsLayout: CardsLayoutType; sort: SortOrder }) => {
-  const Icon = order2icon[sort]
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (
@@ -38,7 +39,7 @@ export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; 
         className={clsx(
           "| absolute bottom-0 flex w-full flex-col gap-2 p-4",
           "backdrop-blur",
-          "dark:backdropbrightness-50 backdrop-brightness-[.75] "
+          "backdrop-brightness-[.75] dark:backdrop-brightness-50 "
         )}
       >
         {/* title */}
@@ -51,15 +52,15 @@ export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; 
           {/* user */}
           <Link className={"| flex w-1/2 items-center gap-2"} href={getUserLink(app.creatorId)}>
             <Avatar className={"wh-5"}>
-              <AvatarImage src={app.avatar} />
+              <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
             </Avatar>
             <span className={"truncate italic"}>{app.name}</span>
           </Link>
 
           {/* ranks */}
           <div className={"flex items-center gap-1"}>
-            <Icon />
-            <span>{numeral(app.state?.views).format("0a")}</span>
+            <UsesField v={app.state!.calls} size={"sm"} />
+            <ViewsField v={app.state!.calls} size={"sm"} />
           </div>
         </div>
       </div>

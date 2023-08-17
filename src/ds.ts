@@ -23,11 +23,8 @@ export const userWithRelationsInclude = {
   following: true,
 }
 
-export enum UserAppRelationType {
-  created = "created",
-  used = "used",
-  starred = "starred",
-}
+export const userAppRelationTypes = ["create", "used", "starred"] as const
+export type UserAppRelationType = (typeof userAppRelationTypes)[number]
 
 export type UserWithRelations = UserGetPayload<{
   include: typeof userWithRelationsInclude
@@ -40,6 +37,7 @@ export type UserWithRelations = UserGetPayload<{
 // -----------------------------------------------------------------------------
 
 export type IFlowgptPromptBasic = typeof sampleBasicPrompt
+export type IFlowgptUserBasic = typeof sampleBasicPrompt.User
 export type IFlowgptConversation = typeof sampleConversation
 export type IFlowGPTComment = typeof sampleComment
 export const GET_PROMPTS_BATCH_SIZE = 36
@@ -49,14 +47,9 @@ export interface FlowgptPromptFull // todo: add comments
   Conversation: IFlowgptConversation
 }
 
-export enum FlowGPTSortOrder {
-  recommended = "recommended",
-  top = "top",
-  mostSaved = "most-saved",
-  trending = "trending",
-  new = "new",
-  follow = "follow",
-}
+const flowgptSortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow"] as const
+export const sortOrders = [...flowgptSortOrders, "mostViewed"] as const
+export type SortOrder = (typeof sortOrders)[number]
 
 export interface IAppComment extends Omit<IFlowGPTComment, "user"> {
   ratedStars: number
@@ -66,8 +59,6 @@ export interface IAppComment extends Omit<IFlowGPTComment, "user"> {
 
 export interface IPokettoFunction /* extends ChatGPTFunction */ {}
 
-export const SortOrder = { ...FlowGPTSortOrder }
-export type SortOrder = FlowGPTSortOrder
 export const appInclude = {
   creator: true,
   actions: true, // note: unnecessary to track appActions
@@ -87,7 +78,7 @@ export const conversationInclude = {
     include: {
       user: true, // 获取每条信息的用户
     },
-  }
+  },
 }
 type IAppInclude = typeof appInclude
 type IConversationInclude = typeof conversationInclude
@@ -96,7 +87,7 @@ export type AppWithRelation = AppGetPayload<{
 }>
 export type ConversationWithRelation = ConversationGetPayload<{
   include: IConversationInclude
-}> & {latestMessage: ChatMessage}
+}> & { latestMessage: ChatMessage }
 
 // -----------------------------------------------------------------------------
 // poketto

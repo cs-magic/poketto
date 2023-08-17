@@ -24,6 +24,8 @@ import { URI } from "@/config"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { AppDetail } from "@/components/app-detail-view"
 import { AppContainer } from "@/components/containers"
+import log from "@/lib/log"
+import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
 
 export default function HomePage() {
   const user = useUser()
@@ -69,13 +71,13 @@ export default function HomePage() {
 }
 
 const RecentConversations = ({ user }: { user: User }) => {
-  const { data: conversations = [] } = api.poketto.listConversations.useQuery({})
+  const { data: conversations = [] } = api.conv.listConversations.useQuery({})
   return (
     <>
       {conversations.slice(0, 10).map((c) => {
         return (
           <Link className={"w-48 shrink-0"} key={c.id} href={getConversationLink(c.id)}>
-            <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={SortOrder.new} key={c.id} />
+            <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.id} />
           </Link>
         )
       })}
@@ -84,7 +86,13 @@ const RecentConversations = ({ user }: { user: User }) => {
 }
 
 const ExploreApps = () => {
-  const { data: page } = api.flowgpt.listPoketto.useQuery({ sort: SortOrder.trending })
+  const query = api.app.listApps.useInfiniteQuery(
+    {},
+    {
+      getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
+    }
+  )
+  const apps = query.data?.pages.flatMap((item) => item.data) ?? []
 
   return (
     <Card id={"explore"} variant={"ghost"} className={"w-full"}>
@@ -102,7 +110,7 @@ const ExploreApps = () => {
       <CardContent className={"flex w-full justify-between"}>
         <div className={"flex w-full flex-col divide-y"}>
           {_.sampleSize(_.range(30), 3).map((i) => (
-            <AppView app={page?.data[i]} key={i} />
+            <AppView app={apps[i]} key={i} />
           ))}
         </div>
       </CardContent>
@@ -129,9 +137,9 @@ const AppView = ({ app }: { app: AppWithRelation | undefined }) => {
     )
 
   const view = (
-    <div className={"| | flex w-full cursor-pointer gap-8 p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
-      <Avatar className={"rounded-sm"}>
-        <AvatarImage src={app.avatar} />
+    <div className={"flex w-full cursor-pointer  items-center gap-8 p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
+      <Avatar className={"rounded-sm wh-[64px]"}>
+        <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
       </Avatar>
 
       <div className={"flex grow flex-col items-start gap-2"}>
@@ -151,5 +159,5 @@ const AppView = ({ app }: { app: AppWithRelation | undefined }) => {
     </div>
   )
 
-  return <AppContainer app={app} view={view} />
+  return <AppContainer app={app}>{view}</AppContainer>
 }

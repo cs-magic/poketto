@@ -82,12 +82,13 @@ function getExtendedClient() {
       },
       conversation: {
         latestMessage: {
-          needs: { // @ts-ignore
-            messages: true
+          needs: {
+            // @ts-ignore
+            messages: true,
           },
-          compute: (conv) => conv.messages[conv.messages.length-1]
-        }
-      }
+          compute: (conv) => conv.messages[conv.messages.length - 1],
+        },
+      },
     },
   })
 
@@ -101,13 +102,16 @@ function getExtendedClient() {
 export type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>
 
 const globalForDB = globalThis as unknown as {
-  prisma: ExtendedPrismaClient | undefined
-  mongo: MongoClient | undefined
+  prisma?: ExtendedPrismaClient
+  mongo?: MongoClient
+  mongoLocal?: MongoClient
 }
 export const prisma = globalForDB.prisma ?? getExtendedClient()
 export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI, {})
+export const mongoLocal = globalForDB.mongoLocal ?? new MongoClient(env.DB_MONGO_LOCAL_URI, {})
 
 if (env.NODE_ENV !== "production") {
   globalForDB.prisma = prisma
   globalForDB.mongo = mongo
+  globalForDB.mongoLocal = mongoLocal
 }
