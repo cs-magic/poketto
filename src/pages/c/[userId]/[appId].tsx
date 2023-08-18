@@ -40,6 +40,7 @@ import log from "@/lib/log"
 import { useUser } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 
 export default function ConversationPage({ conversationStr }: { conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
@@ -49,27 +50,21 @@ export default function ConversationPage({ conversationStr }: { conversationStr:
 
   return (
     <RootLayout>
-      <div className={"| flex h-full w-full divide-x overflow-hidden"}>
+      <div className={"flex h-full w-full overflow-auto"}>
         {!!(ui & 1) && chatListVisible && (
-          <section className={"relative hidden w-full flex-col items-center overflow-hidden md:flex md:w-[375px]" + " shrink-[.1]"}>
+          <section className={"hidden w-full shrink-[.1] lg:flex lg:w-[375px]"}>
             <ConversationList />
           </section>
         )}
 
         {!!(ui & 2) && (
-          <section className={clsx("| relative flex h-full w-full grow flex-col overflow-hidden transition-all md:min-w-[375px]")}>
+          <section className={clsx("grow")}>
             <ConversationMain c={c} />
           </section>
         )}
 
         {!!(ui & 4) && chatDetailVisible && (
-          <section
-            className={clsx(
-              "hidden w-full shrink-[.1] overflow-x-hidden md:w-[375px] lg:flex",
-              "h-full gap-4 overflow-y-auto p-4",
-              "break-inside-avoid flex-col"
-            )}
-          >
+          <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>
             {chatDetailVisible && c && <AppDetail app={c.app} comments={c.app.comments} />}
           </section>
         )}
@@ -84,14 +79,17 @@ export default function ConversationPage({ conversationStr }: { conversationStr:
 
 const ConversationMain = ({ c }: { c: ConversationWithRelation }) => {
   return (
-    <>
-      <div className={"| flex w-full items-center justify-between gap-2 truncate bg-muted px-4 py-5"}>
-        <div>{c.app.name}</div>
+    <div className={"flex h-full w-full flex-col overflow-hidden"}>
+      <div className={"| flex w-full items-center justify-between gap-4 overflow-hidden truncate bg-muted px-4 py-5"}>
+        <div />
+        <h2 className={"truncate text-center"}>{c.app.name}</h2>
         <ControlTool c={c} />
       </div>
 
-      <ConversationInput appId={c.appId} />
-    </>
+      <div className={"overflow-auto"}>
+        <ConversationInput appId={c.appId} />
+      </div>
+    </div>
   )
 }
 
@@ -124,7 +122,7 @@ const ConversationInput = ({ appId }: { appId: string }) => {
   console.log({ isLoading })
 
   return (
-    <>
+    <div className={"flex h-full w-full flex-col overflow-hidden"}>
       <ScrollToBottom className={"w-full grow overflow-auto p-2"} initialScrollBehavior={"auto"}>
         {initialMessages ? (
           <ConversationMessages messages={messages} appId={appId} />
@@ -149,7 +147,7 @@ const ConversationInput = ({ appId }: { appId: string }) => {
           ])}
         />
       </form>
-    </>
+    </div>
   )
 }
 
@@ -246,6 +244,19 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
           <span>Back</span> <ChevronLeftIcon />
         </Link>
 
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant={"ghost"} className={" justify-between xl:hidden"}>
+              <span>Detail</span> <CodeSandboxLogoIcon />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <AppDetail app={c.app} comments={[]} />
+          </DialogContent>
+        </Dialog>
+
+        <Separator orientation={"horizontal"} className={"xl:hidden"} />
+
         <Button className={"justify-between"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
           {c.pinned ? (
             <>
@@ -259,17 +270,6 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
             </>
           )}
         </Button>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant={"ghost"} className={" justify-between lg:hidden"}>
-              <span>Detail</span> <CodeSandboxLogoIcon />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <AppDetail app={c.app} comments={[]} />
-          </DialogContent>
-        </Dialog>
 
         <Button className={"justify-between"} variant={"ghost"}>
           <span>Share (todo)</span> <Link2Icon />
@@ -295,7 +295,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     include: conversationInclude,
   })
   // log.info({ time: new Date(), fetched: conversation, userId, appId })
-  log.info({ time: new Date(), userId, appId })
+  // log.info({ time: new Date(), userId, appId })
   if (!conversation) {
     log.warn({ time: new Date(), userId, appId, conversation })
     return {

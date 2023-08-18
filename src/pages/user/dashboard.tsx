@@ -12,13 +12,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { IconUser } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
 import { type AppWithRelation, type UserAppRelationType, userAppRelationTypes, type UserWithRelations } from "@/ds"
-import { DEFAULT_USER_AVATAR, DEFAULT_USER_ID, DEFAULT_USER_NAME, POKETTO_CREATOR_ID, POKETTO_CREATOR_NAME } from "@/config"
+import {
+  DEFAULT_USER_AVATAR,
+  DEFAULT_USER_ID,
+  DEFAULT_USER_NAME,
+  MAX_MOBILE_WIDTH,
+  POKETTO_CREATOR_ID,
+  POKETTO_CREATOR_NAME,
+} from "@/config"
 import d from "@/lib/datetime"
 import { todo } from "@/lib/helpers"
-import { signOut } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 
 import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
 import Link from "next/link"
+import { useElementSize } from "@mantine/hooks"
+import { clsx } from "clsx"
 
 export default function DashboardPage() {
   const user = useUser()
@@ -29,12 +38,10 @@ export default function DashboardPage() {
 
   return (
     <RootLayout>
-      <div className={"| flex h-full w-full flex-wrap gap-4 overflow-auto p-4"}>
-        <UserProfile user={user} />
+      <div className={"grid grid-cols-1 gap-4 overflow-auto p-4 md:grid-cols-2"}>
+        <UserProfile />
 
-        <div className={"| flex grow flex-col overflow-auto"}>
-          {user && <ConversationsView userId={user.id} relationType={relationType} />}
-        </div>
+        {user && <ConversationsView userId={user.id} relationType={relationType} />}
       </div>
     </RootLayout>
   )
@@ -42,26 +49,29 @@ export default function DashboardPage() {
 
 const ConversationsView = ({ userId, relationType }: { userId: string; relationType: UserAppRelationType }) => {
   const { data: convs = [] } = api.conv.listConversations.useQuery({ userId })
+  const { ref, width, height } = useElementSize()
+  const expand = width > MAX_MOBILE_WIDTH
+
   return (
-    <>
-      <div className={"my-4 flex h-8 items-center gap-2"}>
-        <Input className={"h-full grow"} placeholder={"Find an app..."} />
-        <Button variant={"outline"} className={"h-full gap-2"}>
-          Category <ChevronDownIcon />
-        </Button>
-        <Button variant={"outline"} className={"h-full gap-2"}>
-          Language <ChevronDownIcon />
-        </Button>
-        <Button variant={"outline"} className={"h-full gap-2"}>
-          Sort <ChevronDownIcon />
-        </Button>
-        <Button className={"h-full gap-2 bg-primary"}>
-          <Pencil2Icon /> New
-        </Button>
+    <div className={"flex flex-col gap-2"}>
+      <div ref={ref} className={clsx("my-2 gap-2", expand ? "flex " : "grid grid-cols-1")}>
+        <Input className={"grow"} placeholder={"Find an app..."} />
+        <div className={"flex grow items-center justify-between gap-2"}>
+          <Button variant={"outline"} className={"h-full gap-2"}>
+            Category {expand && <ChevronDownIcon />}
+          </Button>
+          <Button variant={"outline"} className={"h-full gap-2"}>
+            Language {expand && <ChevronDownIcon />}
+          </Button>
+          <Button variant={"outline"} className={"h-full gap-2"}>
+            Sort {expand && <ChevronDownIcon />}
+          </Button>
+          <Button className={"h-full gap-2 bg-primary"}>{expand && <Pencil2Icon />} New</Button>
+        </div>
       </div>
 
       {relationType === "used" && convs.map((c) => <AppView app={c.app} key={c.appId} />)}
-    </>
+    </div>
   )
 }
 
@@ -75,10 +85,14 @@ const AppView = ({ app }: { app: AppWithRelation }) => {
       as={getConversationLink(userId, app.id)}
     >
       <div className={"flex flex-col gap-2"}>
-        <div className={"flex items-center gap-2"}>
+        <div className={"flex flex-wrap items-center gap-2"}>
           <h2>{app.name}</h2>
-          {app.creatorId === POKETTO_CREATOR_ID && <Badge className={"bg-blue-500"}>{POKETTO_CREATOR_NAME}</Badge>}
-          <Badge variant={"outline"}>{app.isOpenSource ? "Open Source" : "Close Source"}</Badge>
+          <div className={"flex items-center gap-2"}>
+            {app.creatorId === POKETTO_CREATOR_ID && <Badge className={"bg-blue-500 sm:text-xs md:text-sm"}>{POKETTO_CREATOR_NAME}</Badge>}
+            <Badge className={"sm:text-xs md:text-sm"} variant={"outline"}>
+              {app.isOpenSource ? "Open Source" : "Close Source"}
+            </Badge>
+          </div>
         </div>
         <div className={"line-clamp-3 text-muted-foreground"}>{app.desc}</div>
         <div className={"| flex items-center gap-4 text-muted-foreground"}>
@@ -90,7 +104,7 @@ const AppView = ({ app }: { app: AppWithRelation }) => {
         </div>
       </div>
 
-      <div className={"flex flex-col gap-2"}>
+      <div className={"hidden flex-col gap-2 md:flex"}>
         <Button variant={"outline"} size={"sm"} className={"h-8 gap-2"}>
           <StarIcon />
           <span>Star</span>
@@ -102,13 +116,11 @@ const AppView = ({ app }: { app: AppWithRelation }) => {
   )
 }
 
-const UserProfile = ({ user }: { user?: UserWithRelations }) => {
+const UserProfile = () => {
+  const user = useUser()
+
   return (
-    <div
-      className={
-        "| flex h-fit w-full shrink-0 flex-col justify-around gap-4 overflow-y-auto overflow-x-hidden rounded-2xl p-4" + " md:w-[375px]"
-      }
-    >
+    <div className={"| mx-auto flex h-fit max-w-[375px] flex-col justify-around gap-4 rounded-2xl p-4"}>
       <Avatar className={"mx-auto wh-[256px]"}>
         <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? DEFAULT_USER_AVATAR, "md")} className={""} />
         <AvatarFallback>
@@ -152,9 +164,16 @@ const UserProfile = ({ user }: { user?: UserWithRelations }) => {
           编辑简介
         </Button>
 
-        <Button disabled={!user} variant={"ghost"} onClick={() => void signOut()}>
-          退出登录
-        </Button>
+        {user ? (
+          <Button variant={"ghost"} onClick={() => void signOut()}>
+            退出登录
+          </Button>
+        ) : (
+          <Button variant={"destructive"} onClick={() => void signIn()}>
+            立即登录
+          </Button>
+        )}
+
         {/* <Button disabled={!user}>收藏</Button> */}
       </div>
     </div>

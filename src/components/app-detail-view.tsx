@@ -42,7 +42,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
   const userId = useUserId()
 
   return (
-    <>
+    <div className={"flex h-full w-full flex-col overflow-auto p-2"}>
       <section id={"basic"} className={"| flex w-full items-center gap-2"}>
         <Avatar className={"shrink-0 p-4  wh-28"}>
           <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className={"rounded-2xl"} />
@@ -174,7 +174,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
       )}
 
       {userId && <UninstallButton app={app} />}
-    </>
+    </div>
   )
 }
 
@@ -241,7 +241,9 @@ const PokettoComment = ({ comment }: { comment: IAppComment }) => {
           </Avatar>
         </div>
       </CardHeader>
+
       <CardContent>{comment.content}</CardContent>
+
       <CardFooter className={"gap-4 text-primary-foreground/50"}>
         <ResponsiveField icon={<IconThumbUp />} value={comment.upvotes} />
         {/*<ResponsiveField icon={<IconThumbDown />} value={"Not Helpful"} />*/}

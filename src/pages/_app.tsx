@@ -21,6 +21,8 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
           <Head>
             <title>{PRODUCT.name}</title>
             <meta name="description" content={PRODUCT.desc} />
+            {/* prevent screen scale when input, ref: https://github.com/vercel/next.js/issues/6919#issuecomment-486521697*/}
+            <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" className="next-head" />
             <link rel="icon" href={PRODUCT.icon} />
           </Head>
 

@@ -36,7 +36,7 @@ export const ConversationList = () => {
   const searchedApps = queryApps.data?.pages.flatMap((item) => item.data) ?? []
 
   return (
-    <>
+    <div className={"flex h-full w-full shrink-[.1] flex-col overflow-hidden"}>
       {/* 搜索框 */}
       <div className={"relative w-full"}>
         <Input
@@ -79,7 +79,7 @@ export const ConversationList = () => {
           </>
         )}
       </div>
-    </>
+    </div>
   )
 }
 
