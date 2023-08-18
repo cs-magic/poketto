@@ -7,7 +7,6 @@ import _ from "lodash"
 import Link from "next/link"
 
 import { useUser } from "@/hooks/use-user"
-import React, { Fragment } from "react"
 import { type User } from ".prisma/client"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { todo } from "@/lib/helpers"
@@ -15,24 +14,19 @@ import { Skeleton } from "@/components/ui/skeleton"
 import dayjs from "dayjs"
 import { UsesField, ViewsField } from "@/components/field"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/router"
 import { AppCardView } from "@/components/app-card-view"
 import { CardsLayoutType } from "@/store/ui.slice"
-import { getAppLink, getConversationLink } from "@/lib/string"
-import { type AppWithRelation, SortOrder } from "@/ds"
-import { URI } from "@/config"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { AppDetail } from "@/components/app-detail-view"
+import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { type AppWithRelation } from "@/ds"
+import { DEFAULT_BATCH_CARDS, URI } from "@/config"
 import { AppContainer } from "@/components/containers"
-import log from "@/lib/log"
-import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
 
 export default function HomePage() {
   const user = useUser()
 
   return (
     <RootLayout>
-      <div className={"h-full w-full"}>
+      <div className={"h-full w-full overflow-auto"}>
         <Card id={"recent-apps"} variant={"ghost"} className={"w-full"}>
           <CardHeader>
             <div className={"| flex shrink-0 items-end justify-between"}>
@@ -71,13 +65,13 @@ export default function HomePage() {
 }
 
 const RecentConversations = ({ user }: { user: User }) => {
-  const { data: conversations = [] } = api.conv.listConversations.useQuery({})
+  const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId: user.id })
   return (
     <>
       {conversations.slice(0, 10).map((c) => {
         return (
-          <Link className={"w-48 shrink-0"} key={c.id} href={getConversationLink(c.id)}>
-            <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.id} />
+          <Link className={"w-48 shrink-0"} key={c.appId} href={getConversationLink(user.id, c.appId)}>
+            <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.appId} />
           </Link>
         )
       })}
@@ -95,7 +89,7 @@ const ExploreApps = () => {
   const apps = query.data?.pages.flatMap((item) => item.data) ?? []
 
   return (
-    <Card id={"explore"} variant={"ghost"} className={"w-full"}>
+    <Card id={"explore"} variant={"ghost"} className={"w-full grow"}>
       <CardHeader>
         <div className={"| flex shrink-0 items-end justify-between"}>
           <CardTitle>Explore trending apps</CardTitle>
@@ -109,7 +103,7 @@ const ExploreApps = () => {
       </CardHeader>
       <CardContent className={"flex w-full justify-between"}>
         <div className={"flex w-full flex-col divide-y"}>
-          {_.sampleSize(_.range(30), 3).map((i) => (
+          {_.sampleSize(_.range(DEFAULT_BATCH_CARDS), 3).map((i) => (
             <AppView app={apps[i]} key={i} />
           ))}
         </div>

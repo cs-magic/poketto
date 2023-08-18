@@ -31,7 +31,7 @@ export default function ExplorePage() {
     }
   )
   const apps = query.data?.pages.flatMap((item) => item.data) ?? []
-  log.info("[FlowGPT] ", apps)
+  // log.info("[FlowGPT] ", apps)
 
   return (
     <RootLayout>

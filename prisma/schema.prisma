@@ -67,8 +67,8 @@ model VerificationToken {
 model User {
   id String @id @default(cuid())
 
-  platformType   PlatformType @default(Poketto)
-  platformUserId String
+  platformType PlatformType @default(Poketto)
+  platformId   String
 
   /// [PlatformArgs]
   platformArgs Json?
@@ -85,7 +85,7 @@ model User {
   balance Int @default(0)
 
   invitedFrom InvitationRelation[] @relation("from")
-  invitdeTo   InvitationRelation[] @relation("to")
+  invitedTo   InvitationRelation[] @relation("to")
 
   followedBy FollowRelation[] @relation("from")
   following  FollowRelation[] @relation("to")
@@ -100,9 +100,10 @@ model User {
   StarringApp StarringApp[]
   createdApps App[]
 
-  Conversation Conversation[]
+  conversations Conversation[]
 
-  @@unique([platformType, platformUserId], name: "platform")
+  // maybe we only need one id
+  @@unique([platformType, platformId], name: "platform")
 }
 
 model FollowRelation {
@@ -159,9 +160,11 @@ enum PlatformType {
 }
 
 model App {
-  platformType PlatformType @default(Poketto)
+  id String @id @default(cuid())
 
-  id        String   @id @default(cuid())
+  platformType PlatformType @default(Poketto)
+  platformId   String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -182,8 +185,13 @@ model App {
   starring StarringApp[]
   comments AppComment[]
 
-  model AppModel?
   state AppState?
+
+  modelName    String
+  isOpenSource Boolean @default(true)
+  modelArgs    Json? // prompts, temperature
+
+  @@unique([platformType, platformId], name: "platform")
 }
 
 /// use 和 star 是一个持久的、可来回变化的属性
@@ -194,12 +202,11 @@ model App {
 
 /// space -- use --> app
 model Conversation {
-  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   isActive Boolean       @default(true)
-  messages ChatMessage[] 
+  messages ChatMessage[]
 
   userId String
   appId  String
@@ -208,8 +215,8 @@ model Conversation {
   app  App  @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   pinned Boolean @default(false)
-  // lastMessage ChatMessage? @relation("latest")
-  // lastMessageId String?
+
+  @@id([userId, appId], name: "id", map: "id")
 }
 
 /// user -- star --> app
@@ -225,22 +232,6 @@ model StarringApp {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
-}
-
-model AppModel {
-  id        String    @id @default(cuid())
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 为了减少理解成本，就不加 name 了（默认为app.title）
-  type         String
-  initPrompts  PrommptMessage[]
-  isOpenSource Boolean          @default(true)
-
-  app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  appId String @unique
-
-  temperature Float @default(0.7)
 }
 
 model AppState {
@@ -264,16 +255,6 @@ enum PromptRoleType {
   user
   assistant
   function
-}
-
-model PrommptMessage {
-  /// or user message
-  id      String         @id @default(cuid())
-  role    PromptRoleType
-  content String
-
-  AppModel   AppModel? @relation(fields: [appModelId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  appModelId String?
 }
 
 enum ChatMessageFormatType {
@@ -301,8 +282,9 @@ model ChatMessage {
   format              ChatMessageFormatType @default(text)
   userActionOnMessage ChatMessageAction[]
 
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  conversationId String
+  conversation       Conversation @relation(fields: [conversationUserId, conversationAppId], references: [userId, appId], onDelete: Cascade, onUpdate: Cascade)
+  conversationUserId String
+  conversationAppId  String
 }
 
 model AppCategory {

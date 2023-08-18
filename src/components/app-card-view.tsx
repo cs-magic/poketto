@@ -7,23 +7,37 @@ import _ from "lodash"
 import { IconDotsVertical } from "@tabler/icons-react"
 import clsx from "clsx"
 import Link from "next/link"
-import { getUserLink } from "@/lib/user"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import numeral from "numeral"
 import React from "react"
 import { type AppWithRelation, type SortOrder } from "@/ds"
-import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
 import { UsesField, ViewsField } from "@/components/field"
+import { getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
 
 export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; cardsLayout: CardsLayoutType; sort: SortOrder }) => {
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (
         <AspectRatio ratio={3 / 4} className={"overflow-hidden rounded-2xl"}>
-          <Image src={app.avatar} fill className={"object-fill transition-all group-hover:scale-125"} alt={app.avatar} />
+          <Image
+            src={app.avatar}
+            priority
+            fill
+            className={"object-fill transition-all group-hover:scale-125"}
+            alt={app.avatar}
+            sizes={"300px"}
+          />
         </AspectRatio>
       ) : (
-        <Image src={app.avatar} width={800} height={600} className={"object-fill transition-all group-hover:scale-125"} alt={app.avatar} />
+        <Image
+          src={app.avatar}
+          priority
+          width={300}
+          height={400}
+          className={"object-fill transition-all group-hover:scale-125"}
+          alt={app.avatar}
+          style={{ width: "100%", height: "auto" }}
+        />
       )}
 
       {/* header desc */}
@@ -59,8 +73,8 @@ export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; 
 
           {/* ranks */}
           <div className={"flex items-center gap-1"}>
-            <UsesField v={app.state!.calls} size={"sm"} />
-            <ViewsField v={app.state!.calls} size={"sm"} />
+            <UsesField v={app.state?.calls ?? 0} size={"sm"} />
+            <ViewsField v={app.state?.views ?? 0} size={"sm"} />
           </div>
         </div>
       </div>

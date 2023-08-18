@@ -8,7 +8,8 @@ export const conversationRouter = createTRPCRouter({
    * todo: public with permission control
    */
 
-  listConversations: protectedProcedure.input(z.object({})).query(
+  listConversations: protectedProcedure.input(z.object({
+  })).query(
     async ({
       ctx: {
         prisma,
@@ -24,32 +25,10 @@ export const conversationRouter = createTRPCRouter({
     }
   ),
 
-  getConversation: protectedProcedure
-    .input(
-      z.object({
-        cid: z.string(),
-      })
-    )
-    .query(
-      async ({
-        ctx: {
-          prisma,
-          session: { user },
-        },
-        input: { cid },
-      }) => {
-        const result = await prisma.conversation.findUnique({
-          where: { userId: user.id, id: cid },
-          include: conversationInclude,
-        })
-        return result as ConversationWithRelation
-      }
-    ),
-
   listMessages: protectedProcedure
     .input(
       z.object({
-        cid: z.string(),
+        appId: z.string(),
       })
     )
     .query(
@@ -58,10 +37,10 @@ export const conversationRouter = createTRPCRouter({
           prisma,
           session: { user },
         },
-        input: { cid },
+        input: { appId },
       }) => {
         const result = await prisma.chatMessage.findMany({
-          where: { conversationId: cid },
+          where: { conversationAppId: appId, conversationUserId: user.id }
         })
         return result
       }
@@ -70,13 +49,13 @@ export const conversationRouter = createTRPCRouter({
   pinConv: protectedProcedure
     .input(
       z.object({
-        cid: z.string(),
+        appId: z.string(),
         toStatus: z.boolean(),
       })
     )
-    .mutation(async ({ ctx: { prisma, session }, input: { cid, toStatus } }) => {
-      const user = await prisma.conversation.update({
-        where: { id: cid },
+    .mutation(async ({ ctx: { prisma, session: { user } }, input: { appId, toStatus } }) => {
+      await prisma.conversation.update({
+        where: { id: { userId: user.id, appId } },
         data: { pinned: toStatus },
       })
     }),
@@ -84,11 +63,11 @@ export const conversationRouter = createTRPCRouter({
   delConversation: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        appId: z.string(),
       })
     )
-    .mutation(async ({ ctx: { prisma, session }, input: { id } }) => {
-      return await prisma.conversation.delete({ where: { id } })
+    .mutation(async ({ ctx: { prisma, session: { user } }, input: { appId } }) => {
+      return await prisma.conversation.delete({ where: { id: { userId: user.id, appId } } })
     }),
 
   pushMessage: protectedProcedure
@@ -96,7 +75,7 @@ export const conversationRouter = createTRPCRouter({
       z.object({
         content: z.string(),
         role: z.nativeEnum(PromptRoleType),
-        cid: z.string(),
+        appId: z.string()
       })
     )
     .mutation(
@@ -105,19 +84,20 @@ export const conversationRouter = createTRPCRouter({
           prisma,
           session: { user },
         },
-        input: { cid, content, role },
+        input: { appId, content, role },
       }) => {
         const result = await prisma.chatMessage.create({
           data: {
-            conversationId: cid,
+            conversationAppId: appId,
+            conversationUserId: user.id,
+            userId: user.id,
             content,
             role,
-            userId: user.id,
             format: ChatMessageFormatType.text,
           },
         })
         await prisma.conversation.update({
-          where: { id: cid },
+          where: { id: { appId: appId, userId: user.id } },
           data: { updatedAt: new Date() },
         })
         return result

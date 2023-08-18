@@ -1,39 +1,10 @@
-import {
-  type AppWithRelation,
-  type FlowgptPromptFull,
-  type IAppComment,
-  type IFlowGPTComment,
-  type IFlowgptConversation,
-  type IFlowgptPromptBasic,
-  type IFlowgptUserBasic,
-  type IPokettoConversation,
-} from "@/ds"
-import d from "@/lib/datetime"
-import { nanoid } from "nanoid"
+import { type AppWithRelation, type FlowgptPromptFull, type IFlowgptPromptBasic, type IFlowgptUserBasic } from "@/ds"
 import dayjs from "dayjs"
-import { PlatformType, Prisma } from ".prisma/client"
+import { PlatformType } from ".prisma/client"
 
-import { DEFAULT_APP_VERSION, FLOWGPT_IMAGE_DIR } from "@/config"
-import { type App, type AppModel, type AppState, type AppTag, type User } from "@prisma/client"
-
-import hash from "js-sha1"
-import JsonObject = Prisma.JsonObject
-
-export const transFlowgptConversation = (f: IFlowgptConversation): IPokettoConversation => ({
-  createdAt: d(f.createdAt).toDate(),
-  messages: f.messages.map((m) => ({
-    ...m,
-    type: "user",
-    format: "text",
-    appId: f.id,
-    userId: undefined,
-    parentId: undefined,
-    interactions: {},
-    id: nanoid(),
-    createdAt: new Date(),
-    role: m.role as "system" | "user" | "assistant" | "function",
-  })),
-})
+import { DEFAULT_APP_VERSION } from "@/config"
+import { type AppState, type AppTag, type User } from "@prisma/client"
+import { type JsonValue } from "prisma/prisma-client/runtime/library"
 
 export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   id: `${PlatformType.FlowGPT}_${u.id}`,
@@ -42,7 +13,7 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   balance: 0,
   image: u.image,
   platformType: PlatformType.FlowGPT,
-  platformUserId: u.id,
+  platformId: u.id,
   email: null,
   emailVerified: null,
   // platformArgs: null,
@@ -51,23 +22,7 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   },
 })
 
-export const transFlowgptPrompt2App = (p: IFlowgptPromptBasic): App => ({
-  platformType: PlatformType.FlowGPT,
-
-  id: p.id,
-  name: p.title,
-  avatar: p.thumbnailURL,
-  language: p.language,
-  desc: p.description,
-  updatedAt: dayjs(p.updatedAt).toDate(),
-  createdAt: dayjs(p.createdAt).toDate(),
-  version: DEFAULT_APP_VERSION,
-  creatorId: p.userId,
-  categoryMain: p.categoryId,
-  categorySub: p.subCategoryId,
-})
-
-export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic): AppModel => ({
+export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
   id: p.id,
   appId: p.id,
   createdAt: dayjs(p.createdAt).toDate(),
@@ -115,21 +70,14 @@ export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | 
     creator: transFlowgptUserBasic(p.User),
     tags: transFlowgptPrompt2Tags(p),
     state: transFlowgptPrompt2State(p),
-    model: { ...transFlowgptPrompt2Model(p), initPrompts: [] },
+    modelName: p.model,
+    modelArgs: { ...transFlowgptPrompt2Model(p), initPrompts: [] } as unknown as JsonValue,
     actions: [],
     categoryMain: p.categoryId,
     categorySub: p.subCategoryId,
+    platformId: PlatformType.FlowGPT,
+    isOpenSource: p.visibility,
   }
 }
-export const transFlowgptComments = (comment: IFlowGPTComment): IAppComment => ({
-  ...comment,
-  ratedStars: 0,
-  content: comment.body,
-  user: transFlowgptUserBasic(comment.user),
-})
 
 export type IMAGE_SIZE = "xs" | "md" | "raw"
-export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs") => {
-  if (size === "raw") return uri
-  return `${FLOWGPT_IMAGE_DIR}/thumbs/${size}/${hash(uri)}.jpg`
-}

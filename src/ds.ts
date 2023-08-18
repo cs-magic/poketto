@@ -57,20 +57,12 @@ export interface IAppComment extends Omit<IFlowGPTComment, "user"> {
   user: User
 }
 
-export interface IPokettoFunction /* extends ChatGPTFunction */ {}
-
 export const appInclude = {
   creator: true,
   actions: true, // note: unnecessary to track appActions
   tags: true,
   state: true,
   comments: true,
-  model: {
-    include: {
-      // nested includes: https://stackoverflow.com/a/62053744
-      initPrompts: true,
-    },
-  }, // todo: category
 }
 export const conversationInclude = {
   app: { include: appInclude },

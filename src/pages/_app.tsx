@@ -10,7 +10,7 @@ import clsx from "clsx"
 
 import "@/styles/globals.css"
 import Head from "next/head"
-import { product } from "@/config"
+import { PRODUCT } from "@/config"
 // import { font } from "@/lib/assets"
 
 const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
@@ -19,9 +19,9 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
       <SessionProvider session={session}>
         <ErrorBoundary>
           <Head>
-            <title>{product.name}</title>
-            <meta name="description" content={product.desc} />
-            <link rel="icon" href={product.icon} />
+            <title>{PRODUCT.name}</title>
+            <meta name="description" content={PRODUCT.desc} />
+            <link rel="icon" href={PRODUCT.icon} />
           </Head>
 
           <main

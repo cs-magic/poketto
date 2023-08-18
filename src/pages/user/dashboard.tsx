@@ -1,5 +1,5 @@
 import { RootLayout } from "@/layouts/root.layout"
-import { useUser } from "@/hooks/use-user"
+import { useUser, useUserId } from "@/hooks/use-user"
 import { useSearchParams } from "next/navigation"
 
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,9 @@ import { DEFAULT_USER_AVATAR, DEFAULT_USER_ID, DEFAULT_USER_NAME, POKETTO_CREATO
 import d from "@/lib/datetime"
 import { todo } from "@/lib/helpers"
 import { signOut } from "next-auth/react"
-import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
+
+import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
+import Link from "next/link"
 
 export default function DashboardPage() {
   const user = useUser()
@@ -39,7 +41,7 @@ export default function DashboardPage() {
 }
 
 const ConversationsView = ({ userId, relationType }: { userId: string; relationType: UserAppRelationType }) => {
-  const { data: convs = [] } = api.conv.listConversations.useQuery({ userId, relationType })
+  const { data: convs = [] } = api.conv.listConversations.useQuery({ userId })
   return (
     <>
       <div className={"my-4 flex h-8 items-center gap-2"}>
@@ -58,19 +60,20 @@ const ConversationsView = ({ userId, relationType }: { userId: string; relationT
         </Button>
       </div>
 
-      {relationType === "used" && convs.map((c) => <AppView app={c.app} key={c.id} />)}
+      {relationType === "used" && convs.map((c) => <AppView app={c.app} key={c.appId} />)}
     </>
   )
 }
 
 const AppView = ({ app }: { app: AppWithRelation }) => {
+  const userId = useUserId()!
   return (
-    <div className={"| | flex w-full justify-between gap-4 border-y p-4"} key={app.id}>
+    <Link className={"| | flex w-full justify-between gap-4 border-y p-4"} key={app.id} href={getConversationLink(userId, app.id)}>
       <div className={"flex flex-col gap-2"}>
         <div className={"flex items-center gap-2"}>
           <h2>{app.name}</h2>
           {app.creatorId === POKETTO_CREATOR_ID && <Badge className={"bg-blue-500"}>{POKETTO_CREATOR_NAME}</Badge>}
-          <Badge variant={"outline"}>{app.model?.isOpenSource ? "Open Source" : "Close Source"}</Badge>
+          <Badge variant={"outline"}>{app.isOpenSource ? "Open Source" : "Close Source"}</Badge>
         </div>
         <div className={"line-clamp-3 text-muted-foreground"}>{app.desc}</div>
         <div className={"| flex items-center gap-4 text-muted-foreground"}>
@@ -90,7 +93,7 @@ const AppView = ({ app }: { app: AppWithRelation }) => {
           {/*<ChevronDownIcon/>*/}
         </Button>
       </div>
-    </div>
+    </Link>
   )
 }
 

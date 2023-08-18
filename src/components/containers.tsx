@@ -1,10 +1,10 @@
 import React, { type HTMLProps, type PropsWithChildren, type ReactNode, useCallback, useState } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import { type DEVICE_TYPE, DEVICES } from "@/config"
 import clsx from "clsx"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { AppDetail } from "@/components/app-detail-view"
 import { type AppWithRelation } from "@/ds"
+import { type DEVICE_TYPE, DEVICES } from "@/lib/device"
 
 export const GridContainer = ({ children }: PropsWithChildren) => {
   return (
@@ -99,7 +99,7 @@ export const AppContainer = ({ app, children }: { app: AppWithRelation } & Props
   return (
     <Dialog>
       <DialogTrigger className={"w-full"}>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[80%] overflow-auto">
         <AppDetail app={app} comments={[]} />
       </DialogContent>
     </Dialog>

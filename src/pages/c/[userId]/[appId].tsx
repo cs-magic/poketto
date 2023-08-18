@@ -9,13 +9,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from ".prisma/client"
-import { type Conversation, type User } from "@prisma/client"
 import { getHotkeyHandler, useDebouncedValue } from "@mantine/hooks"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { ViewsField } from "@/components/field"
-import React, { type FormEvent, type PropsWithChildren, useEffect, useRef, useState } from "react"
+import { type FormEvent, type PropsWithChildren, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import d from "@/lib/datetime"
 import { ChevronDownIcon, DotsVerticalIcon } from "@radix-ui/react-icons"
@@ -24,7 +23,7 @@ import { AppDetail } from "@/components/app-detail-view"
 import { type GetServerSideProps } from "next"
 import { getSession } from "next-auth/react"
 import { prisma } from "@/server/db"
-import { getConversationLink } from "@/lib/string"
+import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
 import superjson from "superjson"
 import { nanoid } from "nanoid"
 import {
@@ -34,7 +33,7 @@ import {
   type UserWithRelations,
   userWithRelationsInclude,
 } from "@/ds"
-import { POKETTO_APP_ID, URI } from "@/config"
+import { URI } from "@/config"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
 import { XIcon } from "lucide-react"
@@ -43,23 +42,23 @@ import { Textarea } from "@/components/ui/textarea"
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import _ from "lodash"
 import log from "@/lib/log"
-import { getLocalFlowgptImageUri } from "@/lib/flowgpt"
+import { useUser, useUserId } from "@/hooks/use-user"
 
-export default function ConversationPage({ user, conversationStr }: { user: UserWithRelations; conversationStr: string }) {
+export default function ConversationPage({ conversationStr }: { conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
   const { chatListVisible, chatDetailVisible } = useAppStore()
-  const { data: persistedMessages = [] } = api.conv.listMessages.useQuery({ cid: c.id })
+
   return (
     <RootLayout>
       <div className={"| flex h-full w-full divide-x overflow-hidden"}>
-        {chatListVisible && user && (
+        {chatListVisible && (
           <section className={"| | relative flex w-full shrink-0 flex-col items-center overflow-hidden md:w-[375px]"}>
-            <ConversationList user={user} />
+            <ConversationList />
           </section>
         )}
 
         <section className={clsx("| relative flex h-full w-full grow flex-col overflow-hidden transition-all")}>
-          {user && c && <ConversationMain u={user} c={c} initialMessages={persistedMessages} />}
+          <ConversationMain c={c} />
         </section>
 
         {chatDetailVisible && (
@@ -76,7 +75,7 @@ export default function ConversationPage({ user, conversationStr }: { user: User
  [left] conversation list
  */
 
-const ConversationList = ({ user }: { user: User }) => {
+const ConversationList = () => {
   const { data: convs = [] } = api.conv.listConversations.useQuery({})
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)
@@ -129,7 +128,7 @@ const ConversationList = ({ user }: { user: User }) => {
           <>
             <SectionTitle>Poketto Apps</SectionTitle>
             {_.orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
-              <ConversationListView key={c.id} c={c} />
+              <ConversationListView key={c.appId} c={c} />
             ))}
           </>
         )}
@@ -140,13 +139,11 @@ const ConversationList = ({ user }: { user: User }) => {
 
 const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
   const m = useMustache()
+  const userId = useUserId()!
 
   return (
     <Link
-      href={c.id}
-      // href={"[id]"}
-      // as={c.id}
-      //{getConversationLink(c.id)}
+      href={getConversationLink(userId, c.appId)}
       className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
     >
       <div className={"flex h-fit w-full items-center  gap-4"}>
@@ -197,32 +194,7 @@ const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
  * [middle] conversation messages
  */
 
-const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationWithRelation; initialMessages: ChatMessage[] }) => {
-  const refForm = useRef<HTMLFormElement>(null)
-
-  const utils = api.useContext()
-  const { mutate: pushMessage } = api.conv.pushMessage.useMutation({
-    onSuccess: () => void utils.conv.listConversations.invalidate(),
-  })
-
-  const post = (event: FormEvent<HTMLFormElement>) => {
-    handleSubmit(event)
-    pushMessage({ content: input, role: PromptRoleType.user, cid: c.id })
-  }
-
-  const { messages, handleSubmit, input, handleInputChange, setMessages } = useChat({
-    initialMessages,
-    onError: (err) => toast.error(err.message),
-    onFinish: (msg) => pushMessage({ ...msg, cid: c.id }),
-    onResponse: (response) => {
-      // if (scrolled && response.status === 200) setUnread(true) // 有必要的话，这里可以做更精细地控制
-    },
-  })
-
-  useEffect(() => {
-    setMessages(initialMessages)
-  }, [initialMessages])
-
+const ConversationMain = ({ c }: { c: ConversationWithRelation }) => {
   return (
     <>
       <div className={"| flex w-full items-center justify-between gap-2 truncate bg-muted px-4 py-5"}>
@@ -230,8 +202,37 @@ const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationW
         <ControlTool c={c} />
       </div>
 
+      <ConversationInput appId={c.appId} />
+    </>
+  )
+}
+
+const ConversationInput = ({ appId }: { appId: string }) => {
+  const { data: initialMessages = [] } = api.conv.listMessages.useQuery({ appId })
+  const refForm = useRef<HTMLFormElement>(null)
+
+  const utils = api.useContext()
+  const { mutate: pushMessage } = api.conv.pushMessage.useMutation({
+    onSuccess: () => void utils.conv.listConversations.invalidate(),
+  })
+
+  const { messages, handleSubmit, input, handleInputChange, setMessages } = useChat({
+    initialMessages,
+    onError: (err) => toast.error(err.message),
+    onFinish: (msg) => pushMessage({ ...msg, appId }),
+    onResponse: (response) => {
+      // if (scrolled && response.status === 200) setUnread(true) // 有必要的话，这里可以做更精细地控制
+    },
+  })
+  const post = (event: FormEvent<HTMLFormElement>) => {
+    handleSubmit(event)
+    pushMessage({ content: input, role: PromptRoleType.user, appId })
+  }
+
+  return (
+    <>
       <ScrollToBottom className={"w-full grow overflow-auto p-2"} initialScrollBehavior={"auto"}>
-        <ConversationMessages messages={messages} u={u} c={c} />
+        <ConversationMessages messages={messages} appId={appId} />
       </ScrollToBottom>
 
       <form ref={refForm} className={"| flex w-full items-center justify-center gap-2 p-4"} onSubmit={post}>
@@ -252,10 +253,11 @@ const ConversationMain = ({ u, c, initialMessages }: { u: User; c: ConversationW
   )
 }
 
-const ConversationMessages = ({ messages, u, c }: { messages: (Message | ChatMessage)[]; u: User; c: Conversation }) => {
+const ConversationMessages = ({ messages, appId }: { messages: (Message | ChatMessage)[]; appId: string }) => {
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
+  const u = useUser()
 
   useEffect(() => {
     if (!sticky) setHasUnread(true)
@@ -270,23 +272,24 @@ const ConversationMessages = ({ messages, u, c }: { messages: (Message | ChatMes
       {
         // todo: using ourself messages
         // _.reverse(messages)
-        messages
-          // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
-          .map((msg, index) => (
-            <ConversationMessage
-              user={u}
-              msg={{
-                ...msg,
-                conversationId: c.id,
-                id: nanoid(),
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                format: "format" in msg ? msg.format : ChatMessageFormatType.text,
-                userId: msg.role === PromptRoleType.user ? u.id : "OpenAI",
-              }}
-              key={index}
-            />
-          ))
+        u &&
+          messages
+            // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
+            .map((msg, index) => (
+              <ConversationMessage
+                msg={{
+                  ...msg,
+                  userId: u.id,
+                  conversationUserId: u.id,
+                  conversationAppId: appId,
+                  id: nanoid(),
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  format: "format" in msg ? msg.format : ChatMessageFormatType.text,
+                }}
+                key={index}
+              />
+            ))
       }
       {hasUnread && !sticky && (
         <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>
@@ -297,7 +300,7 @@ const ConversationMessages = ({ messages, u, c }: { messages: (Message | ChatMes
   )
 }
 
-const ConversationMessage = ({ msg, user }: { user: User; msg: ChatMessage }) => {
+const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
   const { role } = msg
   const m = useMustache()
 
@@ -341,7 +344,7 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
         <DotsVerticalIcon />
       </PopoverTrigger>
       <PopoverContent className={"flex flex-col gap-2"}>
-        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={() => pinConv({ cid: c.id, toStatus: !c.pinned })}>
+        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
           {c.pinned ? "Unpin" : "Pin"}
         </Button>
         <Button className={"justify-start pl-4"} variant={"ghost"} onClick={toggleSidebar}>
@@ -367,14 +370,19 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx)
-  const cid = ctx.query.cid as string
+  const userId = ctx.query.userId as string
+  const appId = ctx.query.appId as string
+  // const { userId, appId } = ctx.query
+
   // logger.info({ time: new Date(), fetching: cid })
   const conversation = await prisma.conversation.findUnique({
-    where: { id: cid },
+    where: { id: { userId, appId } },
     include: conversationInclude,
   })
-  // logger.info({ time: new Date(), fetched: conversation })
+  // log.info({ time: new Date(), fetched: conversation, userId, appId })
+  log.info({ time: new Date(), userId, appId })
   if (!conversation) {
+    log.warn({ time: new Date(), userId, appId, conversation })
     return {
       redirect: {
         destination: "/404",

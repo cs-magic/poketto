@@ -1,6 +1,6 @@
 import { type AppComment } from ".prisma/client"
 import { useRouter } from "next/router"
-import { useUser } from "@/hooks/use-user"
+import { useUserId } from "@/hooks/use-user"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import { vIsNumber } from "@/lib/number"
-import React, { type ReactNode, useCallback, useEffect, useState } from "react"
+import { type ReactNode, useCallback, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import d from "@/lib/datetime"
@@ -21,9 +21,9 @@ import { ResponsiveField } from "@/components/field"
 import { IconThumbDown, IconThumbUp } from "@tabler/icons-react"
 import { api } from "@/lib/api"
 
-import { getConversationLink } from "@/lib/string"
+import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
 import { type AppWithRelation, type IAppComment } from "@/ds"
-import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED } from "@/config"
+import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { UserIcon } from "lucide-react"
 import {
   AlertDialog,
@@ -36,34 +36,16 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog"
 import { useMustache } from "@/hooks/use-mustache"
+import Link from "next/link"
 
 export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; comments: AppComment[]; setOpen?: (v: boolean) => void }) => {
-  const router = useRouter()
-  const utils = api.useContext()
-
-  const { data: conversations = [] } = api.conv.listConversations.useQuery({})
-  const conv = conversations.find((c) => c.appId === app.id)!
-
-  const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
-    onSuccess: (data) => {
-      void utils.conv.listConversations.invalidate()
-      toast.success(`Successfully added app: ${app.name}`)
-      void router.push(getConversationLink(data.id))
-      setOpen && setOpen(false)
-    },
-  })
-  const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
-    onSuccess: (input) => {
-      void utils.conv.listConversations.invalidate()
-      void router.push(getConversationLink(conversations.find((c) => c.id !== conv.id)!.id))
-    },
-  })
+  const userId = useUserId()
 
   return (
     <>
       <section id={"basic"} className={"| flex w-full items-center gap-2"}>
         <Avatar className={"shrink-0 p-4  wh-28"}>
-          <AvatarImage src={app.avatar} className={"rounded-2xl"} />
+          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className={"rounded-2xl"} />
         </Avatar>
 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
@@ -72,15 +54,12 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
             <p className={"truncate text-primary-foreground/75"}>by {app.creator.name}</p>
           </div>
         </div>
-        {!conv && (
-          <Badge
-            className={clsx("cursor-pointer rounded-3xl px-4 transition-all")}
-            onClick={() => {
-              addApp({ appId: app.id })
-            }}
-          >
-            Try
-          </Badge>
+        {userId ? (
+          <InstallButton app={app} setOpen={setOpen} />
+        ) : (
+          <Link href={URI.user.auth.signin}>
+            <Button className={clsx("whitespace-nowrap rounded-3xl px-4")}>Login to Get</Button>
+          </Link>
         )}
       </section>
 
@@ -88,7 +67,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
 
       <section id={"status"} className={clsx("w-full", "flex items-center justify-between gap-1")}>
         <StatusItem a={"category"} b={`${app.categoryMain}-${app.categorySub}`} c={"of All 31"} />
-        <StatusItem a={"model"} b={app.model?.type} c={app.creator.name} />
+        <StatusItem a={"model"} b={app.modelName} c={app.creator.name} />
         {POKETTO_DETAIL_RATINGS_ENABLED && (
           <StatusItem
             a={"ratings"}
@@ -169,7 +148,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         <h2>Information</h2>
         <div className={"grid grid-cols-2 gap-4"}>
           <InfoItem a={"provider"} b={app.creator.name} />
-          <InfoItem a={"Open Source"} b={app.model?.isOpenSource.toString()} />
+          <InfoItem a={"Open Source"} b={app.isOpenSource.toString()} />
           <InfoItem a={"category"} b={`${app.categoryMain}-${app.categorySub}`} />
           <InfoItem a={"language"} b={app.language} />
         </div>
@@ -194,36 +173,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         </>
       )}
 
-      {conv && (
-        <>
-          <Separator orientation={"horizontal"} />
-          <section id={"collections"} className={"flex w-full flex-col gap-4"}>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant={"destructive"} disabled={conv.appId === POKETTO_APP_ID}>
-                  Clear
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>确定要清除该App下的所有信息吗（包括会话记录）？</AlertDialogHeader>
-                <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    className={"bg-destructive"}
-                    onClick={() => {
-                      delConv({ id: conv.id })
-                      toast.success(`You have deleted one app.`)
-                    }}
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </section>
-        </>
-      )}
+      {userId && <UninstallButton app={app} />}
     </>
   )
 }
@@ -297,5 +247,80 @@ const PokettoComment = ({ comment }: { comment: IAppComment }) => {
         <ResponsiveField icon={<IconThumbDown />} title={"Not Helpful"} />
       </CardFooter>
     </Card>
+  )
+}
+
+function InstallButton({ app, setOpen }: { app: AppWithRelation; setOpen?: (v: boolean) => void }) {
+  const userId = useUserId()!
+  const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId })
+  const router = useRouter()
+  const utils = api.useContext()
+  const conv = conversations.find((c) => c.appId === app.id)!
+
+  const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
+    onSuccess: (data) => {
+      void utils.conv.listConversations.invalidate()
+      toast.success(`Successfully added app: ${app.name}`)
+      void router.push(getConversationLink(userId, data.appId)) // app.id 进数据库后会生成新的
+      setOpen && setOpen(false)
+    },
+  })
+
+  return (
+    <Button
+      className={clsx(" h-6 rounded-3xl px-4 transition-all")}
+      disabled={!!conv}
+      onClick={() => {
+        addApp({ appId: app.id, appPlatform: app.platformType })
+      }}
+    >
+      {conv ? "Got" : "Get"}
+    </Button>
+  )
+}
+
+function UninstallButton({ app }: { app: AppWithRelation }) {
+  const userId = useUserId()!
+  const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId })
+  const router = useRouter()
+  const utils = api.useContext()
+  const curConv = conversations.find((c) => c.appId === app.id)
+
+  const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
+    onSuccess: (input) => {
+      void utils.conv.listConversations.invalidate()
+      const nextConv = conversations.find((c) => c.appId !== app.id)!
+      void router.push(getConversationLink(userId, nextConv.appId))
+    },
+  })
+  return !curConv ? null : (
+    <>
+      <Separator orientation={"horizontal"} />
+      <section id={"collections"} className={"flex w-full flex-col gap-4"}>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant={"destructive"} disabled={app.id === POKETTO_APP_ID}>
+              Clear
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>确定要清除该App下的所有信息吗（包括会话记录）？</AlertDialogHeader>
+            <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className={"bg-destructive"}
+                onClick={() => {
+                  delConv({ appId: curConv.appId })
+                  toast.success(`You have deleted one app.`)
+                }}
+              >
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </section>
+    </>
   )
 }

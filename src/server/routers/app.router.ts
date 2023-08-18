@@ -1,18 +1,11 @@
-import { z } from "zod"
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
-import { appInclude, type AppWithRelation, type IFlowgptPromptBasic, sortOrders } from "@/ds"
-import {
-  transFlowgptPrompt2App,
-  transFlowgptPrompt2Model,
-  transFlowgptPrompt2State,
-  transFlowgptPrompt2Tags,
-  transFlowgptUserBasic,
-  transformFlowgptPrompt2AppWithRelation as transFlowgptPrompt2AppWithRelation,
-} from "@/lib/flowgpt"
-import { addAppIntoConversation } from "@/server/auth"
 import { PlatformType } from ".prisma/client"
-import { prisma } from "@/server/db"
 import { TAG_SEPARATOR } from "@/config"
+import { type AppWithRelation, type IFlowgptPromptBasic, sortOrders } from "@/ds"
+import { transformFlowgptPrompt2AppWithRelation as transFlowgptPrompt2AppWithRelation } from "@/lib/flowgpt"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
+import { ChatMessageFormatType, PromptRoleType } from "@prisma/client"
+import { z } from "zod"
+import { getWelcomeSystemNotification } from "@/lib/string"
 
 export const appRouter = createTRPCRouter({
   /**
@@ -77,89 +70,93 @@ export const appRouter = createTRPCRouter({
         appPlatform: z.nativeEnum(PlatformType).default(PlatformType.Poketto),
       })
     )
-    .mutation(async ({ ctx: { prisma, session }, input: { appId, appPlatform } }) => {
-      const user = await prisma.user.findUniqueOrThrow({
-        where: { id: session.user.id },
-      })
-
-      const app =
-        appPlatform === PlatformType.FlowGPT
-          ? await prisma.app.findUniqueOrThrow({
-              where: { id: appId },
-              include: appInclude,
-            })
-          : await initFlowgptApp(appId)
-      return addAppIntoConversation(user, app)
-    }),
+    .mutation(
+      async ({
+        ctx: {
+          prisma,
+          mongoLocal,
+          session: { user },
+        },
+        input: { appId, appPlatform },
+      }) => {
+        const p = (await mongoLocal.db("flowgpt").collection("basic").findOne({ id: appId })) as unknown as IFlowgptPromptBasic
+        return prisma.conversation.create({
+          include: {
+            messages: true,
+            user: true,
+            app: {
+              include: {
+                creator: true,
+                category: true,
+              },
+            },
+          },
+          data: {
+            user: {
+              connect: { id: user.id }, // 需要 user + app 同时指定！
+            },
+            app: {
+              connectOrCreate: {
+                where: { platform: { platformType: appPlatform, platformId: appId } },
+                create: {
+                  modelName: p.model,
+                  modelArgs: {
+                    temperature: p.temperature,
+                    prompts: [
+                      {
+                        role: PromptRoleType.system,
+                        content: p.initPrompt,
+                      },
+                    ],
+                  },
+                  platformType: PlatformType.FlowGPT,
+                  platformId: p.id,
+                  name: p.title,
+                  avatar: p.thumbnailURL,
+                  desc: p.description,
+                  language: p.language ?? "en",
+                  category: {
+                    connectOrCreate: {
+                      where: { id: { main: p.categoryId, sub: p.subCategoryId } },
+                      create: {
+                        main: p.categoryId,
+                        sub: p.subCategoryId,
+                      },
+                    },
+                  },
+                  creator: {
+                    connectOrCreate: {
+                      where: { platform: { platformId: p.userId, platformType: PlatformType.FlowGPT } },
+                      create: {
+                        platformId: p.userId,
+                        platformType: PlatformType.FlowGPT,
+                        platformArgs: {
+                          uri: p.User.uri,
+                        },
+                        name: p.User.name,
+                        image: p.User.image,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            messages: {
+              createMany: {
+                data: [
+                  {
+                    content: getWelcomeSystemNotification(user.name ?? "bro", p.title),
+                    format: ChatMessageFormatType.systemNotification,
+                  },
+                  {
+                    content: p.initPrompt,
+                    role: PromptRoleType.system,
+                  },
+                ],
+              },
+            },
+          },
+        })
+      }
+    ),
 })
-
-async function initFlowgptApp(appId: string): Promise<AppWithRelation> {
-  const fetchFlowgptPrompt = async (appId: string): Promise<IFlowgptPromptBasic> => {
-    const singleFetch = async <T>(props: { path: string; j: object }) => {
-      // await sleep(3000)
-
-      const input = encodeURI(JSON.stringify({ "0": props.j }))
-      const url = `https://flowgpt.com/api/trpc/${props.path}?batch=1&input=${input}`
-      console.log("[API] ", "fetching: ", url)
-      const response = await fetch(url)
-      // console.log('[API] ', 'response: ', response)
-      const result = await response.json()
-      // console.debug('[API] ', 'fetched: ', result)
-      return result[0].result.data.json as T
-    }
-    return singleFetch<IFlowgptPromptBasic>({ path: "prompt.getById", j: { json: appId } })
-  }
-
-  const p = await fetchFlowgptPrompt(appId)
-  // drop foreign keys for nested create/upsert
-  const { creatorId, categoryMain, categorySub, ...app_ } = transFlowgptPrompt2App(p)
-  const { appId: appIdInModel, ...model } = transFlowgptPrompt2Model(p)
-  const { appId: appIdInState, ...state } = transFlowgptPrompt2State(p)
-  return prisma.app.upsert({
-    include: appInclude,
-    where: { id: p.id },
-    update: {},
-    create: {
-      ...app_,
-      model: {
-        create: {
-          ...model,
-          initPrompts: {
-            create: [],
-          },
-        },
-      },
-      creator: {
-        connectOrCreate: {
-          where: { id: p.userId },
-          create: transFlowgptUserBasic(p.User),
-        },
-      },
-      tags: {
-        connectOrCreate: transFlowgptPrompt2Tags(p).map((t) => ({
-          where: { id: t.id },
-          create: t,
-        })),
-      },
-      category: {
-        connectOrCreate: {
-          where: { id: { main: p.categoryId, sub: p.subCategoryId } },
-          create: {
-            main: p.categoryId ?? -1,
-            sub: p.subCategoryId ?? -1,
-          },
-        },
-      },
-      actions: { create: [] },
-      comments: {
-        // todo
-        create: [],
-      },
-      state: {
-        create: {
-          ...state,
-        },
-      },
-    },
-  })
-}

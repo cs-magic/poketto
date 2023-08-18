@@ -1,18 +1,25 @@
+import { ChatMessageFormatType, PlatformType, PromptRoleType } from ".prisma/client"
+import {
+  POKETTO_APP_ID,
+  POKETTO_APP_NAME,
+  POKETTO_SYSTEM_PROMPT,
+  POKETTO_WELCOME_MESSAGE,
+  USER_INVITATIONS_COUNT,
+  allowDangerousEmailAccountLinking,
+} from "@/config"
+import { env } from "@/env.mjs"
+import log from "@/lib/log"
+import { prisma } from "@/server/db"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { type PrismaClient } from "@prisma/client"
+import _ from "lodash"
 import { type GetServerSidePropsContext } from "next"
-import { type DefaultSession, getServerSession, type NextAuthOptions } from "next-auth"
+import { getServerSession, type DefaultSession, type NextAuthOptions } from "next-auth"
+import { type Adapter } from "next-auth/adapters"
 import DiscordProvider from "next-auth/providers/discord"
 import GithubProvider from "next-auth/providers/github"
-import { env } from "@/env.mjs"
-import { prisma } from "@/server/db"
-import { Conversation, type PrismaClient } from "@prisma/client"
-import log from "@/lib/log"
-import _ from "lodash"
-import { ChatMessageFormatType, PlatformType, PromptRoleType, type User } from ".prisma/client"
-import { type Adapter } from "next-auth/adapters"
-import { prompt2chatMessage } from "@/lib/prompt"
-import { type AppWithRelation } from "@/ds"
-import { allowDangerousEmailAccountLinking, POKETTO_APP_WITH_RELATION, POKETTO_WELCOME_MESSAGE, USER_INVITATIONS_COUNT } from "@/config"
+import { getWelcomeSystemNotification } from "@/lib/string"
+import { createMedium } from "use-sidecar"
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -31,73 +38,55 @@ declare module "next-auth" {
   interface User {
     // ...other properties
     // role: UserRole;
-    platformUserId: string
+    platformId: string
     platformType: PlatformType
   }
-}
-
-export const addAppIntoConversation = async (u: User, app: AppWithRelation): Promise<Conversation> => {
-  const existed = await prisma.conversation.findFirst({
-    where: {
-      userId: u.id,
-      appId: app.id,
-    },
-  })
-  if (existed) return existed
-
-  // init conversation
-  const c = await prisma.conversation.create({
-    data: {
-      userId: u.id,
-      appId: app.id,
-      pinned: false,
-    },
-  })
-
-  // init chatMessage
-  await prisma.chatMessage.createMany({
-    data: [
-      {
-        content: `Welcome ${u.name} to join the ${app.name}`,
-        conversationId: c.id,
-        format: ChatMessageFormatType.systemNotification,
-      },
-      ...(app.model?.initPrompts ?? []).map((p) => prompt2chatMessage(u, c.id, p)),
-    ],
-  })
-  return c
-}
-
-const initUser = async (user: User) => {
-  log.info(`initializing user(id=${user.id}, name=${user.name})`)
-  const conversation = await addAppIntoConversation(user, POKETTO_APP_WITH_RELATION)
-  // welcome message
-  await prisma.chatMessage.create({
-    data: {
-      content: POKETTO_WELCOME_MESSAGE,
-      conversationId: conversation.id,
-      format: ChatMessageFormatType.text,
-      role: PromptRoleType.assistant,
-    },
-  })
-
-  // init invitation tickets
-  await prisma.invitationRelation.createMany({
-    data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })),
-  })
-
-  // finished initialization
-  log.info(`initialized user(id=${user.id}, name=${user.name})`)
 }
 
 const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 
 const adapter: Adapter = {
+  /**
+   * example user:
+   image: "https://avatars.githubusercontent.com/u/33591398?v=4"
+   platformId: "33591398"
+   platformType: "Poketto"
+   emailVerified: null
+   */
   createUser: async (user) => {
+    // note: 已经插入用户了！！！！！！
     const createdUser = await createUser(user)
 
-    // init extra relations when user created here
-    await initUser(createdUser as unknown as User) // todo: avoid as ?
+    // 更新 conversation
+    await prisma.conversation.create({
+      include: {
+        messages: true,
+      },
+      data: {
+        appId: POKETTO_APP_ID,
+        userId: createdUser.id,
+        messages: {
+          create: [
+            {
+              content: getWelcomeSystemNotification(user.name ?? "bro", POKETTO_APP_NAME),
+              format: ChatMessageFormatType.systemNotification,
+            },
+            {
+              content: POKETTO_SYSTEM_PROMPT,
+              role: PromptRoleType.system,
+            },
+            {
+              content: POKETTO_WELCOME_MESSAGE,
+              role: PromptRoleType.assistant,
+            },
+          ],
+        },
+      },
+    })
+    // 更新 邀请码
+    await prisma.invitationRelation.createMany({
+      data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: createdUser.id })),
+    })
 
     return createdUser
   },
@@ -119,7 +108,7 @@ export const authOptions: NextAuthOptions = {
         account: account,
         credentials: credentials,
       })
-      user.platformUserId = user.id
+      user.platformId = user.id
       user.platformType = PlatformType.Poketto
       return true
     },
@@ -130,7 +119,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: user.id,
-          platformUserId: user.id,
+          platformId: user.id,
           platformType: PlatformType.Poketto,
         },
       }
