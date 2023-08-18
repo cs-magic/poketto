@@ -128,7 +128,7 @@ export const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
           <p className={"| truncate "}>{app.desc}</p>
         </div>
         <div className={"| flex w-20 shrink-0 flex-col gap-1 overflow-hidden whitespace-nowrap"}>
-          <ViewsField v={app.state?.views ?? 0} />
+          <ViewsField value={app.state?.views ?? 0} />
           <p className={"truncate"}>@{app.creator.name}</p>
         </div>
       </DialogTrigger>

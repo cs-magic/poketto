@@ -19,6 +19,7 @@ import {
   DrawingPinFilledIcon,
   DrawingPinIcon,
   Link2Icon,
+  SymbolIcon,
 } from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { AppDetail } from "@/components/app-detail-view"
@@ -38,6 +39,7 @@ import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bo
 import log from "@/lib/log"
 import { useUser } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 export default function ConversationPage({ conversationStr }: { conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
@@ -65,7 +67,7 @@ export default function ConversationPage({ conversationStr }: { conversationStr:
             className={clsx(
               "hidden w-full shrink-[.1] overflow-x-hidden md:w-[375px] lg:flex",
               "h-full gap-4 overflow-y-auto p-4",
-              "flex-col "
+              "break-inside-avoid flex-col"
             )}
           >
             {chatDetailVisible && c && <AppDetail app={c.app} comments={c.app.comments} />}
@@ -94,7 +96,7 @@ const ConversationMain = ({ c }: { c: ConversationWithRelation }) => {
 }
 
 const ConversationInput = ({ appId }: { appId: string }) => {
-  const { data: initialMessages = [] } = api.conv.listMessages.useQuery({ appId })
+  const { data: initialMessages } = api.conv.listMessages.useQuery({ appId })
   const refForm = useRef<HTMLFormElement>(null)
 
   const utils = api.useContext()
@@ -102,7 +104,7 @@ const ConversationInput = ({ appId }: { appId: string }) => {
     onSuccess: () => void utils.conv.listConversations.invalidate(),
   })
 
-  const { messages, handleSubmit, input, handleInputChange, setMessages } = useChat({
+  const { isLoading, messages, handleSubmit, input, handleInputChange, setMessages } = useChat({
     initialMessages,
     onError: (err) => toast.error(err.message),
     onFinish: (msg) => pushMessage({ ...msg, appId }),
@@ -115,10 +117,22 @@ const ConversationInput = ({ appId }: { appId: string }) => {
     pushMessage({ content: input, role: PromptRoleType.user, appId })
   }
 
+  useEffect(() => {
+    if (initialMessages) setMessages(initialMessages)
+  }, [initialMessages])
+
+  console.log({ isLoading })
+
   return (
     <>
       <ScrollToBottom className={"w-full grow overflow-auto p-2"} initialScrollBehavior={"auto"}>
-        <ConversationMessages messages={messages} appId={appId} />
+        {initialMessages ? (
+          <ConversationMessages messages={messages} appId={appId} />
+        ) : (
+          <div className={"flex h-full w-full items-center justify-center"}>
+            <SymbolIcon className={"animate-spin"} />
+          </div>
+        )}
       </ScrollToBottom>
 
       <form ref={refForm} className={"| flex w-full items-center justify-center gap-2 p-4"} onSubmit={post}>
@@ -228,10 +242,11 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
         <DotsVerticalIcon />
       </PopoverTrigger>
       <PopoverContent className={"flex flex-col gap-2"}>
-        <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal"}>
-          Back <ChevronLeftIcon />
+        <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal justify-between lg:hidden"}>
+          <span>Back</span> <ChevronLeftIcon />
         </Link>
-        <Button className={"justify-between pl-4"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
+
+        <Button className={"justify-between"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
           {c.pinned ? (
             <>
               <span>Unpin</span>
@@ -245,12 +260,19 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
           )}
         </Button>
 
-        <Link href={"/p/[appId]"} as={getAppLink(c.appId)} className={"p-btn-horizontal"}>
-          Detail <CodeSandboxLogoIcon />
-        </Link>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant={"ghost"} className={" justify-between lg:hidden"}>
+              <span>Detail</span> <CodeSandboxLogoIcon />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <AppDetail app={c.app} comments={[]} />
+          </DialogContent>
+        </Dialog>
 
-        <Button className={"justify-between pl-4"} variant={"ghost"}>
-          Share (todo) <Link2Icon />
+        <Button className={"justify-between"} variant={"ghost"}>
+          <span>Share (todo)</span> <Link2Icon />
         </Button>
       </PopoverContent>
     </Popover>

@@ -243,8 +243,8 @@ const PokettoComment = ({ comment }: { comment: IAppComment }) => {
       </CardHeader>
       <CardContent>{comment.content}</CardContent>
       <CardFooter className={"gap-4 text-primary-foreground/50"}>
-        <ResponsiveField icon={<IconThumbUp />} value={comment.upvotes.toString()} />
-        <ResponsiveField icon={<IconThumbDown />} value={"Not Helpful"} />
+        <ResponsiveField icon={<IconThumbUp />} value={comment.upvotes} />
+        {/*<ResponsiveField icon={<IconThumbDown />} value={"Not Helpful"} />*/}
       </CardFooter>
     </Card>
   )

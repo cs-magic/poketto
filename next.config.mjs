@@ -12,7 +12,7 @@ sms.install();
 const config = {
 	
 	experimental: {
-		typedRoutes: true
+		// typedRoutes: true // too strict, since we have a dozen of json uri
 	},
 	
 	reactStrictMode: true,

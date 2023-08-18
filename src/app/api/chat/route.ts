@@ -1,4 +1,3 @@
-// ./app/api/chat/route.ts
 import { Configuration, OpenAIApi } from "openai-edge"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { kv } from "@vercel/kv"
