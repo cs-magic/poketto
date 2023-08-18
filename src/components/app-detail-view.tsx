@@ -21,7 +21,7 @@ import { ResponsiveField } from "@/components/field"
 import { IconThumbDown, IconThumbUp } from "@tabler/icons-react"
 import { api } from "@/lib/api"
 
-import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri } from "@/lib/string"
 import { type AppWithRelation, type IAppComment } from "@/ds"
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { UserIcon } from "lucide-react"
@@ -190,7 +190,7 @@ const CollapsablePara = ({ content }: { content: string }) => {
 
   return (
     <div className={"flex w-full flex-col"}>
-      <article className={clsx("prose prose-sm prose-slate dark:prose-invert", !shownMore && "line-clamp-4")} ref={ref}>
+      <article className={clsx("p-prose", !shownMore && "line-clamp-4")} ref={ref}>
         <ReactMarkdown>{m(content)}</ReactMarkdown>
       </article>
 
@@ -243,8 +243,8 @@ const PokettoComment = ({ comment }: { comment: IAppComment }) => {
       </CardHeader>
       <CardContent>{comment.content}</CardContent>
       <CardFooter className={"gap-4 text-primary-foreground/50"}>
-        <ResponsiveField icon={<IconThumbUp />} title={comment.upvotes.toString()} />
-        <ResponsiveField icon={<IconThumbDown />} title={"Not Helpful"} />
+        <ResponsiveField icon={<IconThumbUp />} value={comment.upvotes.toString()} />
+        <ResponsiveField icon={<IconThumbDown />} value={"Not Helpful"} />
       </CardFooter>
     </Card>
   )
@@ -290,7 +290,7 @@ function UninstallButton({ app }: { app: AppWithRelation }) {
     onSuccess: (input) => {
       void utils.conv.listConversations.invalidate()
       const nextConv = conversations.find((c) => c.appId !== app.id)!
-      void router.push(getConversationLink(userId, nextConv.appId))
+      void router.push(getConversationsLink(userId))
     },
   })
   return !curConv ? null : (

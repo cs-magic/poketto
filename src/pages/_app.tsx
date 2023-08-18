@@ -26,7 +26,7 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
 
           <main
             className={clsx(
-              "| | flex h-screen w-screen flex-col text-sm font-light text-foreground",
+              "| | max-w-screen flex h-screen w-auto min-w-[375px] flex-col text-sm font-light text-foreground",
               "bg-background" // 'bg-zinc-900',
               // font.className
             )}

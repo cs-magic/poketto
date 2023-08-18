@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   return (
     <RootLayout>
-      <div className={"| flex h-full w-full gap-4 p-4"}>
+      <div className={"| flex h-full w-full flex-wrap gap-4 overflow-auto p-4"}>
         <UserProfile user={user} />
 
         <div className={"| flex grow flex-col overflow-auto"}>

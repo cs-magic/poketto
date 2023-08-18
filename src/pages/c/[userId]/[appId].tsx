@@ -5,189 +5,74 @@ import { toast } from "sonner"
 import clsx from "clsx"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from ".prisma/client"
-import { getHotkeyHandler, useDebouncedValue } from "@mantine/hooks"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { ViewsField } from "@/components/field"
-import { type FormEvent, type PropsWithChildren, useEffect, useRef, useState } from "react"
+import { getHotkeyHandler } from "@mantine/hooks"
+import { type FormEvent, useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import d from "@/lib/datetime"
-import { ChevronDownIcon, DotsVerticalIcon } from "@radix-ui/react-icons"
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  CodeSandboxLogoIcon,
+  DotsVerticalIcon,
+  DrawingPinFilledIcon,
+  DrawingPinIcon,
+  Link2Icon,
+} from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { AppDetail } from "@/components/app-detail-view"
 import { type GetServerSideProps } from "next"
 import { getSession } from "next-auth/react"
 import { prisma } from "@/server/db"
-import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { getAppLink, getConversationsLink } from "@/lib/string"
 import superjson from "superjson"
 import { nanoid } from "nanoid"
-import {
-  type AppWithRelation,
-  conversationInclude,
-  type ConversationWithRelation,
-  type UserWithRelations,
-  userWithRelationsInclude,
-} from "@/ds"
+import { conversationInclude, type ConversationWithRelation, type UserWithRelations, userWithRelationsInclude } from "@/ds"
 import { URI } from "@/config"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
-import { XIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import _ from "lodash"
 import log from "@/lib/log"
-import { useUser, useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
+import { ConversationList } from "@/components/conversations"
 
 export default function ConversationPage({ conversationStr }: { conversationStr: string }) {
   const c = superjson.parse<ConversationWithRelation>(conversationStr)
   const { chatListVisible, chatDetailVisible } = useAppStore()
 
+  const ui = 7
+
   return (
     <RootLayout>
       <div className={"| flex h-full w-full divide-x overflow-hidden"}>
-        {chatListVisible && (
-          <section className={"| | relative flex w-full shrink-0 flex-col items-center overflow-hidden md:w-[375px]"}>
+        {!!(ui & 1) && chatListVisible && (
+          <section className={"relative hidden w-full flex-col items-center overflow-hidden md:flex md:w-[375px]" + " shrink-[.1]"}>
             <ConversationList />
           </section>
         )}
 
-        <section className={clsx("| relative flex h-full w-full grow flex-col overflow-hidden transition-all")}>
-          <ConversationMain c={c} />
-        </section>
+        {!!(ui & 2) && (
+          <section className={clsx("| relative flex h-full w-full grow flex-col overflow-hidden transition-all md:min-w-[375px]")}>
+            <ConversationMain c={c} />
+          </section>
+        )}
 
-        {chatDetailVisible && (
-          <section className={clsx("w-full shrink-0 overflow-x-hidden md:w-[375px]", "h-full gap-4 overflow-y-auto p-4", "flex flex-col ")}>
+        {!!(ui & 4) && chatDetailVisible && (
+          <section
+            className={clsx(
+              "hidden w-full shrink-[.1] overflow-x-hidden md:w-[375px] lg:flex",
+              "h-full gap-4 overflow-y-auto p-4",
+              "flex-col "
+            )}
+          >
             {chatDetailVisible && c && <AppDetail app={c.app} comments={c.app.comments} />}
           </section>
         )}
       </div>
     </RootLayout>
-  )
-}
-
-/**
- [left] conversation list
- */
-
-const ConversationList = () => {
-  const { data: convs = [] } = api.conv.listConversations.useQuery({})
-  const [searchKey, setSearchKey] = useState("")
-  const [toSearch] = useDebouncedValue(searchKey, 200)
-  // todo: avoid empty call of trpc
-  const queryApps = api.app.listApps.useInfiniteQuery(
-    { searchKey: toSearch },
-    {
-      enabled: toSearch !== "",
-      getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
-    }
-  )
-  const searchedApps = queryApps.data?.pages.flatMap((item) => item.data) ?? []
-
-  return (
-    <>
-      {/* 搜索框 */}
-      <div className={"relative w-full"}>
-        <Input
-          value={searchKey}
-          placeholder={"Search: Title / Description / Init Prompt"}
-          className={"mx-auto my-2 w-[95%] rounded-2xl bg-accent"}
-          onChange={(event) => {
-            setSearchKey(event.currentTarget.value)
-          }}
-        />
-        {searchKey && (
-          <Button className={"absolute bottom-2 right-4 text-muted-foreground"} variant={"ghost"} onClick={() => setSearchKey("")}>
-            <XIcon className={" wh-5"} />
-          </Button>
-        )}
-      </div>
-
-      <div className={"flex w-full grow flex-col overflow-y-auto overflow-x-hidden"}>
-        {/* 列表 */}
-        {searchKey ? ( // 搜索时
-          searchedApps ? (
-            <>
-              <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
-              {searchedApps.slice(0, 10).map((prompt) => (
-                <SearchResultItem app={prompt} key={prompt.id} />
-              ))}
-            </>
-          ) : (
-            <>
-              <SectionTitle>Global search results</SectionTitle>
-              <Skeleton className={"h-8"} />
-            </>
-          ) // 	没有搜索时显示最近聊天列表
-        ) : (
-          <>
-            <SectionTitle>Poketto Apps</SectionTitle>
-            {_.orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
-              <ConversationListView key={c.appId} c={c} />
-            ))}
-          </>
-        )}
-      </div>
-    </>
-  )
-}
-
-const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
-  const m = useMustache()
-  const userId = useUserId()!
-
-  return (
-    <Link
-      href={"/c/[userId]/[appId]"}
-      as={getConversationLink(userId, c.appId)}
-      className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
-    >
-      <div className={"flex h-fit w-full items-center  gap-4"}>
-        <Avatar className={"shrink-0"}>
-          <AvatarImage src={getLocalFlowgptImageUri(c.app.avatar, "md")} />
-        </Avatar>
-
-        <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
-          <div className={"| flex w-full justify-between gap-2"}>
-            <span className={"truncate "}>{c.app.name}</span>
-            <span>{d(c.latestMessage.updatedAt).calendar()}</span>
-          </div>
-          <div className={"flex gap-2"}>
-            {/* 只有 group 才需要打开 */}
-            <span className={"truncate text-muted-foreground"}>{m(c.latestMessage.content)}</span>
-          </div>
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
-  const [open, setOpen] = useState(false)
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className={"flex w-full items-center gap-2 p-2 hover:bg-accent"}>
-        <Avatar className={"shrink-0"}>
-          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
-        </Avatar>
-        <div className={"| flex grow flex-col gap-1 overflow-hidden"}>
-          <p className={"| truncate text-sm font-semibold text-primary-foreground/75"}>{app.name}</p>
-          <p className={"| truncate "}>{app.desc}</p>
-        </div>
-        <div className={"| flex w-20 shrink-0 flex-col gap-1 overflow-hidden whitespace-nowrap"}>
-          <ViewsField v={app.state?.views ?? 0} />
-          <p className={"truncate"}>@{app.creator.name}</p>
-        </div>
-      </DialogTrigger>
-      <DialogContent className={"max-h-[80vh] overflow-auto"}>
-        <AppDetail app={app} comments={[]} setOpen={setOpen} />
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -311,7 +196,7 @@ const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
     <div className={clsx("chat text-sm tracking-normal", role === PromptRoleType.assistant ? "chat-start" : "chat-end")}>
       <div
         className={clsx(
-          "| prose prose-sm chat-bubble w-full overflow-auto dark:prose-invert",
+          "| p-prose chat-bubble w-full overflow-auto",
           {
             system: "bg-slate-700",
             function: "bg-destructive",
@@ -330,8 +215,6 @@ const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
  * [right] conversation detail (wrapped)
  */
 
-const SectionTitle = ({ children }: PropsWithChildren) => <div className={"| w-full bg-muted px-4 py-2"}>{children}</div>
-
 const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
   const { chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
   const utils = api.useContext()
@@ -345,20 +228,29 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
         <DotsVerticalIcon />
       </PopoverTrigger>
       <PopoverContent className={"flex flex-col gap-2"}>
-        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
-          {c.pinned ? "Unpin" : "Pin"}
+        <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal"}>
+          Back <ChevronLeftIcon />
+        </Link>
+        <Button className={"justify-between pl-4"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
+          {c.pinned ? (
+            <>
+              <span>Unpin</span>
+              <DrawingPinIcon />
+            </>
+          ) : (
+            <>
+              <span>Pin</span>
+              <DrawingPinFilledIcon />
+            </>
+          )}
         </Button>
-        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={toggleSidebar}>
-          {(sidebarVisible ? "Hide" : "Show") + " Sidebar"}
-        </Button>
-        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={toggleChatList}>
-          {(chatListVisible ? "Hide" : "Show") + " Chat List"}
-        </Button>
-        <Button className={"justify-start pl-4"} variant={"ghost"} onClick={toggleChatDetail}>
-          {(chatDetailVisible ? "Hide" : "Show") + " Chat Detail"}
-        </Button>
-        <Button className={"justify-start pl-4"} variant={"ghost"}>
-          Share (todo)
+
+        <Link href={"/p/[appId]"} as={getAppLink(c.appId)} className={"p-btn-horizontal"}>
+          Detail <CodeSandboxLogoIcon />
+        </Link>
+
+        <Button className={"justify-between pl-4"} variant={"ghost"}>
+          Share (todo) <Link2Icon />
         </Button>
       </PopoverContent>
     </Popover>

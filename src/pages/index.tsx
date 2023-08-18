@@ -12,7 +12,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { todo } from "@/lib/helpers"
 import { Skeleton } from "@/components/ui/skeleton"
 import dayjs from "dayjs"
-import { UsesField, ViewsField } from "@/components/field"
+import { SavesField, UsesField, ViewsField } from "@/components/field"
 import { signIn } from "next-auth/react"
 import { AppCardView } from "@/components/app-card-view"
 import { CardsLayoutType } from "@/store/ui.slice"
@@ -131,24 +131,27 @@ const AppView = ({ app }: { app: AppWithRelation | undefined }) => {
     )
 
   const view = (
-    <div className={"flex w-full cursor-pointer  items-center gap-8 p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
+    <div className={"flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
       <Avatar className={"rounded-sm wh-[64px]"}>
         <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
       </Avatar>
 
-      <div className={"flex grow flex-col items-start gap-2"}>
-        <p className={"font-semibold text-primary-foreground"}>{app.name}</p>
+      <div className={"flex grow flex-col items-start gap-2 overflow-hidden"}>
+        <p className={"truncate font-semibold text-primary-foreground"}>{app.name}</p>
         <p className={"line-clamp-2 text-primary-foreground/75"}>{app.desc}</p>
 
-        <div className={"inline-flex gap-4"}>
-          <p>By {app.name}</p>
-          <p>Updated on {dayjs(app.updatedAt).format("DD MMM, YYYY")}</p>
+        <div className={"inline-flex w-full justify-between gap-4 overflow-hidden"}>
+          <p className={"truncate"}>By {app.name}</p>
+          <p className={" truncate "} style={{ direction: "rtl" }}>
+            Updated on {dayjs(app.updatedAt).format("DD MMM, YYYY")}
+          </p>
         </div>
       </div>
 
-      <div className={"inline-flex shrink-0 gap-2"}>
-        <UsesField v={app.state?.calls ?? 0} />
-        <ViewsField v={app.state?.views ?? 0} />
+      <div className={"flex shrink-0 flex-col gap-2 md:flex-row"}>
+        <ViewsField value={app.state?.views ?? 0} />
+        <UsesField value={app.state?.calls ?? 0} />
+        {/*<SavesField value={app.state?.stars ?? 0} />*/}
       </div>
     </div>
   )

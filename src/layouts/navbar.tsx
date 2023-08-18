@@ -6,7 +6,7 @@ import { useMount } from "@/hooks/use-mount"
 import { BellIcon, GearIcon, PersonIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
 import { ICON_DIMENSION_SM, Icons } from "@/lib/assets"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { MenuLink } from "@/components/link"
+import { SidebarNavItem } from "@/components/link"
 import { Button } from "@/components/ui/button"
 import { useAppStore } from "@/store"
 import Image from "next/image"
@@ -23,7 +23,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import _ from "lodash"
-import { PRODUCT, URI } from "@/config"
+import { navs, PRODUCT, URI } from "@/config"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()
@@ -44,10 +44,10 @@ export const ThemeSwitcher = () => {
 export const LogoWithName = () => {
   const { toggleSidebar } = useAppStore()
   return (
-    <Button variant={"ghost"} className={"justify-start gap-2"} onClick={toggleSidebar}>
+    <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
       {/*<Logo height={24}/>*/}
       <Image src={CatLogo} alt={"Cat Logo"} width={24} height={24} />
-      <span className={"text-lg tracking-widest"}>{PRODUCT.name}</span>
+      <span className={"whitespace-nowrap text-lg tracking-widest"}>{PRODUCT.name}</span>
     </Button>
   )
 }
@@ -58,33 +58,40 @@ export const IconContainer = ({ children }: PropsWithChildren) => {
 
 export default function Navbar() {
   return (
-    <div className={"| | flex items-center border-b px-4 py-2"}>
+    <div className={"flex items-center border-b px-4 py-2"}>
       <LogoWithName />
 
       <div className={"grow"} />
       <CommandDemo />
 
-      <Popover>
-        <PopoverTrigger>
-          <IconContainer children={<QuestionMarkCircledIcon />} />
-        </PopoverTrigger>
+      <div className={"hidden items-center md:flex"}>
+        <Popover>
+          <PopoverTrigger>
+            <IconContainer>
+              <QuestionMarkCircledIcon />
+            </IconContainer>
+          </PopoverTrigger>
 
-        <PopoverContent>
-          <section className={"flex flex-col"}>
-            <MenuLink field={"whats-poketto"} title={"What's Poketto.AI ?"} link={URI.app.docs.intro} />
-            <MenuLink field={"whats-dora"} title={"What's Dora ?"} link={URI.app.docs.currency} />
-            <MenuLink field={"learning-center"} link={URI.app.docs.learn} />
-            <MenuLink field={"support-center"} link={URI.app.docs.support} />
-          </section>
-        </PopoverContent>
-      </Popover>
+          <PopoverContent>
+            <section className={"flex flex-col"}>
+              <SidebarNavItem {...navs.whatsPoketto} />
+              <SidebarNavItem {...navs.whatsDora} />
+              <SidebarNavItem {...navs.learningCenter} />
+              <SidebarNavItem {...navs.supportCenter} />
+            </section>
+          </PopoverContent>
+        </Popover>
 
-      {/* 由 lara 调 */}
-      <ThemeSwitcher />
+        <ThemeSwitcher />
 
-      <IconContainer children={<BellIcon />} />
+        <IconContainer>
+          <BellIcon />
+        </IconContainer>
 
-      <IconContainer children={<GearIcon />} />
+        <IconContainer>
+          <GearIcon />
+        </IconContainer>
+      </div>
     </div>
   )
 }
@@ -150,7 +157,7 @@ const CommandDemo = () => {
       <div className={"| | relative flex w-[256px] items-center text-sm text-muted-foreground"}>
         <IconSearch className={"absolute left-2 wh-5"} />
         <Input className={"grow"} onFocus={() => setOpen(!open)} />
-        <kbd className="| pointer-events-none absolute right-2 inline-flex h-6  shrink-0 select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground">
+        <kbd className="pointer-events-none absolute right-2 hidden h-6  shrink-0  select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground md:inline-flex">
           ⌘ {KEY}
         </kbd>
       </div>

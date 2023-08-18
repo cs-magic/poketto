@@ -62,9 +62,13 @@ export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; 
         {/*	user - ranks */}
         <div className={"| flex justify-between text-xs text-gray-100  dark:text-primary-foreground/75 "}>
           {/* user */}
-          <Button variant={'link'} className={"| flex w-1/2 items-center gap-2"} onClick={()=> {
-            window.location.href = getUserLink(app.creatorId)
-          }}>
+          <Button
+            variant={"link"}
+            className={"| flex w-1/2 items-center gap-2"}
+            onClick={() => {
+              window.location.href = getUserLink(app.creatorId)
+            }}
+          >
             <Avatar className={"wh-5"}>
               <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
             </Avatar>
@@ -73,8 +77,8 @@ export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; 
 
           {/* ranks */}
           <div className={"flex items-center gap-1"}>
-            <UsesField v={app.state?.calls ?? 0} size={"sm"} />
-            <ViewsField v={app.state?.views ?? 0} size={"sm"} />
+            <UsesField value={app.state?.calls ?? 0} />
+            <ViewsField value={app.state?.views ?? 0} />
           </div>
         </div>
       </div>

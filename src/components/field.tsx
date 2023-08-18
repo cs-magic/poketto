@@ -3,15 +3,18 @@ import { IconEye, IconGitFork } from "@tabler/icons-react"
 import { ICON_DIMENSION_SM } from "@/lib/assets"
 import numeral from "numeral"
 import { clsx } from "clsx"
+import { BookmarkFilledIcon, EyeOpenIcon, VideoIcon } from "@radix-ui/react-icons"
 
 export const ResponsiveField = ({
   icon,
-  title,
+  value,
+  suffix,
   className,
   ...props
 }: {
   icon: ReactNode
-  title?: string
+  value: number
+  suffix?: string
 } & HTMLProps<HTMLDivElement>) => {
   return (
     <div
@@ -19,15 +22,12 @@ export const ResponsiveField = ({
       {...props}
     >
       {icon}
-      {title && <span> {title}</span>}
+      <span> {numeral(value).format("0a")}</span>
+      <span className={"hidden md:block"}>{suffix}</span>
     </div>
   )
 }
 
-export const UsesField = ({ v, size = "md" }: { v: number; size?: "md" | "sm" }) => (
-  <ResponsiveField icon={<IconGitFork className={ICON_DIMENSION_SM} />} title={numeral(v).format("0a") + (size === "md" ? "Uses" : "")} />
-)
-
-export const ViewsField = ({ v, size = "md" }: { v: number; size?: "md" | "sm" }) => (
-  <ResponsiveField icon={<IconEye className={ICON_DIMENSION_SM} />} title={numeral(v).format("0a") + (size === "md" ? "Views" : "")} />
-)
+export const UsesField = ({ value }: { value: number }) => <ResponsiveField icon={<VideoIcon />} value={value} />
+export const ViewsField = ({ value }: { value: number }) => <ResponsiveField icon={<EyeOpenIcon />} value={value} />
+export const SavesField = ({ value }: { value: number }) => <ResponsiveField icon={<BookmarkFilledIcon />} value={value} />

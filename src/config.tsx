@@ -1,4 +1,7 @@
 import { getRobotAvatar } from "@/lib/string"
+import { type INavItem } from "@/components/link"
+import { EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
+import React from "react"
 
 // -----------------------------------------------------------------------------
 // system
@@ -33,12 +36,12 @@ export const URI = {
     },
   },
   user: {
-    dashboard: "/user/dashboard" as const,
+    dashboard: "/user/dashboard",
     gallery: "/user/gallery",
     integrations: "/user/integrations",
 
     auth: {
-      signin: "/api/auth/signin" as const,
+      signin: "/api/auth/signin",
       login: "/auth/login",
       register: "/auth/register",
     },
@@ -58,6 +61,68 @@ export const URI = {
     },
   },
 } as const
+
+export const navKeys = [
+  "home",
+  "explore",
+  "dashboard",
+  "gallery",
+  "waitlist",
+  "enterprise",
+  "whatsPoketto",
+  "whatsDora",
+  "learningCenter",
+  "supportCenter",
+] as const
+export type NavKey = (typeof navKeys)[number]
+export const navs: Record<NavKey, INavItem> = {
+  home: {
+    title: "home",
+    link: URI.app.home,
+    Icon: HomeIcon,
+  },
+  explore: {
+    title: "explore",
+    link: URI.app.explore,
+    Icon: RocketIcon,
+  },
+  dashboard: {
+    title: "dashboard",
+    link: URI.user.dashboard,
+    Icon: MixIcon,
+  },
+  gallery: {
+    title: "gallery",
+    link: URI.user.gallery,
+    Icon: TargetIcon,
+  },
+  waitlist: {
+    title: "Join Platform Waitlist",
+    link: URI.user.seek.waitlist,
+    Icon: LightningBoltIcon,
+  },
+  enterprise: {
+    title: "poketto enterprise",
+    link: URI.user.seek.enterprise,
+    Icon: EnvelopeOpenIcon,
+  },
+  whatsPoketto: {
+    title: "What's Poketto.AI ?",
+    link: URI.app.docs.intro,
+  },
+  whatsDora: {
+    title: "What's Dora ?",
+    link: URI.app.docs.currency,
+  },
+  learningCenter: {
+    title: "Learning Center",
+    link: URI.app.docs.learn,
+  },
+  supportCenter: {
+    title: "Support Center",
+    link: URI.app.docs.support,
+  },
+}
 
 export const CAROUSELS = [
   // { src: uri.images.AiMap, /* 色调太白了，不会让人喜欢的 */ title: 'AIGC 魔法能力评测' },
@@ -109,7 +174,8 @@ export const DEFAULT_APP_VERSION = "1.0.0" as const
 // -----------------------------------------------------------------------------
 
 export const POKETTO_MODEL_NAME = "poketto-1.0" as const
-export const POKETTO_SYSTEM_PROMPT = `You are a loyal companion by the name of Poketto, developed by the official Poketto team led by MarkShawn, and my name is {{userName}}.
+export const POKETTO_SYSTEM_PROMPT =
+  `You are a loyal companion by the name of Poketto, developed by the official Poketto team led by MarkShawn, and my name is {{userName}}.
 For each conversation we have, you must summarize that conversation as 1-3 hashtags after giving a reply, with line breaks added to the end of the reply. Each hashtag should be as short as possible, prefixed with a "#" sign. If the tag involves more than one word, replace the space between the words with a "-" sign. Every two tags need to be separated by a space.` as const
 export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
 
@@ -132,4 +198,4 @@ export const POKETTO_WELCOME_MESSAGE = `Hi，{{userName}}！
 export const USER_INVITATIONS_COUNT = 5 as const
 export const DEFAULT_USER_NAME = "游客" as const
 export const DEFAULT_USER_ID = "guest" as const
-export const DEFAULT_USER_AVATAR = getRobotAvatar(DEFAULT_USER_ID) 
+export const DEFAULT_USER_AVATAR = getRobotAvatar(DEFAULT_USER_ID)

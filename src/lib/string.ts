@@ -29,7 +29,9 @@ export const getRobotAvatar = (
   return `https://robohash.org/${key}?set=set${mode}&size=${width}x${height}`
 }
 
+export const getConversationsLink = (userId: string) => `/c/${userId}`
 export const getConversationLink = (userId: string, appId: string) => `/c/${userId}/${appId}`
+export const getAppLink = (appId: string) => `/p/${appId}`
 
 export const getUserLink = (userId: string) => `https://flowgpt.com/user/${userId}`
 

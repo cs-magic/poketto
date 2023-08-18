@@ -1,30 +1,20 @@
 import React from "react"
 import { Separator } from "@/components/ui/separator"
 import { clsx } from "clsx"
-import {
-  ChevronRightIcon,
-  Cross1Icon,
-  EnvelopeOpenIcon,
-  HomeIcon,
-  LightningBoltIcon,
-  MixIcon,
-  RocketIcon,
-  TargetIcon,
-} from "@radix-ui/react-icons"
-import { MenuLink } from "@/components/link"
+import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
+import { SidebarNavItem } from "@/components/link"
 import { useAppStore } from "@/store"
 import { useUser } from "@/hooks/use-user"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ICON_DIMENSION_MD } from "@/lib/assets"
 import { UserIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { signIn, signOut } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import { api } from "@/lib/api"
 import { InvitationStatus } from ".prisma/client"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
-import Mustache from "mustache"
-import { PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
+import { navs, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
 import { useMustache } from "@/hooks/use-mustache"
 import Link from "next/link"
 
@@ -35,26 +25,24 @@ export const Sidebar = () => {
   return (
     <div
       className={clsx(
-        "| | flex h-full max-w-[240px] shrink-0 flex-col gap-6 whitespace-nowrap bg-sidebar px-4 pt-8 text-sm text-primary-foreground"
+        "hidden h-full max-w-[240px] shrink-0 flex-col gap-6 whitespace-nowrap bg-sidebar px-4 pt-8 text-sm text-primary-foreground md:flex"
       )}
     >
       <section className={"flex flex-col"}>
-        <MenuLink icon={<HomeIcon />} field={"home"} link={URI.app.home} />
-        <MenuLink icon={<RocketIcon />} field={"explore"} link={URI.app.explore} />
+        <SidebarNavItem {...navs.home} />
+        <SidebarNavItem {...navs.explore} />
         {/*<MenuLink field={'toolkits'}/>*/}
       </section>
-
       <Separator />
       <section className={"flex flex-col"}>
-        <MenuLink icon={<MixIcon />} field={"dashboard"} link={URI.user.dashboard} />
-        <MenuLink icon={<TargetIcon />} field={"gallery"} link={URI.user.gallery} />
+        <SidebarNavItem {...navs.dashboard} />
+        <SidebarNavItem {...navs.gallery} />
         {/*<MenuLink field={'integrations'} link={uri.user.integrations}/>*/}
       </section>
-
       <Separator />
       <section className={"flex flex-col"}>
-        <MenuLink icon={<LightningBoltIcon />} field={"Join Platform Waitlist"} link={URI.user.seek.waitlist} />
-        <MenuLink icon={<EnvelopeOpenIcon />} field={"poketto-enterprise"} link={URI.user.seek.enterprise} />
+        <SidebarNavItem {...navs.waitlist} />
+        <SidebarNavItem {...navs.enterprise} />
       </section>
 
       {/* footer */}
@@ -104,7 +92,7 @@ const InviteCard = () => {
         </Badge>
         <Cross1Icon className={"text-muted-foreground wh-4"} />
       </div>
-      <article className={"prose dark:prose-invert"}>
+      <article className={"p-prose"}>
         <ReactMarkdown>
           {m(
             "每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})" +
