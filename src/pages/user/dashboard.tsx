@@ -68,7 +68,12 @@ const ConversationsView = ({ userId, relationType }: { userId: string; relationT
 const AppView = ({ app }: { app: AppWithRelation }) => {
   const userId = useUserId()!
   return (
-    <Link className={"| | flex w-full justify-between gap-4 border-y p-4"} key={app.id} href={getConversationLink(userId, app.id)}>
+    <Link
+      className={"| | flex w-full justify-between gap-4 border-y p-4"}
+      key={app.id}
+      href={"/c/[userId]/[appId]"}
+      as={getConversationLink(userId, app.id)}
+    >
       <div className={"flex flex-col gap-2"}>
         <div className={"flex items-center gap-2"}>
           <h2>{app.name}</h2>

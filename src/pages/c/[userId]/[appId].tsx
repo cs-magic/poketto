@@ -143,7 +143,8 @@ const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
 
   return (
     <Link
-      href={getConversationLink(userId, c.appId)}
+      href={"/c/[userId]/[appId]"}
+      as={getConversationLink(userId, c.appId)}
       className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
     >
       <div className={"flex h-fit w-full items-center  gap-4"}>

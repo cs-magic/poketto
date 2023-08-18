@@ -33,12 +33,12 @@ export const URI = {
     },
   },
   user: {
-    dashboard: "/user/dashboard",
+    dashboard: "/user/dashboard" as const,
     gallery: "/user/gallery",
     integrations: "/user/integrations",
 
     auth: {
-      signin: "/api/auth/signin",
+      signin: "/api/auth/signin" as const,
       login: "/auth/login",
       register: "/auth/register",
     },
@@ -57,7 +57,7 @@ export const URI = {
       competition: "/images/mj/carousel-peace.jpg",
     },
   },
-}
+} as const
 
 export const CAROUSELS = [
   // { src: uri.images.AiMap, /* 色调太白了，不会让人喜欢的 */ title: 'AIGC 魔法能力评测' },

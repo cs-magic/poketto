@@ -70,7 +70,7 @@ const RecentConversations = ({ user }: { user: User }) => {
     <>
       {conversations.slice(0, 10).map((c) => {
         return (
-          <Link className={"w-48 shrink-0"} key={c.appId} href={getConversationLink(user.id, c.appId)}>
+          <Link className={"w-48 shrink-0"} key={c.appId} href={"/c/[userId]/[apId]"} as={getConversationLink(user.id, c.appId)}>
             <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.appId} />
           </Link>
         )
