@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import _ from "lodash"
-import { type AppWithRelation, type ConversationWithRelation } from "@/ds"
+import { type AppWithRelation, type IConvListView, type ListConv } from "@/ds"
 import { useMustache } from "@/hooks/use-mustache"
 import { useUserId } from "@/hooks/use-user"
 import Link from "next/link"
@@ -22,7 +22,10 @@ import { ViewsField } from "@/components/field"
 import { AppDetail } from "@/components/app-detail-view"
 
 export const ConversationList = () => {
-  const { data: convs = [] } = api.conv.listConversations.useQuery({})
+  // const { convs } = useAppStore()
+  const utils = api.useContext()
+  const convs = utils.conv.listConversations.getData()
+
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)
   // todo: avoid empty call of trpc
@@ -85,15 +88,15 @@ export const ConversationList = () => {
 
 export const SectionTitle = ({ children }: PropsWithChildren) => <div className={"| w-full bg-muted px-4 py-2"}>{children}</div>
 
-export const ConversationListView = ({ c }: { c: ConversationWithRelation }) => {
+export const ConversationListView = ({ c }: { c: ListConv }) => {
   const m = useMustache()
   const userId = useUserId()!
-
+  const latestMessage = c.messages[0]!
   return (
     <Link
       href={"/c/[userId]/[appId]"}
       as={getConversationLink(userId, c.appId)}
-      className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-accent/50")}
+      className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-indigo-100 dark:bg-slate-900")}
     >
       <div className={"flex h-fit w-full items-center  gap-4"}>
         <Avatar className={"shrink-0"}>
@@ -103,11 +106,11 @@ export const ConversationListView = ({ c }: { c: ConversationWithRelation }) => 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
           <div className={"| flex w-full justify-between gap-2"}>
             <span className={"truncate "}>{c.app.name}</span>
-            <span>{d(c.latestMessage.updatedAt).calendar()}</span>
+            <span>{d(latestMessage.updatedAt).calendar()}</span>
           </div>
           <div className={"flex gap-2"}>
             {/* 只有 group 才需要打开 */}
-            <span className={"truncate text-muted-foreground"}>{m(c.latestMessage.content)}</span>
+            <span className={"truncate text-muted-foreground"}>{m(latestMessage.content)}</span>
           </div>
         </div>
       </div>

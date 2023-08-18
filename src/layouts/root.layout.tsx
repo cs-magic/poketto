@@ -1,10 +1,13 @@
-import React, { type PropsWithChildren, ReactNode } from "react"
+import React, { type PropsWithChildren, ReactNode, useEffect } from "react"
 import { Sidebar } from "@/layouts/sidebar"
 import Navbar from "@/layouts/navbar"
 import { useMount } from "@/hooks/use-mount"
 import { clsx } from "clsx"
 import { navs, URI } from "@/config"
 import { FooterNavItem } from "@/components/link"
+import { useUserId } from "@/hooks/use-user"
+import { api } from "@/lib/api"
+import { useAppStore } from "@/store"
 
 export const MobileLayout = (props: PropsWithChildren) => {
   return (
@@ -36,7 +39,25 @@ export const DesktopLayout = (props: PropsWithChildren) => {
 }
 
 export function RootLayout({ children }: PropsWithChildren) {
+  const userId = useUserId()
+  // const { convs, setConvs } = useAppStore()
+
+  // const { data: newConvs } = api.conv.listConversations.useQuery(
+  //   {},
+  //   {
+  // enabled: false, //!!userId,
+  // staleTime: Infinity,
+  // cacheTime: Infinity,
+  // }
+  // )
   const mounted = useMount()
+
+  // useEffect(() => {
+  //   if(newConvs) {
+  //     if(newConvs.length !== convs.length )
+  //   }
+  //   setConvs(newConvs)
+  // }, [newConvs])
 
   if (!mounted) return null
 

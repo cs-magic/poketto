@@ -7,6 +7,9 @@ import type sampleConversation from "@/data/flowgpt/conversation.json"
 import UserGetPayload = Prisma.UserGetPayload
 import AppGetPayload = Prisma.AppGetPayload
 import ConversationGetPayload = Prisma.ConversationGetPayload
+import validator = Prisma.validator
+import ConversationSelect = Prisma.ConversationSelect
+import ConversationInclude = Prisma.ConversationInclude
 
 // -----------------------------------------------------------------------------
 // general
@@ -64,22 +67,10 @@ export const appInclude = {
   state: true,
   comments: true,
 }
-export const conversationInclude = {
-  app: { include: appInclude },
-  messages: {
-    include: {
-      user: true, // 获取每条信息的用户
-    },
-  },
-}
 type IAppInclude = typeof appInclude
-type IConversationInclude = typeof conversationInclude
 export type AppWithRelation = AppGetPayload<{
   include: IAppInclude
 }>
-export type ConversationWithRelation = ConversationGetPayload<{
-  include: IConversationInclude
-}> & { latestMessage: ChatMessage }
 
 // -----------------------------------------------------------------------------
 // poketto
@@ -103,3 +94,44 @@ export interface IPokettoConversation {
   createdAt: Date
   messages: IAppMessage[]
 }
+
+export type IConvListView = ConversationGetPayload<{
+  select: { appId: true; pinned: true; app: { select: { name: true; avatar: true } } }
+}> & { latestMessage: { updatedAt: Date; content: string } }
+
+// ref: https://stackoverflow.com/a/69943634/9422455
+export const selectConvForListView = validator<ConversationSelect>()({
+  // @ts-ignore
+  // latestMessage: true, // 这会覆盖我的 messages 数据结构，因为 latestMessages need messages
+  messages: {
+    orderBy: { updatedAt: "desc" },
+    take: 1,
+    select: {
+      updatedAt: true,
+      content: true,
+    },
+  },
+  pinned: true,
+  appId: true,
+  app: {
+    select: {
+      avatar: true,
+      name: true,
+    },
+  },
+})
+
+export type ListConv = ConversationGetPayload<{ select: typeof selectConvForListView }>
+
+export const convDetailInclude = validator<ConversationInclude>()({
+  app: { include: appInclude },
+  messages: {
+    include: {
+      user: true, // 获取每条信息的用户
+    },
+  },
+})
+export type DetailConv = ConversationGetPayload<{
+  include: typeof convDetailInclude
+}>
+// & { latestMessage: ChatMessage }

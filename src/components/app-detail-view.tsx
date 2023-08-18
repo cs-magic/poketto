@@ -1,6 +1,6 @@
 import { type AppComment } from ".prisma/client"
 import { useRouter } from "next/router"
-import { useConversations, useUserId } from "@/hooks/use-user"
+import { useUserId } from "@/hooks/use-user"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -18,7 +18,7 @@ import ReactMarkdown from "react-markdown"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import d from "@/lib/datetime"
 import { ResponsiveField } from "@/components/field"
-import { IconThumbDown, IconThumbUp } from "@tabler/icons-react"
+import { IconThumbUp } from "@tabler/icons-react"
 import { api } from "@/lib/api"
 
 import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri } from "@/lib/string"
@@ -37,15 +37,14 @@ import {
 } from "./ui/alert-dialog"
 import { useMustache } from "@/hooks/use-mustache"
 import Link from "next/link"
+import { useAppStore } from "@/store"
 
 export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; comments: AppComment[]; setOpen?: (v: boolean) => void }) => {
   const userId = useUserId()
-  const convs = useConversations()
-  console.log({ convs, app })
-
-  const foundApp = convs?.find((c) => c.app.platformId === app.platformId && c.app.platformType === app.platformType)
-  const hasApp = convs && foundApp
-  const notHasApp = convs && !foundApp
+  const utils = api.useContext()
+  const convs = utils.conv.listConversations.getData()
+  const ownedApp =
+    convs === undefined ? undefined : !!convs.find((c) => c.app.platformId === app.platformId && c.app.platformType === app.platformType)
 
   return (
     <div className={"flex h-full w-full flex-col overflow-auto p-2"}>
@@ -66,7 +65,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
             Login to Get
           </Link>
         )}
-        {notHasApp && <InstallButton app={app} setOpen={setOpen} />}
+        {ownedApp === false && <InstallButton app={app} setOpen={setOpen} />}
       </section>
 
       <Separator orientation={"horizontal"} />
@@ -180,7 +179,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         </>
       )}
 
-      {hasApp && <UninstallButton app={app} />}
+      {ownedApp === true && <UninstallButton app={app} />}
     </div>
   )
 }
@@ -261,10 +260,11 @@ const PokettoComment = ({ comment }: { comment: IAppComment }) => {
 
 function InstallButton({ app, setOpen }: { app: AppWithRelation; setOpen?: (v: boolean) => void }) {
   const userId = useUserId()!
-  const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId })
-  const router = useRouter()
+  // const { convs: conversations } = useAppStore()
   const utils = api.useContext()
-  const conv = conversations.find((c) => c.appId === app.id)!
+  const conversations = utils.conv.listConversations.getData()
+  const router = useRouter()
+  const conv = (conversations ?? []).find((c) => c.appId === app.id)!
 
   const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
     onSuccess: (data) => {
@@ -290,14 +290,13 @@ function InstallButton({ app, setOpen }: { app: AppWithRelation; setOpen?: (v: b
 
 function UninstallButton({ app }: { app: AppWithRelation }) {
   const userId = useUserId()!
-  const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId })
+  const { convs: conversations } = useAppStore()
   const router = useRouter()
   const utils = api.useContext()
 
   const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
     onSuccess: (input) => {
       void utils.conv.listConversations.invalidate()
-      const nextConv = conversations.find((c) => c.appId !== app.id)!
       void router.push(getConversationsLink(userId))
     },
   })

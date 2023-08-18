@@ -36,9 +36,18 @@ function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
 export const api = createTRPCNext<AppRouter>({
   config() {
     return {
+      // react-query config
       queryClientConfig: {
         defaultOptions: {
           queries: {
+            // ref: https://tanstack.com/query/v4/docs/react/reference/QueryClient
+            // staleTime: Infinity,
+            staleTime: 5 * 1000,
+            refetchOnWindowFocus: false,
+            refetchOnmount: false,
+            refetchOnReconnect: false,
+            // notifyOnChangeProps: "tracked",
+
             retry: (failureCount, error) => {
               if (handleUnauthorizedErrorsOnClient(error)) return false
               return failureCount < 0 // ref: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528

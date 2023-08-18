@@ -40,7 +40,7 @@
     "@trpc/server": "^10.37.1",
     "@upstash/ratelimit": "^0.4.3",
     "@vercel/kv": "^0.2.2",
-    "ai": "^2.1.33",
+    "ai": "^2.2.2",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",

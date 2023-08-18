@@ -1,5 +1,5 @@
 import { type StoreSlice } from "@/store/index"
-import { type ConversationWithRelation, type IAppComment, type IAppMessage, type SortOrder } from "@/ds"
+import { type DetailConv, type IAppComment, type IAppMessage, type SortOrder } from "@/ds"
 
 /**
  * poketto
@@ -15,8 +15,8 @@ export interface PokettoState {
   convId?: string
   setConvId: (v: string) => void
 
-  convs: ConversationWithRelation[]
-  setConvs: (v: ConversationWithRelation[]) => void
+  convs?: DetailConv[]
+  setConvs: (v: DetailConv[] | undefined) => void
 
   appMessages: IAppMessage[]
   pushAppMessage: (v: IAppMessage) => void
@@ -35,7 +35,7 @@ export const createPokettoSlice: StoreSlice<PokettoState> = (setState) => ({
       state.convId = v
     }),
 
-  convs: [],
+  convs: undefined,
   setConvs: (v) =>
     setState((state) => {
       state.convs = v

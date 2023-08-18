@@ -28,6 +28,7 @@ import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
 import Link from "next/link"
 import { useElementSize } from "@mantine/hooks"
 import { clsx } from "clsx"
+import { useAppStore } from "@/store"
 
 export default function DashboardPage() {
   const user = useUser()
@@ -48,7 +49,8 @@ export default function DashboardPage() {
 }
 
 const ConversationsView = ({ userId, relationType }: { userId: string; relationType: UserAppRelationType }) => {
-  const { data: convs = [] } = api.conv.listConversations.useQuery({ userId })
+  const { convs } = useAppStore()
+
   const { ref, width, height } = useElementSize()
   const expand = width > MAX_MOBILE_WIDTH
 
@@ -70,7 +72,7 @@ const ConversationsView = ({ userId, relationType }: { userId: string; relationT
         </div>
       </div>
 
-      {relationType === "used" && convs.map((c) => <AppView app={c.app} key={c.appId} />)}
+      {relationType === "used" && (convs ?? []).map((c) => <AppView app={c.app} key={c.appId} />)}
     </div>
   )
 }

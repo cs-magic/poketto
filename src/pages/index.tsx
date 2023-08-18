@@ -20,6 +20,7 @@ import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
 import { type AppWithRelation } from "@/ds"
 import { DEFAULT_BATCH_CARDS, URI } from "@/config"
 import { AppContainer } from "@/components/containers"
+import { useAppStore } from "@/store"
 
 export default function HomePage() {
   const user = useUser()
@@ -65,10 +66,11 @@ export default function HomePage() {
 }
 
 const RecentConversations = ({ user }: { user: User }) => {
-  const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId: user.id })
+  const { convs: conversations } = useAppStore()
+
   return (
     <>
-      {conversations.slice(0, 10).map((c) => {
+      {(conversations ?? []).slice(0, 10).map((c) => {
         return (
           <Link className={"w-48 shrink-0"} key={c.appId} href={"/c/[userId]/[apId]"} as={getConversationLink(user.id, c.appId)}>
             <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.appId} />

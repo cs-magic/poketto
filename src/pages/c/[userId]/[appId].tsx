@@ -26,10 +26,10 @@ import { AppDetail } from "@/components/app-detail-view"
 import { type GetServerSideProps } from "next"
 import { getSession } from "next-auth/react"
 import { prisma } from "@/server/db"
-import { getAppLink, getConversationsLink } from "@/lib/string"
+import { getConversationsLink } from "@/lib/string"
 import superjson from "superjson"
 import { nanoid } from "nanoid"
-import { conversationInclude, type ConversationWithRelation, type UserWithRelations, userWithRelationsInclude } from "@/ds"
+import { convDetailInclude, type DetailConv, type UserWithRelations, userWithRelationsInclude } from "@/ds"
 import { URI } from "@/config"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
@@ -37,35 +37,38 @@ import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import log from "@/lib/log"
-import { useUser } from "@/hooks/use-user"
+import { useUser, useUserId } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/router"
 
-export default function ConversationPage({ conversationStr }: { conversationStr: string }) {
-  const c = superjson.parse<ConversationWithRelation>(conversationStr)
-  const { chatListVisible, chatDetailVisible } = useAppStore()
+export default function ConversationPage() {
+  // { conversationStr }: { conversationStr: string }
+  // const c = superjson.parse<ConversationWithRelation>(conversationStr)
+  const router = useRouter()
+  const userId = router.query.userId as string
+  const appId = router.query.appId as string
+  const { data: convs = [] } = api.conv.listConversations.useQuery()
+  const { data: curConv } = api.conv.getConversation.useQuery({ appId })
 
+  // console.log({ convs, curConv })
   const ui = 7
 
   return (
     <RootLayout>
       <div className={"flex h-full w-full overflow-auto"}>
-        {!!(ui & 1) && chatListVisible && (
+        {!!(ui & 1) && (
           <section className={"hidden w-full shrink-[.1] lg:flex lg:w-[375px]"}>
             <ConversationList />
           </section>
         )}
 
-        {!!(ui & 2) && (
-          <section className={clsx("w-full lg:grow")}>
-            <ConversationMain c={c} />
-          </section>
-        )}
+        {!!(ui & 2) && <section className={clsx("w-full lg:grow")}>{curConv && <ConversationMain c={curConv} />}</section>}
 
-        {!!(ui & 4) && chatDetailVisible && (
+        {!!(ui & 4) && (
           <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>
-            {chatDetailVisible && c && <AppDetail app={c.app} comments={c.app.comments} />}
+            {curConv && <AppDetail app={curConv.app} comments={[]} />}
           </section>
         )}
       </div>
@@ -77,7 +80,7 @@ export default function ConversationPage({ conversationStr }: { conversationStr:
  * [middle] conversation messages
  */
 
-const ConversationMain = ({ c }: { c: ConversationWithRelation }) => {
+const ConversationMain = ({ c }: { c: DetailConv }) => {
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
       <div className={"| flex w-full items-center justify-between gap-4 overflow-hidden truncate bg-muted px-4 py-5"}>
@@ -94,32 +97,48 @@ const ConversationMain = ({ c }: { c: ConversationWithRelation }) => {
 }
 
 const ConversationInput = ({ appId }: { appId: string }) => {
+  const userId = useUserId()
   const { data: initialMessages } = api.conv.listMessages.useQuery({ appId })
   const refForm = useRef<HTMLFormElement>(null)
 
   const utils = api.useContext()
   const { mutate: pushMessage } = api.conv.pushMessage.useMutation({
-    onSuccess: () => void utils.conv.listConversations.invalidate(),
+    onSuccess: () => {
+      console.log("=== called onSuccess")
+      void utils.conv.listConversations.invalidate()
+    },
   })
 
-  const { isLoading, messages, handleSubmit, input, handleInputChange, setMessages } = useChat({
+  const { isLoading, metadata, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages,
     onError: (err) => toast.error(err.message),
     onFinish: (msg) => pushMessage({ ...msg, appId }),
     onResponse: (response) => {
       // if (scrolled && response.status === 200) setUnread(true) // 有必要的话，这里可以做更精细地控制
     },
+    id: `${userId}-${appId}`,
   })
+
+  /**
+   * todo: push in the backend
+   */
   const post = (event: FormEvent<HTMLFormElement>) => {
+    // ref: https://stackoverflow.com/a/59961329/9422455
+    const formData = new FormData(event.currentTarget)
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value)
+    }
     handleSubmit(event)
     pushMessage({ content: input, role: PromptRoleType.user, appId })
   }
 
+  // useEffect(() => {
+  //   stop()
+  // }, [appId])
+
   useEffect(() => {
     if (initialMessages) setMessages(initialMessages)
   }, [initialMessages])
-
-  console.log({ isLoading })
 
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
@@ -146,6 +165,8 @@ const ConversationInput = ({ appId }: { appId: string }) => {
             ["Enter", (event) => refForm.current!.requestSubmit()],
           ])}
         />
+        <input className={"hidden"} name={"conversationUserId"} value={userId} />
+        <input className={"hidden"} name={"conversationAppId"} value={appId} />
       </form>
     </div>
   )
@@ -227,11 +248,13 @@ const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
  * [right] conversation detail (wrapped)
  */
 
-const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
-  const { chatDetailVisible, toggleChatDetail, chatListVisible, toggleChatList, toggleSidebar, sidebarVisible } = useAppStore()
+const ControlTool = ({ c }: { c: DetailConv }) => {
   const utils = api.useContext()
   const { mutate: pinConv } = api.conv.pinConv.useMutation({
-    onSuccess: void utils.conv.listConversations.invalidate(),
+    onSuccess: () => {
+      void utils.conv.listConversations.invalidate()
+      void utils.conv.getConversation.invalidate()
+    },
   })
 
   return (
@@ -278,55 +301,55 @@ const ControlTool = ({ c }: { c: ConversationWithRelation }) => {
     </Popover>
   )
 }
-
-/**
- * server
- */
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-  const userId = ctx.query.userId as string
-  const appId = ctx.query.appId as string
-  // const { userId, appId } = ctx.query
-
-  // logger.info({ time: new Date(), fetching: cid })
-  const conversation = await prisma.conversation.findUnique({
-    where: { id: { userId, appId } },
-    include: conversationInclude,
-  })
-  // log.info({ time: new Date(), fetched: conversation, userId, appId })
-  // log.info({ time: new Date(), userId, appId })
-  if (!conversation) {
-    log.warn({ time: new Date(), userId, appId, conversation })
-    return {
-      redirect: {
-        destination: "/404",
-        permanent: false,
-      },
-    }
-  }
-
-  if (session) {
-    const conversationStr = superjson.stringify(conversation)
-    // logger.info({ time: new Date(), parsed: conversationStr })
-
-    const user = (await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: userWithRelationsInclude,
-    })) as UserWithRelations
-
-    return {
-      props: {
-        user,
-        conversationStr,
-      },
-    }
-  }
-
-  return {
-    redirect: {
-      destination: URI.user.auth.signin,
-      permanent: false,
-    },
-  }
-}
+//
+// /**
+//  * server
+//  */
+//
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const session = await getSession(ctx)
+//   const userId = ctx.query.userId as string
+//   const appId = ctx.query.appId as string
+//   // const { userId, appId } = ctx.query
+//
+//   // logger.info({ time: new Date(), fetching: cid })
+//   const conversation = await prisma.conversation.findUnique({
+//     where: { id: { userId, appId } },
+//     include: conversationInclude,
+//   })
+//   // log.info({ time: new Date(), fetched: conversation, userId, appId })
+//   // log.info({ time: new Date(), userId, appId })
+//   if (!conversation) {
+//     log.warn({ time: new Date(), userId, appId, conversation })
+//     return {
+//       redirect: {
+//         destination: "/404",
+//         permanent: false,
+//       },
+//     }
+//   }
+//
+//   if (session) {
+//     const conversationStr = superjson.stringify(conversation)
+//     // logger.info({ time: new Date(), parsed: conversationStr })
+//
+//     const user = (await prisma.user.findUnique({
+//       where: { id: session.user.id },
+//       include: userWithRelationsInclude,
+//     })) as UserWithRelations
+//
+//     return {
+//       props: {
+//         user,
+//         conversationStr,
+//       },
+//     }
+//   }
+//
+//   return {
+//     redirect: {
+//       destination: URI.user.auth.signin,
+//       permanent: false,
+//     },
+//   }
+// }
