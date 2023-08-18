@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from ".prisma/client"
 import { getHotkeyHandler } from "@mantine/hooks"
-import { type FormEvent, useEffect, useRef, useState } from "react"
+import { type FormEvent, SyntheticEvent, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   ChevronDownIcon,
@@ -161,8 +161,15 @@ const ConversationInput = ({ appId }: { appId: string }) => {
           onChange={handleInputChange}
           id={"input"}
           onKeyDown={getHotkeyHandler([
-            //  ref: https://stackoverflow.com/a/71478740
-            ["Enter", (event) => refForm.current!.requestSubmit()],
+            [
+              "Enter",
+              (event) => {
+                // isComposing, ref: https://github.com/facebook/react/issues/13104
+                if (!(event as KeyboardEvent).isComposing)
+                  // request submit, ref: https://stackoverflow.com/a/71478740
+                  refForm.current!.requestSubmit()
+              },
+            ],
           ])}
         />
         <input className={"hidden"} name={"conversationUserId"} value={userId} />
