@@ -58,7 +58,7 @@ export default function ConversationPage({ conversationStr }: { conversationStr:
         )}
 
         {!!(ui & 2) && (
-          <section className={clsx("grow")}>
+          <section className={clsx("w-full lg:grow")}>
             <ConversationMain c={c} />
           </section>
         )}
