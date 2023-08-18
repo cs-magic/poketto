@@ -86,7 +86,7 @@ const ConversationMain = ({ c }: { c: ConversationWithRelation }) => {
         <ControlTool c={c} />
       </div>
 
-      <div className={"overflow-auto"}>
+      <div className={"grow overflow-auto"}>
         <ConversationInput appId={c.appId} />
       </div>
     </div>

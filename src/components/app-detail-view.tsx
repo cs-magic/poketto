@@ -1,6 +1,6 @@
 import { type AppComment } from ".prisma/client"
 import { useRouter } from "next/router"
-import { useUserId } from "@/hooks/use-user"
+import { useConversations, useUserId } from "@/hooks/use-user"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -40,6 +40,12 @@ import Link from "next/link"
 
 export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; comments: AppComment[]; setOpen?: (v: boolean) => void }) => {
   const userId = useUserId()
+  const convs = useConversations()
+  console.log({ convs, app })
+
+  const foundApp = convs?.find((c) => c.app.platformId === app.platformId && c.app.platformType === app.platformType)
+  const hasApp = convs && foundApp
+  const notHasApp = convs && !foundApp
 
   return (
     <div className={"flex h-full w-full flex-col overflow-auto p-2"}>
@@ -54,13 +60,13 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
             <p className={"truncate text-primary-foreground/75"}>by {app.creator.name}</p>
           </div>
         </div>
-        {userId ? (
-          <InstallButton app={app} setOpen={setOpen} />
-        ) : (
-          <Link href={URI.user.auth.signin}>
-            <Button className={clsx("whitespace-nowrap rounded-3xl px-4")}>Login to Get</Button>
+
+        {!userId && (
+          <Link href={URI.user.auth.signin} className={"p-btn"}>
+            Login to Get
           </Link>
         )}
+        {notHasApp && <InstallButton app={app} setOpen={setOpen} />}
       </section>
 
       <Separator orientation={"horizontal"} />
@@ -152,6 +158,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
           <InfoItem a={"category"} b={`${app.categoryMain}-${app.categorySub}`} />
           <InfoItem a={"language"} b={app.language} />
         </div>
+
         <Separator orientation={"horizontal"} />
         <div className={"grid grid-cols-2 gap-4"}>
           {Object.entries(app.state ?? {})
@@ -173,7 +180,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         </>
       )}
 
-      {userId && <UninstallButton app={app} />}
+      {hasApp && <UninstallButton app={app} />}
     </div>
   )
 }
@@ -286,7 +293,6 @@ function UninstallButton({ app }: { app: AppWithRelation }) {
   const { data: conversations = [] } = api.conv.listConversations.useQuery({ userId })
   const router = useRouter()
   const utils = api.useContext()
-  const curConv = conversations.find((c) => c.appId === app.id)
 
   const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
     onSuccess: (input) => {
@@ -295,7 +301,7 @@ function UninstallButton({ app }: { app: AppWithRelation }) {
       void router.push(getConversationsLink(userId))
     },
   })
-  return !curConv ? null : (
+  return (
     <>
       <Separator orientation={"horizontal"} />
       <section id={"collections"} className={"flex w-full flex-col gap-4"}>
@@ -313,7 +319,7 @@ function UninstallButton({ app }: { app: AppWithRelation }) {
               <AlertDialogAction
                 className={"bg-destructive"}
                 onClick={() => {
-                  delConv({ appId: curConv.appId })
+                  delConv({ appId: app.id })
                   toast.success(`You have deleted one app.`)
                 }}
               >

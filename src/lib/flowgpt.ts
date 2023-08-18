@@ -57,7 +57,7 @@ export const transFlowgptPrompt2Tags = (p: IFlowgptPromptBasic): AppTag[] =>
 export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppWithRelation => {
   return {
     comments: [], // todo: add comments
-    id: p.id,
+    id: p.id, // todo: we should not use this id, since it's not real
     name: p.title,
     avatar: p.thumbnailURL,
     language: p.language,
@@ -75,7 +75,7 @@ export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | 
     actions: [],
     categoryMain: p.categoryId,
     categorySub: p.subCategoryId,
-    platformId: PlatformType.FlowGPT,
+    platformId: p.id,
     isOpenSource: p.visibility,
   }
 }

@@ -60,8 +60,8 @@ export const ConversationList = () => {
           searchedApps ? (
             <>
               <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
-              {searchedApps.slice(0, 10).map((prompt) => (
-                <SearchResultItem app={prompt} key={prompt.id} />
+              {searchedApps.slice(0, 10).map((app) => (
+                <SearchResultItem app={app} key={app.id} />
               ))}
             </>
           ) : (
@@ -132,6 +132,7 @@ export const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
           <p className={"truncate"}>@{app.creator.name}</p>
         </div>
       </DialogTrigger>
+
       <DialogContent className={"max-h-[80vh] overflow-auto"}>
         <AppDetail app={app} comments={[]} setOpen={setOpen} />
       </DialogContent>

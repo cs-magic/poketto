@@ -15,7 +15,7 @@ import { type PrismaClient } from "@prisma/client"
 import _ from "lodash"
 import { type GetServerSidePropsContext } from "next"
 import { getServerSession, type DefaultSession, type NextAuthOptions } from "next-auth"
-import { type Adapter } from "next-auth/adapters"
+import { type Adapter, type AdapterUser } from "next-auth/adapters"
 import DiscordProvider from "next-auth/providers/discord"
 import GithubProvider from "next-auth/providers/github"
 import { getWelcomeSystemNotification } from "@/lib/string"
@@ -54,6 +54,10 @@ const adapter: Adapter = {
    emailVerified: null
    */
   createUser: async (user) => {
+    // 有可能会重新插入！！！
+    const existed = await prisma.user.findUnique({ where: { platform: { platformId: user.platformId, platformType: user.platformType } } })
+    if (existed) return existed as AdapterUser
+
     // note: 已经插入用户了！！！！！！
     const createdUser = await createUser(user)
 
@@ -104,9 +108,9 @@ export const authOptions: NextAuthOptions = {
       log.info({
         profile: profile,
         user: user,
-        email: email,
-        account: account,
-        credentials: credentials,
+        // email: email,
+        // account: account,
+        // credentials: credentials,
       })
       user.platformId = user.id
       user.platformType = PlatformType.Poketto
