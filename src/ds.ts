@@ -115,6 +115,8 @@ export const selectConvForListView = validator<ConversationSelect>()({
   appId: true,
   app: {
     select: {
+      platformId: true,
+      platformType: true,
       avatar: true,
       name: true,
     },
