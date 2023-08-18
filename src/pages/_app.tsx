@@ -36,7 +36,7 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
             <Component {...pageProps} />
           </main>
         </ErrorBoundary>
-        <Toaster />
+        <Toaster richColors closeButton position={"top-right"} />
       </SessionProvider>
     </ThemeProvider>
   )

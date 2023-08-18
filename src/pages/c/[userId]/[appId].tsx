@@ -42,6 +42,7 @@ import { ConversationList } from "@/components/conversations"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/router"
+import _ from "lodash"
 
 export default function ConversationPage() {
   // { conversationStr }: { conversationStr: string }
@@ -111,7 +112,10 @@ const ConversationInput = ({ appId }: { appId: string }) => {
 
   const { isLoading, metadata, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages,
-    onError: (err) => toast.error(err.message),
+    onError: (err) => {
+      console.warn(err)
+      toast.error(err.message, { duration: Infinity })
+    },
     onFinish: (msg) => pushMessage({ ...msg, appId }),
     onResponse: (response) => {
       // if (scrolled && response.status === 200) setUnread(true) // 有必要的话，这里可以做更精细地控制
@@ -142,9 +146,11 @@ const ConversationInput = ({ appId }: { appId: string }) => {
 
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
-      <ScrollToBottom className={"w-full grow overflow-auto p-2"} initialScrollBehavior={"auto"}>
+      <ScrollToBottom className={"flex w-full grow overflow-auto "} initialScrollBehavior={"auto"}>
         {initialMessages ? (
-          <ConversationMessages messages={messages} appId={appId} />
+          <div className={"flex w-full flex-col-reverse p-2"}>
+            <ConversationMessages messages={[...messages].reverse()} appId={appId} />
+          </div>
         ) : (
           <div className={"flex h-full w-full items-center justify-center"}>
             <SymbolIcon className={"animate-spin"} />

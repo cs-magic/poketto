@@ -4,6 +4,7 @@ import { kv } from "@vercel/kv"
 import { Ratelimit } from "@upstash/ratelimit"
 import { env } from "@/env.mjs"
 import { type PromptRoleType } from ".prisma/client"
+import { NextResponse } from "next/server"
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
@@ -14,7 +15,7 @@ const openai = new OpenAIApi(config)
 // IMPORTANT! Set the runtime to edge
 export const runtime = "edge"
 
-export async function POST(req: Request) {
+export async function POST(req: Request, res: Response) {
   if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
     const ip = req.headers.get("x-forwarded-for")
     const ratelimit = new Ratelimit({
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
   const data = await req.json()
   const { messages, ...extraData } = data
-  console.log("[CHAT] ", { data })
+  // console.log("[CHAT] ", { data })
 
   // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.createChatCompletion({
@@ -51,6 +52,13 @@ export async function POST(req: Request) {
       role: message.role,
     })),
   })
+
+  const {
+    error: { message },
+  } = await response.json()
+  if (response.status !== 200) {
+    return NextResponse.json(message, { status: 500 })
+  }
 
   // Convert the response into a friendly text-stream
   const stream = OpenAIStream(response)
