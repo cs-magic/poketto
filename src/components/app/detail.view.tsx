@@ -41,7 +41,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
   const { data: app, error: appError } = api.app.getApp.useQuery({ appId })
 
   if (app === undefined) return <SymbolIcon />
-  if (appError) return toast.error(appError.message)
+  if (appError) return null //toast.error(appError.message) // 已经在 lib/api 里handle了
 
   return (
     <div className={"flex h-full w-full flex-col overflow-auto p-2"}>

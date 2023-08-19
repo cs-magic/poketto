@@ -1,9 +1,13 @@
 import { Prisma, type User } from ".prisma/client"
-import { type ChatMessage } from "@prisma/client"
 import { type Message } from "ai"
 import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
 import type sampleComment from "@/data/flowgpt/comment.getComments/comment.json"
 import type sampleConversation from "@/data/flowgpt/conversation.json"
+import { type NextComponentType, type NextPage, type NextPageContext } from "next"
+import { type AppProps } from "next/app"
+import { type Session } from "next-auth"
+import { type ForwardRefExoticComponent, type RefAttributes } from "react"
+import { type IconProps } from "@radix-ui/react-icons/dist/types"
 import UserGetPayload = Prisma.UserGetPayload
 import AppGetPayload = Prisma.AppGetPayload
 import ConversationGetPayload = Prisma.ConversationGetPayload
@@ -12,9 +16,6 @@ import ConversationSelect = Prisma.ConversationSelect
 import ConversationInclude = Prisma.ConversationInclude
 import AppSelect = Prisma.AppSelect
 import UserSelect = Prisma.UserSelect
-import { type NextComponentType, type NextPageContext, type NextPage } from "next"
-import { type AppProps } from "next/app"
-import { type Session } from "next-auth"
 
 // -----------------------------------------------------------------------------
 // general
@@ -135,6 +136,7 @@ export type AppForListView = AppGetPayload<{ select: typeof selectAppForListView
 export const selectAppForDetailView = validator<AppSelect>()({
   ...selectAppForListView,
   comments: true,
+  modelArgs: true,
 })
 
 // ref: https://stackoverflow.com/a/69943634/9422455
@@ -191,4 +193,10 @@ export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> 
 
 export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
   Component: NextComponentWithAuth
+}
+
+export interface INavItem {
+  title: string
+  link: string
+  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
 }

@@ -30,7 +30,7 @@ export default function ExplorePage() {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
   )
-  const apps = query.data?.pages.flatMap((item) => item.data) ?? []
+  const apps = query.data?.pages.flatMap((item) => item.items) ?? []
   // log.info("[FlowGPT] ", apps)
 
   return (

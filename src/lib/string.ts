@@ -35,7 +35,8 @@ export const getAppLink = (appId: string) => `/p/${appId}`
 
 export const getUserLink = (userId: string) => `https://flowgpt.com/user/${userId}`
 
-export const getWelcomeSystemNotification = (userName: string, appName: string) => `Welcome ${userName} to join the ${appName}`
+export const getWelcomeSystemNotification = (userName: string, appName?: string) =>
+  `Welcome ${userName}` + (appName ? `to join the ${appName}` : "") + " !"
 
 export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
   if (uri.startsWith("/") || size === "raw") return uri

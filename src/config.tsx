@@ -1,7 +1,7 @@
 import { getRobotAvatar } from "@/lib/string"
-import { type INavItem } from "@/components/link"
 import { EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import React from "react"
+import { type INavItem } from "@/ds"
 
 // -----------------------------------------------------------------------------
 // system

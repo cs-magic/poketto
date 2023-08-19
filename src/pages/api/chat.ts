@@ -15,7 +15,7 @@ const openai = new OpenAIApi(config)
 // IMPORTANT! Set the runtime to edge
 export const runtime = "edge"
 
-export async function POST(req: Request, res: Response) {
+export default async function (req: Request, res: Response) {
   if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
     const ip = req.headers.get("x-forwarded-for")
     const ratelimit = new Ratelimit({
@@ -53,10 +53,10 @@ export async function POST(req: Request, res: Response) {
     })),
   })
 
-  const {
-    error: { message },
-  } = await response.json()
   if (response.status !== 200) {
+    const {
+      error: { message },
+    } = await response.json()
     return NextResponse.json(message, { status: 500 })
   }
 

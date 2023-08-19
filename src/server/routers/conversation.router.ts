@@ -11,6 +11,7 @@ export const conversationRouter = createTRPCRouter({
   getConversation: protectedProcedure
     .input(
       z.object({
+        userId: z.string(),
         appId: z.string(),
       })
     )
@@ -20,11 +21,11 @@ export const conversationRouter = createTRPCRouter({
           prisma,
           session: { user },
         },
-        input: { appId },
+        input: { userId, appId },
       }) => {
         return prisma.conversation.findFirst({
           include: includeConvForDetailView,
-          where: { userId: user.id, appId },
+          where: { userId: userId, appId },
         })
       }
     ),

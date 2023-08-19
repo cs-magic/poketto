@@ -1,14 +1,8 @@
 import Link from "next/link"
 import _ from "lodash"
-import React, { type ForwardRefExoticComponent, type RefAttributes } from "react"
+import React from "react"
 import { useAppStore } from "@/store"
-import { type IconProps } from "@radix-ui/react-icons/dist/types"
-
-export interface INavItem {
-  title: string
-  link: string
-  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
-}
+import { type INavItem } from "@/ds"
 
 export const SidebarNavItem = ({ Icon, link, title }: INavItem) => {
   const { sidebarVisible } = useAppStore()

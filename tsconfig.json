@@ -43,9 +43,6 @@
       {
         "name": "next"
       }
-    ],
-    "typeRoots": [
-      "src/types.d.ts"
     ]
   },
   "include": [

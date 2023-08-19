@@ -5,6 +5,7 @@ import { getLocalFlowgptImageUri } from "@/lib/string"
 import { UsesField, ViewsField } from "@/components/field"
 import d from "@/lib/datetime"
 import { AppDialogContainer } from "@/components/app/container"
+import { Button } from "@/components/ui/button"
 
 export const AppHorizontalCardView = ({ app }: { app: AppForListView | undefined }) => {
   if (!app)

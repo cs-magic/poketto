@@ -1,11 +1,10 @@
 import { MongoClient } from "mongodb"
-import { env } from "@/env.mjs"
 import { PrismaClient } from ".prisma/client"
 
 function getExtendedClient() {
   const c = new PrismaClient({
     log:
-      env.NODE_ENV === "development"
+      process.env.NODE_ENV === "development"
         ? [
             // 'query',
             "warn",
@@ -49,9 +48,9 @@ const globalForDB = globalThis as unknown as {
   mongoLocal?: MongoClient
 }
 export const prisma = globalForDB.prisma ?? getExtendedClient()
-export const mongoLocal = globalForDB.mongoLocal ?? new MongoClient(env.DB_MONGO_LOCAL_URI, {})
+export const mongoLocal = globalForDB.mongoLocal ?? new MongoClient(process.env.DB_MONGO_LOCAL_URI!, {})
 
-if (env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production") {
   globalForDB.prisma = prisma
   globalForDB.mongoLocal = mongoLocal
 }

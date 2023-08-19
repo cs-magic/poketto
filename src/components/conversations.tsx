@@ -39,7 +39,7 @@ export const ConversationList = () => {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
     }
   )
-  const searchedApps = queryApps.data?.pages.flatMap((item) => item.data) ?? []
+  const searchedApps = queryApps.data?.pages.flatMap((item) => item.items) ?? []
 
   return (
     <div className={"flex h-full w-full shrink-[.1] flex-col overflow-hidden"}>

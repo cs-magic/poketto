@@ -4,10 +4,6 @@
  */
 await import("./src/env.mjs");
 
-import sms from 'source-map-support'
-
-sms.install();
-
 /** @type {import("next").NextConfig} */
 const config = {
 	

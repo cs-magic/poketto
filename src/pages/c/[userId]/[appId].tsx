@@ -37,15 +37,12 @@ import { AppDetailView } from "@/components/app/detail.view"
 import { AppDialogContainer } from "@/components/app/container"
 
 export default function ConversationPage() {
-  // { conversationStr }: { conversationStr: string }
-  // const c = superjson.parse<ConversationWithRelation>(conversationStr)
   const router = useRouter()
   const userId = router.query.userId as string
   const appId = router.query.appId as string
-  const { data: convs = [] } = api.conv.listConversations.useQuery()
-  const { data: curConv } = api.conv.getConversation.useQuery({ appId })
+  console.log({ userId, appId })
+  const { data: curConv } = api.conv.getConversation.useQuery({ userId, appId }, { enabled: !!(userId && appId) })
 
-  // console.log({ convs, curConv })
   const ui = 7
 
   return (
@@ -305,55 +302,3 @@ const ControlTool = ({ c }: { c: ConvForDetailView }) => {
     </Popover>
   )
 }
-//
-// /**
-//  * server
-//  */
-//
-// export const getServerSideProps: GetServerSideProps = async (ctx) => {
-//   const session = await getSession(ctx)
-//   const userId = ctx.query.userId as string
-//   const appId = ctx.query.appId as string
-//   // const { userId, appId } = ctx.query
-//
-//   // logger.info({ time: new Date(), fetching: cid })
-//   const conversation = await prisma.conversation.findUnique({
-//     where: { id: { userId, appId } },
-//     include: conversationInclude,
-//   })
-//   // log.info({ time: new Date(), fetched: conversation, userId, appId })
-//   // log.info({ time: new Date(), userId, appId })
-//   if (!conversation) {
-//     log.warn({ time: new Date(), userId, appId, conversation })
-//     return {
-//       redirect: {
-//         destination: "/404",
-//         permanent: false,
-//       },
-//     }
-//   }
-//
-//   if (session) {
-//     const conversationStr = superjson.stringify(conversation)
-//     // logger.info({ time: new Date(), parsed: conversationStr })
-//
-//     const user = (await prisma.user.findUnique({
-//       where: { id: session.user.id },
-//       include: userWithRelationsInclude,
-//     })) as UserWithRelations
-//
-//     return {
-//       props: {
-//         user,
-//         conversationStr,
-//       },
-//     }
-//   }
-//
-//   return {
-//     redirect: {
-//       destination: URI.user.auth.signin,
-//       permanent: false,
-//     },
-//   }
-// }
