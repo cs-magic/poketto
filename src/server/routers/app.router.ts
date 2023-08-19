@@ -1,15 +1,7 @@
 import { PlatformType } from ".prisma/client"
 import { TAG_SEPARATOR } from "@/config"
-import {
-  type AppWithRelation,
-  includeConvForDetailView,
-  type IFlowgptPromptBasic,
-  sortOrders,
-  selectAppForListView,
-  selectAppForDetailView,
-  type AppForListView,
-} from "@/ds"
-import { transformFlowgptPrompt2AppWithRelation as transFlowgptPrompt2AppWithRelation } from "@/lib/flowgpt"
+import { type AppForListView, type IFlowgptPromptBasic, includeConvForDetailView, selectAppForDetailView, sortOrders } from "@/ds"
+import { transformFlowgptPrompt2ForListView as transFlowgptPrompt2AppWithRelation } from "@/lib/flowgpt"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
 import { ChatMessageFormatType, PromptRoleType } from "@prisma/client"
 import { z } from "zod"
@@ -148,7 +140,12 @@ export const appRouter = createTRPCRouter({
                   },
                   creator: {
                     connectOrCreate: {
-                      where: { platform: { platformId: p.userId, platformType: PlatformType.FlowGPT } },
+                      where: {
+                        platform: {
+                          platformId: p.userId,
+                          platformType: PlatformType.FlowGPT,
+                        },
+                      },
                       create: {
                         platformId: p.userId,
                         platformType: PlatformType.FlowGPT,
@@ -156,7 +153,7 @@ export const appRouter = createTRPCRouter({
                           uri: p.User.uri,
                         },
                         name: p.User.name,
-                        avatar: p.User.image,
+                        image: p.User.image,
                       },
                     },
                   },

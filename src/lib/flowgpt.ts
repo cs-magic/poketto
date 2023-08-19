@@ -19,6 +19,8 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   platformArgs: {
     uri: u.uri,
   },
+  followedByCount: 0,
+  followingCount: 0,
 })
 
 export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
@@ -53,7 +55,7 @@ export const transFlowgptPrompt2Tags = (p: IFlowgptPromptBasic): AppTag[] =>
     creatorId: null,
   }))
 
-export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppForListView => {
+export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppForListView => {
   return {
     id: p.id, // todo: we should not use this id, since it's not real
     name: p.title,
