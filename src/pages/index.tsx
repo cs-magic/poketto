@@ -1,5 +1,5 @@
 import { RootLayout } from "@/layouts/root.layout"
-import { ArrowRightIcon } from "@radix-ui/react-icons"
+import { ArrowRightIcon, SymbolIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,23 +7,18 @@ import _ from "lodash"
 import Link from "next/link"
 
 import { useUser } from "@/hooks/use-user"
-import { type User } from ".prisma/client"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { todo } from "@/lib/helpers"
-import { Skeleton } from "@/components/ui/skeleton"
-import dayjs from "dayjs"
-import { SavesField, UsesField, ViewsField } from "@/components/field"
 import { signIn } from "next-auth/react"
 import { AppCardView } from "@/components/app-card-view"
 import { CardsLayoutType } from "@/store/ui.slice"
-import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
-import { type AppWithRelation } from "@/ds"
+import { getConversationLink } from "@/lib/string"
 import { DEFAULT_BATCH_CARDS, URI } from "@/config"
-import { AppContainer } from "@/components/containers"
-import { useAppStore } from "@/store"
+import { AppListViewInHome } from "@/components/app/in-home.view"
 
 export default function HomePage() {
   const user = useUser()
+
+  const { data: conversations } = api.conv.listConversations.useQuery(undefined, { enabled: !!user })
 
   return (
     <RootLayout>
@@ -47,7 +42,15 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className={"flex w-full gap-2 overflow-auto"}>
             {user ? (
-              <RecentConversations user={user} />
+              <>
+                {(conversations ?? []).slice(0, 10).map((c) => {
+                  return (
+                    <Link className={"w-48 shrink-0"} key={c.appId} href={"/c/[userId]/[apId]"} as={getConversationLink(user.id, c.appId)}>
+                      <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.appId} />
+                    </Link>
+                  )
+                })}
+              </>
             ) : (
               <div>
                 <Button variant={"link"} onClick={() => void signIn()}>
@@ -65,22 +68,6 @@ export default function HomePage() {
   )
 }
 
-const RecentConversations = ({ user }: { user: User }) => {
-  const { convs: conversations } = useAppStore()
-
-  return (
-    <>
-      {(conversations ?? []).slice(0, 10).map((c) => {
-        return (
-          <Link className={"w-48 shrink-0"} key={c.appId} href={"/c/[userId]/[apId]"} as={getConversationLink(user.id, c.appId)}>
-            <AppCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort={"new"} key={c.appId} />
-          </Link>
-        )
-      })}
-    </>
-  )
-}
-
 const ExploreApps = () => {
   const query = api.app.listApps.useInfiniteQuery(
     {},
@@ -88,7 +75,7 @@ const ExploreApps = () => {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
   )
-  const apps = query.data?.pages.flatMap((item) => item.data) ?? []
+  const apps = query.data?.pages.flatMap((item) => item.data)
 
   return (
     <Card id={"explore"} variant={"ghost"} className={"w-full grow"}>
@@ -105,58 +92,9 @@ const ExploreApps = () => {
       </CardHeader>
       <CardContent className={"flex w-full justify-between"}>
         <div className={"flex w-full flex-col divide-y"}>
-          {_.sampleSize(_.range(DEFAULT_BATCH_CARDS), 3).map((i) => (
-            <AppView app={apps[i]} key={i} />
-          ))}
+          {!apps ? <SymbolIcon /> : _.sampleSize(_.range(DEFAULT_BATCH_CARDS), 3).map((i) => <AppListViewInHome app={apps[i]} key={i} />)}
         </div>
       </CardContent>
     </Card>
   )
-}
-
-const AppView = ({ app }: { app: AppWithRelation | undefined }) => {
-  if (!app)
-    return (
-      <div className={"| flex w-full gap-8 pb-3 pt-6 text-muted-foreground"}>
-        <Skeleton className={"wh-12"} />
-
-        <div className={"flex grow flex-col gap-2"}>
-          <Skeleton className={"h-4"} />
-          <Skeleton className={"h-8"} />
-          <Skeleton className={"h-4"} />
-        </div>
-
-        <div className={"inline-flex shrink-0 gap-2"}>
-          <Skeleton className={"h-8 w-40"} />
-        </div>
-      </div>
-    )
-
-  const view = (
-    <div className={"flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
-      <Avatar className={"rounded-sm wh-[64px]"}>
-        <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
-      </Avatar>
-
-      <div className={"flex grow flex-col items-start gap-2 overflow-hidden"}>
-        <p className={"truncate font-semibold text-primary-foreground"}>{app.name}</p>
-        <p className={"line-clamp-2 text-primary-foreground/75"}>{app.desc}</p>
-
-        <div className={"inline-flex w-full justify-between gap-4 overflow-hidden"}>
-          <p className={"truncate"}>By {app.name}</p>
-          <p className={" truncate "} style={{ direction: "rtl" }}>
-            Updated on {dayjs(app.updatedAt).format("DD MMM, YYYY")}
-          </p>
-        </div>
-      </div>
-
-      <div className={"flex shrink-0 flex-col gap-2 md:flex-row"}>
-        <ViewsField value={app.state?.views ?? 0} />
-        <UsesField value={app.state?.calls ?? 0} />
-        {/*<SavesField value={app.state?.stars ?? 0} />*/}
-      </div>
-    </div>
-  )
-
-  return <AppContainer app={app}>{view}</AppContainer>
 }

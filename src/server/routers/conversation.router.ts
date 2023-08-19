@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { createTRPCRouter, protectedProcedure } from "@/server/routers/trpc.helpers"
-import { convDetailInclude, type DetailConv, type IConvListView, selectConvForListView } from "@/ds"
-import { ChatMessageFormatType, type Conversation, PromptRoleType } from ".prisma/client"
+import { includeConvForDetailView, selectConvForListView } from "@/ds"
+import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
 
 export const conversationRouter = createTRPCRouter({
   /**
@@ -23,7 +23,7 @@ export const conversationRouter = createTRPCRouter({
         input: { appId },
       }) => {
         return prisma.conversation.findFirst({
-          include: convDetailInclude,
+          include: includeConvForDetailView,
           where: { userId: user.id, appId },
         })
       }

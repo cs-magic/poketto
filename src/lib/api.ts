@@ -9,7 +9,6 @@ import { createTRPCNext } from "@trpc/next"
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server"
 import superjson from "superjson"
 import { type AppRouter } from "@/server/routers/trpc.router"
-import { Router } from "next/router"
 import { URI } from "@/config"
 import { toast } from "sonner"
 

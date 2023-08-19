@@ -10,6 +10,7 @@ import ConversationGetPayload = Prisma.ConversationGetPayload
 import validator = Prisma.validator
 import ConversationSelect = Prisma.ConversationSelect
 import ConversationInclude = Prisma.ConversationInclude
+import AppSelect = Prisma.AppSelect
 
 // -----------------------------------------------------------------------------
 // general
@@ -95,9 +96,22 @@ export interface IPokettoConversation {
   messages: IAppMessage[]
 }
 
-export type IConvListView = ConversationGetPayload<{
-  select: { appId: true; pinned: true; app: { select: { name: true; avatar: true } } }
-}> & { latestMessage: { updatedAt: Date; content: string } }
+export const selectApPForListView = validator<AppSelect>()({
+  platformId: true,
+  platformType: true,
+  avatar: true,
+  name: true,
+  desc: true,
+  creatorId: true,
+  tags: {
+    select: {
+      name: true,
+    },
+  },
+  state: true,
+})
+
+export type AppForListView = AppGetPayload<{ select: typeof selectApPForListView }>
 
 // ref: https://stackoverflow.com/a/69943634/9422455
 export const selectConvForListView = validator<ConversationSelect>()({
@@ -114,18 +128,13 @@ export const selectConvForListView = validator<ConversationSelect>()({
   pinned: true,
   appId: true,
   app: {
-    select: {
-      platformId: true,
-      platformType: true,
-      avatar: true,
-      name: true,
-    },
+    select: selectApPForListView,
   },
 })
 
-export type ListConv = ConversationGetPayload<{ select: typeof selectConvForListView }>
+export type ConvForListView = ConversationGetPayload<{ select: typeof selectConvForListView }>
 
-export const convDetailInclude = validator<ConversationInclude>()({
+export const includeConvForDetailView = validator<ConversationInclude>()({
   app: { include: appInclude },
   messages: {
     include: {
@@ -133,7 +142,7 @@ export const convDetailInclude = validator<ConversationInclude>()({
     },
   },
 })
-export type DetailConv = ConversationGetPayload<{
-  include: typeof convDetailInclude
+export type ConvForDetailView = ConversationGetPayload<{
+  include: typeof includeConvForDetailView
 }>
 // & { latestMessage: ChatMessage }

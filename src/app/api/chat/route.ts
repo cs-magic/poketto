@@ -41,7 +41,7 @@ export async function POST(req: Request, res: Response) {
   // Extract the `prompt` from the body of the request
   const data = await req.json()
   const { messages, ...extraData } = data
-  // console.log("[CHAT] ", { data })
+  console.log("req: ", { data })
 
   // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.createChatCompletion({
@@ -61,7 +61,11 @@ export async function POST(req: Request, res: Response) {
   }
 
   // Convert the response into a friendly text-stream
-  const stream = OpenAIStream(response)
+  const stream = OpenAIStream(response, {
+    onFinal: (data) => {
+      console.log("onFinal: ", { data })
+    },
+  })
   // Respond with the stream
   return new StreamingTextResponse(stream)
 }

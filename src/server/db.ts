@@ -20,6 +20,7 @@ import {
 import { PlatformType, PrismaClient } from ".prisma/client"
 import log from "@/lib/log"
 import { PromptRoleType } from "@prisma/client"
+import { initSystem } from "@/server/init"
 
 function getExtendedClient() {
   const c = new PrismaClient({
@@ -57,77 +58,6 @@ function getExtendedClient() {
 
   globalForDB.prisma = c
 
-  c.user
-    .upsert({
-      where: { id: POKETTO_CREATOR_ID },
-      include: {
-        createdApps: {
-          include: {
-            category: true,
-            state: true,
-          },
-        },
-      },
-      update: {},
-      create: {
-        id: POKETTO_CREATOR_ID, // 必须要加，因为是基于id比对的
-        platformId: POKETTO_CREATOR_ID,
-        platformType: PlatformType.Poketto,
-        platformArgs: {},
-        email: POKETTO_CREATOR_EMAIL,
-        desc: POKETTO_CREATOR_DESC,
-        name: POKETTO_CREATOR_NAME,
-        image: POKETTO_CREATOR_AVATAR,
-        createdApps: {
-          create: [
-            {
-              id: POKETTO_APP_ID,
-              name: POKETTO_APP_NAME,
-              language: POKETTO_APP_LANGUAGE,
-              avatar: POKETTO_APP_AVATAR,
-              platformId: POKETTO_APP_AVATAR,
-              platformType: PlatformType.Poketto,
-              desc: POKETTO_APP_DESC,
-              modelName: POKETTO_MODEL_NAME,
-              modelArgs: {
-                prompts: [
-                  {
-                    role: PromptRoleType.system,
-                    content: POKETTO_SYSTEM_PROMPT,
-                  },
-                  {
-                    role: PromptRoleType.assistant,
-                    content: POKETTO_WELCOME_MESSAGE,
-                  },
-                ],
-              },
-              category: {
-                connectOrCreate: {
-                  where: { id: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB } },
-                  create: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB },
-                },
-              },
-              isOpenSource: false,
-              state: {
-                create: {
-                  calls: 0,
-                  forks: 0,
-                  shares: 0,
-                  stars: 0,
-                  tips: 0,
-                  views: 0,
-                },
-              },
-            },
-          ],
-        },
-      },
-    })
-    .then(() => {
-      log.info("Successfully inited poketto ~")
-    })
-    .catch(console.error) //这里不能用pino，会报错
-
   return c
 }
 
@@ -135,15 +65,12 @@ export type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>
 
 const globalForDB = globalThis as unknown as {
   prisma?: ExtendedPrismaClient
-  mongo?: MongoClient
   mongoLocal?: MongoClient
 }
 export const prisma = globalForDB.prisma ?? getExtendedClient()
-export const mongo = globalForDB.mongo ?? new MongoClient(env.DB_MONGO_URI, {})
 export const mongoLocal = globalForDB.mongoLocal ?? new MongoClient(env.DB_MONGO_LOCAL_URI, {})
 
 if (env.NODE_ENV !== "production") {
   globalForDB.prisma = prisma
-  globalForDB.mongo = mongo
   globalForDB.mongoLocal = mongoLocal
 }

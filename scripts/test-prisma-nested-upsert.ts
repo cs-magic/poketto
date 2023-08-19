@@ -1,13 +1,6 @@
-import * as path from "path"
-import dotenv from "dotenv"
-const p = path.dirname(__dirname)
-const p1 = path.join(p, ".env.development")
-dotenv.config({ path: p1 })
-dotenv.config({ path: path.join(p, ".env") })
-
 import { POKETTO_APP_ID, POKETTO_APP_NAME, POKETTO_SYSTEM_PROMPT, POKETTO_WELCOME_MESSAGE, USER_INVITATIONS_COUNT } from "@/config"
 import { getWelcomeSystemNotification } from "@/lib/string"
-import { ChatMessageFormatType, PlatformType, Prisma, PrismaClient, PromptRoleType, User } from ".prisma/client"
+import { ChatMessageFormatType, PlatformType, Prisma, PrismaClient, PromptRoleType } from ".prisma/client"
 import _ from "lodash"
 import UserCreateInput = Prisma.UserCreateInput
 
@@ -15,8 +8,6 @@ const user: UserCreateInput & { platformType: PlatformType } = {
   platformId: "xxx",
   platformType: PlatformType.Poketto,
 }
-
-console.log({ p1, POKETTO_APP_ID })
 
 const c = new PrismaClient({}).$extends({
   result: {

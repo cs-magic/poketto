@@ -20,6 +20,7 @@ import DiscordProvider from "next-auth/providers/discord"
 import GithubProvider from "next-auth/providers/github"
 import { getWelcomeSystemNotification } from "@/lib/string"
 import { createMedium } from "use-sidecar"
+import { initUser } from "@/server/init"
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -60,37 +61,7 @@ const adapter: Adapter = {
 
     // note: 已经插入用户了！！！！！！
     const createdUser = await createUser(user)
-
-    // 更新 conversation
-    await prisma.conversation.create({
-      include: {
-        messages: true,
-      },
-      data: {
-        appId: POKETTO_APP_ID,
-        userId: createdUser.id,
-        messages: {
-          create: [
-            {
-              content: getWelcomeSystemNotification(user.name ?? "bro", POKETTO_APP_NAME),
-              format: ChatMessageFormatType.systemNotification,
-            },
-            {
-              content: POKETTO_SYSTEM_PROMPT,
-              role: PromptRoleType.system,
-            },
-            {
-              content: POKETTO_WELCOME_MESSAGE,
-              role: PromptRoleType.assistant,
-            },
-          ],
-        },
-      },
-    })
-    // 更新 邀请码
-    await prisma.invitationRelation.createMany({
-      data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: createdUser.id })),
-    })
+    await initUser(prisma, createdUser)
 
     return createdUser
   },

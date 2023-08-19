@@ -1,6 +1,6 @@
 import { PlatformType } from ".prisma/client"
 import { TAG_SEPARATOR } from "@/config"
-import { type AppWithRelation, convDetailInclude, type IFlowgptPromptBasic, sortOrders } from "@/ds"
+import { type AppWithRelation, includeConvForDetailView, type IFlowgptPromptBasic, sortOrders } from "@/ds"
 import { transformFlowgptPrompt2AppWithRelation as transFlowgptPrompt2AppWithRelation } from "@/lib/flowgpt"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
 import { ChatMessageFormatType, PromptRoleType } from "@prisma/client"
@@ -81,7 +81,7 @@ export const appRouter = createTRPCRouter({
       }) => {
         const p = (await mongoLocal.db("flowgpt").collection("basic").findOne({ id: appId })) as unknown as IFlowgptPromptBasic
         return prisma.conversation.create({
-          include: convDetailInclude,
+          include: includeConvForDetailView,
           data: {
             user: {
               connect: { id: user.id }, // 需要 user + app 同时指定！

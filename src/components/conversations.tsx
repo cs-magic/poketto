@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import _ from "lodash"
-import { type AppWithRelation, type IConvListView, type ListConv } from "@/ds"
+import { type ConvForListView, type AppWithRelation } from "@/ds"
 import { useMustache } from "@/hooks/use-mustache"
 import { useUserId } from "@/hooks/use-user"
 import Link from "next/link"
@@ -88,7 +88,7 @@ export const ConversationList = () => {
 
 export const SectionTitle = ({ children }: PropsWithChildren) => <div className={"| w-full bg-muted px-4 py-2"}>{children}</div>
 
-export const ConversationListView = ({ c }: { c: ListConv }) => {
+export const ConversationListView = ({ c }: { c: ConvForListView }) => {
   const m = useMustache()
   const userId = useUserId()!
   const latestMessage = c.messages[0]!

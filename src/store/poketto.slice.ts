@@ -1,5 +1,5 @@
 import { type StoreSlice } from "@/store/index"
-import { type DetailConv, type IAppComment, type IAppMessage, type SortOrder } from "@/ds"
+import { type ConvForDetailView, type IAppComment, type IAppMessage, type SortOrder } from "@/ds"
 
 /**
  * poketto
@@ -15,8 +15,8 @@ export interface PokettoState {
   convId?: string
   setConvId: (v: string) => void
 
-  convs?: DetailConv[]
-  setConvs: (v: DetailConv[] | undefined) => void
+  convs?: ConvForDetailView[]
+  setConvs: (v: ConvForDetailView[] | undefined) => void
 
   appMessages: IAppMessage[]
   pushAppMessage: (v: IAppMessage) => void

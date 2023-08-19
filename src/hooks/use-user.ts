@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react"
 import { api } from "@/lib/api"
 import { type User } from ".prisma/client"
 
-import { type DetailConv, type UserWithRelations } from "@/ds"
+import { type ConvForDetailView, type UserWithRelations } from "@/ds"
 
 export const useUserId = () => {
   const { data } = useSession()

@@ -8,7 +8,6 @@ export const env = createEnv({
 	 */
 	server: {
 		DATABASE_URL: z.string().url(),
-		DB_MONGO_URI: z.string().url(),
 		DB_MONGO_LOCAL_URI: z.string().url(),
 		NODE_ENV: z.enum(["development", "test", "production"]),
 		NEXTAUTH_SECRET:
@@ -47,7 +46,6 @@ export const env = createEnv({
 	 */
 	runtimeEnv: {
 		DATABASE_URL: process.env.DATABASE_URL,
-		DB_MONGO_URI: process.env.DB_MONGO_URI,
 		DB_MONGO_LOCAL_URI: process.env.DB_MONGO_LOCAL_URI,
 		NODE_ENV: process.env.NODE_ENV,
 		NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,

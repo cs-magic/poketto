@@ -7,12 +7,12 @@ import { IconDotsVertical } from "@tabler/icons-react"
 import clsx from "clsx"
 import Link from "next/link"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { type AppWithRelation, type SortOrder } from "@/ds"
+import { type AppForListView, type AppWithRelation, type SortOrder } from "@/ds"
 import { UsesField, ViewsField } from "@/components/field"
 import { getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
 import { Button } from "./ui/button"
 
-export const AppCardView = ({ app, cardsLayout, sort }: { app: AppWithRelation; cardsLayout: CardsLayoutType; sort: SortOrder }) => {
+export const AppCardView = ({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) => {
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (

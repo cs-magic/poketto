@@ -29,7 +29,7 @@ import { prisma } from "@/server/db"
 import { getConversationsLink } from "@/lib/string"
 import superjson from "superjson"
 import { nanoid } from "nanoid"
-import { convDetailInclude, type DetailConv, type UserWithRelations, userWithRelationsInclude } from "@/ds"
+import { includeConvForDetailView, type ConvForDetailView, type UserWithRelations, userWithRelationsInclude } from "@/ds"
 import { URI } from "@/config"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
@@ -81,7 +81,7 @@ export default function ConversationPage() {
  * [middle] conversation messages
  */
 
-const ConversationMain = ({ c }: { c: DetailConv }) => {
+const ConversationMain = ({ c }: { c: ConvForDetailView }) => {
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
       <div className={"| flex w-full items-center justify-between gap-4 overflow-hidden truncate bg-muted px-4 py-5"}>
@@ -112,6 +112,10 @@ const ConversationInput = ({ appId }: { appId: string }) => {
 
   const { isLoading, metadata, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages,
+    body: {
+      userId,
+      appId,
+    },
     onError: (err) => {
       console.warn(err)
       toast.error(err.message, { duration: Infinity })
@@ -261,7 +265,7 @@ const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
  * [right] conversation detail (wrapped)
  */
 
-const ControlTool = ({ c }: { c: DetailConv }) => {
+const ControlTool = ({ c }: { c: ConvForDetailView }) => {
   const utils = api.useContext()
   const { mutate: pinConv } = api.conv.pinConv.useMutation({
     onSuccess: () => {
