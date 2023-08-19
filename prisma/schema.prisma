@@ -1,13 +1,14 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+///////////////////////////
+// ref: https://pris.ly/d/prisma-schema
+///////////////////////////
 
 generator client {
   provider = "prisma-client-js"
   // output   = "../node_modules/@prisma/client/generated" // support for webstorm autocompletion
 }
 
-/// Always after the prisma-client-js generator
 generator json {
+  /// Always after the prisma-client-js generator
   provider = "prisma-json-types-generator"
   // namespace = "PrismaJson"
   // clientOutput = "<finds it automatically>"
@@ -26,9 +27,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -----------------------------------------------------------------------------
-// next-auth
-// -----------------------------------------------------------------------------
+///////////////////////////
+// models
+///////////////////////////
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
@@ -47,123 +49,6 @@ model Account {
 
   @@unique([provider, providerAccountId])
 }
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model User {
-  id String @id @default(cuid())
-
-  platformType PlatformType @default(Poketto)
-  platformId   String
-
-  /// [PlatformArgs]
-  platformArgs Json?
-
-  accounts Account[]
-  sessions Session[]
-
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image        String?
-  desc          String?
-
-  balance Int @default(0)
-
-  invitedFrom InvitationRelation[] @relation("from")
-  invitedTo   InvitationRelation[] @relation("to")
-
-  followedBy FollowRelation[] @relation("from")
-  following  FollowRelation[] @relation("to")
-
-  /// note: 这里显式声明计数字段，是为了提高性能，以及 prisma 对 computed field 的 type support 还处于开始阶段
-  /// 我们为了对象的数据切片，故分开
-  followedByCount Int @default(0)
-  followingCount  Int @default(0)
-
-  chatMessages       ChatMessage[]
-  chatMessageActions ChatMessageAction[]
-
-  tags AppTag[]
-
-  appComments AppComment[]
-  appActions  AppAction[]
-  StarringApp StarringApp[]
-  createdApps App[]
-
-  conversations Conversation[]
-
-  // maybe we only need one id
-  @@unique([platformType, platformId], name: "platform")
-}
-
-model FollowRelation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  fromId String
-  toId   String
-}
-
-enum RoleType {
-  admin
-  manager
-  normal
-}
-
-// -----------------------------------------------------------------------------
-// invitation
-// -----------------------------------------------------------------------------
-enum InvitationStatus {
-  Idle
-  Pending
-  Accepted
-  Expired
-}
-
-model InvitationRelation {
-  id        String           @id @default(cuid())
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  status    InvitationStatus @default(Idle)
-  // code if necessary
-
-  from   User?  @relation("from", fields: [fromId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  fromId String
-
-  to   User?   @relation("to", fields: [toId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  toId String? @unique
-}
-
-// -----------------------------------------------------------------------------
-// poketto app
-// -----------------------------------------------------------------------------
-enum PlatformType {
-  Poketto
-  FlowGPT
-  OpenAI
-  MidJourney
-  StableDiffusion
-  OpenChat
-}
-
 model App {
   id String @id @default(cuid())
 
@@ -198,47 +83,42 @@ model App {
 
   @@unique([platformType, platformId], name: "platform")
 }
+model AppAction {
+  id        String    @id @default(cuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
-/// use 和 star 是一个持久的、可来回变化的属性
-/// 与 view 等无脑递增的还是有区别
-/// 之所以独立设计model，主要是方便在 trpc 里去获取
-/// 这样 app 的返回结果就始终是固定的数据结构，只需要 AppWithRelation 就可以
-/// 区别就在于数据表不一样
+  user   User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId String?
+  app    App     @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appId  String
 
-/// space -- use --> app
-model Conversation {
+  action String
+}
+model AppCategory {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  isActive Boolean       @default(true)
-  messages ChatMessage[]
+  main Int
+  sub  Int
+  App  App[]
 
-  userId String
-  appId  String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  pinned Boolean @default(false)
-
-  @@id([userId, appId], name: "id", map: "id")
+  @@id([main, sub], name: "id")
 }
-
-/// user -- star --> app
-model StarringApp {
+model AppComment {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  appId String
-
-  isActive Boolean @default(true)
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId String
-}
+  aApp   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  appId  String
 
+  title   String?
+  content String
+  rate    Int?    @default(0)
+}
 model AppState {
   id        String    @id @default(cuid())
   createdAt DateTime? @default(now())
@@ -254,26 +134,18 @@ model AppState {
   app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   appId String @unique
 }
+model AppTag {
+  id String @id @default(cuid())
 
-enum PromptRoleType {
-  system
-  user
-  assistant
-  function
+  /// 这几个主要是 flowgpt 没有
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  creator   User?     @relation(fields: [creatorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  creatorId String?
+
+  name String
+  apps App[]
 }
-
-enum ChatMessageFormatType {
-  text
-  image
-  voice
-  video
-  map
-  realtimeVoice
-  realtimeVideo
-
-  systemNotification
-}
-
 model ChatMessage {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -291,48 +163,6 @@ model ChatMessage {
   conversationUserId String
   conversationAppId  String
 }
-
-model AppCategory {
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  main Int
-  sub  Int
-  App  App[]
-
-  @@id([main, sub], name: "id")
-}
-
-model AppTag {
-  id String @id @default(cuid())
-
-  /// 这几个主要是 flowgpt 没有
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  creator   User?     @relation(fields: [creatorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  creatorId String?
-
-  name String
-  apps App[]
-}
-
-// -----------------------------------------------------------------------------
-// actions
-// -----------------------------------------------------------------------------
-
-model AppAction {
-  id        String    @id @default(cuid())
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  user   User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId String?
-  app    App     @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  appId  String
-
-  action String
-}
-
 model ChatMessageAction {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -345,18 +175,157 @@ model ChatMessageAction {
 
   action String
 }
+model Conversation {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model AppComment {
+  isActive Boolean       @default(true)
+  messages ChatMessage[]
+
+  userId String
+  appId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  pinned Boolean @default(false)
+
+  @@id([userId, appId], name: "id", map: "id")
+}
+model FollowRelation {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId String
-  aApp   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  appId  String
+  from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fromId String
+  toId   String
+}
+model InvitationRelation {
+  id        String           @id @default(cuid())
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  status    InvitationStatus @default(Idle)
+  // code if necessary
 
-  title   String?
-  content String
-  rate    Int?    @default(0)
+  from   User?  @relation("from", fields: [fromId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fromId String
+
+  to   User?   @relation("to", fields: [toId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  toId String? @unique
+}
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+model StarringApp {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  appId String
+
+  isActive Boolean @default(true)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+}
+model User {
+  id String @id @default(cuid())
+
+  platformType PlatformType @default(Poketto)
+  platformId   String
+
+  /// [PlatformArgs]
+  platformArgs Json?
+
+  accounts Account[]
+  sessions Session[]
+
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  desc          String?
+
+  balance Int @default(0)
+
+  invitedFrom InvitationRelation[] @relation("from")
+  invitedTo   InvitationRelation[] @relation("to")
+
+  followedBy FollowRelation[] @relation("from")
+  following  FollowRelation[] @relation("to")
+
+  /// note: 这里显式声明计数字段，是为了提高性能，以及 prisma 对 computed field 的 type support 还处于开始阶段
+  /// 我们为了对象的数据切片，故分开
+  followedByCount Int @default(0)
+  followingCount  Int @default(0)
+
+  chatMessages       ChatMessage[]
+  chatMessageActions ChatMessageAction[]
+
+  tags AppTag[]
+
+  appComments AppComment[]
+  appActions  AppAction[]
+  StarringApp StarringApp[]
+  createdApps App[]
+
+  conversations Conversation[]
+
+  // maybe we only need one id
+  @@unique([platformType, platformId], name: "platform")
+}
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+////////////////////////////
+// enums
+///////////////////////////
+
+enum ChatMessageFormatType {
+  text
+  image
+  voice
+  video
+  map
+  realtimeVoice
+  realtimeVideo
+
+  systemNotification
+}
+enum InvitationStatus {
+  Idle
+  Pending
+  Accepted
+  Expired
+}
+enum PlatformType {
+  Poketto
+  FlowGPT
+  OpenAI
+  MidJourney
+  StableDiffusion
+  OpenChat
+}
+enum PromptRoleType {
+  system
+  user
+  assistant
+  function
+}
+enum RoleType {
+  admin
+  manager
+  normal
 }

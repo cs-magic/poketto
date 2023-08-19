@@ -25,9 +25,7 @@ import { AppDialogContainer } from "@/components/app/container"
 import { SearchResultView } from "@/components/app/search-result.view"
 
 export const ConversationList = () => {
-  // const { convs } = useAppStore()
-  const utils = api.useContext()
-  const convs = utils.conv.listConversations.getData()
+  const { data: convs } = api.conv.listConversations.useQuery()
 
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)

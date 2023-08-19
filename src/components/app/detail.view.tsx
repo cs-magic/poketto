@@ -57,7 +57,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
             Login to Get
           </Link>
         ) : (
-          <InstallButton appId={appId} setOpen={setOpen} />
+          <InstallButton userId={userId} appId={appId} setOpen={setOpen} />
         )}
       </section>
 
@@ -172,7 +172,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
         </>
       )}
 
-      {userId && <UninstallButton appId={appId} />}
+      {userId && <UninstallButton userId={userId} appId={appId} setOpen={setOpen} />}
     </div>
   )
 }
@@ -221,48 +221,59 @@ export const InfoItem = ({ a, b }: { a: string; b: ReactNode }) => {
   )
 }
 
-export function InstallButton({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
-  const userId = useUserId()!
-  const utils = api.useContext()
-  const conversations = utils.conv.listConversations.getData()
+/**
+ * 新加app后应该立即进入
+ */
+export function InstallButton({ userId, appId, setOpen }: { userId: string; appId: string; setOpen?: (v: boolean) => void }) {
   const router = useRouter()
-  const conv = (conversations ?? []).find((c) => c.appId === appId)!
+
+  const utils = api.useContext()
+  const { data: hasApp } = api.conv.hasApp.useQuery({ appId })
 
   const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
     onSuccess: (data) => {
       void utils.conv.listConversations.invalidate()
-      toast.success(`Successfully added one app`)
-      void router.push(getConversationLink(userId, data.appId)) // app.id 进数据库后会生成新的
+      void utils.conv.hasApp.invalidate()
       setOpen && setOpen(false)
+      toast.success(`Successfully added one app`)
+
+      void router.push(getConversationLink(userId, data.appId)) // app.id 进数据库后会生成新的
     },
   })
 
   return (
     <Button
       className={clsx(" h-6 rounded-3xl px-4 transition-all")}
-      disabled={!!conv}
+      disabled={hasApp}
       onClick={() => {
         addApp({ appId })
       }}
     >
-      {conv ? "Got" : "Get"}
+      {hasApp ? "Got" : "Get"}
     </Button>
   )
 }
 
-export function UninstallButton({ appId }: { appId: string }) {
-  const userId = useUserId()!
-  const utils = api.useContext()
-  const conversations = utils.conv.listConversations.getData()
+/**
+ * 删除app后应该留在原地, todo: maybe can go into the list page, if so
+ */
+export function UninstallButton({ userId, appId, setOpen }: { userId: string; appId: string; setOpen?: (v: boolean) => void }) {
   const router = useRouter()
-  const conv = (conversations ?? []).find((c) => c.appId === appId)!
+
+  const utils = api.useContext()
+  const { data: hasApp } = api.conv.hasApp.useQuery({ appId })
 
   const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
     onSuccess: (input) => {
       void utils.conv.listConversations.invalidate()
-      void router.push(getConversationsLink(userId))
+      void utils.conv.hasApp.invalidate()
+      setOpen && setOpen(false)
+      toast.success(`You have deleted one app.`)
     },
   })
+
+  if (!hasApp) return null
+
   return (
     <>
       <Separator orientation={"horizontal"} />
@@ -278,13 +289,7 @@ export function UninstallButton({ appId }: { appId: string }) {
             <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className={"bg-destructive"}
-                onClick={() => {
-                  delConv({ appId })
-                  toast.success(`You have deleted one app.`)
-                }}
-              >
+              <AlertDialogAction className={"bg-destructive"} onClick={() => delConv({ appId })}>
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>

@@ -91,13 +91,15 @@ export const appRouter = createTRPCRouter({
         },
         input: { appId },
       }) => {
+        const userId = user.id
+        console.log("adding app: ", { userId, appId })
         const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, select: selectAppForDetailView })
         return prisma.conversation.create({
           include: {
             messages: true,
           },
           data: {
-            userId: user.id,
+            userId,
             appId,
             messages: {
               createMany: {

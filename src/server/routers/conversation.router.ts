@@ -7,6 +7,17 @@ export const conversationRouter = createTRPCRouter({
   /**
    * todo: public with permission control
    */
+  hasApp: protectedProcedure.input(z.object({ appId: z.string() })).query(
+    async ({
+      input: { appId },
+      ctx: {
+        prisma,
+        session: { user },
+      },
+    }) => {
+      return !!(await prisma.conversation.findUnique({ where: { id: { userId: user.id, appId } } }))
+    }
+  ),
 
   getConversation: protectedProcedure
     .input(

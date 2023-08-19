@@ -274,7 +274,7 @@ const ControlTool = ({ c }: { c: ConvForDetailView }) => {
         </Link>
 
         <AppDialogContainer appId={c.appId}>
-          <Button variant={"ghost"} className={" justify-between xl:hidden"}>
+          <Button variant={"ghost"} className={"w-full justify-between xl:hidden"} onClick={() => {}}>
             <span>Detail</span> <CodeSandboxLogoIcon />
           </Button>
         </AppDialogContainer>
