@@ -6,7 +6,7 @@
  */
 import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client"
 import { createTRPCNext } from "@trpc/next"
-import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server"
+import { type inferRouterInputs, type inferRouterOutputs, type TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { type AppRouter } from "@/server/routers/trpc.router"
 import { URI } from "@/config"
@@ -50,6 +50,13 @@ export const api = createTRPCNext<AppRouter>({
             retry: (failureCount, error) => {
               if (handleUnauthorizedErrorsOnClient(error)) return false
               return failureCount < 0 // ref: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528
+            },
+            // 这里可以获得从 server 拿过来的 error，然后在客户端反馈，因此可以在这里用 toast
+            onError: (error) => {
+              const errorMessage = `error: ${(error as TRPCError).message}`
+              console.log(errorMessage)
+              toast.error(errorMessage)
+              return error
             },
           },
           mutations: {

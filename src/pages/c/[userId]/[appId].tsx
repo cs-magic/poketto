@@ -1,5 +1,4 @@
 import { RootLayout } from "@/layouts/root.layout"
-import { useAppStore } from "@/store"
 import { type Message, useChat } from "ai/react"
 import { toast } from "sonner"
 import clsx from "clsx"
@@ -9,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from ".prisma/client"
 import { getHotkeyHandler } from "@mantine/hooks"
-import { type FormEvent, SyntheticEvent, useEffect, useRef, useState } from "react"
+import { type FormEvent, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   ChevronDownIcon,
@@ -22,27 +21,20 @@ import {
   SymbolIcon,
 } from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { AppDetail } from "@/components/app-detail-view"
-import { type GetServerSideProps } from "next"
-import { getSession } from "next-auth/react"
-import { prisma } from "@/server/db"
 import { getConversationsLink } from "@/lib/string"
-import superjson from "superjson"
 import { nanoid } from "nanoid"
-import { includeConvForDetailView, type ConvForDetailView, type UserWithRelations, userWithRelationsInclude } from "@/ds"
-import { URI } from "@/config"
+import { type ConvForDetailView } from "@/ds"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
 import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import log from "@/lib/log"
-import { useUser, useUserId } from "@/hooks/use-user"
+import { useSessionUser, useUserId } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/router"
-import _ from "lodash"
+import { AppDetailView } from "@/components/app/detail.view"
+import { AppDialogContainer } from "@/components/app/container"
 
 export default function ConversationPage() {
   // { conversationStr }: { conversationStr: string }
@@ -69,7 +61,7 @@ export default function ConversationPage() {
 
         {!!(ui & 4) && (
           <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>
-            {curConv && <AppDetail app={curConv.app} comments={[]} />}
+            {curConv && <AppDetailView appId={curConv.appId} />}
           </section>
         )}
       </div>
@@ -193,7 +185,7 @@ const ConversationMessages = ({ messages, appId }: { messages: (Message | ChatMe
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
-  const u = useUser()
+  const u = useSessionUser()
 
   useEffect(() => {
     if (!sticky) setHasUnread(true)
@@ -284,16 +276,11 @@ const ControlTool = ({ c }: { c: ConvForDetailView }) => {
           <span>Back</span> <ChevronLeftIcon />
         </Link>
 
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant={"ghost"} className={" justify-between xl:hidden"}>
-              <span>Detail</span> <CodeSandboxLogoIcon />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <AppDetail app={c.app} comments={[]} />
-          </DialogContent>
-        </Dialog>
+        <AppDialogContainer appId={c.appId}>
+          <Button variant={"ghost"} className={" justify-between xl:hidden"}>
+            <span>Detail</span> <CodeSandboxLogoIcon />
+          </Button>
+        </AppDialogContainer>
 
         <Separator orientation={"horizontal"} className={"xl:hidden"} />
 

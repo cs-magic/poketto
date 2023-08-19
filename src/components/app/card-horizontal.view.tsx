@@ -1,17 +1,16 @@
-import { type AppWithRelation } from "@/ds"
+import { type AppForListView } from "@/ds"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { getLocalFlowgptImageUri } from "@/lib/string"
 import { UsesField, ViewsField } from "@/components/field"
-import { AppContainer } from "@/components/containers"
 import d from "@/lib/datetime"
+import { AppDialogContainer } from "@/components/app/container"
 
-export const AppListViewInHome = ({ app }: { app: AppWithRelation | undefined }) => {
+export const AppHorizontalCardView = ({ app }: { app: AppForListView | undefined }) => {
   if (!app)
     return (
       <div className={"| flex w-full gap-8 pb-3 pt-6 text-muted-foreground"}>
         <Skeleton className={"wh-12"} />
-
         <div className={"flex grow flex-col gap-2"}>
           <Skeleton className={"h-4"} />
           <Skeleton className={"h-8"} />
@@ -24,10 +23,10 @@ export const AppListViewInHome = ({ app }: { app: AppWithRelation | undefined })
       </div>
     )
 
-  const view = (
+  return (
     <div className={"flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
       <Avatar className={"rounded-sm wh-[64px]"}>
-        <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
+        <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} />
       </Avatar>
 
       <div className={"flex grow flex-col items-start gap-2 overflow-hidden"}>
@@ -49,6 +48,4 @@ export const AppListViewInHome = ({ app }: { app: AppWithRelation | undefined })
       </div>
     </div>
   )
-
-  return <AppContainer app={app}>{view}</AppContainer>
 }

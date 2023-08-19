@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from "react"
 import clsx from "clsx"
 import { RootLayout } from "@/layouts/root.layout"
 import { api } from "@/lib/api"
-import { AppContainer, GridContainer, MasonryContainer } from "@/components/containers"
+import { GridContainer, MasonryContainer } from "@/components/containers"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import _ from "lodash"
@@ -15,10 +15,10 @@ import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
 import { order2icon } from "@/lib/assets"
 import { useIntersection } from "@mantine/hooks"
-import { AppCardView } from "@/components/app-card-view"
-import log from "@/lib/log"
 import { CAROUSELS } from "@/config"
 import { sortOrders } from "@/ds"
+import { AppDialogContainer } from "@/components/app/container"
+import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 
 export default function ExplorePage() {
   const { cardsLayout, sortOrder, setSortOrder } = useAppStore()
@@ -73,9 +73,9 @@ export default function ExplorePage() {
 
         <Container>
           {apps.map((app) => (
-            <AppContainer key={app.id} app={app}>
-              <AppCardView app={app} cardsLayout={cardsLayout} sort={sortOrder} />
-            </AppContainer>
+            <AppDialogContainer key={app.id} appId={app.id}>
+              <AppVerticalCardView app={app} cardsLayout={cardsLayout} sort={sortOrder} />
+            </AppDialogContainer>
           ))}
         </Container>
 

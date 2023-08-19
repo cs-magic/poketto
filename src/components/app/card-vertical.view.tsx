@@ -1,3 +1,4 @@
+import { type AppForListView, type SortOrder } from "@/ds"
 import { CardsLayoutType } from "@/store/ui.slice"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
@@ -5,35 +6,33 @@ import { Badge } from "@/components/ui/badge"
 import _ from "lodash"
 import { IconDotsVertical } from "@tabler/icons-react"
 import clsx from "clsx"
-import Link from "next/link"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { type AppForListView, type AppWithRelation, type SortOrder } from "@/ds"
-import { UsesField, ViewsField } from "@/components/field"
+import { Button } from "@/components/ui/button"
 import { getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
-import { Button } from "./ui/button"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { UsesField, ViewsField } from "@/components/field"
 
-export const AppCardView = ({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) => {
+export const AppVerticalCardView = ({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) => {
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (
         <AspectRatio ratio={3 / 4} className={"overflow-hidden rounded-2xl"}>
           <Image
-            src={app.avatar}
+            src={app.image}
             priority
             fill
             className={"object-fill transition-all group-hover:scale-125"}
-            alt={app.avatar}
+            alt={app.image}
             sizes={"300px"}
           />
         </AspectRatio>
       ) : (
         <Image
-          src={app.avatar}
+          src={app.image}
           priority
           width={300}
           height={400}
           className={"object-fill transition-all group-hover:scale-125"}
-          alt={app.avatar}
+          alt={app.image}
           style={{ width: "100%", height: "auto" }}
         />
       )}
@@ -70,7 +69,7 @@ export const AppCardView = ({ app, cardsLayout, sort }: { app: AppForListView; c
             }}
           >
             <Avatar className={"wh-5"}>
-              <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
+              <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} />
             </Avatar>
             <span className={"truncate italic"}>{app.name}</span>
           </Button>

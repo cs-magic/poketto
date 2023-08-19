@@ -39,26 +39,7 @@ export const DesktopLayout = (props: PropsWithChildren) => {
 }
 
 export function RootLayout({ children }: PropsWithChildren) {
-  const userId = useUserId()
-  // const { convs, setConvs } = useAppStore()
-
-  // const { data: newConvs } = api.conv.listConversations.useQuery(
-  //   {},
-  //   {
-  // enabled: false, //!!userId,
-  // staleTime: Infinity,
-  // cacheTime: Infinity,
-  // }
-  // )
   const mounted = useMount()
-
-  // useEffect(() => {
-  //   if(newConvs) {
-  //     if(newConvs.length !== convs.length )
-  //   }
-  //   setConvs(newConvs)
-  // }, [newConvs])
-
   if (!mounted) return null
 
   return (

@@ -1,6 +1,14 @@
 import { PlatformType } from ".prisma/client"
 import { TAG_SEPARATOR } from "@/config"
-import { type AppWithRelation, includeConvForDetailView, type IFlowgptPromptBasic, sortOrders } from "@/ds"
+import {
+  type AppWithRelation,
+  includeConvForDetailView,
+  type IFlowgptPromptBasic,
+  sortOrders,
+  selectAppForListView,
+  selectAppForDetailView,
+  type AppForListView,
+} from "@/ds"
 import { transformFlowgptPrompt2AppWithRelation as transFlowgptPrompt2AppWithRelation } from "@/lib/flowgpt"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
 import { ChatMessageFormatType, PromptRoleType } from "@prisma/client"
@@ -11,6 +19,19 @@ export const appRouter = createTRPCRouter({
   /**
    * todo: public with permission control
    */
+
+  getApp: publicProcedure
+    .input(
+      z.object({
+        appId: z.string(),
+      })
+    )
+    .query(async ({ ctx: { prisma }, input: { appId } }) => {
+      return prisma.app.findUniqueOrThrow({
+        select: selectAppForDetailView,
+        where: { id: appId },
+      })
+    }),
 
   listApps: publicProcedure
     .input(
@@ -28,7 +49,7 @@ export const appRouter = createTRPCRouter({
         sortOrder: z.enum(sortOrders).default("mostViewed"),
       })
     )
-    .query<{ data: AppWithRelation[]; nextCursor: number | undefined }>(async ({ ctx: { mongoLocal }, input }) => {
+    .query<{ data: AppForListView[]; nextCursor: number | undefined }>(async ({ ctx: { mongoLocal }, input }) => {
       let query: Record<string, any> = {}
       if (input.language !== undefined) query.language = input.language
       if (input.categoryId !== undefined) query.categoryId = input.categoryId
@@ -135,7 +156,7 @@ export const appRouter = createTRPCRouter({
                           uri: p.User.uri,
                         },
                         name: p.User.name,
-                        image: p.User.image,
+                        avatar: p.User.image,
                       },
                     },
                   },

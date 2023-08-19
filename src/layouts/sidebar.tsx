@@ -4,7 +4,6 @@ import { clsx } from "clsx"
 import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { SidebarNavItem } from "@/components/link"
 import { useAppStore } from "@/store"
-import { useUser } from "@/hooks/use-user"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ICON_DIMENSION_MD } from "@/lib/assets"
 import { UserIcon } from "lucide-react"
@@ -17,10 +16,11 @@ import ReactMarkdown from "react-markdown"
 import { navs, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
 import { useMustache } from "@/hooks/use-mustache"
 import Link from "next/link"
+import { useSessionUser } from "@/hooks/use-user"
 
 export const Sidebar = () => {
   const { sidebarVisible } = useAppStore()
-  const user = useUser()
+  const user = useSessionUser()
 
   return (
     <div

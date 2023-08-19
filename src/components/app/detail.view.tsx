@@ -1,30 +1,30 @@
-import { type AppComment } from ".prisma/client"
-import { useRouter } from "next/router"
 import { useUserId } from "@/hooks/use-user"
+import { api } from "@/lib/api"
+import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import clsx from "clsx"
+import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri } from "@/lib/string"
+import Link from "next/link"
+import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { Separator } from "@/components/ui/separator"
+import clsx from "clsx"
 import numeral from "numeral"
 import _ from "lodash"
-import { StarFilledIcon, StarIcon } from "@radix-ui/react-icons"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import { vIsNumber } from "@/lib/number"
 import { type ReactNode, useCallback, useState } from "react"
+import { useMustache } from "@/hooks/use-mustache"
 import ReactMarkdown from "react-markdown"
+import { type IAppComment } from "@/ds"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import d from "@/lib/datetime"
+import { UserIcon } from "lucide-react"
 import { ResponsiveField } from "@/components/field"
 import { IconThumbUp } from "@tabler/icons-react"
-import { api } from "@/lib/api"
-
-import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri } from "@/lib/string"
-import { type AppWithRelation, type IAppComment } from "@/ds"
-import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
-import { UserIcon } from "lucide-react"
+import { useRouter } from "next/router"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,23 +34,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTrigger,
-} from "./ui/alert-dialog"
-import { useMustache } from "@/hooks/use-mustache"
-import Link from "next/link"
-import { useAppStore } from "@/store"
+} from "@/components/ui/alert-dialog"
 
-export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; comments: AppComment[]; setOpen?: (v: boolean) => void }) => {
+export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) => {
   const userId = useUserId()
-  const utils = api.useContext()
-  const convs = utils.conv.listConversations.getData()
-  const ownedApp =
-    convs === undefined ? undefined : !!convs.find((c) => c.app.platformId === app.platformId && c.app.platformType === app.platformType)
+  const { data: app, error: appError } = api.app.getApp.useQuery({ appId })
+
+  if (app === undefined) return <SymbolIcon />
+  if (appError) return toast.error(appError.message)
 
   return (
     <div className={"flex h-full w-full flex-col overflow-auto p-2"}>
       <section id={"basic"} className={"| flex w-full items-center gap-2"}>
         <Avatar className={"shrink-0 p-4  wh-28"}>
-          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className={"rounded-2xl"} />
+          <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} className={"rounded-2xl"} />
         </Avatar>
 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
@@ -60,18 +57,19 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
           </div>
         </div>
 
-        {!userId && (
+        {!userId ? (
           <Link href={URI.user.auth.signin} className={"p-btn"}>
             Login to Get
           </Link>
+        ) : (
+          <InstallButton appId={appId} setOpen={setOpen} />
         )}
-        {ownedApp === false && <InstallButton app={app} setOpen={setOpen} />}
       </section>
 
       <Separator orientation={"horizontal"} />
 
       <section id={"status"} className={clsx("w-full", "flex items-center justify-between gap-1")}>
-        <StatusItem a={"category"} b={`${app.categoryMain}-${app.categorySub}`} c={"of All 31"} />
+        <StatusItem a={"category"} b={`${app.category.main}-${app.category.sub}`} c={"of All 31"} />
         <StatusItem a={"model"} b={app.modelName} c={app.creator.name} />
         {POKETTO_DETAIL_RATINGS_ENABLED && (
           <StatusItem
@@ -121,7 +119,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         <div className={"flex items-center justify-between"}>
           {/* todo: Ratings & */}
           <h2>Reviews</h2>
-          {comments.length > 2 && (
+          {app.comments.length > 2 && (
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant={"ghost"}>See All</Button>
@@ -133,7 +131,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
             </Dialog>
           )}
         </div>
-        {comments.length === 0 && "No Comments Yet !"}
+        {app.comments.length === 0 && "No Comments Yet !"}
 
         {/* todo: rate level */}
         {/*<div className={'grid grid-col-1 md:grid-cols-2 gap-4'}>*/}
@@ -154,7 +152,7 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         <div className={"grid grid-cols-2 gap-4"}>
           <InfoItem a={"provider"} b={app.creator.name} />
           <InfoItem a={"Open Source"} b={app.isOpenSource.toString()} />
-          <InfoItem a={"category"} b={`${app.categoryMain}-${app.categorySub}`} />
+          <InfoItem a={"category"} b={`${app.category.main}-${app.category.sub}`} />
           <InfoItem a={"language"} b={app.language} />
         </div>
 
@@ -179,12 +177,12 @@ export const AppDetail = ({ app, comments, setOpen }: { app: AppWithRelation; co
         </>
       )}
 
-      {ownedApp === true && <UninstallButton app={app} />}
+      {userId && <UninstallButton appId={appId} />}
     </div>
   )
 }
 
-const CollapsablePara = ({ content }: { content: string }) => {
+export const CollapsablePara = ({ content }: { content: string }) => {
   const [shownMore, setShownMore] = useState(false)
   const [needMore, setNeedMore] = useState(false)
   const m = useMustache()
@@ -209,7 +207,7 @@ const CollapsablePara = ({ content }: { content: string }) => {
   )
 }
 
-const StatusItem = ({ a, b, c }: { a: string; b: ReactNode; c: ReactNode }) => {
+export const StatusItem = ({ a, b, c }: { a: string; b: ReactNode; c: ReactNode }) => {
   return (
     <div className={"| flex w-full flex-col items-center justify-between gap-1 overflow-hidden whitespace-nowrap py-2"}>
       <div className={"font-bold uppercase text-muted-foreground"}>{a}</div>
@@ -219,7 +217,7 @@ const StatusItem = ({ a, b, c }: { a: string; b: ReactNode; c: ReactNode }) => {
   )
 }
 
-const InfoItem = ({ a, b }: { a: string; b: ReactNode }) => {
+export const InfoItem = ({ a, b }: { a: string; b: ReactNode }) => {
   return (
     <div className={"flex flex-col items-center gap-1"}>
       <div className={"font-bold capitalize text-muted-foreground"}>{a}</div>
@@ -228,7 +226,7 @@ const InfoItem = ({ a, b }: { a: string; b: ReactNode }) => {
   )
 }
 
-const PokettoComment = ({ comment }: { comment: IAppComment }) => {
+export const PokettoComment = ({ comment }: { comment: IAppComment }) => {
   return (
     <Card variant={"default"}>
       <CardHeader>
@@ -258,18 +256,17 @@ const PokettoComment = ({ comment }: { comment: IAppComment }) => {
   )
 }
 
-function InstallButton({ app, setOpen }: { app: AppWithRelation; setOpen?: (v: boolean) => void }) {
+export function InstallButton({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
   const userId = useUserId()!
-  // const { convs: conversations } = useAppStore()
   const utils = api.useContext()
   const conversations = utils.conv.listConversations.getData()
   const router = useRouter()
-  const conv = (conversations ?? []).find((c) => c.appId === app.id)!
+  const conv = (conversations ?? []).find((c) => c.appId === appId)!
 
   const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
     onSuccess: (data) => {
       void utils.conv.listConversations.invalidate()
-      toast.success(`Successfully added app: ${app.name}`)
+      toast.success(`Successfully added one app`)
       void router.push(getConversationLink(userId, data.appId)) // app.id 进数据库后会生成新的
       setOpen && setOpen(false)
     },
@@ -280,7 +277,7 @@ function InstallButton({ app, setOpen }: { app: AppWithRelation; setOpen?: (v: b
       className={clsx(" h-6 rounded-3xl px-4 transition-all")}
       disabled={!!conv}
       onClick={() => {
-        addApp({ appId: app.id, appPlatform: app.platformType })
+        addApp({ appId })
       }}
     >
       {conv ? "Got" : "Get"}
@@ -288,11 +285,12 @@ function InstallButton({ app, setOpen }: { app: AppWithRelation; setOpen?: (v: b
   )
 }
 
-function UninstallButton({ app }: { app: AppWithRelation }) {
+export function UninstallButton({ appId }: { appId: string }) {
   const userId = useUserId()!
-  const { convs: conversations } = useAppStore()
-  const router = useRouter()
   const utils = api.useContext()
+  const conversations = utils.conv.listConversations.getData()
+  const router = useRouter()
+  const conv = (conversations ?? []).find((c) => c.appId === appId)!
 
   const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
     onSuccess: (input) => {
@@ -306,7 +304,7 @@ function UninstallButton({ app }: { app: AppWithRelation }) {
       <section id={"collections"} className={"flex w-full flex-col gap-4"}>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant={"destructive"} disabled={app.id === POKETTO_APP_ID}>
+            <Button variant={"destructive"} disabled={appId === POKETTO_APP_ID}>
               Clear
             </Button>
           </AlertDialogTrigger>
@@ -318,7 +316,7 @@ function UninstallButton({ app }: { app: AppWithRelation }) {
               <AlertDialogAction
                 className={"bg-destructive"}
                 onClick={() => {
-                  delConv({ appId: app.id })
+                  delConv({ appId })
                   toast.success(`You have deleted one app.`)
                 }}
               >

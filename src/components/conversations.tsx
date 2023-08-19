@@ -19,7 +19,10 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import d from "@/lib/datetime"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { ViewsField } from "@/components/field"
-import { AppDetail } from "@/components/app-detail-view"
+
+import { AppDetailView } from "@/components/app/detail.view"
+import { AppDialogContainer } from "@/components/app/container"
+import { SearchResultView } from "@/components/app/search-result.view"
 
 export const ConversationList = () => {
   // const { convs } = useAppStore()
@@ -64,7 +67,9 @@ export const ConversationList = () => {
             <>
               <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
               {searchedApps.slice(0, 10).map((app) => (
-                <SearchResultItem app={app} key={app.id} />
+                <AppDialogContainer appId={app.id} key={app.id}>
+                  <SearchResultView app={app} />
+                </AppDialogContainer>
               ))}
             </>
           ) : (
@@ -100,7 +105,7 @@ export const ConversationListView = ({ c }: { c: ConvForListView }) => {
     >
       <div className={"flex h-fit w-full items-center  gap-4"}>
         <Avatar className={"shrink-0"}>
-          <AvatarImage src={getLocalFlowgptImageUri(c.app.avatar, "md")} />
+          <AvatarImage src={getLocalFlowgptImageUri(c.app.image, "md")} />
         </Avatar>
 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
@@ -115,30 +120,5 @@ export const ConversationListView = ({ c }: { c: ConvForListView }) => {
         </div>
       </div>
     </Link>
-  )
-}
-
-export const SearchResultItem = ({ app }: { app: AppWithRelation }) => {
-  const [open, setOpen] = useState(false)
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className={"flex w-full items-center gap-2 p-2 hover:bg-accent"}>
-        <Avatar className={"shrink-0"}>
-          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
-        </Avatar>
-        <div className={"| flex grow flex-col gap-1 overflow-hidden"}>
-          <p className={"| truncate text-sm font-semibold text-primary-foreground/75"}>{app.name}</p>
-          <p className={"| truncate "}>{app.desc}</p>
-        </div>
-        <div className={"| flex w-20 shrink-0 flex-col gap-1 overflow-hidden whitespace-nowrap"}>
-          <ViewsField value={app.state?.views ?? 0} />
-          <p className={"truncate"}>@{app.creator.name}</p>
-        </div>
-      </DialogTrigger>
-
-      <DialogContent className={"max-h-[80vh] overflow-auto"}>
-        <AppDetail app={app} comments={[]} setOpen={setOpen} />
-      </DialogContent>
-    </Dialog>
   )
 }

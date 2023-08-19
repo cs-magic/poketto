@@ -1,10 +1,9 @@
-import { type AppWithRelation, type FlowgptPromptFull, type IFlowgptPromptBasic, type IFlowgptUserBasic } from "@/ds"
+import { type AppForListView, type FlowgptPromptFull, type IFlowgptPromptBasic, type IFlowgptUserBasic } from "@/ds"
 import dayjs from "dayjs"
 import { PlatformType } from ".prisma/client"
 
 import { DEFAULT_APP_VERSION } from "@/config"
 import { type AppState, type AppTag, type User } from "@prisma/client"
-import { type JsonValue } from "prisma/prisma-client/runtime/library"
 
 export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   id: `${PlatformType.FlowGPT}_${u.id}`,
@@ -54,9 +53,8 @@ export const transFlowgptPrompt2Tags = (p: IFlowgptPromptBasic): AppTag[] =>
     creatorId: null,
   }))
 
-export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppWithRelation => {
+export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppForListView => {
   return {
-    comments: [], // todo: add comments
     id: p.id, // todo: we should not use this id, since it's not real
     name: p.title,
     avatar: p.thumbnailURL,
@@ -71,12 +69,14 @@ export const transformFlowgptPrompt2AppWithRelation = (p: IFlowgptPromptBasic | 
     tags: transFlowgptPrompt2Tags(p),
     state: transFlowgptPrompt2State(p),
     modelName: p.model,
-    modelArgs: { ...transFlowgptPrompt2Model(p), initPrompts: [] } as unknown as JsonValue,
-    actions: [],
-    categoryMain: p.categoryId,
-    categorySub: p.subCategoryId,
     platformId: p.id,
     isOpenSource: p.visibility,
+    category: {
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      main: p.categoryId,
+      sub: p.subCategoryId,
+    },
   }
 }
 

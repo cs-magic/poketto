@@ -11,6 +11,7 @@ import validator = Prisma.validator
 import ConversationSelect = Prisma.ConversationSelect
 import ConversationInclude = Prisma.ConversationInclude
 import AppSelect = Prisma.AppSelect
+import UserSelect = Prisma.UserSelect
 
 // -----------------------------------------------------------------------------
 // general
@@ -91,27 +92,47 @@ export interface IAppMessage extends Message {
   interactions: Record<string, number>
 }
 
-export interface IPokettoConversation {
-  createdAt: Date
-  messages: IAppMessage[]
-}
+export const selectUserProfile = validator<UserSelect>()({
+  id: true,
+  name: true,
+  desc: true,
+  avatar: true,
+  followingCount: true,
+  followedByCount: true,
+  balance: true,
+})
+export type UserForProfile = UserGetPayload<{ select: typeof selectUserProfile }>
 
-export const selectApPForListView = validator<AppSelect>()({
+export const selectAppForListView = validator<AppSelect>()({
+  id: true,
+  version: true,
   platformId: true,
   platformType: true,
   avatar: true,
   name: true,
   desc: true,
   creatorId: true,
-  tags: {
+  tags: true,
+  state: true,
+  modelName: true,
+  language: true,
+  isOpenSource: true,
+  createdAt: true,
+  updatedAt: true,
+  category: true,
+  creator: {
     select: {
+      id: true,
       name: true,
     },
   },
-  state: true,
 })
+export type AppForListView = AppGetPayload<{ select: typeof selectAppForListView }>
 
-export type AppForListView = AppGetPayload<{ select: typeof selectApPForListView }>
+export const selectAppForDetailView = validator<AppSelect>()({
+  ...selectAppForListView,
+  comments: true,
+})
 
 // ref: https://stackoverflow.com/a/69943634/9422455
 export const selectConvForListView = validator<ConversationSelect>()({
@@ -126,9 +147,10 @@ export const selectConvForListView = validator<ConversationSelect>()({
     },
   },
   pinned: true,
+  userId: true,
   appId: true,
   app: {
-    select: selectApPForListView,
+    select: selectAppForListView,
   },
 })
 

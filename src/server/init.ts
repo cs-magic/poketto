@@ -1,4 +1,4 @@
-import { type ExtendedPrismaClient, prisma } from "@/server/db"
+import { type ExtendedPrismaClient } from "@/server/db"
 import {
   POKETTO_APP_AVATAR,
   POKETTO_APP_DESC,
@@ -19,10 +19,10 @@ import {
 } from "@/config"
 import log from "@/lib/log"
 import { PlatformType, PromptRoleType } from "@prisma/client"
-import { type User as NextAuthUser } from "next-auth"
 import { getWelcomeSystemNotification } from "@/lib/string"
 import { ChatMessageFormatType, type User as PrismaUser } from ".prisma/client"
 import _ from "lodash"
+import { type AdapterUser } from "next-auth/adapters"
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
   const result = await prisma.user.upsert({
@@ -44,7 +44,7 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       email: POKETTO_CREATOR_EMAIL,
       desc: POKETTO_CREATOR_DESC,
       name: POKETTO_CREATOR_NAME,
-      image: POKETTO_CREATOR_AVATAR,
+      avatar: POKETTO_CREATOR_AVATAR,
       createdApps: {
         create: [
           {
@@ -99,41 +99,52 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
  * @param {ExtendedPrismaClient} prisma
  * @param {} user 注意是 next-auth 里 user
  */
-export const initUser = async (prisma: ExtendedPrismaClient, user: NextAuthUser) => {
+export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterUser, "id">) => {
   // note: 在创建用户之前先创建系统用户，因为是 upsert 的操作，所以可以保证不会出错
   await initSystem(prisma)
 
-  // 更新 conversation
-  await prisma.conversation.create({
+  const createdUser = await prisma.user.create({
     include: {
-      messages: true,
+      conversations: {
+        include: {
+          messages: true,
+        },
+      },
+      invitedFrom: true,
     },
     data: {
-      appId: POKETTO_APP_ID,
-      userId: user.id,
-      messages: {
+      ...user,
+      conversations: {
         create: [
           {
-            content: getWelcomeSystemNotification(user.name ?? "bro", POKETTO_APP_NAME),
-            format: ChatMessageFormatType.systemNotification,
-          },
-          {
-            content: POKETTO_SYSTEM_PROMPT,
-            role: PromptRoleType.system,
-          },
-          {
-            content: POKETTO_WELCOME_MESSAGE,
-            role: PromptRoleType.assistant,
+            appId: POKETTO_APP_ID,
+            messages: {
+              create: [
+                {
+                  content: getWelcomeSystemNotification(user.name ?? "bro", POKETTO_APP_NAME),
+                  format: ChatMessageFormatType.systemNotification,
+                },
+                {
+                  content: POKETTO_SYSTEM_PROMPT,
+                  role: PromptRoleType.system,
+                },
+                {
+                  content: POKETTO_WELCOME_MESSAGE,
+                  role: PromptRoleType.assistant,
+                },
+              ],
+            },
           },
         ],
+      },
+      invitedFrom: {
+        createMany: {
+          data: _.range(USER_INVITATIONS_COUNT).map(() => ({})),
+        },
       },
     },
   })
 
-  // 更新 邀请码
-  await prisma.invitationRelation.createMany({
-    data: _.range(USER_INVITATIONS_COUNT).map(() => ({ fromId: user.id })),
-  })
-
-  log.info(`Successfully created user(id=${user.id}, name=${user.name}) ~`)
+  log.info(`Successfully created user(id=${createdUser.id}, name=${createdUser.name}) ~`)
+  return createdUser
 }

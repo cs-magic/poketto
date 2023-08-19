@@ -1,25 +1,14 @@
-import { ChatMessageFormatType, PlatformType, PromptRoleType } from ".prisma/client"
-import {
-  POKETTO_APP_ID,
-  POKETTO_APP_NAME,
-  POKETTO_SYSTEM_PROMPT,
-  POKETTO_WELCOME_MESSAGE,
-  USER_INVITATIONS_COUNT,
-  allowDangerousEmailAccountLinking,
-} from "@/config"
+import { PlatformType, type User as PrismaUser } from ".prisma/client"
+import { allowDangerousEmailAccountLinking } from "@/config"
 import { env } from "@/env.mjs"
-import log from "@/lib/log"
 import { prisma } from "@/server/db"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { type PrismaClient } from "@prisma/client"
-import _ from "lodash"
 import { type GetServerSidePropsContext } from "next"
-import { getServerSession, type DefaultSession, type NextAuthOptions } from "next-auth"
-import { type Adapter, type AdapterUser } from "next-auth/adapters"
+import { type DefaultSession, type DefaultUser, getServerSession, type NextAuthOptions } from "next-auth"
+import { type Adapter as NextAuthAdapter, type AdapterUser } from "next-auth/adapters"
 import DiscordProvider from "next-auth/providers/discord"
 import GithubProvider from "next-auth/providers/github"
-import { getWelcomeSystemNotification } from "@/lib/string"
-import { createMedium } from "use-sidecar"
 import { initUser } from "@/server/init"
 
 /**
@@ -31,39 +20,45 @@ import { initUser } from "@/server/init"
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
-      id: string // ...other properties
-      // role: UserRole;
+      id: string
     }
   }
 
-  interface User {
-    // ...other properties
-    // role: UserRole;
+  // ref:
+  // 1. https://next-auth.js.org/getting-started/typescript#popular-interfaces-to-augment
+  // 2. next-auth/core/types.d.ts
+  /**
+   * The shape of the user object returned in the OAuth providers' `profile` callback,
+   * or the second parameter of the `session` callback, when using a database.
+   */
+  interface User extends DefaultUser {
     platformId: string
     platformType: PlatformType
   }
+  /**
+   * Usually contains information about the provider being used
+   * and also extends `TokenSet`, which is different tokens returned by OAuth Providers.
+   */
+  // interface Account {}
+  /** The OAuth profile returned from your provider */
+  // interface Profile {}
 }
 
 const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 
-const adapter: Adapter = {
+const adapter: NextAuthAdapter = {
   /**
-   * example user:
-   image: "https://avatars.githubusercontent.com/u/33591398?v=4"
-   platformId: "33591398"
-   platformType: "Poketto"
-   emailVerified: null
-   */
+     * example user:
+     image: "https://avatars.githubusercontent.com/u/33591398?v=4"
+     platformId: "33591398"
+     platformType: "Poketto"
+     emailVerified: null
+     */
   createUser: async (user) => {
+    console.log("creating user: ", { user })
     // 有可能会重新插入！！！
     const existed = await prisma.user.findUnique({ where: { platform: { platformId: user.platformId, platformType: user.platformType } } })
-    if (existed) return existed as AdapterUser
-
-    // note: 已经插入用户了！！！！！！
-    const createdUser = await createUser(user)
-    await initUser(prisma, createdUser)
-
-    return createdUser
+    return (existed ? existed : await initUser(prisma, user)) as AdapterUser
   },
   ...adapterExtra,
 }
@@ -75,28 +70,20 @@ const adapter: Adapter = {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    signIn: async ({ profile, user, email, account, credentials }) => {
-      log.info({
-        profile: profile,
-        user: user,
-        // email: email,
-        // account: account,
-        // credentials: credentials,
-      })
+    signIn: async (signInParams) => {
+      console.log("signIn: ", { signInParams })
+      const { user, profile } = signInParams
       user.platformId = user.id
       user.platformType = PlatformType.Poketto
       return true
     },
 
-    session: async ({ session, user, newSession, trigger, token }) => {
+    session: async (sessionParams) => {
+      console.log("session: ", sessionParams)
+      const { session, user } = sessionParams
       return {
         ...session,
-        user: {
-          ...session.user,
-          id: user.id,
-          platformId: user.id,
-          platformType: PlatformType.Poketto,
-        },
+        user,
       }
     },
   }, // ref: https://github.com/nextauthjs/next-auth/issues/6078
