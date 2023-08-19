@@ -1,7 +1,6 @@
 import { RootLayout } from "@/layouts/root.layout"
 
 import ErrorImg from "@/../public/images/timed-out-error.svg"
-import Image from "next/image"
 
 export default function Custom404() {
   return (

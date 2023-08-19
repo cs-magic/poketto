@@ -42,7 +42,7 @@ export type UserWithRelations = UserGetPayload<{
 // flowgpt
 // -----------------------------------------------------------------------------
 
-const sortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow", "mostViewed"] as const
+export const sortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow", "mostViewed"] as const
 export type SortOrder = (typeof sortOrders)[number]
 
 export const appInclude = {

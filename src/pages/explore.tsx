@@ -16,9 +16,9 @@ import Image from "next/image"
 import { order2icon } from "@/lib/assets"
 import { useIntersection } from "@mantine/hooks"
 import { CAROUSELS } from "@/config"
-import { sortOrders } from "@/ds"
 import { AppDialogContainer } from "@/components/app/container"
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
+import { sortOrders } from "@/ds"
 
 export default function ExplorePage() {
   const { cardsLayout, sortOrder, setSortOrder } = useAppStore()
