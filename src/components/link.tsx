@@ -1,12 +1,7 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { clsx } from "clsx"
 import _ from "lodash"
-import React, { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
+import React, { type ForwardRefExoticComponent, type RefAttributes } from "react"
 import { useAppStore } from "@/store"
-import { useRouter } from "next/router"
-import { useUser } from "@/hooks/use-user"
-import { toast } from "sonner"
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
 
 export interface INavItem {
