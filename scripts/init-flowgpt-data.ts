@@ -1,10 +1,14 @@
-import { mongoLocal, prisma } from "@/server/db"
+import { prisma } from "@/server/db"
 import { PlatformType, PromptRoleType } from ".prisma/client"
 import { type IFlowgptPromptBasic } from "./lib/flowgpt"
+import { MongoClient } from "mongodb"
 
 const init = async () => {
   console.log("initializing flowgpt apps")
-  for await (const p of mongoLocal.db("flowgpt").collection("basic").find() as unknown as IFlowgptPromptBasic[]) {
+  for await (const p of new MongoClient(process.env.MONGO_URI!)
+    .db("flowgpt")
+    .collection("basic")
+    .find() as unknown as IFlowgptPromptBasic[]) {
     console.log(`dumping (id=${p.id}, title=${p.title})`)
     await prisma.app.upsert({
       where: { platform: { platformId: p.id, platformType: PlatformType.FlowGPT } },
