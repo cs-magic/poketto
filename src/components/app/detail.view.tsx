@@ -18,12 +18,7 @@ import { vIsNumber } from "@/lib/number"
 import { type ReactNode, useCallback, useState } from "react"
 import { useMustache } from "@/hooks/use-mustache"
 import ReactMarkdown from "react-markdown"
-import { type IAppComment } from "@/ds"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import d from "@/lib/datetime"
-import { UserIcon } from "lucide-react"
-import { ResponsiveField } from "@/components/field"
-import { IconThumbUp } from "@tabler/icons-react"
+
 import { useRouter } from "next/router"
 import {
   AlertDialog,
