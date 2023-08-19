@@ -1,4 +1,3 @@
-import { MongoClient } from "mongodb"
 import { PrismaClient } from ".prisma/client"
 
 function getExtendedClient() {
@@ -45,12 +44,9 @@ export type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>
 
 const globalForDB = globalThis as unknown as {
   prisma?: ExtendedPrismaClient
-  mongoLocal?: MongoClient
 }
 export const prisma = globalForDB.prisma ?? getExtendedClient()
-export const mongoLocal = globalForDB.mongoLocal ?? new MongoClient(process.env.DB_MONGO_LOCAL_URI!, {})
 
 if (process.env.NODE_ENV !== "production") {
   globalForDB.prisma = prisma
-  globalForDB.mongoLocal = mongoLocal
 }

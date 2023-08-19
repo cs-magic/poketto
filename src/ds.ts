@@ -200,3 +200,5 @@ export interface INavItem {
   link: string
   Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
 }
+
+export type IMAGE_SIZE = "xs" | "md" | "raw"

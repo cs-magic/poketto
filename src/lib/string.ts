@@ -1,7 +1,8 @@
 import { capitalize } from "lodash"
 import { FLOWGPT_IMAGE_DIR } from "@/config"
 import hash from "js-sha1"
-import { type IMAGE_SIZE } from "@/lib/flowgpt"
+
+import { type IMAGE_SIZE } from "@/ds"
 
 export const getShortName = (s: string, len: number = 2) => {
   return s

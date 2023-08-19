@@ -1,9 +1,8 @@
 import { type AppForListView, type FlowgptPromptFull, type IFlowgptPromptBasic, type IFlowgptUserBasic } from "@/ds"
+import { type AppState, type AppTag, type User } from "@prisma/client"
 import dayjs from "dayjs"
 import { PlatformType } from ".prisma/client"
-
 import { DEFAULT_APP_VERSION } from "@/config"
-import { type AppState, type AppTag, type User } from "@prisma/client"
 
 export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   id: `${PlatformType.FlowGPT}_${u.id}`,
@@ -22,7 +21,6 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   followedByCount: 0,
   followingCount: 0,
 })
-
 export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
   id: p.id,
   appId: p.id,
@@ -32,7 +30,6 @@ export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
   temperature: p.temperature,
   type: p.model,
 })
-
 export const transFlowgptPrompt2State = (p: IFlowgptPromptBasic): AppState => ({
   id: p.id,
   createdAt: null,
@@ -45,7 +42,6 @@ export const transFlowgptPrompt2State = (p: IFlowgptPromptBasic): AppState => ({
   stars: p.saves,
   shares: p.shares,
 })
-
 export const transFlowgptPrompt2Tags = (p: IFlowgptPromptBasic): AppTag[] =>
   p.Tag.map((t) => ({
     id: t.name,
@@ -54,7 +50,6 @@ export const transFlowgptPrompt2Tags = (p: IFlowgptPromptBasic): AppTag[] =>
     updatedAt: null,
     creatorId: null,
   }))
-
 export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppForListView => {
   return {
     id: p.id, // todo: we should not use this id, since it's not real
@@ -81,5 +76,3 @@ export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | Flow
     },
   }
 }
-
-export type IMAGE_SIZE = "xs" | "md" | "raw"
