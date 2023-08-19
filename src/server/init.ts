@@ -44,7 +44,7 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       email: POKETTO_CREATOR_EMAIL,
       desc: POKETTO_CREATOR_DESC,
       name: POKETTO_CREATOR_NAME,
-      avatar: POKETTO_CREATOR_AVATAR,
+      image: POKETTO_CREATOR_AVATAR,
       createdApps: {
         create: [
           {
@@ -91,7 +91,7 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     },
   })
   log.info("Successfully inited poketto system ~")
-  return result as PrismaUser
+  return result
 }
 
 /**

@@ -17,22 +17,22 @@ export const AppVerticalCardView = ({ app, cardsLayout, sort }: { app: AppForLis
       {cardsLayout === CardsLayoutType.grid ? (
         <AspectRatio ratio={3 / 4} className={"overflow-hidden rounded-2xl"}>
           <Image
-            src={app.image}
+            src={app.avatar}
             priority
             fill
             className={"object-fill transition-all group-hover:scale-125"}
-            alt={app.image}
+            alt={app.avatar}
             sizes={"300px"}
           />
         </AspectRatio>
       ) : (
         <Image
-          src={app.image}
+          src={app.avatar}
           priority
           width={300}
           height={400}
           className={"object-fill transition-all group-hover:scale-125"}
-          alt={app.image}
+          alt={app.avatar}
           style={{ width: "100%", height: "auto" }}
         />
       )}
@@ -69,7 +69,7 @@ export const AppVerticalCardView = ({ app, cardsLayout, sort }: { app: AppForLis
             }}
           >
             <Avatar className={"wh-5"}>
-              <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} />
+              <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
             </Avatar>
             <span className={"truncate italic"}>{app.name}</span>
           </Button>

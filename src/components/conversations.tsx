@@ -105,7 +105,7 @@ export const ConversationListView = ({ c }: { c: ConvForListView }) => {
     >
       <div className={"flex h-fit w-full items-center  gap-4"}>
         <Avatar className={"shrink-0"}>
-          <AvatarImage src={getLocalFlowgptImageUri(c.app.image, "md")} />
+          <AvatarImage src={getLocalFlowgptImageUri(c.app.avatar, "md")} />
         </Avatar>
 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>

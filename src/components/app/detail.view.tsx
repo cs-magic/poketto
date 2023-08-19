@@ -47,7 +47,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
     <div className={"flex h-full w-full flex-col overflow-auto p-2"}>
       <section id={"basic"} className={"| flex w-full items-center gap-2"}>
         <Avatar className={"shrink-0 p-4  wh-28"}>
-          <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} className={"rounded-2xl"} />
+          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className={"rounded-2xl"} />
         </Avatar>
 
         <div className={"| flex grow flex-col gap-2 overflow-hidden"}>

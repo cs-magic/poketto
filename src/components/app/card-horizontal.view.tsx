@@ -26,7 +26,7 @@ export const AppHorizontalCardView = ({ app }: { app: AppForListView | undefined
   return (
     <div className={"flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
       <Avatar className={"rounded-sm wh-[64px]"}>
-        <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} />
+        <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
       </Avatar>
 
       <div className={"flex grow flex-col items-start gap-2 overflow-hidden"}>

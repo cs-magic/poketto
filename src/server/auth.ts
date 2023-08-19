@@ -71,7 +71,7 @@ const adapter: NextAuthAdapter = {
 export const authOptions: NextAuthOptions = {
   callbacks: {
     signIn: async (signInParams) => {
-      console.log("signIn: ", { signInParams })
+      console.log("signIn: ", signInParams) // 这个文件里，不要用 pino 之类的异步 log 函数，否则会导致 debug 困难
       const { user, profile } = signInParams
       user.platformId = user.id
       user.platformType = PlatformType.Poketto
@@ -79,7 +79,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     session: async (sessionParams) => {
-      console.log("session: ", sessionParams)
+      // console.log("session: ", sessionParams)
       const { session, user } = sessionParams
       return {
         ...session,

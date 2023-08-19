@@ -7,7 +7,7 @@ import { ViewsField } from "@/components/field"
 export const SearchResultView = ({ app }: { app: AppForListView }) => (
   <div className={"flex w-full items-center gap-2 p-2 hover:bg-accent"}>
     <Avatar className={"shrink-0"}>
-      <AvatarImage src={getLocalFlowgptImageUri(app.image, "md")} />
+      <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
     </Avatar>
     <div className={"| flex grow flex-col gap-1 overflow-hidden"}>
       <p className={"| truncate text-sm font-semibold text-primary-foreground/75"}>{app.name}</p>

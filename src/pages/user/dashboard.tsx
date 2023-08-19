@@ -1,5 +1,4 @@
 import { RootLayout } from "@/layouts/root.layout"
-import { useSessionUser, useUserId } from "@/hooks/use-user"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -11,16 +10,14 @@ import { clsx } from "clsx"
 import { AppPlainListView } from "@/components/app/plain.view"
 import { api } from "@/lib/api"
 import { UserProfile } from "@/components/user/profile.view"
-import { getSession, useSession } from "next-auth/react"
-import { useRouter } from "next/router"
+import { getSession } from "next-auth/react"
 import { type GetServerSideProps } from "next"
-import { prisma } from "@/server/db"
-import { appInclude } from "@/ds"
-import superjson from "superjson"
-import { type User } from "next-auth"
+import { type NextPageWithAuth } from "@/ds"
+import { useUserId } from "@/hooks/use-user"
 
-export default function DashboardPage({ sessionUser }: { sessionUser: User }) {
-  const { data: userProfile } = api.user.getProfile.useQuery({ userId: sessionUser.id })
+export const DashboardPage: NextPageWithAuth = () => {
+  const userId = useUserId()!
+  const { data: userProfile } = api.user.getProfile.useQuery({ userId })
   const { data: convs } = api.conv.listConversations.useQuery(undefined)
 
   return (
@@ -36,6 +33,10 @@ export default function DashboardPage({ sessionUser }: { sessionUser: User }) {
     </RootLayout>
   )
 }
+
+DashboardPage.auth = true
+
+export default DashboardPage
 
 export const ConversationsToolView = () => {
   const { ref, width, height } = useElementSize()
@@ -57,26 +58,4 @@ export const ConversationsToolView = () => {
       </div>
     </div>
   )
-}
-
-/**
- * protected router
- */
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: URI.user.auth.signin,
-        permanent: false,
-      },
-    }
-  }
-
-  return {
-    props: {
-      sessionUser: session.user,
-    },
-  }
 }

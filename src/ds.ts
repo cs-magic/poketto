@@ -12,6 +12,9 @@ import ConversationSelect = Prisma.ConversationSelect
 import ConversationInclude = Prisma.ConversationInclude
 import AppSelect = Prisma.AppSelect
 import UserSelect = Prisma.UserSelect
+import { type NextComponentType, type NextPageContext, type NextPage } from "next"
+import { type AppProps } from "next/app"
+import { type Session } from "next-auth"
 
 // -----------------------------------------------------------------------------
 // general
@@ -96,7 +99,7 @@ export const selectUserProfile = validator<UserSelect>()({
   id: true,
   name: true,
   desc: true,
-  avatar: true,
+  image: true,
   followingCount: true,
   followedByCount: true,
   balance: true,
@@ -168,3 +171,24 @@ export type ConvForDetailView = ConversationGetPayload<{
   include: typeof includeConvForDetailView
 }>
 // & { latestMessage: ChatMessage }
+
+///////////////////////////
+// next-auth
+// ref: https://stackoverflow.com/a/69968164/9422455
+///////////////////////////
+
+// type PageAuth = {
+//   role: string
+//   loading?: JSX.Element
+//   unauthorized?: string
+// }
+
+export type NextPageWithAuth<P = {}, IP = P> = NextPage<P, IP> & {
+  auth?: boolean
+}
+
+export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> & Partial<NextPageWithAuth>
+
+export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
+  Component: NextComponentWithAuth
+}

@@ -13,7 +13,7 @@ export const UserProfile = ({ user }: { user: UserForProfile }) => {
   return (
     <div className={"| mx-auto flex h-fit max-w-[375px] flex-col justify-around gap-4 rounded-2xl p-4"}>
       <Avatar className={"mx-auto wh-[256px]"}>
-        <AvatarImage src={getLocalFlowgptImageUri(user?.avatar ?? DEFAULT_USER_AVATAR, "md")} className={""} />
+        <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? DEFAULT_USER_AVATAR, "md")} className={""} />
         <AvatarFallback>
           <IconUser />
         </AvatarFallback>
