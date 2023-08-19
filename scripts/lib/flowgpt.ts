@@ -1,8 +1,21 @@
-import { type AppForListView, type FlowgptPromptFull, type IFlowgptPromptBasic, type IFlowgptUserBasic } from "@/ds"
+import { type AppForListView } from "@/ds"
 import { type AppState, type AppTag, type User } from "@prisma/client"
 import dayjs from "dayjs"
 import { PlatformType } from ".prisma/client"
 import { DEFAULT_APP_VERSION } from "@/config"
+import type sampleConversation from "@/data/flowgpt/conversation.json"
+import type sampleComment from "@/data/flowgpt/comment.getComments/comment.json"
+import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
+
+export type IFlowgptPromptBasic = typeof sampleBasicPrompt
+export type IFlowgptUserBasic = typeof sampleBasicPrompt.User
+export type IFlowgptConversation = typeof sampleConversation
+export type IFlowGPTComment = typeof sampleComment
+
+export interface FlowgptPromptFull // todo: add comments
+  extends IFlowgptPromptBasic {
+  Conversation: IFlowgptConversation
+}
 
 export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   id: `${PlatformType.FlowGPT}_${u.id}`,

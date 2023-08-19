@@ -1,8 +1,5 @@
-import { Prisma, type User } from ".prisma/client"
+import { Prisma } from ".prisma/client"
 import { type Message } from "ai"
-import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
-import type sampleComment from "@/data/flowgpt/comment.getComments/comment.json"
-import type sampleConversation from "@/data/flowgpt/conversation.json"
 import { type NextComponentType, type NextPage, type NextPageContext } from "next"
 import { type AppProps } from "next/app"
 import { type Session } from "next-auth"
@@ -45,26 +42,8 @@ export type UserWithRelations = UserGetPayload<{
 // flowgpt
 // -----------------------------------------------------------------------------
 
-export type IFlowgptPromptBasic = typeof sampleBasicPrompt
-export type IFlowgptUserBasic = typeof sampleBasicPrompt.User
-export type IFlowgptConversation = typeof sampleConversation
-export type IFlowGPTComment = typeof sampleComment
-export const GET_PROMPTS_BATCH_SIZE = 36
-
-export interface FlowgptPromptFull // todo: add comments
-  extends IFlowgptPromptBasic {
-  Conversation: IFlowgptConversation
-}
-
-const flowgptSortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow"] as const
-export const sortOrders = [...flowgptSortOrders, "mostViewed"] as const
+const sortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow", "mostViewed"] as const
 export type SortOrder = (typeof sortOrders)[number]
-
-export interface IAppComment extends Omit<IFlowGPTComment, "user"> {
-  ratedStars: number
-  content: string // !important: support markdown
-  user: User
-}
 
 export const appInclude = {
   creator: true,

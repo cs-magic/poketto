@@ -226,36 +226,6 @@ export const InfoItem = ({ a, b }: { a: string; b: ReactNode }) => {
   )
 }
 
-export const PokettoComment = ({ comment }: { comment: IAppComment }) => {
-  return (
-    <Card variant={"default"}>
-      <CardHeader>
-        {/* todo: title of comment like Apple */}
-        {/*<CardTitle>{item.title}</CardTitle>*/}
-        <div className={"flex items-center justify-between gap-4 text-primary-foreground/50"}>
-          <div className={"flex flex-col items-start gap-2"}>
-            <p>{d(comment.updatedAt).fromNow()}</p>
-            <p>@{comment.user.name}</p>
-          </div>
-          <Avatar className={"shrink-0"}>
-            <AvatarImage src={comment.user.image ?? ""} />
-            <AvatarFallback>
-              <UserIcon />
-            </AvatarFallback>
-          </Avatar>
-        </div>
-      </CardHeader>
-
-      <CardContent>{comment.content}</CardContent>
-
-      <CardFooter className={"gap-4 text-primary-foreground/50"}>
-        <ResponsiveField icon={<IconThumbUp />} value={comment.upvotes} />
-        {/*<ResponsiveField icon={<IconThumbDown />} value={"Not Helpful"} />*/}
-      </CardFooter>
-    </Card>
-  )
-}
-
 export function InstallButton({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
   const userId = useUserId()!
   const utils = api.useContext()

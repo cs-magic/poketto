@@ -1,6 +1,6 @@
 import { mongoLocal, prisma } from "@/server/db"
-import { type IFlowgptPromptBasic } from "@/ds"
 import { PlatformType, PromptRoleType } from ".prisma/client"
+import { type IFlowgptPromptBasic } from "./lib/flowgpt"
 
 const init = async () => {
   console.log("initializing flowgpt apps")
