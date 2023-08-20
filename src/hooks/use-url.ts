@@ -4,7 +4,7 @@ export const useUrl = () => {
   const router = useRouter()
   const origin = window?.location.origin ? window.location.origin : ""
 
-  console.log({ router })
+  // console.log({ router })
   const baseUrl = `${origin}${router.asPath}`
   return { origin, baseUrl }
 }

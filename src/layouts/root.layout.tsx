@@ -29,28 +29,11 @@ export const MobileLayout = (props: PropsWithChildren) => {
 
 export const DesktopLayout = (props: PropsWithChildren) => {
   return (
-    <div
-      className={clsx(
-        "hidden h-full w-full flex-col md:flex"
-        // "overflow-hidden"
-      )}
-    >
+    <div className={clsx("hidden h-full w-full flex-col md:flex", "overflow-hidden")}>
       <Navbar />
-      <div
-        className={clsx(
-          "flex grow divide-x"
-          // "overflow-hidden"
-        )}
-      >
+      <div className={clsx("flex grow divide-x", "overflow-hidden")}>
         <Sidebar />
-        <div
-          className={clsx(
-            "flex h-full grow flex-col items-center justify-center gap-2"
-            // "overflow-hidden"
-          )}
-        >
-          {props.children}
-        </div>
+        <div className={clsx("flex h-full grow flex-col items-center justify-center gap-2", "overflow-hidden")}>{props.children}</div>
       </div>
     </div>
   )
