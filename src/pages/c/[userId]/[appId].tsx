@@ -8,6 +8,8 @@ import {
   DotsVerticalIcon,
   DrawingPinFilledIcon,
   DrawingPinIcon,
+  EnterFullScreenIcon,
+  ExitFullScreenIcon,
   HamburgerMenuIcon,
   Link2Icon,
 } from "@radix-ui/react-icons"
@@ -20,6 +22,8 @@ import { useRouter } from "next/router"
 import { AppDetailView } from "@/components/app/detail.view"
 import { AppDialogContainer } from "@/components/app/container"
 import { ConversationInput } from "@/components/conv/input"
+import { useFullscreen } from "@mantine/hooks"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 export default function ConversationPage() {
   const router = useRouter()
@@ -42,7 +46,7 @@ export default function ConversationPage() {
           <ConversationList />
         </section>
 
-        <section className={clsx("w-full overflow-hidden lg:grow")}>{curConv && <ConversationMain c={curConv} />}</section>
+        <section className={clsx("relative w-full overflow-hidden lg:grow")}>{curConv && <ConversationMain c={curConv} />}</section>
 
         <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>{curConv && <AppDetailView appId={curConv.appId} />}</section>
       </div>
@@ -58,53 +62,71 @@ const ConversationMain = ({ c }: { c: ConvForDetailView }) => {
       void utils.conv.get.invalidate()
     },
   })
+  const { ref, toggle, fullscreen } = useFullscreen()
 
   return (
-    <div className={"flex h-full w-full flex-col overflow-hidden"}>
-      <div className={"flex w-full items-center justify-between gap-4 overflow-hidden bg-muted px-4 py-5"}>
-        <div />
-        <h2 className={"truncate text-center"}>{c.app.name}</h2>
+    <div className={"flex h-full w-full flex-col items-center overflow-hidden "} ref={ref}>
+      <div className={"flex h-full w-full max-w-[1080px] flex-col overflow-hidden !backdrop-blur-lg"}>
+        <div className={"flex w-full items-center justify-between gap-4 overflow-hidden bg-muted px-4 py-5"}>
+          <div />
+          <h2 className={"truncate text-center"}>{c.app.name}</h2>
 
-        <Popover>
-          <PopoverTrigger className={"shrink-0"}>
-            <DotsVerticalIcon />
-          </PopoverTrigger>
-          <PopoverContent className={"flex flex-col gap-2"}>
-            <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal justify-between lg:hidden"}>
-              <span>List</span> <HamburgerMenuIcon />
-            </Link>
+          {fullscreen ? (
+            <span className={"text-muted-foreground"}>ESC to exit</span>
+          ) : (
+            <Popover>
+              <PopoverTrigger className={"shrink-0"}>
+                <DotsVerticalIcon />
+              </PopoverTrigger>
+              <PopoverContent className={"flex flex-col gap-2"}>
+                <Button variant={"ghost"} onClick={toggle} className={"hidden w-full justify-between md:flex"}>
+                  <span>{fullscreen ? "窗口模式" : "全屏模式"}</span>
+                  {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+                </Button>
 
-            <AppDialogContainer appId={c.appId}>
-              <Button variant={"ghost"} className={"w-full justify-between xl:hidden"} onClick={() => {}}>
-                <span>Detail</span> <CodeSandboxLogoIcon />
-              </Button>
-            </AppDialogContainer>
+                <Separator orientation={"horizontal"} className={"hidden md:flex"} />
 
-            <Separator orientation={"horizontal"} className={"xl:hidden"} />
+                <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal justify-between lg:hidden"}>
+                  <span>List</span> <HamburgerMenuIcon />
+                </Link>
 
-            <Button className={"justify-between"} variant={"ghost"} onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}>
-              {c.pinned ? (
-                <>
-                  <span>Unpin</span>
-                  <DrawingPinIcon />
-                </>
-              ) : (
-                <>
-                  <span>Pin</span>
-                  <DrawingPinFilledIcon />
-                </>
-              )}
-            </Button>
+                <AppDialogContainer appId={c.appId}>
+                  <Button variant={"ghost"} className={"w-full justify-between xl:hidden"} onClick={() => {}}>
+                    <span>Detail</span> <CodeSandboxLogoIcon />
+                  </Button>
+                </AppDialogContainer>
 
-            <Button className={"justify-between"} variant={"ghost"}>
-              <span>Share (todo)</span> <Link2Icon />
-            </Button>
-          </PopoverContent>
-        </Popover>
-      </div>
+                <Separator orientation={"horizontal"} className={"xl:hidden"} />
 
-      <div className={"w-full grow overflow-auto"}>
-        <ConversationInput conversationId={c.id} app={c.app} />
+                <Button
+                  className={"justify-between"}
+                  variant={"ghost"}
+                  onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}
+                >
+                  {c.pinned ? (
+                    <>
+                      <span>Unpin</span>
+                      <DrawingPinIcon />
+                    </>
+                  ) : (
+                    <>
+                      <span>Pin</span>
+                      <DrawingPinFilledIcon />
+                    </>
+                  )}
+                </Button>
+
+                <Button className={"justify-between"} variant={"ghost"}>
+                  <span>Share (todo)</span> <Link2Icon />
+                </Button>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+
+        <div className={"w-full grow overflow-auto"}>
+          <ConversationInput conversationId={c.id} app={c.app} />
+        </div>
       </div>
     </div>
   )
