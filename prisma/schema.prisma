@@ -104,7 +104,8 @@ model App {
 
   modelName    String
   isOpenSource Boolean @default(true)
-  modelArgs    Json? // prompts, temperature
+  /// [ModelArgs]
+  modelArgs    Json?
 
   @@unique([platformType, platformId], name: "platform")
 }

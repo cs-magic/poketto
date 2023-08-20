@@ -21,12 +21,12 @@ import { AppDialogContainer } from "@/components/app/container"
 import { SearchResultView } from "@/components/app/search-result.view"
 
 export const ConversationList = () => {
-  const { data: convs } = api.conv.listConversations.useQuery()
+  const { data: convs } = api.conv.list.useQuery()
 
   const [searchKey, setSearchKey] = useState("")
   const [toSearch] = useDebouncedValue(searchKey, 200)
   // todo: avoid empty call of trpc
-  const queryApps = api.app.listApps.useInfiniteQuery(
+  const queryApps = api.app.list.useInfiniteQuery(
     { searchKey: toSearch },
     {
       enabled: toSearch !== "",

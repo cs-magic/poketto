@@ -1,0 +1,131 @@
+import { z } from "zod"
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc.helpers"
+import { includeConvForDetailView, selectAppForDetailView, selectConvForListView } from "@/ds"
+import { Prisma } from ".prisma/client"
+import ConversationWhereUniqueInputSchema from "../../../prisma/generated/zod/inputTypeSchemas/ConversationWhereUniqueInputSchema"
+import { getWelcomeSystemNotification } from "@/lib/string"
+import { ChatMessageFormatType } from "@prisma/client"
+import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
+import ChatMessageCreateInput = Prisma.ChatMessageCreateInput
+
+export const convRouter = createTRPCRouter({
+  /**
+   * todo: public with permission control
+   */
+  has: protectedProcedure.input(z.object({ appId: z.string() })).query(
+    async ({
+      input: { appId },
+      ctx: {
+        prisma,
+        session: { user },
+      },
+    }) => {
+      return !!(await prisma.conversation.findUnique({ where: { conversation: { userId: user.id, appId } } }))
+    }
+  ),
+
+  add: protectedProcedure
+    .input(
+      z.object({
+        appId: z.string(),
+      })
+    )
+    .mutation(
+      async ({
+        ctx: {
+          prisma,
+          session: { user },
+        },
+        input: { appId },
+      }) => {
+        const userId = user.id
+        console.log("adding app: ", { userId, appId })
+        const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, select: selectAppForDetailView })
+        const addedConv = await prisma.conversation.create({
+          include: {
+            messages: true,
+          },
+          data: {
+            userId,
+            appId,
+            messages: {
+              create: [
+                {
+                  content: getWelcomeSystemNotification(user.name ?? "bro"), // do not know app name here, lol
+                  format: ChatMessageFormatType.systemNotification,
+                },
+                ...app.modelArgs.prompts,
+              ].map((m) => ({ ...m, userId: user.id })), // !important
+            },
+          },
+        })
+        console.log(`added conv(id=${addedConv.id})`)
+        return addedConv
+      }
+    ),
+
+  list: protectedProcedure.query(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+      input,
+    }) => {
+      return prisma.conversation.findMany({
+        select: selectConvForListView,
+        where: { userId: user.id },
+      })
+    }
+  ),
+
+  get: protectedProcedure.input(ConversationWhereUniqueInputSchema).query(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+      input,
+    }) => {
+      return prisma.conversation.findUnique({
+        include: includeConvForDetailView,
+        where: input,
+      })
+    }
+  ),
+
+  pin: protectedProcedure
+    .input(
+      z.object({
+        conversationId: z.string(),
+        toStatus: z.boolean(),
+      })
+    )
+    .mutation(
+      async ({
+        ctx: {
+          prisma,
+          session: { user },
+        },
+        input: { conversationId, toStatus },
+      }) => {
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { pinned: toStatus },
+        })
+      }
+    ),
+
+  del: protectedProcedure.input(z.any()).mutation(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+      input,
+    }) => {
+      //   todo: validate in zod
+      return prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
+    }
+  ),
+})

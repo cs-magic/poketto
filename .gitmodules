@@ -1,0 +1,6 @@
+[submodule "pacakges/ai"]
+	path = pacakges/ai
+	url = ./packages/ai
+[submodule "packages/ai"]
+	path = packages/ai
+	url = ./packages/ai

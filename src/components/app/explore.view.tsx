@@ -9,7 +9,7 @@ import { AppDialogContainer } from "@/components/app/container"
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
 
 export const ExploreApps = () => {
-  const query = api.app.listApps.useInfiniteQuery(
+  const query = api.app.list.useInfiniteQuery(
     {},
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加

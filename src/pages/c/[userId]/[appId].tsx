@@ -6,8 +6,8 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
-import { type ChatMessage, ChatMessageFormatType, Prisma, PromptRoleType } from ".prisma/client"
-import { getHotkeyHandler } from "@mantine/hooks"
+import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
@@ -28,7 +28,7 @@ import { useMustache } from "@/hooks/use-mustache"
 import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import { useSessionUser, useUserId } from "@/hooks/use-user"
+import { useUserId } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/router"
@@ -46,18 +46,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
-import ChatMessageWhereInput = Prisma.ChatMessageWhereInput
-import validator = Prisma.validator
-import RoleTypeSchema from "../../../../prisma/generated/zod/inputTypeSchemas/RoleTypeSchema"
-import { nanoid } from "nanoid"
+import { useUrl } from "@/hooks/use-url"
 
 export default function ConversationPage() {
   const router = useRouter()
   const userId = router.query.userId as string
   const appId = router.query.appId as string
-  console.log({ userId, appId })
-  const { data: curConv } = api.conv.getConversation.useQuery(
+  const { data: curConv } = api.conv.get.useQuery(
     {
       conversation: {
         userId,
@@ -114,9 +109,9 @@ const AddAppAlertDialog = ({ app }: { app: AppForListView }) => {
   const utils = api.useContext()
   const [addOpen, setAddOpen] = useState(false)
 
-  const { mutateAsync: addApp } = api.app.addAppIntoConversation.useMutation({
+  const { mutateAsync: addApp } = api.conv.add.useMutation({
     onSuccess: async (data) => {
-      await utils.conv.hasApp.invalidate()
+      await utils.conv.has.invalidate()
       toast.success("添加成功！")
     },
   })
@@ -146,50 +141,48 @@ const AddAppAlertDialog = ({ app }: { app: AppForListView }) => {
 }
 
 const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; conversationId: string }) => {
-  const user = useSessionUser()
   const userId = useUserId()
-  const { data: hasApp } = api.conv.hasApp.useQuery({ appId: app.id })
-  const { data: initialMessages } = api.conv.listMessages.useQuery(
-    validator<ChatMessageWhereInput>()({
-      userId: userId!,
-      conversationId,
-    }),
-    { enabled: !!userId }
-  )
+  const appId = app.id
+  const { data: hasApp } = api.conv.has.useQuery({ appId: app.id })
+  const { data: initialMessages } = api.message.list.useQuery({ conversationId }, { enabled: !!userId })
+  const { mutateAsync: getLatestId } = api.message.syncLatestId.useMutation()
   const refForm = useRef<HTMLFormElement>(null)
   const utils = api.useContext()
   const [addDialogVisible, setAddDialogVisible] = useState(false)
+  const refMessage = useRef<string>("")
 
-  const { isLoading, metadata, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
-    initialMessages,
-    body: {
-      userId,
-      conversationId,
-    },
+  // console.log({ userId, appId, conversationId })
+
+  const { isLoading, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
+    initialMessages: [],
+    sendExtraMessageFields: true, // 添加 id 信息
+    body: { userId, conversationId },
     onError: (err) => {
       console.warn(err)
       toast.error(err.message, { duration: Infinity })
     },
-    onFinish: (msg) => void utils.conv.listConversations.invalidate(),
+    onResponse: async (response) => {
+      // console.log("onResponse:", {response })
+      refMessage.current = response.headers.get("replyId")!
+    },
+    onFinish: async (data) => {
+      void utils.conv.list.invalidate()
+
+      console.log("onFinish:", { data })
+      // 不能用以下的办法更新id，会与数据库不同步，性能也不好
+      // const latestId = await getLatestId({ conversationId })
+      const n = messages.length
+      setMessages([...messages.slice(0, n - 1), { ...messages[n - 1]!, id: refMessage.current }])
+    },
     id: conversationId,
   })
-
-  const validatedSubmit = (event) => {
-    console.log({ hasApp })
-    if (!hasApp) {
-      event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
-      return setAddDialogVisible(true)
-    }
-    handleSubmit(event)
-  }
 
   useEffect(() => {
     stop() // 防止串台
   }, [conversationId])
 
   useEffect(() => {
-    // todo: prompts json define
-    if (initialMessages) setMessages([...(app.modelArgs as unknown as { prompts: Message[] })?.prompts, ...initialMessages])
+    if (initialMessages) setMessages(initialMessages)
   }, [initialMessages])
 
   return (
@@ -197,20 +190,9 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
       {addDialogVisible && <AddAppAlertDialog app={app} />}
 
       <ScrollToBottom className={"flex w-full grow overflow-auto "} initialScrollBehavior={"auto"}>
-        {initialMessages ? (
+        {messages ? (
           <div className={"flex w-full flex-col-reverse p-2"}>
-            <ConversationMessages
-              messages={[
-                //   todo: the method not to use as
-                {
-                  id: nanoid(),
-                  content: `Welcome ${user!.name} !`,
-                  role: "system",
-                  format: ChatMessageFormatType.systemNotification,
-                } as Message,
-                ...messages,
-              ].reverse()}
-            />
+            <ConversationMessages messages={[...messages].reverse() /* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序*/} />
           </div>
         ) : (
           <div className={"flex h-full w-full items-center justify-center"}>
@@ -219,7 +201,18 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
         )}
       </ScrollToBottom>
 
-      <form ref={refForm} className={"| flex w-full items-center justify-center gap-2 p-4"} onSubmit={validatedSubmit}>
+      <form
+        ref={refForm}
+        className={"| flex w-full items-center justify-center gap-2 p-4"}
+        onSubmit={(event) => {
+          console.log({ hasApp })
+          if (!hasApp) {
+            event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
+            return setAddDialogVisible(true)
+          }
+          handleSubmit(event)
+        }}
+      >
         <Textarea
           name={"prompt"}
           className={"w-[95%]"}
@@ -246,11 +239,14 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
   )
 }
 
-const ConversationMessages = ({ messages }: { messages: (Message | ChatMessage)[] }) => {
+const ConversationMessages = ({ messages }: { messages: Message[] }) => {
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
   const m = useMustache()
+
+  const { url } = useUrl()
+  const clipboard = useClipboard({ timeout: 500 })
 
   useEffect(() => {
     if (!sticky) setHasUnread(true)
@@ -266,24 +262,32 @@ const ConversationMessages = ({ messages }: { messages: (Message | ChatMessage)[
         // todo: using ourself messages
         messages
           // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
-          .map((msg, index) =>
-            "format" in msg && msg.format === ChatMessageFormatType.systemNotification ? (
-              // system notification
-              <p key={msg.id} className={"mx-auto my-2 text-center text-muted-foreground"}>
-                {m(msg.content)}
-              </p>
-            ) : (
-              // normal messages
-              <div
-                key={msg.id}
-                className={clsx("chat text-sm tracking-normal", msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end")}
-              >
-                <div className={clsx("| p-prose chat-bubble w-full overflow-auto", contentStyleBasedOnRole[msg.role])}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m(msg.content)}</ReactMarkdown>
+          .map((msg, index) => (
+            <div id={msg.id} key={msg.id} className={"relative h-fit w-full bg-cyan-950"}>
+              {"format" in msg && msg.format === ChatMessageFormatType.systemNotification ? (
+                // system notification
+                <div key={msg.id} className={"mx-auto my-2 text-center text-muted-foreground"}>
+                  {m(msg.content)}
                 </div>
+              ) : (
+                // normal messages
+                <div
+                  key={msg.id}
+                  className={clsx("chat text-sm tracking-normal", msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end")}
+                >
+                  <div className={clsx("| p-prose chat-bubble w-full overflow-auto", contentStyleBasedOnRole[msg.role])}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m(msg.content)}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              <div
+                className={"absolute right-1 top-1 z-10 bg-slate-800 text-muted-foreground"}
+                onClick={() => clipboard.copy(`${url}?id=${msg.id}`)}
+              >
+                {msg.id}
               </div>
-            )
-          )
+            </div>
+          ))
       }
       {hasUnread && !sticky && (
         <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>
@@ -300,10 +304,10 @@ const ConversationMessages = ({ messages }: { messages: (Message | ChatMessage)[
 
 const ControlTool = ({ c }: { c: ConvForDetailView }) => {
   const utils = api.useContext()
-  const { mutate: pinConv } = api.conv.pinConv.useMutation({
+  const { mutate: pinConv } = api.conv.pin.useMutation({
     onSuccess: () => {
-      void utils.conv.listConversations.invalidate()
-      void utils.conv.getConversation.invalidate()
+      void utils.conv.list.invalidate()
+      void utils.conv.get.invalidate()
     },
   })
 

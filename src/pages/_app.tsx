@@ -1,6 +1,4 @@
-import { type Session } from "next-auth"
 import { SessionProvider, useSession } from "next-auth/react"
-import { type AppType } from "next/app"
 import { api } from "@/lib/api"
 import React from "react"
 import { ThemeProvider } from "next-themes"

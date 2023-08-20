@@ -1,9 +1,9 @@
 import React, { type HTMLProps, type ReactNode } from "react"
 import { IconEye, IconGitFork } from "@tabler/icons-react"
-import { ICON_DIMENSION_SM } from "@/lib/assets"
 import numeral from "numeral"
 import { clsx } from "clsx"
 import { BookmarkFilledIcon, EyeOpenIcon, VideoIcon } from "@radix-ui/react-icons"
+import { ICON_DIMENSION_SM } from "@/config"
 
 export const ResponsiveField = ({
   icon,

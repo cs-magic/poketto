@@ -1,16 +1,14 @@
-import React, { Fragment, type PropsWithChildren, type ReactNode } from "react"
+import React, { Fragment, type PropsWithChildren } from "react"
 import { useTheme } from "next-themes"
-import { IconBrandOpenai, IconBrightnessHalf, IconLayoutDashboard, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
+import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMount } from "@/hooks/use-mount"
-import { BellIcon, GearIcon, PersonIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
-import { ICON_DIMENSION_SM, Icons } from "@/lib/assets"
+import { BellIcon, GearIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
+import { Icons } from "@/lib/assets"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { SidebarNavItem } from "@/components/link"
 import { Button } from "@/components/ui/button"
 import { useAppStore } from "@/store"
-import Image from "next/image"
-import CatLogo from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
 import { useHotkeys } from "@mantine/hooks"
 import { Input } from "@/components/ui/input"
 import {
@@ -23,7 +21,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import _ from "lodash"
-import { navs, PRODUCT, URI } from "@/config"
+import { COMMANDS, ICON_DIMENSION_SM, navs, PRODUCT } from "@/config"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()
@@ -46,7 +44,7 @@ export const LogoWithName = () => {
   return (
     <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
       {/*<Logo height={24}/>*/}
-      <Image src={CatLogo} alt={"Cat Logo"} width={24} height={24} />
+      <Icons.logo />
       <span className={"whitespace-nowrap text-lg tracking-widest"}>{PRODUCT.name}</span>
     </Button>
   )
@@ -96,55 +94,6 @@ export default function Navbar() {
   )
 }
 
-enum CommandType {
-  suggestion = "suggestion",
-  settings = "settings",
-}
-
-interface ICommandItem {
-  id: string
-  icon: ReactNode
-  title?: string
-  category: CommandType
-  kbd?: string
-}
-
-const commands: ICommandItem[] = [
-  {
-    id: "ChatGPT",
-    icon: <IconBrandOpenai />,
-    category: CommandType.suggestion,
-  },
-  {
-    id: "OpenChat",
-    icon: <Icons.openchat />,
-    category: CommandType.suggestion,
-  },
-  {
-    id: "MidJourney",
-    icon: <Icons.midjourney />,
-    category: CommandType.suggestion,
-  },
-  {
-    id: "Dashboard",
-    icon: <IconLayoutDashboard />,
-    category: CommandType.settings,
-    kbd: "⌘ D",
-  },
-  {
-    id: "Profile",
-    icon: <PersonIcon />,
-    category: CommandType.settings,
-    kbd: "⌘ P",
-  },
-  {
-    id: "System",
-    icon: <GearIcon />,
-    category: CommandType.settings,
-    kbd: "⇧ ⌘ P",
-  },
-]
-
 const CommandDemo = () => {
   const [open, setOpen] = React.useState(false)
   const { searchHistory: history, pushSearch: push } = useAppStore()
@@ -170,7 +119,7 @@ const CommandDemo = () => {
           <CommandGroup heading="History">
             <div className={"flex flex-wrap gap-2"}>
               {history
-                .map((id) => commands.find((command) => command.id === id)!)
+                .map((id) => COMMANDS.find((command) => command.id === id)!)
                 .map((item) => (
                   <CommandItem key={item.id} className={"flex items-center gap-2"}>
                     {item.icon}
@@ -180,7 +129,7 @@ const CommandDemo = () => {
             </div>
           </CommandGroup>
 
-          {Object.entries(_.groupBy(commands, "category")).map(([cat, items]) => (
+          {Object.entries(_.groupBy(COMMANDS, "category")).map(([cat, items]) => (
             <Fragment key={cat}>
               <CommandSeparator />
               <CommandGroup heading={cat} key={cat}>

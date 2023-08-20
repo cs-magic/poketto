@@ -13,7 +13,7 @@ import { useAppStore } from "@/store"
 import { Carousel } from "react-responsive-carousel"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
-import { order2icon } from "@/lib/assets"
+import { Order2icon } from "@/lib/assets"
 import { useIntersection } from "@mantine/hooks"
 import { CAROUSELS } from "@/config"
 import { AppDialogContainer } from "@/components/app/container"
@@ -24,7 +24,7 @@ export default function ExplorePage() {
   const { cardsLayout, sortOrder, setSortOrder } = useAppStore()
   const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 
-  const query = api.app.listApps.useInfiniteQuery(
+  const query = api.app.list.useInfiniteQuery(
     {},
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
@@ -48,7 +48,7 @@ export default function ExplorePage() {
           {/*<span className={'hidden md:block'}>Sort By</span>*/}
           <div className={"flex items-center"}>
             {sortOrders.map((order) => {
-              const Icon = order2icon[order]
+              const Icon = Order2icon[order]
               return (
                 <Fragment key={order}>
                   <Separator orientation={"vertical"} className={"h-4 first:hidden"} />

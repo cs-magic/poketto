@@ -1,7 +1,10 @@
 import { getRobotAvatar } from "@/lib/string"
-import { EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
-import { type INavItem } from "@/ds"
-import { PromptRoleType } from ".prisma/client"
+import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
+import { CommandType, type ICommandItem, type INavItem } from "@/ds"
+import { type PromptRoleType } from ".prisma/client"
+import { IconLayoutDashboard } from "@tabler/icons-react"
+import React from "react"
+import { Icons } from "./lib/assets"
 
 // -----------------------------------------------------------------------------
 // system
@@ -22,6 +25,31 @@ export const allowDangerousEmailAccountLinking = true as const // ref: https://n
 export const FLOWGPT_IMAGE_DIR = "/images/flowgpt" as const
 
 export const TAG_SEPARATOR = "|" as const
+
+export const COMMANDS: ICommandItem[] = [
+  {
+    id: "Ask Poketto",
+    icon: <Icons.logo />,
+    category: CommandType.suggestion,
+    kbd: "⌘ D",
+  },
+  {
+    id: "Dashboard",
+    icon: <IconLayoutDashboard />,
+    category: CommandType.settings,
+    kbd: "⌘ D",
+  },
+  {
+    id: "Explore",
+    icon: <GearIcon />,
+    category: CommandType.settings,
+    kbd: "⌘ E",
+  },
+]
+
+export const ICON_DIMENSION_SM = "wh-4"
+export const ICON_DIMENSION_MD = "wh-8"
+export const ICON_DIMENSION_LG = "wh-12"
 
 export const URI = {
   app: {
@@ -199,6 +227,7 @@ export const USER_INVITATIONS_COUNT = 5 as const
 export const DEFAULT_USER_NAME = "游客" as const
 export const DEFAULT_USER_ID = "guest" as const
 export const DEFAULT_USER_AVATAR = getRobotAvatar(DEFAULT_USER_ID)
+
 export const contentStyleBasedOnRole: Record<PromptRoleType, string> = {
   system: "bg-slate-700",
   function: "bg-destructive",

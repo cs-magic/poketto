@@ -1,63 +1,35 @@
-import React, { type ElementType, type HTMLProps } from "react"
+import React from "react"
 
 import CSCoin from "../../public/images/cs-coin.svg"
-import Logo from "../../public/images/logo/m/1280.svg"
 import OpenchatIcon from "../../public/brands/openchat.svg"
 import MidjourneyIcon from "../../public/brands/midjourney.svg"
 import localFont from "next/font/local"
 
 import { Inter } from "next/font/google"
-import {
-  IconCalendarFilled,
-  IconDownload,
-  IconStackPush,
-  IconTelescope,
-  IconThumbUp,
-  IconTrendingUp,
-  type TablerIconsProps,
-} from "@tabler/icons-react"
-import { clsx } from "clsx"
+import { IconCalendarFilled, IconDownload, IconEye, IconStackPush, IconTelescope, IconThumbUp, IconTrendingUp } from "@tabler/icons-react"
 
 import { type SortOrder } from "@/ds"
-import { EyeIcon } from "lucide-react"
+import Image, { type ImageProps } from "next/image"
+import CatLogo from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
 
-export const ICON_DIMENSION_SM = "wh-4"
-export const ICON_DIMENSION_MD = "wh-8"
-export const ICON_DIMENSION_LG = "wh-12"
-
-export const TablerIconFactory = ({
-  Comp,
-  presetClassName = "",
-  className = "",
-  ...props
-}: TablerIconsProps & {
-  Comp: ElementType
-  presetClassName?: string
-}) => <Comp className={clsx(ICON_DIMENSION_SM, presetClassName, className)} {...props} />
-export type SVGProps = Omit<HTMLProps<SVGSVGElement>, "">
-export const SVGFactory = ({
-  Comp,
-  presetClassName = "",
-  className = "",
-  ...props
-}: HTMLProps<SVGSVGElement> & {
-  Comp: ElementType
-  presetClassName?: string
-}) => <Comp className={clsx(ICON_DIMENSION_SM, presetClassName, className)} {...props} />
-export const order2icon: Record<SortOrder, JSX.ElementType> = {
-  recommend: (props: TablerIconsProps) => <TablerIconFactory Comp={IconStackPush} {...props} />,
-  top: (props: TablerIconsProps) => <TablerIconFactory Comp={IconThumbUp} {...props} />,
-  "most-saved": (props: TablerIconsProps) => <TablerIconFactory Comp={IconDownload} {...props} />,
-  trending: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTrendingUp} {...props} />,
-  new: (props: TablerIconsProps) => <TablerIconFactory Comp={IconCalendarFilled} {...props} />,
-  follow: (props: TablerIconsProps) => <TablerIconFactory Comp={IconTelescope} {...props} />,
-  mostViewed: (props: TablerIconsProps) => <TablerIconFactory Comp={EyeIcon} {...props} />,
+export const Order2icon: Record<SortOrder, JSX.ElementType> = {
+  recommend: IconStackPush,
+  top: IconThumbUp,
+  "most-saved": IconDownload,
+  trending: IconTrendingUp,
+  new: IconCalendarFilled,
+  follow: IconTelescope,
+  mostViewed: IconEye,
 }
-export const Icons = {
-  logo: (props: SVGProps) => <SVGFactory Comp={Logo} presetClassName={"bg-black text-white"} {...props} />,
-  csCoin: (props: SVGProps) => <SVGFactory Comp={CSCoin} {...props} />,
-  openchat: (props: SVGProps) => <SVGFactory Comp={OpenchatIcon} {...props} />,
-  midjourney: (props: SVGProps) => <SVGFactory Comp={MidjourneyIcon} {...props} />,
+
+export const Icons: Record<"logo" | "csCoin" | "openchat" | "midjourney" | keyof typeof Order2icon, JSX.ElementType> = {
+  logo: ({ src = CatLogo, alt = "Cat Logo", width = 24, height = 24, ...props }: Partial<ImageProps>) => (
+    <Image width={width} height={height} src={src} alt={alt} {...props} />
+  ),
+  csCoin: CSCoin,
+  openchat: OpenchatIcon,
+  midjourney: MidjourneyIcon,
+  ...Order2icon,
 }
 
 const interFont = Inter({ subsets: ["latin"] })
@@ -68,7 +40,11 @@ export const font = localFont({
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Light.otf', weight: '300', style: 'normal' },
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Regular.otf', weight: '400', style: 'normal' },
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Book.otf', weight: '500', style: 'normal' },
-    { path: "../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Medium.otf", weight: "600", style: "normal" },
+    {
+      path: "../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Medium.otf",
+      weight: "600",
+      style: "normal",
+    },
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Bold.otf', weight: '700', style: 'normal' },
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-ExtraBold.otf', weight: '800', style: 'normal' },
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Heavy.otf', weight: '900', style: 'normal' },

@@ -1,9 +1,8 @@
 import { Prisma } from ".prisma/client"
-import { type Message } from "ai"
 import { type NextComponentType, type NextPage, type NextPageContext } from "next"
 import { type AppProps } from "next/app"
 import { type Session } from "next-auth"
-import { type ForwardRefExoticComponent, type RefAttributes } from "react"
+import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
 import UserGetPayload = Prisma.UserGetPayload
 import AppGetPayload = Prisma.AppGetPayload
@@ -130,4 +129,17 @@ export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> 
 
 export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
   Component: NextComponentWithAuth
+}
+
+export enum CommandType {
+  suggestion = "suggestion",
+  settings = "settings",
+}
+
+export interface ICommandItem {
+  id: string
+  icon: ReactNode
+  title?: string
+  category: CommandType
+  kbd?: string
 }

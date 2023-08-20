@@ -26,7 +26,7 @@ export default function HomePage() {
 
 export const RecentConversations = () => {
   const user = useSessionUser()
-  const { data: conversations } = api.conv.listConversations.useQuery(undefined, { enabled: !!user })
+  const { data: conversations } = api.conv.list.useQuery(undefined, { enabled: !!user })
 
   return (
     <Card id={"recent-apps"} variant={"ghost"} className={"w-full"}>

@@ -1,13 +1,16 @@
 import { Configuration, OpenAIApi } from "openai-edge"
-import { OpenAIStream, StreamingTextResponse } from "ai"
+import { type Message, OpenAIStream, StreamingTextResponse, experimental_StreamData } from "ai"
 import { kv } from "@vercel/kv"
 import { Ratelimit } from "@upstash/ratelimit"
 import { env } from "@/env.mjs"
-import { PromptRoleType } from ".prisma/client"
+import { Prisma, PromptRoleType } from ".prisma/client"
 import { NextResponse } from "next/server"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
-import { type AppRouter } from "@/server/routers/trpc.router"
+import { type RootRouter } from "@/server/trpc.router"
 import superjson from "superjson"
+
+import { nanoid } from "@/lib/id"
+import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput // Create an OpenAI API client (that's edge friendly!)
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
@@ -19,7 +22,7 @@ const openai = new OpenAIApi(config)
 export const runtime = "edge"
 
 export default async function (req: Request, res: Response) {
-  const proxy = createTRPCProxyClient<AppRouter>({
+  const proxy = createTRPCProxyClient<RootRouter>({
     links: [
       // loggerLink(),
       httpBatchLink({ url: `${req.headers.get("origin")}/api/trpc` }),
@@ -31,12 +34,18 @@ export default async function (req: Request, res: Response) {
   const data = await req.json()
   const { messages, conversationId } = data
   // console.log("req: ", { data })
-  const pushMessage = async (content: string, role: PromptRoleType) => {
-    const newMessage = { content, conversationId, role }
+  const pushMessage = async (msg: Message) => {
+    const { id, role, content } = msg
+    const newMessage: ChatMessageUncheckedCreateInput = {
+      id,
+      role,
+      content,
+      conversationId,
+    }
     console.log("pushing: ", newMessage)
-    await proxy.conv.pushMessage.mutate(newMessage)
+    await proxy.message.push.mutate(newMessage)
   }
-  void pushMessage(messages[messages.length - 1].content, PromptRoleType.user)
+  void pushMessage(messages[messages.length - 1])
 
   if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
     const ip = req.headers.get("x-forwarded-for")
@@ -77,19 +86,25 @@ export default async function (req: Request, res: Response) {
     return NextResponse.json(message, { status: 500 })
   }
 
+  const replyId = nanoid()
   // Convert the response into a friendly text-stream
   const stream = OpenAIStream(response, {
     onCompletion: (data) => {
       // console.log("onCompletion: ", { data })
+    },
+    onStart: () => {
+      console.log("onStart: ")
     },
     onToken: (data) => {
       // console.log("onToken: ", { data })
     },
     onFinal: (data) => {
       // console.log("onFinal: ", { data })
-      void pushMessage(data, PromptRoleType.assistant)
+      void pushMessage({ content: data, role: PromptRoleType.assistant, id: replyId })
     },
   })
+
+  const headers = { replyId }
   // Respond with the stream
-  return new StreamingTextResponse(stream)
+  return new StreamingTextResponse(stream, { headers })
 }

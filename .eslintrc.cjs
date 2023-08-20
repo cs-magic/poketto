@@ -43,6 +43,7 @@ const config = {
 		'@typescript-eslint/no-unused-vars': ['off'],
 		'@typescript-eslint/ban-types': ['warn'],
 		"@typescript-eslint/no-empty-function": ['warn'],
+		'@typescript-eslint/no-misused-promises': ['off']
 	},
 };
 

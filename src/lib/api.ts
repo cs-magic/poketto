@@ -8,7 +8,7 @@ import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client"
 import { createTRPCNext } from "@trpc/next"
 import { type inferRouterInputs, type inferRouterOutputs, type TRPCError } from "@trpc/server"
 import superjson from "superjson"
-import { type AppRouter } from "@/server/routers/trpc.router"
+import { type RootRouter } from "@/server/trpc.router"
 import { URI } from "@/config"
 import { toast } from "sonner"
 
@@ -32,7 +32,7 @@ function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
 }
 
 /** A set of type-safe react-query hooks for your tRPC API. */
-export const api = createTRPCNext<AppRouter>({
+export const api = createTRPCNext<RootRouter>({
   config() {
     return {
       // react-query config
@@ -103,11 +103,11 @@ export const api = createTRPCNext<AppRouter>({
  *
  * @example type HelloInput = RouterInputs['example']['hello']
  */
-export type RouterInputs = inferRouterInputs<AppRouter>
+export type RouterInputs = inferRouterInputs<RootRouter>
 
 /**
  * Inference helper for outputs.
  *
  * @example type HelloOutput = RouterOutputs['example']['hello']
  */
-export type RouterOutputs = inferRouterOutputs<AppRouter>
+export type RouterOutputs = inferRouterOutputs<RootRouter>

@@ -36,7 +36,7 @@ import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
 export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) => {
   const userId = useUserId()
-  const { data: app, error: appError } = api.app.getApp.useQuery({ appId })
+  const { data: app, error: appError } = api.app.get.useQuery({ appId })
 
   if (app === undefined) return <SymbolIcon />
   if (appError) return null //toast.error(appError.message) // 已经在 lib/api 里handle了
@@ -231,14 +231,14 @@ export function InstallButton({ userId, appId, setOpen }: { userId: string; appI
   const router = useRouter()
 
   const utils = api.useContext()
-  const { data: hasApp } = api.conv.hasApp.useQuery({ appId })
+  const { data: hasApp } = api.conv.has.useQuery({ appId })
   const go = () => void router.push(getConversationLink(userId, appId)) // app.id 进数据库后会生成新的
 
-  const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
+  const { mutate: addApp } = api.conv.add.useMutation({
     onSuccess: (data) => {
       toast.success(`Successfully added one app`)
-      void utils.conv.listConversations.invalidate()
-      void utils.conv.hasApp.invalidate()
+      void utils.conv.list.invalidate()
+      void utils.conv.has.invalidate()
       setOpen && setOpen(false)
       go()
     },
@@ -263,13 +263,13 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
   const router = useRouter()
 
   const utils = api.useContext()
-  const { data: hasApp } = api.conv.hasApp.useQuery({ appId })
+  const { data: hasApp } = api.conv.has.useQuery({ appId })
 
-  const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
+  const { mutate: delConv, data: delResult } = api.conv.del.useMutation({
     onSuccess: (input) => {
       toast.success(`You have deleted one app.`)
-      void utils.conv.listConversations.invalidate()
-      void utils.conv.hasApp.invalidate()
+      void utils.conv.list.invalidate()
+      void utils.conv.has.invalidate()
       setOpen && setOpen(false)
       void router.push(getConversationsLink(userId))
     },

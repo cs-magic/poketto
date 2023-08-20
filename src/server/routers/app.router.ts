@@ -1,32 +1,14 @@
-import { Prisma } from ".prisma/client"
 import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
 import { selectAppForDetailView, selectAppForListView, sortOrders } from "@/ds"
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
-import { ChatMessageFormatType } from "@prisma/client"
+import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
 import { z } from "zod"
-import { getWelcomeSystemNotification } from "@/lib/string"
-import ChatMessageCreateInput = Prisma.ChatMessageCreateInput
 
 export const pokettoAppRouter = createTRPCRouter({
   /**
    * todo: public with permission control
    */
 
-  getApp: publicProcedure
-    .input(
-      z.object({
-        appId: z.string(),
-      })
-    )
-    .query(async ({ ctx: { prisma }, input: { appId } }) => {
-      console.log("finding app: ", { appId })
-      return prisma.app.findUniqueOrThrow({
-        select: selectAppForDetailView,
-        where: { id: appId },
-      })
-    }),
-
-  listApps: publicProcedure
+  list: publicProcedure
     .input(
       z.object({
         cursor: z.string().nullish(), // offset pagination; todo: cursor pagination (when database is bigger)
@@ -77,45 +59,17 @@ export const pokettoAppRouter = createTRPCRouter({
       }
     }),
 
-  addAppIntoConversation: protectedProcedure
+  get: publicProcedure
     .input(
       z.object({
         appId: z.string(),
       })
     )
-    .mutation(
-      async ({
-        ctx: {
-          prisma,
-          session: { user },
-        },
-        input: { appId },
-      }) => {
-        const userId = user.id
-        console.log("adding app: ", { userId, appId })
-        const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, select: selectAppForDetailView })
-        const addedConv = await prisma.conversation.create({
-          include: {
-            messages: true,
-          },
-          data: {
-            userId,
-            appId,
-            messages: {
-              createMany: {
-                data: [
-                  {
-                    content: getWelcomeSystemNotification(user.name ?? "bro"), // do not know app name here, lol
-                    format: ChatMessageFormatType.systemNotification,
-                  },
-                  ...(app.modelArgs as { prompts: ChatMessageCreateInput[] }).prompts,
-                ],
-              },
-            },
-          },
-        })
-        console.log(`added conv(id=${addedConv.id})`)
-        return addedConv
-      }
-    ),
+    .query(async ({ ctx: { prisma }, input: { appId } }) => {
+      console.log("finding app: ", { appId })
+      return prisma.app.findUniqueOrThrow({
+        select: selectAppForDetailView,
+        where: { id: appId },
+      })
+    }),
 })

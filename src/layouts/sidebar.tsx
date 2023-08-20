@@ -5,7 +5,6 @@ import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { SidebarNavItem } from "@/components/link"
 import { useAppStore } from "@/store"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ICON_DIMENSION_MD } from "@/lib/assets"
 import { UserIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { signIn } from "next-auth/react"
@@ -13,7 +12,7 @@ import { api } from "@/lib/api"
 import { InvitationStatus } from ".prisma/client"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
-import { navs, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
+import { ICON_DIMENSION_MD, navs, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
 import { useMustache } from "@/hooks/use-mustache"
 import Link from "next/link"
 import { useSessionUser } from "@/hooks/use-user"
@@ -79,7 +78,7 @@ export const Sidebar = () => {
 }
 
 const InviteCard = () => {
-  const { data = [] } = api.user.getInvitations.useQuery()
+  const { data = [] } = api.invitation.list.useQuery()
   // todo: include ? on enum type
   const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
   const m = useMustache()

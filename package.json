@@ -62,7 +62,7 @@
     "pino": "^8.15.0",
     "pino-caller": "^3.4.0",
     "pino-logflare": "^0.4.0",
-    "prisma-json-types-generator": "^2.5.0",
+    "prisma-json-types-generator": "^3.0.0-beta.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.4",
