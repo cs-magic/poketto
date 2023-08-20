@@ -23,7 +23,6 @@ import { AppDetailView } from "@/components/app/detail.view"
 import { AppDialogContainer } from "@/components/app/container"
 import { ConversationInput } from "@/components/conv/input"
 import { useFullscreen } from "@mantine/hooks"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 export default function ConversationPage() {
   const router = useRouter()

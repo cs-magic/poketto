@@ -1351,7 +1351,7 @@
     picocolors "^1.0.0"
     tslib "^2.6.0"
 
-"@prisma/client@^5.0.0":
+"@prisma/client@5":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-5.1.1.tgz#ea2b0c8599bdb3f86d92e8df46fba795a744db01"
   integrity sha512-fxcCeK5pMQGcgCqCrWsi+I2rpIbk0rAhdrN+ke7f34tIrgPwA68ensrpin+9+fZvuV2OtzHmuipwduSY6HswdA==
@@ -1362,6 +1362,15 @@
   version "4.16.2"
   resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-4.16.2.tgz#d93724e4d7a46ed7e9c9daf1cc66dac736596c7e"
   integrity sha512-7L7WbG0qNNZYgLpsVB8rCHCXEyHFyIycRlRDNwkVfjQmACC2OW6AWCYCbfdjQhkF/t7+S3njj8wAWAocSs+Brw==
+  dependencies:
+    "@types/debug" "4.1.8"
+    debug "4.3.4"
+    strip-ansi "6.0.1"
+
+"@prisma/debug@5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-5.1.1.tgz#c7142699107cdf2d8939f0c139142ef7651e74c7"
+  integrity sha512-R9e2Tn8f+ujVjwn6ne1YkXY35BXzUmxJbGsmD1c8RAZ/NXgbYktEFAwIkOZn5H5zRfY2VDSBvGI6TFpnOu50cg==
   dependencies:
     "@types/debug" "4.1.8"
     debug "4.3.4"
@@ -1383,6 +1392,16 @@
   integrity sha512-bMOH7y73Ui7gpQrioFeavMQA+Tf8ksaVf8Nhs9rQNzuSg8SSV6E9baczob0L5KGZTSgYoqnrRxuo03kVJYrnIg==
   dependencies:
     "@prisma/debug" "4.16.2"
+    "@types/cross-spawn" "6.0.2"
+    cross-spawn "7.0.3"
+    kleur "4.1.5"
+
+"@prisma/generator-helper@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@prisma/generator-helper/-/generator-helper-5.1.1.tgz#aa16d63262b6b12554ea921d2885450cb6708de5"
+  integrity sha512-Qk9iiVk4JZQYZrYsc1Wx9fXFFnS1AH4T7WyLxCIFnX/end0K5tOK75Qxv6mjZAHE0XUGrzoTlZUkbSDVYz/CvQ==
+  dependencies:
+    "@prisma/debug" "5.1.1"
     "@types/cross-spawn" "6.0.2"
     cross-spawn "7.0.3"
     kleur "4.1.5"
@@ -3004,6 +3023,11 @@ cmdk@^0.2.0:
   dependencies:
     "@radix-ui/react-dialog" "1.0.0"
     command-score "0.1.2"
+
+code-block-writer@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/code-block-writer/-/code-block-writer-12.0.0.tgz#4dd58946eb4234105aff7f0035977b2afdc2a770"
+  integrity sha512-q4dMFMlXtKR3XNBHyMHt/3pwYNA69EDk00lloMOaaUMKPUXBw6lpXtbu3MMVG6/uOihGnRDOlkyqsONEUj60+w==
 
 color-convert@^1.9.0:
   version "1.9.3"
@@ -5933,7 +5957,7 @@ prisma-json-types-generator@^3.0.0-beta.4:
     "@prisma/generator-helper" "4.16.2"
     tslib "2.6.0"
 
-prisma@^5.0.0:
+prisma@5:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-5.1.1.tgz#8f5c0f9467a828746cb94f846d694dc7b7481a9e"
   integrity sha512-WJFG/U7sMmcc6TjJTTifTfpI6Wjoh55xl4AzopVwAdyK68L9/ogNo8QQ2cxuUjJf/Wa82z/uhyh3wMzvRIBphg==
@@ -7299,15 +7323,30 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
+zod-prisma-types@^2.7.9:
+  version "2.7.9"
+  resolved "https://registry.yarnpkg.com/zod-prisma-types/-/zod-prisma-types-2.7.9.tgz#c38682d652fdc406b517527a935386d816e0279c"
+  integrity sha512-JgPN32d/Wm6/E61oHXek2jDT6VxBpKVPmLom7585SmdCyj+xb+OAg8O3G0BLU+gWNiC+Eyt3blo1S/8W9sIaxA==
+  dependencies:
+    "@prisma/generator-helper" "^5.1.1"
+    code-block-writer "^12.0.0"
+    lodash "^4.17.21"
+    zod "^3.21.1"
+
+zod@3.21.1:
+  version "3.21.1"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.1.tgz#ac5bb7cf68876281ebd02f95ac4bb9a080370282"
+  integrity sha512-+dTu2m6gmCbO9Ahm4ZBDapx2O6ZY9QSPXst2WXjcznPMwf2YNpn3RevLx4KkZp1OPW/ouFcoBtBzFz/LeY69oA==
+
 zod@3.21.4:
   version "3.21.4"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.4.tgz#10882231d992519f0a10b5dd58a38c9dabbb64db"
   integrity sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==
 
-zod@^3.22.1:
-  version "3.22.1"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.1.tgz#815f850baf933fef96c1061322dbe579b1a80c27"
-  integrity sha512-+qUhAMl414+Elh+fRNtpU+byrwjDFOS1N7NioLY+tSlcADTx4TkCUua/hxJvxwDXcV4397/nZ420jy4n4+3WUg==
+zod@^3.21.1:
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.2.tgz#3add8c682b7077c05ac6f979fea6998b573e157b"
+  integrity sha512-wvWkphh5WQsJbVk1tbx1l1Ly4yg+XecD+Mq280uBGt9wa5BKSWf4Mhp6GmrkPixhMxmabYY7RbzlwVP32pbGCg==
 
 zustand@^4.4.1:
   version "4.4.1"

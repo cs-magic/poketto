@@ -38,15 +38,17 @@
     ]
   },
   "include": [
-    ".eslintrc.cjs",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.cjs",
+    "src/**/*.mjs",
+    "*.cjs",
+
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.cjs",
-    "**/*.mjs",
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "packages",
   ]
 }

@@ -2,7 +2,7 @@ import { z } from "zod"
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc.helpers"
 import { includeConvForDetailView, selectAppForDetailView, selectConvForListView } from "@/ds"
 import { Prisma } from ".prisma/client"
-import ConversationWhereUniqueInputSchema from "../../../prisma/generated/zod/inputTypeSchemas/ConversationWhereUniqueInputSchema"
+import { ConversationWhereUniqueInputSchema } from ".prisma/generated/zod"
 import { getWelcomeSystemNotification } from "@/lib/string"
 import { ChatMessageFormatType } from "@prisma/client"
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput

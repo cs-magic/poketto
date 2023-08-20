@@ -1,7 +1,6 @@
 import { z } from "zod"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
-import ChatMessageWhereInputSchema from "../../../prisma/generated/zod/inputTypeSchemas/ChatMessageWhereInputSchema"
-import ChatMessageUncheckedCreateInputSchema from "../../../prisma/generated/zod/inputTypeSchemas/ChatMessageUncheckedCreateInputSchema"
+import { ChatMessageWhereInputSchema, ChatMessageUncheckedCreateInputSchema } from ".prisma/generated/zod"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
