@@ -19,6 +19,7 @@ import Link from "next/link"
 import { getConversationsLink } from "@/lib/string"
 import { AppDialogContainer } from "@/components/app/container"
 import { ConversationInput } from "@/components/conv/input"
+import { LogoWithName } from "@/layouts/navbar"
 
 export const ConversationMain = ({ cid }: { cid: string }) => {
   const { data: c } = api.conv.get.useQuery({ id: cid })
@@ -37,12 +38,12 @@ export const ConversationMain = ({ cid }: { cid: string }) => {
   return (
     <div className={clsx("flex h-full w-full flex-col items-center", "overflow-hidden ")} ref={ref}>
       <div className={clsx("flex h-full w-full max-w-[1080px] flex-col  !backdrop-blur-lg", "overflow-hidden")}>
-        <div className={clsx("flex w-full items-center justify-between gap-4  bg-muted px-4 py-5", "overflow-hidden")}>
-          <div />
+        <div className={clsx("flex w-full items-center justify-between gap-4  bg-muted py-5", "overflow-hidden")}>
+          {fullscreen ? <LogoWithName /> : <div />}
           <h2 className={"truncate text-center"}>{c.app.name}</h2>
 
           {fullscreen ? (
-            <span className={"text-muted-foreground"}>ESC to exit</span>
+            <span className={"text-muted-foreground px-4"}>ESC to exit</span>
           ) : (
             <Popover>
               <PopoverTrigger className={"shrink-0"}>

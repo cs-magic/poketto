@@ -163,7 +163,7 @@ export const CAROUSELS = [
 // -----------------------------------------------------------------------------
 
 export const PRODUCT = {
-  name: "口袋 A I", // name: 'Poketto.AI',
+  name: "Poketto.AI", // name: 'Poketto.AI',
   currency: "甜甜圈", // currency: 'Dora',
   desc: "每一个人的哆啦A梦", // '每个人都是魔法师',
   icon: URI.images.favicon,
