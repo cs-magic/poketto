@@ -1,7 +1,7 @@
 import { RootLayout } from "@/layouts/root.layout"
 
 import ErrorImg from "@/../public/images/timed-out-error.svg"
-import { ExploreApps } from "@/components/app/explore.view"
+import { ExploreAppsWidget } from "@/components/app/explore.widget"
 
 export default function Custom404() {
   return (
@@ -12,7 +12,7 @@ export default function Custom404() {
 
         <ErrorImg className={"shrink-0 wh-[240px] md:wh-[480px]"} />
 
-        <ExploreApps />
+        <ExploreAppsWidget />
       </div>
     </RootLayout>
   )

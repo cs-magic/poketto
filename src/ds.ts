@@ -12,6 +12,8 @@ import ConversationSelect = Prisma.ConversationSelect
 import ConversationInclude = Prisma.ConversationInclude
 import AppSelect = Prisma.AppSelect
 import UserSelect = Prisma.UserSelect
+import ChatMessageSelect = Prisma.ChatMessageSelect
+import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
 
 // -----------------------------------------------------------------------------
 // general
@@ -32,11 +34,16 @@ export interface INavItem {
 // models
 // -----------------------------------------------------------------------------
 
-export const selectUserProfile = validator<UserSelect>()({
+export const selectUserForListView = validator<UserSelect>()({
   id: true,
   name: true,
-  desc: true,
   image: true,
+})
+export type UserForListView = UserGetPayload<{ select: typeof selectUserForListView }>
+
+export const selectUserProfile = validator<UserSelect>()({
+  ...selectUserForListView,
+  desc: true,
   followingCount: true,
   followedByCount: true,
   balance: true,
@@ -109,6 +116,19 @@ export const includeConvForDetailView = validator<ConversationInclude>()({
 export type ConvForDetailView = ConversationGetPayload<{
   include: typeof includeConvForDetailView
 }>
+
+export const selectChatMessageForListView = validator<ChatMessageSelect>()({
+  id: true,
+  createdAt: true,
+  // updatedAt: true, // todo: support message modification
+  content: true,
+  role: true,
+  format: true,
+  user: {
+    select: selectUserForListView,
+  },
+})
+export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeof selectChatMessageForListView }>
 
 ///////////////////////////
 // next-auth

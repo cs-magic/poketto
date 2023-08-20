@@ -8,9 +8,11 @@ import _ from "lodash"
 import { AppDialogContainer } from "@/components/app/container"
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
 
-export const ExploreApps = () => {
+const limit = 5
+
+export const ExploreAppsWidget = () => {
   const query = api.app.list.useInfiniteQuery(
-    {},
+    { limit },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
@@ -35,7 +37,7 @@ export const ExploreApps = () => {
           {!apps ? (
             <SymbolIcon />
           ) : (
-            _.sampleSize(_.range(DEFAULT_BATCH_CARDS), 3).map((i) => (
+            _.sampleSize(_.range(limit), 3).map((i) => (
               <AppDialogContainer appId={apps[i]!.id} key={i}>
                 <AppHorizontalCardView app={apps[i]} key={i} />
               </AppDialogContainer>

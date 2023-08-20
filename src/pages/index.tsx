@@ -11,14 +11,14 @@ import { CardsLayoutType } from "@/store/ui.slice"
 import { getConversationLink } from "@/lib/string"
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { useSessionUser } from "@/hooks/use-user"
-import { ExploreApps } from "@/components/app/explore.view"
+import { ExploreAppsWidget } from "@/components/app/explore.widget"
 
 export default function HomePage() {
   return (
     <RootLayout>
       <div className={"h-full w-full overflow-auto"}>
         <RecentConversations />
-        <ExploreApps />
+        <ExploreAppsWidget />
       </div>
     </RootLayout>
   )
