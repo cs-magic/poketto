@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "ChatMessage" ALTER COLUMN "shortId" SET DEFAULT nanoid(7),
+ALTER COLUMN "shortId" SET DATA TYPE VARCHAR(7);

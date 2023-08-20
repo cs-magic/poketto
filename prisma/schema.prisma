@@ -55,7 +55,7 @@ model Account {
 }
 
 model App {
-  id String @id @default(cuid())
+  id String @id @default(dbgenerated("nanoid()")) @db.VarChar(5)
 
   platformType PlatformType @default(Poketto)
   platformId   String
@@ -173,6 +173,9 @@ model ChatMessage {
 
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   conversationId String
+
+  shortId String @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
+  @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
 }
 
 model ChatMessageAction {
@@ -255,7 +258,7 @@ model StarringApp {
 }
 
 model User {
-  id String @id @default(cuid())
+  id String @id @default(dbgenerated("nanoid()")) @db.VarChar(5)
 
   platformType PlatformType @default(Poketto)
   platformId   String

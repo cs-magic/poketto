@@ -5,11 +5,11 @@ import { MongoClient } from "mongodb"
 
 const init = async () => {
   console.log("initializing flowgpt apps")
+  let k = 0
   for await (const p of new MongoClient(process.env.MONGO_URI!)
     .db("flowgpt")
     .collection("basic")
     .find() as unknown as IFlowgptPromptBasic[]) {
-    console.log(`dumping (id=${p.id}, title=${p.title})`)
     await prisma.app.upsert({
       where: { platform: { platformId: p.id, platformType: PlatformType.FlowGPT } },
       include: {
@@ -75,6 +75,9 @@ const init = async () => {
         },
       },
     })
+    if (++k % 100 === 0) {
+      console.log(`dumping ${k}`)
+    }
   }
   console.log("successfully initialized")
 }

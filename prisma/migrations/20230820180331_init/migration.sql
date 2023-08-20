@@ -34,7 +34,7 @@ CREATE TABLE "Account" (
 
 -- CreateTable
 CREATE TABLE "App" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(5) NOT NULL DEFAULT nanoid(),
     "platformType" "PlatformType" NOT NULL DEFAULT 'Poketto',
     "platformId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -127,6 +127,7 @@ CREATE TABLE "ChatMessage" (
     "content" TEXT NOT NULL,
     "format" "ChatMessageFormatType" NOT NULL DEFAULT 'text',
     "conversationId" TEXT NOT NULL,
+    "shortId" VARCHAR(5) NOT NULL DEFAULT nanoid(),
 
     CONSTRAINT "ChatMessage_pkey" PRIMARY KEY ("id")
 );
@@ -203,7 +204,7 @@ CREATE TABLE "StarringApp" (
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(5) NOT NULL DEFAULT nanoid(),
     "platformType" "PlatformType" NOT NULL DEFAULT 'Poketto',
     "platformId" TEXT NOT NULL,
     "platformArgs" JSONB,
@@ -228,7 +229,7 @@ CREATE TABLE "VerificationToken" (
 
 -- CreateTable
 CREATE TABLE "_AppToAppTag" (
-    "A" TEXT NOT NULL,
+    "A" VARCHAR(5) NOT NULL,
     "B" TEXT NOT NULL
 );
 
@@ -242,7 +243,10 @@ CREATE UNIQUE INDEX "App_platformType_platformId_key" ON "App"("platformType", "
 CREATE UNIQUE INDEX "AppState_appId_key" ON "AppState"("appId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Conversation_userId_appId_key" ON "Conversation"("userId", "appId");
+CREATE UNIQUE INDEX "id2" ON "ChatMessage"("conversationId", "shortId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "conversation" ON "Conversation"("userId", "appId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "InvitationRelation_toId_key" ON "InvitationRelation"("toId");

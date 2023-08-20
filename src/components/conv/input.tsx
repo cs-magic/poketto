@@ -71,7 +71,7 @@ export const ConversationInput = ({ app, conversationId }: { app: AppForDetailVi
   }, [conversationId])
 
   useEffect(() => {
-    if (initialMessages) setMessages(initialMessages)
+    if (initialMessages) setMessages([...initialMessages].reverse())
   }, [initialMessages])
 
   return (
@@ -85,7 +85,7 @@ export const ConversationInput = ({ app, conversationId }: { app: AppForDetailVi
             .map((m) => ({
               ...m,
               createdAt: m.createdAt ?? new Date(),
-              format: ChatMessageFormatType.text,
+              format: "format" in m ? (m.format as ChatMessageFormatType) : ChatMessageFormatType.text,
               user:
                 m.role === PromptRoleType.user
                   ? {

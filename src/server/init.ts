@@ -26,7 +26,7 @@ import { type AdapterUser } from "next-auth/adapters"
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
   const result = await prisma.user.upsert({
-    where: { id: POKETTO_CREATOR_ID },
+    where: { platform: { platformId: POKETTO_CREATOR_ID, platformType: PlatformType.Poketto } },
     include: {
       createdApps: {
         include: {
@@ -37,7 +37,6 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     },
     update: {},
     create: {
-      id: POKETTO_CREATOR_ID, // 必须要加，因为是基于id比对的
       platformId: POKETTO_CREATOR_ID,
       platformType: PlatformType.Poketto,
       platformArgs: {},
@@ -48,11 +47,10 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       createdApps: {
         create: [
           {
-            id: POKETTO_APP_ID,
             name: POKETTO_APP_NAME,
             language: POKETTO_APP_LANGUAGE,
             avatar: POKETTO_APP_AVATAR,
-            platformId: POKETTO_APP_AVATAR,
+            platformId: POKETTO_APP_ID,
             platformType: PlatformType.Poketto,
             desc: POKETTO_APP_DESC,
             modelName: POKETTO_MODEL_NAME,
@@ -103,6 +101,10 @@ export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterU
   // note: 在创建用户之前先创建系统用户，因为是 upsert 的操作，所以可以保证不会出错
   await initSystem(prisma)
 
+  const pokettoRealApp = await prisma.app.findUniqueOrThrow({
+    where: { platform: { platformId: POKETTO_APP_ID, platformType: PlatformType.Poketto } },
+  })
+
   const createdUser = await prisma.user.create({
     include: {
       conversations: {
@@ -117,7 +119,7 @@ export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterU
       conversations: {
         create: [
           {
-            appId: POKETTO_APP_ID,
+            appId: pokettoRealApp.id,
             messages: {
               create: [
                 {

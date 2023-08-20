@@ -37,10 +37,10 @@ export default async function (req: Request, res: Response) {
   const pushMessage = async (msg: Message) => {
     const { id, role, content } = msg
     const newMessage: ChatMessageUncheckedCreateInput = {
-      id,
       role,
       content,
       conversationId,
+      shortId: id,
     }
     console.log("pushing: ", newMessage)
     await proxy.message.push.mutate(newMessage)
@@ -86,7 +86,7 @@ export default async function (req: Request, res: Response) {
     return NextResponse.json(message, { status: 500 })
   }
 
-  const replyId = nanoid()
+  const replyId = nanoid(7)
   // Convert the response into a friendly text-stream
   const stream = OpenAIStream(response, {
     onCompletion: (data) => {

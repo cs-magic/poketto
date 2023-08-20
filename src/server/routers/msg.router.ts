@@ -16,7 +16,8 @@ export const msgRouter = createTRPCRouter({
       },
       input,
     }) => {
-      return prisma.chatMessage.findMany({ where: input, orderBy: { createdAt: "asc" }, take: -10 })
+      // 不能只按照时间倒序排序，因为有些会相同，然后 id 会顺序，因为 msg 是基于 cuid 的，所以可以直接按照 id 逆序，已经包含时间
+      return prisma.chatMessage.findMany({ where: input, orderBy: { id: "desc" }, take: 10 })
     }
   ),
 
