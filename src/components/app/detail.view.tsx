@@ -42,7 +42,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
   if (appError) return null //toast.error(appError.message) // 已经在 lib/api 里handle了
 
   return (
-    <div className={"flex h-full w-full flex-col overflow-auto p-2"}>
+    <div className={"flex h-full w-full flex-col gap-2 overflow-auto p-2"}>
       <section id={"basic"} className={"| flex w-full items-center gap-2"}>
         <Avatar className={"shrink-0 p-4  wh-28"}>
           <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className={"rounded-2xl"} />
@@ -278,36 +278,33 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
   if (!hasApp) return null
 
   return (
-    <>
-      <Separator orientation={"horizontal"} />
-      <section id={"collections"} className={"flex w-full flex-col gap-4"}>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant={"destructive"} disabled={appId === POKETTO_APP_ID}>
-              Clear
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>确定要清除该App下的所有信息吗（包括会话记录）？</AlertDialogHeader>
-            <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className={"bg-destructive"}
-                onClick={() =>
-                  delConv(
-                    validator<ConversationWhereUniqueInput>()({
-                      conversation: { appId, userId },
-                    })
-                  )
-                }
-              >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </section>
-    </>
+    <section id={"collections"} className={"my-4 flex w-full flex-col gap-4"}>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant={"destructive"} disabled={appId === POKETTO_APP_ID}>
+            Clear
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>确定要清除该App下的所有信息吗（包括会话记录）？</AlertDialogHeader>
+          <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className={"bg-destructive"}
+              onClick={() =>
+                delConv(
+                  validator<ConversationWhereUniqueInput>()({
+                    conversation: { appId, userId },
+                  })
+                )
+              }
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </section>
   )
 }

@@ -12,31 +12,29 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   ChevronDownIcon,
-  ChevronLeftIcon,
   CodeSandboxLogoIcon,
   DotsVerticalIcon,
   DrawingPinFilledIcon,
   DrawingPinIcon,
+  HamburgerMenuIcon,
   Link2Icon,
   SymbolIcon,
 } from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getConversationsLink } from "@/lib/string"
-import { type AppForDetailView, type ConvForDetailView } from "@/ds"
+import { type AppForDetailView, type AppForListView, type ConvForDetailView } from "@/ds"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
 import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import { useUserId } from "@/hooks/use-user"
+import { useSessionUser, useUserId } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/router"
 import { AppDetailView } from "@/components/app/detail.view"
 import { AppDialogContainer } from "@/components/app/container"
 import { contentStyleBasedOnRole } from "@/config"
-import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
-import { has } from "lodash"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,28 +46,39 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
 import ChatMessageWhereInput = Prisma.ChatMessageWhereInput
 import validator = Prisma.validator
+import RoleTypeSchema from "../../../../prisma/generated/zod/inputTypeSchemas/RoleTypeSchema"
+import { nanoid } from "nanoid"
 
 export default function ConversationPage() {
   const router = useRouter()
   const userId = router.query.userId as string
   const appId = router.query.appId as string
   console.log({ userId, appId })
-  const { data: curConv } = api.conv.getConversation.useQuery({ conversation: { userId, appId } }, { enabled: !!(userId && appId) })
+  const { data: curConv } = api.conv.getConversation.useQuery(
+    {
+      conversation: {
+        userId,
+        appId,
+      },
+    },
+    { enabled: !!(userId && appId) }
+  )
 
   const ui = 7
 
   return (
     <RootLayout>
-      <div className={"flex h-full w-full overflow-auto"}>
+      <div className={"flex h-full w-full overflow-hidden"}>
         {!!(ui & 1) && (
           <section className={"hidden w-full shrink-[.1] lg:flex lg:w-[375px]"}>
             <ConversationList />
           </section>
         )}
 
-        {!!(ui & 2) && <section className={clsx("w-full lg:grow")}>{curConv && <ConversationMain c={curConv} />}</section>}
+        {!!(ui & 2) && <section className={clsx("w-full overflow-hidden lg:grow")}>{curConv && <ConversationMain c={curConv} />}</section>}
 
         {!!(ui & 4) && (
           <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>
@@ -88,20 +97,56 @@ export default function ConversationPage() {
 const ConversationMain = ({ c }: { c: ConvForDetailView }) => {
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
-      <div className={"| flex w-full items-center justify-between gap-4 overflow-hidden truncate bg-muted px-4 py-5"}>
+      <div className={"flex w-full items-center justify-between gap-4 overflow-hidden bg-muted px-4 py-5"}>
         <div />
         <h2 className={"truncate text-center"}>{c.app.name}</h2>
         <ControlTool c={c} />
       </div>
 
-      <div className={"grow overflow-auto"}>
+      <div className={"w-full grow overflow-auto"}>
         <ConversationInput conversationId={c.id} app={c.app} />
       </div>
     </div>
   )
 }
 
+const AddAppAlertDialog = ({ app }: { app: AppForListView }) => {
+  const utils = api.useContext()
+  const [addOpen, setAddOpen] = useState(false)
+
+  const { mutateAsync: addApp } = api.app.addAppIntoConversation.useMutation({
+    onSuccess: async (data) => {
+      await utils.conv.hasApp.invalidate()
+      toast.success("添加成功！")
+    },
+  })
+
+  return (
+    <AlertDialog open={addOpen} onOpenChange={setAddOpen}>
+      <AlertDialogTrigger>Open</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>App 添加提示</AlertDialogTitle>
+          <AlertDialogDescription>在您没有添加 {app.name} 之前，您无法使用它，请确认是否要继续 ！</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>取消</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              void addApp({ appId: app.id })
+              setAddOpen(false)
+            }}
+          >
+            确认
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
 const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; conversationId: string }) => {
+  const user = useSessionUser()
   const userId = useUserId()
   const { data: hasApp } = api.conv.hasApp.useQuery({ appId: app.id })
   const { data: initialMessages } = api.conv.listMessages.useQuery(
@@ -113,14 +158,7 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
   )
   const refForm = useRef<HTMLFormElement>(null)
   const utils = api.useContext()
-  const [addOpen, setAddOpen] = useState(false)
-
-  const { mutateAsync: addApp } = api.app.addAppIntoConversation.useMutation({
-    onSuccess: async (data) => {
-      await utils.conv.hasApp.invalidate()
-      toast.success("添加成功！")
-    },
-  })
+  const [addDialogVisible, setAddDialogVisible] = useState(false)
 
   const { isLoading, metadata, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages,
@@ -140,7 +178,7 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
     console.log({ hasApp })
     if (!hasApp) {
       event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
-      return setAddOpen(true)
+      return setAddDialogVisible(true)
     }
     handleSubmit(event)
   }
@@ -150,29 +188,29 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
   }, [conversationId])
 
   useEffect(() => {
-    if (initialMessages) setMessages(initialMessages)
+    // todo: prompts json define
+    if (initialMessages) setMessages([...(app.modelArgs as unknown as { prompts: Message[] })?.prompts, ...initialMessages])
   }, [initialMessages])
 
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
-      <AlertDialog open={addOpen} onOpenChange={setAddOpen}>
-        <AlertDialogTrigger>Open</AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>App 添加提示</AlertDialogTitle>
-            <AlertDialogDescription>在您没有添加 {app.name} 之前，您无法使用它，请确认是否要继续 ！</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void addApp({ appId: app.id })}>确认</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {addDialogVisible && <AddAppAlertDialog app={app} />}
 
       <ScrollToBottom className={"flex w-full grow overflow-auto "} initialScrollBehavior={"auto"}>
         {initialMessages ? (
           <div className={"flex w-full flex-col-reverse p-2"}>
-            <ConversationMessages messages={[...messages].reverse()} conversationId={conversationId} />
+            <ConversationMessages
+              messages={[
+                //   todo: the method not to use as
+                {
+                  id: nanoid(),
+                  content: `Welcome ${user!.name} !`,
+                  role: "system",
+                  format: ChatMessageFormatType.systemNotification,
+                } as Message,
+                ...messages,
+              ].reverse()}
+            />
           </div>
         ) : (
           <div className={"flex h-full w-full items-center justify-center"}>
@@ -208,10 +246,11 @@ const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; con
   )
 }
 
-const ConversationMessages = ({ messages, conversationId }: { messages: (Message | ChatMessage)[]; conversationId: string }) => {
+const ConversationMessages = ({ messages }: { messages: (Message | ChatMessage)[] }) => {
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
+  const m = useMustache()
 
   useEffect(() => {
     if (!sticky) setHasUnread(true)
@@ -227,15 +266,24 @@ const ConversationMessages = ({ messages, conversationId }: { messages: (Message
         // todo: using ourself messages
         messages
           // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
-          .map((msg, index) => (
-            <ConversationMessage
-              msg={{
-                ...msg,
-                format: "format" in msg ? msg.format : ChatMessageFormatType.text,
-              }}
-              key={index}
-            />
-          ))
+          .map((msg, index) =>
+            "format" in msg && msg.format === ChatMessageFormatType.systemNotification ? (
+              // system notification
+              <p key={msg.id} className={"mx-auto my-2 text-center text-muted-foreground"}>
+                {m(msg.content)}
+              </p>
+            ) : (
+              // normal messages
+              <div
+                key={msg.id}
+                className={clsx("chat text-sm tracking-normal", msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end")}
+              >
+                <div className={clsx("| p-prose chat-bubble w-full overflow-auto", contentStyleBasedOnRole[msg.role])}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m(msg.content)}</ReactMarkdown>
+                </div>
+              </div>
+            )
+          )
       }
       {hasUnread && !sticky && (
         <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>
@@ -243,21 +291,6 @@ const ConversationMessages = ({ messages, conversationId }: { messages: (Message
         </Badge>
       )}
     </>
-  )
-}
-
-const ConversationMessage = ({ msg }: { msg: ChatMessageGetPayload<{ select: { role: true; format: true; content: true } }> }) => {
-  const { role } = msg
-  const m = useMustache()
-
-  return msg.format === ChatMessageFormatType.systemNotification ? (
-    <p className={"mx-auto my-2 text-center text-muted-foreground"}>{m(msg.content)}</p>
-  ) : (
-    <div className={clsx("chat text-sm tracking-normal", role === PromptRoleType.assistant ? "chat-start" : "chat-end")}>
-      <div className={clsx("| p-prose chat-bubble w-full overflow-auto", contentStyleBasedOnRole[role])}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{m(msg.content)}</ReactMarkdown>
-      </div>
-    </div>
   )
 }
 
@@ -276,12 +309,12 @@ const ControlTool = ({ c }: { c: ConvForDetailView }) => {
 
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger className={"shrink-0"}>
         <DotsVerticalIcon />
       </PopoverTrigger>
       <PopoverContent className={"flex flex-col gap-2"}>
         <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal justify-between lg:hidden"}>
-          <span>Back</span> <ChevronLeftIcon />
+          <span>List</span> <HamburgerMenuIcon />
         </Link>
 
         <AppDialogContainer appId={c.appId}>
