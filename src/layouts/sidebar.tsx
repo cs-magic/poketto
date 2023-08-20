@@ -1,21 +1,56 @@
 import React from "react"
-import { Separator } from "@/components/ui/separator"
-import { clsx } from "clsx"
 import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
-import { SidebarNavItem } from "@/components/link"
-import { useAppStore } from "@/store"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { UserIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { signIn } from "next-auth/react"
 import { api } from "@/lib/api"
 import { InvitationStatus } from ".prisma/client"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
 import { ICON_DIMENSION_MD, navs, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
 import { useMustache } from "@/hooks/use-mustache"
-import Link from "next/link"
+import { useAppStore } from "@/store"
 import { useSessionUser } from "@/hooks/use-user"
+import clsx from "@/lib/clsx"
+import { SidebarNavItem } from "@/components/link"
+import { Separator } from "@/components/ui/separator"
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserIcon } from "lucide-react"
+import { signIn } from "next-auth/react"
+
+export const InviteCard = () => {
+  const { data = [] } = api.invitation.list.useQuery()
+  // todo: include ? on enum type
+  const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
+  const m = useMustache()
+
+  return (
+    <div className={"| flex flex-col gap-2 whitespace-normal rounded-xl border p-4 text-sm"}>
+      <div className={"flex items-center justify-between"}>
+        <Badge className={"w-fit"} variant={"secondary"}>
+          Tips
+        </Badge>
+        <Cross1Icon className={"text-muted-foreground wh-4"} />
+      </div>
+      <article className={"p-prose"}>
+        <ReactMarkdown>
+          {m(
+            "每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})" +
+              " 赠送哦！当前剩余：[{{surplus}}](/dashboard)",
+            {
+              cnt: USER_INVITATIONS_COUNT,
+              surplus,
+              appName: PRODUCT.name,
+              appDoc: URI.app.docs.intro,
+              currencyName: PRODUCT.currency,
+              currencyDoc: URI.app.docs.currency,
+            }
+          )}
+        </ReactMarkdown>
+      </article>
+      <Button className={"bg-blue-500/75 hover:bg-blue-500"}>Invite</Button>
+    </div>
+  )
+}
 
 export const Sidebar = () => {
   const { sidebarVisible } = useAppStore()
@@ -73,41 +108,6 @@ export const Sidebar = () => {
           登录
         </Button>
       )}
-    </div>
-  )
-}
-
-const InviteCard = () => {
-  const { data = [] } = api.invitation.list.useQuery()
-  // todo: include ? on enum type
-  const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
-  const m = useMustache()
-
-  return (
-    <div className={"| flex flex-col gap-2 whitespace-normal rounded-xl border p-4 text-sm"}>
-      <div className={"flex items-center justify-between"}>
-        <Badge className={"w-fit"} variant={"secondary"}>
-          Tips
-        </Badge>
-        <Cross1Icon className={"text-muted-foreground wh-4"} />
-      </div>
-      <article className={"p-prose"}>
-        <ReactMarkdown>
-          {m(
-            "每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})" +
-              " 赠送哦！当前剩余：[{{surplus}}](/dashboard)",
-            {
-              cnt: USER_INVITATIONS_COUNT,
-              surplus,
-              appName: PRODUCT.name,
-              appDoc: URI.app.docs.intro,
-              currencyName: PRODUCT.currency,
-              currencyDoc: URI.app.docs.currency,
-            }
-          )}
-        </ReactMarkdown>
-      </article>
-      <Button className={"bg-blue-500/75 hover:bg-blue-500"}>Invite</Button>
     </div>
   )
 }

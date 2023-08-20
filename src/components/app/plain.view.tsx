@@ -18,7 +18,7 @@ export const AppPlainListView = ({ app }: { app: AppForListView }) => {
     <Link
       className={"| | flex w-full justify-between gap-4 border-y p-4"}
       key={app.id}
-      href={"/c/[userId]/[appId]"}
+      href={"/clsx/[userId]/[appId]"}
       as={getConversationLink(userId, app.id)}
     >
       <div className={"flex flex-col gap-2"}>

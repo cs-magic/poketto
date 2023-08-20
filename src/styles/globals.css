@@ -110,6 +110,12 @@ colors:
     }
 }
 
+/* ref: https://github.com/vercel/next.js/issues/44295#issuecomment-1624628595 */
+html {
+    --scroll-behavior: smooth !important;
+    scroll-behavior: smooth !important;
+}
+
 @layer base {
     * {
         @apply border-border;

@@ -14,7 +14,7 @@ import { useMustache } from "@/hooks/use-mustache"
 import { useUserId } from "@/hooks/use-user"
 import Link from "next/link"
 import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
-import clsx from "clsx"
+import clsx from "@/lib/clsx"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import d from "@/lib/datetime"
 import { AppDialogContainer } from "@/components/app/container"
@@ -93,7 +93,7 @@ export const ConversationListView = ({ c }: { c: ConvForListView }) => {
   const latestMessage = c.messages[0]!
   return (
     <Link
-      href={"/c/[userId]/[appId]"}
+      href={"/clsx/[userId]/[appId]"}
       as={getConversationLink(userId, c.appId)}
       className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-indigo-100 dark:bg-slate-900")}
     >

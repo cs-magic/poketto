@@ -4,7 +4,7 @@ import React from "react"
 import { ThemeProvider } from "next-themes"
 import { Toaster } from "sonner"
 import ErrorBoundary from "@/components/error-boundary"
-import clsx from "clsx"
+import clsx from "@/lib/clsx"
 
 import "@/styles/globals.css"
 import Head from "next/head"

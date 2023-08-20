@@ -1,7 +1,7 @@
 import superjson from "superjson"
 import { type AppForListView, selectAppForListView } from "@/ds"
 import { RootLayout } from "@/layouts/root.layout"
-import clsx from "clsx"
+import clsx from "@/lib/clsx"
 import { type GetServerSideProps } from "next"
 import { prisma } from "@/server/db"
 import { AppDetailView } from "@/components/app/detail.view"

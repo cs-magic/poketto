@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect } from "react"
-import clsx from "clsx"
+import clsx from "@/lib/clsx"
 import { RootLayout } from "@/layouts/root.layout"
 import { api } from "@/lib/api"
 import { GridContainer, MasonryContainer } from "@/components/containers"

@@ -1,7 +1,8 @@
-import React, {type HTMLProps, type PropsWithChildren, useCallback, useState} from "react"
-import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
-import clsx from "clsx"
-import {type DEVICE_TYPE, DEVICES} from "@/lib/device"
+import React, { type HTMLProps, type PropsWithChildren, useCallback, useState } from "react"
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
+import clsx from "@/lib/clsx"
+import { type DEVICE_TYPE, DEVICES } from "@/lib/device"
+import ScrollToBottom from "react-scroll-to-bottom"
 
 export const GridContainer = ({ children }: PropsWithChildren) => {
   return (
@@ -92,3 +93,10 @@ export const DeviceContainer = ({
   )
 }
 
+export const NormalScrollContainer = ({ children }: PropsWithChildren) => <div className={"grow overflow-auto"}>{children}</div>
+
+export const AutoScrollContainer = ({ children }: PropsWithChildren) => (
+  <ScrollToBottom className={"grow overflow-auto"} initialScrollBehavior={"auto"}>
+    {children}
+  </ScrollToBottom>
+)

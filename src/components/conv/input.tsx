@@ -1,13 +1,13 @@
 import { type AppForDetailView, type AppForListView, type SelectChatMessageForListView } from "@/ds"
 import { useSessionUser, useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
-import { useEffect, useRef, useState } from "react"
+import { RefObject, useEffect, useRef, useState } from "react"
 import { useChat } from "ai/react"
 import { toast } from "sonner"
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import { ChevronDownIcon, EnterFullScreenIcon, ExitFullScreenIcon } from "@radix-ui/react-icons"
+import { ChevronDownIcon, EnterFullScreenIcon, ExitFullScreenIcon, Link2Icon } from "@radix-ui/react-icons"
 import { Textarea } from "@/components/ui/textarea"
-import { getHotkeyHandler, useClipboard, useFullscreen } from "@mantine/hooks"
+import { getHotkeyHandler, useClipboard, useFullscreen, useScrollIntoView } from "@mantine/hooks"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ import {
 import { useMustache } from "@/hooks/use-mustache"
 import { useUrl } from "@/hooks/use-url"
 import { ChatMessageFormatType, Prisma, PromptRoleType } from ".prisma/client"
-import clsx from "clsx"
+import clsx from "@/lib/clsx"
 import { contentStyleBasedOnRole } from "@/config"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -30,12 +30,15 @@ import { Badge } from "@/components/ui/badge"
 import d from "@/lib/datetime"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { NormalScrollContainer } from "@/components/containers"
 
-export const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; conversationId: string }) => {
+export const ConversationInput = ({ cid }: { cid: string }) => {
   const userId = useUserId()
   const user = useSessionUser()
-  const { data: hasApp } = api.conv.has.useQuery({ appId: app.id })
-  const { data: initialMessages } = api.message.list.useQuery({ conversationId }, { enabled: !!userId })
+  const { data: conv } = api.conv.get.useQuery({ id: cid })
+  const { data: hasApp } = api.conv.has.useQuery({ appId: conv?.appId ?? "" }, { enabled: !!conv })
+  const { data: initialMessages } = api.message.list.useQuery({ conversationId: cid }, { enabled: !!userId })
   const refForm = useRef<HTMLFormElement>(null)
   const utils = api.useContext()
   const [addDialogVisible, setAddDialogVisible] = useState(false)
@@ -45,7 +48,7 @@ export const ConversationInput = ({ app, conversationId }: { app: AppForDetailVi
   const { isLoading, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
-    body: { userId, conversationId },
+    body: { userId, conversationId: cid },
     onError: (err) => {
       console.warn(err)
       toast.error(err.message, { duration: Infinity })
@@ -63,48 +66,68 @@ export const ConversationInput = ({ app, conversationId }: { app: AppForDetailVi
       const n = messages.length
       setMessages([...messages.slice(0, n - 1), { ...messages[n - 1]!, id: refMessage.current }])
     },
-    id: conversationId,
+    id: cid,
   })
 
   useEffect(() => {
     stop() // 防止串台
-  }, [conversationId])
+  }, [cid])
 
   useEffect(() => {
     if (initialMessages) setMessages([...initialMessages].reverse())
   }, [initialMessages])
 
-  return (
-    <div className={"relative flex h-full w-full flex-col overflow-hidden"}>
-      {addDialogVisible && <AddAppAlertDialog app={app} />}
+  const ScrollContainer = NormalScrollContainer
 
-      <ScrollToBottom className={"flex w-full grow overflow-auto bg-cyan-600 p-2 dark:bg-cyan-950"} initialScrollBehavior={"auto"}>
-        <ConversationMessages
-          messages={[...messages]
-            .reverse() /* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序*/
-            .map((m) => ({
-              ...m,
-              createdAt: m.createdAt ?? new Date(),
-              format: "format" in m ? (m.format as ChatMessageFormatType) : ChatMessageFormatType.text,
-              user:
-                m.role === PromptRoleType.user
-                  ? {
-                      id: user!.id,
-                      image: user!.image!,
-                      name: user!.name!,
-                    }
-                  : {
-                      id: app.id,
-                      image: app.avatar,
-                      name: app.name!,
-                    },
-            }))}
-        />
-      </ScrollToBottom>
+  return (
+    <div
+      className={clsx(
+        "relative  h-full w-full",
+        "flex  flex-col"
+        // "overflow-hidden"
+      )}
+    >
+      <Link className={"p-btn text-center p-4"} href={"#x"} id={"x"} scroll={false}>
+        x
+      </Link>
+
+      {addDialogVisible && conv && <AddAppAlertDialog app={conv.app} />}
+
+      {/*<ScrollContainer>*/}
+      <div className={"w-full bg-cyan-600 p-2 dark:bg-cyan-950 "}>
+        {conv && (
+          <ConversationMessages
+            messages={[...messages]
+              .reverse() /* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序*/
+              .map((m) => ({
+                ...m,
+                createdAt: m.createdAt ?? new Date(),
+                format: "format" in m ? (m.format as ChatMessageFormatType) : ChatMessageFormatType.text,
+                user:
+                  m.role === PromptRoleType.user
+                    ? {
+                        id: user!.id,
+                        image: user!.image!,
+                        name: user!.name!,
+                      }
+                    : {
+                        id: conv.app.id,
+                        image: conv.app.avatar,
+                        name: conv.app.name!,
+                      },
+              }))}
+          />
+        )}
+      </div>
+      {/*</ScrollContainer>*/}
+
+      <Link className={"p-btn text-center p-4"} href={"#y"} scroll={false} id={"y"}>
+        y
+      </Link>
 
       <form
         ref={refForm}
-        className={"| flex w-full items-center justify-center gap-2"}
+        className={clsx("w-full  gap-2", "flex items-center justify-center")}
         onSubmit={(event) => {
           console.log({ hasApp })
           if (!hasApp) {
@@ -134,7 +157,7 @@ export const ConversationInput = ({ app, conversationId }: { app: AppForDetailVi
           ])}
         />
         <input className={"hidden"} name={"conversationUserId"} value={userId} />
-        <input className={"hidden"} name={"conversationAppId"} value={conversationId} />
+        <input className={"hidden"} name={"conversationAppId"} value={cid} />
       </form>
     </div>
   )
@@ -146,7 +169,7 @@ export const ConversationMessages = ({ messages }: { messages: SelectChatMessage
   const [hasUnread, setHasUnread] = useState(false)
   const m = useMustache()
 
-  const { url } = useUrl()
+  const { baseUrl } = useUrl()
   const clipboard = useClipboard({ timeout: 500 })
 
   useEffect(() => {
@@ -159,11 +182,17 @@ export const ConversationMessages = ({ messages }: { messages: SelectChatMessage
 
   return (
     // 这里不能加 h-full 因为外层包了一个scroll，要超过容器高度，才可以滚动
-    <div className={clsx("relative flex w-full flex-col-reverse")}>
+    <div
+      className={clsx(
+        "relative  w-full",
+        // "flex flex-col-reverse",
+        "overflow-auto"
+      )}
+    >
       {/* 这里为了把下面（倒序）的空间给撑起来，使聊天在不占满的情况下，也能从上显示到下（而非粘在底部，从下到上） */}
       <div className={"grow"} />
       {messages.map((msg, index) => (
-        <div id={msg.id} key={msg.id} className={clsx("group h-fit w-full")}>
+        <Link href={`#${msg.id}`} id={msg.id} key={msg.id} className={clsx("group h-fit w-full")}>
           {"format" in msg && msg.format === ChatMessageFormatType.systemNotification ? (
             // system notification
             <div key={msg.id} className={"mx-auto my-2 text-center text-muted-foreground"}>
@@ -182,11 +211,20 @@ export const ConversationMessages = ({ messages }: { messages: SelectChatMessage
               </div>
 
               <div
-                className={"chat-header invisible text-xs opacity-50 group-hover:visible"}
-                onClick={() => clipboard.copy(`${url}?id=${msg.id}`)}
+                className={clsx(
+                  "chat-header  inline-flex cursor-pointer items-center gap-2 pb-2 text-xs opacity-50"
+                  // "invisible group-hover:visible"
+                )}
+                onClick={() => {
+                  // clipboard.copy(`${baseUrl}#${msg.id}`)
+                  clipboard.copy(`${msg.id}`)
+                  toast.success(`copied url`)
+                }}
               >
                 {/*<span className={"mx-2"}>#{msg.id}</span>*/}
                 <time className="">{d(msg.createdAt).fromNow()}</time>
+                <Link2Icon />
+                <span>#{msg.id}</span>
               </div>
 
               <ReactMarkdown className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])} remarkPlugins={[remarkGfm]}>
@@ -194,7 +232,7 @@ export const ConversationMessages = ({ messages }: { messages: SelectChatMessage
               </ReactMarkdown>
             </div>
           )}
-        </div>
+        </Link>
       ))}
       {hasUnread && !sticky && (
         <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>

@@ -7,7 +7,7 @@ import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, get
 import Link from "next/link"
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { Separator } from "@/components/ui/separator"
-import clsx from "clsx"
+import clsx from "@/lib/clsx"
 import numeral from "numeral"
 import _ from "lodash"
 import { Badge } from "@/components/ui/badge"
