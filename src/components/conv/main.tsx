@@ -56,7 +56,7 @@ export const ConversationMain = ({ cid }: { cid: string }) => {
 
                 <Separator orientation={"horizontal"} className={"hidden md:flex"} />
 
-                <Link href={"/clsx/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal justify-between lg:hidden"}>
+                <Link href={"/c/[userId]"} as={getConversationsLink(c.userId)} className={"p-btn-horizontal justify-between lg:hidden"}>
                   <span>List</span> <HamburgerMenuIcon />
                 </Link>
 

@@ -31,7 +31,7 @@ export const ConversationList = () => {
     {
       enabled: toSearch !== "",
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
-    }
+    },
   )
   const searchedApps = queryApps.data?.pages.flatMap((item) => item.items) ?? []
 
@@ -93,7 +93,7 @@ export const ConversationListView = ({ c }: { c: ConvForListView }) => {
   const latestMessage = c.messages[0]!
   return (
     <Link
-      href={"/clsx/[userId]/[appId]"}
+      href={"/c/[userId]/[appId]"}
       as={getConversationLink(userId, c.appId)}
       className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-indigo-100 dark:bg-slate-900")}
     >

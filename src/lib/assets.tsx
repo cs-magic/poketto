@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ElementType } from "react"
 
 import CSCoin from "../../public/images/cs-coin.svg"
 import OpenchatIcon from "../../public/brands/openchat.svg"
@@ -12,7 +12,7 @@ import { type SortOrder } from "@/ds"
 import Image, { type ImageProps } from "next/image"
 import CatLogo from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
 
-export const Order2icon: Record<SortOrder, JSX.ElementType> = {
+export const Order2icon: Record<SortOrder, ElementType> = {
   recommend: IconStackPush,
   top: IconThumbUp,
   "most-saved": IconDownload,
@@ -22,7 +22,7 @@ export const Order2icon: Record<SortOrder, JSX.ElementType> = {
   mostViewed: IconEye,
 }
 
-export const Icons: Record<"logo" | "csCoin" | "openchat" | "midjourney" | keyof typeof Order2icon, JSX.ElementType> = {
+export const Icons: Record<"logo" | "csCoin" | "openchat" | "midjourney" | keyof typeof Order2icon, ElementType> = {
   logo: ({ src = CatLogo, alt = "Cat Logo", width = 24, height = 24, ...props }: Partial<ImageProps>) => (
     <Image width={width} height={height} src={src} alt={alt} {...props} />
   ),
