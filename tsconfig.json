@@ -38,12 +38,11 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.cjs",
-    "src/**/*.mjs",
-    "*.cjs",
-
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.cjs",
+    "**/*.mjs",
+    ".eslintrc.cjs",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],

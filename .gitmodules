@@ -4,3 +4,6 @@
 [submodule "packages/ai"]
 	path = packages/ai
 	url = ./packages/ai
+[submodule "packages/zod-prisma-types"]
+	path = packages/zod-prisma-types
+	url = ./packages/zod-prisma-types
