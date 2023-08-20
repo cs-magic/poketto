@@ -3,7 +3,7 @@ import { api } from "@/lib/api"
 import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
 import Link from "next/link"
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { Separator } from "@/components/ui/separator"
@@ -30,6 +30,9 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Prisma } from ".prisma/client"
+import validator = Prisma.validator
+import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
 export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) => {
   const userId = useUserId()
@@ -229,27 +232,26 @@ export function InstallButton({ userId, appId, setOpen }: { userId: string; appI
 
   const utils = api.useContext()
   const { data: hasApp } = api.conv.hasApp.useQuery({ appId })
+  const go = () => void router.push(getConversationLink(userId, appId)) // app.id 进数据库后会生成新的
 
   const { mutate: addApp } = api.app.addAppIntoConversation.useMutation({
     onSuccess: (data) => {
+      toast.success(`Successfully added one app`)
       void utils.conv.listConversations.invalidate()
       void utils.conv.hasApp.invalidate()
       setOpen && setOpen(false)
-      toast.success(`Successfully added one app`)
-
-      void router.push(getConversationLink(userId, data.appId)) // app.id 进数据库后会生成新的
+      go()
     },
   })
 
   return (
     <Button
       className={clsx(" h-6 rounded-3xl px-4 transition-all")}
-      disabled={hasApp}
       onClick={() => {
-        addApp({ appId })
+        hasApp ? go() : addApp({ appId })
       }}
     >
-      {hasApp ? "Got" : "Get"}
+      {hasApp ? "Open" : "Get"}
     </Button>
   )
 }
@@ -265,10 +267,11 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
 
   const { mutate: delConv, data: delResult } = api.conv.delConversation.useMutation({
     onSuccess: (input) => {
+      toast.success(`You have deleted one app.`)
       void utils.conv.listConversations.invalidate()
       void utils.conv.hasApp.invalidate()
       setOpen && setOpen(false)
-      toast.success(`You have deleted one app.`)
+      void router.push(getConversationsLink(userId))
     },
   })
 
@@ -289,7 +292,16 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
             <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className={"bg-destructive"} onClick={() => delConv({ appId })}>
+              <AlertDialogAction
+                className={"bg-destructive"}
+                onClick={() =>
+                  delConv(
+                    validator<ConversationWhereUniqueInput>()({
+                      conversation: { appId, userId },
+                    })
+                  )
+                }
+              >
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>

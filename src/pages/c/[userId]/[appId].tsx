@@ -6,9 +6,9 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
-import { type ChatMessage, ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { type ChatMessage, ChatMessageFormatType, Prisma, PromptRoleType } from ".prisma/client"
 import { getHotkeyHandler } from "@mantine/hooks"
-import { type FormEvent, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   ChevronDownIcon,
@@ -22,26 +22,41 @@ import {
 } from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getConversationsLink } from "@/lib/string"
-import { nanoid } from "nanoid"
-import { type ConvForDetailView } from "@/ds"
+import { type AppForDetailView, type ConvForDetailView } from "@/ds"
 import { Badge } from "@/components/ui/badge"
 import { useMustache } from "@/hooks/use-mustache"
 import { Textarea } from "@/components/ui/textarea"
 
 import ScrollToBottom, { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import { useSessionUser, useUserId } from "@/hooks/use-user"
+import { useUserId } from "@/hooks/use-user"
 import { ConversationList } from "@/components/conversations"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/router"
 import { AppDetailView } from "@/components/app/detail.view"
 import { AppDialogContainer } from "@/components/app/container"
+import { contentStyleBasedOnRole } from "@/config"
+import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
+import { has } from "lodash"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import ChatMessageWhereInput = Prisma.ChatMessageWhereInput
+import validator = Prisma.validator
 
 export default function ConversationPage() {
   const router = useRouter()
   const userId = router.query.userId as string
   const appId = router.query.appId as string
   console.log({ userId, appId })
-  const { data: curConv } = api.conv.getConversation.useQuery({ userId, appId }, { enabled: !!(userId && appId) })
+  const { data: curConv } = api.conv.getConversation.useQuery({ conversation: { userId, appId } }, { enabled: !!(userId && appId) })
 
   const ui = 7
 
@@ -80,22 +95,30 @@ const ConversationMain = ({ c }: { c: ConvForDetailView }) => {
       </div>
 
       <div className={"grow overflow-auto"}>
-        <ConversationInput appId={c.appId} />
+        <ConversationInput conversationId={c.id} app={c.app} />
       </div>
     </div>
   )
 }
 
-const ConversationInput = ({ appId }: { appId: string }) => {
+const ConversationInput = ({ app, conversationId }: { app: AppForDetailView; conversationId: string }) => {
   const userId = useUserId()
-  const { data: initialMessages } = api.conv.listMessages.useQuery({ appId })
+  const { data: hasApp } = api.conv.hasApp.useQuery({ appId: app.id })
+  const { data: initialMessages } = api.conv.listMessages.useQuery(
+    validator<ChatMessageWhereInput>()({
+      userId: userId!,
+      conversationId,
+    }),
+    { enabled: !!userId }
+  )
   const refForm = useRef<HTMLFormElement>(null)
-
   const utils = api.useContext()
-  const { mutate: pushMessage } = api.conv.pushMessage.useMutation({
-    onSuccess: () => {
-      console.log("=== called onSuccess")
-      void utils.conv.listConversations.invalidate()
+  const [addOpen, setAddOpen] = useState(false)
+
+  const { mutateAsync: addApp } = api.app.addAppIntoConversation.useMutation({
+    onSuccess: async (data) => {
+      await utils.conv.hasApp.invalidate()
+      toast.success("添加成功！")
     },
   })
 
@@ -103,35 +126,28 @@ const ConversationInput = ({ appId }: { appId: string }) => {
     initialMessages,
     body: {
       userId,
-      appId,
+      conversationId,
     },
     onError: (err) => {
       console.warn(err)
       toast.error(err.message, { duration: Infinity })
     },
-    onFinish: (msg) => pushMessage({ ...msg, appId }),
-    onResponse: (response) => {
-      // if (scrolled && response.status === 200) setUnread(true) // 有必要的话，这里可以做更精细地控制
-    },
-    id: `${userId}-${appId}`,
+    onFinish: (msg) => void utils.conv.listConversations.invalidate(),
+    id: conversationId,
   })
 
-  /**
-   * todo: push in the backend
-   */
-  const post = (event: FormEvent<HTMLFormElement>) => {
-    // ref: https://stackoverflow.com/a/59961329/9422455
-    const formData = new FormData(event.currentTarget)
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value)
+  const validatedSubmit = (event) => {
+    console.log({ hasApp })
+    if (!hasApp) {
+      event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
+      return setAddOpen(true)
     }
     handleSubmit(event)
-    pushMessage({ content: input, role: PromptRoleType.user, appId })
   }
 
-  // useEffect(() => {
-  //   stop()
-  // }, [appId])
+  useEffect(() => {
+    stop() // 防止串台
+  }, [conversationId])
 
   useEffect(() => {
     if (initialMessages) setMessages(initialMessages)
@@ -139,10 +155,24 @@ const ConversationInput = ({ appId }: { appId: string }) => {
 
   return (
     <div className={"flex h-full w-full flex-col overflow-hidden"}>
+      <AlertDialog open={addOpen} onOpenChange={setAddOpen}>
+        <AlertDialogTrigger>Open</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>App 添加提示</AlertDialogTitle>
+            <AlertDialogDescription>在您没有添加 {app.name} 之前，您无法使用它，请确认是否要继续 ！</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void addApp({ appId: app.id })}>确认</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <ScrollToBottom className={"flex w-full grow overflow-auto "} initialScrollBehavior={"auto"}>
         {initialMessages ? (
           <div className={"flex w-full flex-col-reverse p-2"}>
-            <ConversationMessages messages={[...messages].reverse()} appId={appId} />
+            <ConversationMessages messages={[...messages].reverse()} conversationId={conversationId} />
           </div>
         ) : (
           <div className={"flex h-full w-full items-center justify-center"}>
@@ -151,7 +181,7 @@ const ConversationInput = ({ appId }: { appId: string }) => {
         )}
       </ScrollToBottom>
 
-      <form ref={refForm} className={"| flex w-full items-center justify-center gap-2 p-4"} onSubmit={post}>
+      <form ref={refForm} className={"| flex w-full items-center justify-center gap-2 p-4"} onSubmit={validatedSubmit}>
         <Textarea
           name={"prompt"}
           className={"w-[95%]"}
@@ -172,17 +202,16 @@ const ConversationInput = ({ appId }: { appId: string }) => {
           ])}
         />
         <input className={"hidden"} name={"conversationUserId"} value={userId} />
-        <input className={"hidden"} name={"conversationAppId"} value={appId} />
+        <input className={"hidden"} name={"conversationAppId"} value={conversationId} />
       </form>
     </div>
   )
 }
 
-const ConversationMessages = ({ messages, appId }: { messages: (Message | ChatMessage)[]; appId: string }) => {
+const ConversationMessages = ({ messages, conversationId }: { messages: (Message | ChatMessage)[]; conversationId: string }) => {
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
-  const u = useSessionUser()
 
   useEffect(() => {
     if (!sticky) setHasUnread(true)
@@ -196,25 +225,17 @@ const ConversationMessages = ({ messages, appId }: { messages: (Message | ChatMe
     <>
       {
         // todo: using ourself messages
-        // _.reverse(messages)
-        u &&
-          messages
-            // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
-            .map((msg, index) => (
-              <ConversationMessage
-                msg={{
-                  ...msg,
-                  userId: u.id,
-                  conversationUserId: u.id,
-                  conversationAppId: appId,
-                  id: nanoid(),
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  format: "format" in msg ? msg.format : ChatMessageFormatType.text,
-                }}
-                key={index}
-              />
-            ))
+        messages
+          // .filter((value, index) => c.app.model!.isOpenSource || index >= (c.app.model!.initPrompts.length ?? 0))
+          .map((msg, index) => (
+            <ConversationMessage
+              msg={{
+                ...msg,
+                format: "format" in msg ? msg.format : ChatMessageFormatType.text,
+              }}
+              key={index}
+            />
+          ))
       }
       {hasUnread && !sticky && (
         <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>
@@ -225,7 +246,7 @@ const ConversationMessages = ({ messages, appId }: { messages: (Message | ChatMe
   )
 }
 
-const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
+const ConversationMessage = ({ msg }: { msg: ChatMessageGetPayload<{ select: { role: true; format: true; content: true } }> }) => {
   const { role } = msg
   const m = useMustache()
 
@@ -233,17 +254,7 @@ const ConversationMessage = ({ msg }: { msg: ChatMessage }) => {
     <p className={"mx-auto my-2 text-center text-muted-foreground"}>{m(msg.content)}</p>
   ) : (
     <div className={clsx("chat text-sm tracking-normal", role === PromptRoleType.assistant ? "chat-start" : "chat-end")}>
-      <div
-        className={clsx(
-          "| p-prose chat-bubble w-full overflow-auto",
-          {
-            system: "bg-slate-700",
-            function: "bg-destructive",
-            user: "bg-green-600 text-black",
-            assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
-          }[role]
-        )}
-      >
+      <div className={clsx("| p-prose chat-bubble w-full overflow-auto", contentStyleBasedOnRole[role])}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{m(msg.content)}</ReactMarkdown>
       </div>
     </div>
@@ -281,7 +292,7 @@ const ControlTool = ({ c }: { c: ConvForDetailView }) => {
 
         <Separator orientation={"horizontal"} className={"xl:hidden"} />
 
-        <Button className={"justify-between"} variant={"ghost"} onClick={() => pinConv({ appId: c.appId, toStatus: !c.pinned })}>
+        <Button className={"justify-between"} variant={"ghost"} onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}>
           {c.pinned ? (
             <>
               <span>Unpin</span>

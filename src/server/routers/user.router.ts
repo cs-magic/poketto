@@ -1,8 +1,6 @@
 import { z } from "zod"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
-import { selectUserProfile, type UserForProfile, type UserWithRelations, userWithRelationsInclude } from "@/ds"
-import { Simulate } from "react-dom/test-utils"
-import select = Simulate.select
+import { selectUserProfile, type UserForProfile } from "@/ds"
 
 export const userRouter = createTRPCRouter({
   getAllUser: publicProcedure.query(({ ctx }) => {

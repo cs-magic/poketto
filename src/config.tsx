@@ -1,6 +1,7 @@
 import { getRobotAvatar } from "@/lib/string"
 import { EnvelopeOpenIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import { type INavItem } from "@/ds"
+import { PromptRoleType } from ".prisma/client"
 
 // -----------------------------------------------------------------------------
 // system
@@ -198,3 +199,9 @@ export const USER_INVITATIONS_COUNT = 5 as const
 export const DEFAULT_USER_NAME = "游客" as const
 export const DEFAULT_USER_ID = "guest" as const
 export const DEFAULT_USER_AVATAR = getRobotAvatar(DEFAULT_USER_ID)
+export const contentStyleBasedOnRole: Record<PromptRoleType, string> = {
+  system: "bg-slate-700",
+  function: "bg-destructive",
+  user: "bg-green-600 text-black",
+  assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
+}

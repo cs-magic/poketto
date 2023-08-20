@@ -1,5 +1,5 @@
 import superjson from "superjson"
-import { appInclude, type AppWithRelation } from "@/ds"
+import { type AppForListView, selectAppForListView } from "@/ds"
 import { RootLayout } from "@/layouts/root.layout"
 import clsx from "clsx"
 import { type GetServerSideProps } from "next"
@@ -7,7 +7,7 @@ import { prisma } from "@/server/db"
 import { AppDetailView } from "@/components/app/detail.view"
 
 export default function ConversationPage({ appStr }: { appStr: string }) {
-  const app = superjson.parse<AppWithRelation>(appStr)
+  const app = superjson.parse<AppForListView>(appStr)
 
   return (
     <RootLayout>
@@ -27,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const app = await prisma.app.findUniqueOrThrow({
     where: { id: appId },
-    include: appInclude,
+    select: selectAppForListView,
   })
   if (!app) {
     return {

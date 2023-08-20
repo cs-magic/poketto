@@ -1,7 +1,9 @@
 import { z } from "zod"
-import { createTRPCRouter, protectedProcedure } from "@/server/routers/trpc.helpers"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/routers/trpc.helpers"
 import { includeConvForDetailView, selectConvForListView } from "@/ds"
-import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { Prisma, PromptRoleType } from ".prisma/client"
+import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
+import ConversationWhereUniqueInputSchema from "../../../prisma/generated/zod/inputTypeSchemas/ConversationWhereUniqueInputSchema"
 
 export const conversationRouter = createTRPCRouter({
   /**
@@ -15,31 +17,24 @@ export const conversationRouter = createTRPCRouter({
         session: { user },
       },
     }) => {
-      return !!(await prisma.conversation.findUnique({ where: { id: { userId: user.id, appId } } }))
+      return !!(await prisma.conversation.findUnique({ where: { conversation: { userId: user.id, appId } } }))
     }
   ),
 
-  getConversation: protectedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        appId: z.string(),
+  getConversation: protectedProcedure.input(ConversationWhereUniqueInputSchema).query(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+      input,
+    }) => {
+      return prisma.conversation.findUnique({
+        include: includeConvForDetailView,
+        where: input,
       })
-    )
-    .query(
-      async ({
-        ctx: {
-          prisma,
-          session: { user },
-        },
-        input: { userId, appId },
-      }) => {
-        return prisma.conversation.findFirst({
-          include: includeConvForDetailView,
-          where: { userId: userId, appId },
-        })
-      }
-    ),
+    }
+  ),
 
   listConversations: protectedProcedure.query(
     async ({
@@ -56,31 +51,22 @@ export const conversationRouter = createTRPCRouter({
     }
   ),
 
-  listMessages: protectedProcedure
-    .input(
-      z.object({
-        appId: z.string(),
-      })
-    )
-    .query(
-      async ({
-        ctx: {
-          prisma,
-          session: { user },
-        },
-        input: { appId },
-      }) => {
-        const result = await prisma.chatMessage.findMany({
-          where: { conversationAppId: appId, conversationUserId: user.id },
-        })
-        return result
-      }
-    ),
+  listMessages: protectedProcedure.input(z.any()).query(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+      input,
+    }) => {
+      return prisma.chatMessage.findMany({ where: input })
+    }
+  ),
 
   pinConv: protectedProcedure
     .input(
       z.object({
-        appId: z.string(),
+        conversationId: z.string(),
         toStatus: z.boolean(),
       })
     )
@@ -90,64 +76,37 @@ export const conversationRouter = createTRPCRouter({
           prisma,
           session: { user },
         },
-        input: { appId, toStatus },
+        input: { conversationId, toStatus },
       }) => {
         await prisma.conversation.update({
-          where: { id: { userId: user.id, appId } },
+          where: { id: conversationId },
           data: { pinned: toStatus },
         })
       }
     ),
 
-  delConversation: protectedProcedure
-    .input(
-      z.object({
-        appId: z.string(),
-      })
-    )
-    .mutation(
-      async ({
-        ctx: {
-          prisma,
-          session: { user },
-        },
-        input: { appId },
-      }) => {
-        return await prisma.conversation.delete({ where: { id: { userId: user.id, appId } } })
-      }
-    ),
+  delConversation: protectedProcedure.input(z.any()).mutation(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+      input,
+    }) => {
+      //   todo: validate in zod
+      return prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
+    }
+  ),
 
-  pushMessage: protectedProcedure
+  pushMessage: publicProcedure
     .input(
       z.object({
+        conversationId: z.string(),
         content: z.string(),
         role: z.nativeEnum(PromptRoleType),
-        appId: z.string(),
       })
     )
-    .mutation(
-      async ({
-        ctx: {
-          prisma,
-          session: { user },
-        },
-        input: { appId, content, role },
-      }) => {
-        const result = await prisma.chatMessage.create({
-          data: {
-            conversationAppId: appId,
-            conversationUserId: user.id,
-            userId: user.id,
-            content,
-            role,
-            format: ChatMessageFormatType.text,
-          },
-        })
-        await prisma.conversation.update({
-          where: { id: { appId: appId, userId: user.id } },
-          data: { updatedAt: new Date() },
-        })
-        return result
-      }
-    ),
+    .mutation(async ({ ctx: { prisma }, input }) => {
+      return prisma.chatMessage.create({ data: input })
+    }),
 })

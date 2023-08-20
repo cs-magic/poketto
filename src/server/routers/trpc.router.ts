@@ -1,7 +1,6 @@
 import { userRouter } from "@/server/routers/user.router"
 import { createTRPCRouter } from "@/server/routers/trpc.helpers"
-import { chatRouter } from "@/server/routers/chat.router"
-import { appRouter } from "@/server/routers/app.router"
+import { pokettoAppRouter } from "@/server/routers/poketto-app.router"
 import { conversationRouter } from "./conversation.router"
 
 /**
@@ -9,12 +8,11 @@ import { conversationRouter } from "./conversation.router"
  *
  * All routers added in /api/routers should be manually added here.
  */
-export const rootRouter = createTRPCRouter({
-	user: userRouter,
-	chat: chatRouter,
-	app: appRouter,
-	conv: conversationRouter,
+export const appRouter = createTRPCRouter({
+  user: userRouter,
+  app: pokettoAppRouter,
+  conv: conversationRouter,
 })
 
 // export type definition of API
-export type AppRouter = typeof rootRouter
+export type AppRouter = typeof appRouter

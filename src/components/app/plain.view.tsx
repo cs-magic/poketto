@@ -1,4 +1,4 @@
-import { type AppForListView, type AppWithRelation } from "@/ds"
+import { type AppForListView } from "@/ds"
 import { useUserId } from "@/hooks/use-user"
 import Link from "next/link"
 import { getConversationLink } from "@/lib/string"

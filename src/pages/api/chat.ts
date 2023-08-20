@@ -3,8 +3,11 @@ import { OpenAIStream, StreamingTextResponse } from "ai"
 import { kv } from "@vercel/kv"
 import { Ratelimit } from "@upstash/ratelimit"
 import { env } from "@/env.mjs"
-import { type PromptRoleType } from ".prisma/client"
+import { PromptRoleType } from ".prisma/client"
 import { NextResponse } from "next/server"
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
+import { type AppRouter } from "@/server/routers/trpc.router"
+import superjson from "superjson"
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
@@ -16,6 +19,25 @@ const openai = new OpenAIApi(config)
 export const runtime = "edge"
 
 export default async function (req: Request, res: Response) {
+  const proxy = createTRPCProxyClient<AppRouter>({
+    links: [
+      // loggerLink(),
+      httpBatchLink({ url: `${req.headers.get("origin")}/api/trpc` }),
+    ],
+    transformer: superjson,
+  })
+
+  // Extract the `prompt` from the body of the request
+  const data = await req.json()
+  const { messages, conversationId } = data
+  // console.log("req: ", { data })
+  const pushMessage = async (content: string, role: PromptRoleType) => {
+    const newMessage = { content, conversationId, role }
+    console.log("pushing: ", newMessage)
+    await proxy.conv.pushMessage.mutate(newMessage)
+  }
+  void pushMessage(messages[messages.length - 1].content, PromptRoleType.user)
+
   if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
     const ip = req.headers.get("x-forwarded-for")
     const ratelimit = new Ratelimit({
@@ -38,11 +60,6 @@ export default async function (req: Request, res: Response) {
     }
   }
 
-  // Extract the `prompt` from the body of the request
-  const data = await req.json()
-  const { messages, ...extraData } = data
-  console.log("req: ", { data })
-
   // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
@@ -62,8 +79,15 @@ export default async function (req: Request, res: Response) {
 
   // Convert the response into a friendly text-stream
   const stream = OpenAIStream(response, {
+    onCompletion: (data) => {
+      // console.log("onCompletion: ", { data })
+    },
+    onToken: (data) => {
+      // console.log("onToken: ", { data })
+    },
     onFinal: (data) => {
-      console.log("onFinal: ", { data })
+      // console.log("onFinal: ", { data })
+      void pushMessage(data, PromptRoleType.assistant)
     },
   })
   // Respond with the stream

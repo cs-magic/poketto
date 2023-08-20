@@ -18,62 +18,20 @@ import UserSelect = Prisma.UserSelect
 // general
 // -----------------------------------------------------------------------------
 
-export type ID = string | number
-
-// -----------------------------------------------------------------------------
-// database
-// -----------------------------------------------------------------------------
-
-export const userWithRelationsInclude = {
-  followedBy: true,
-  following: true,
-}
-
-export const userAppRelationTypes = ["create", "used", "starred"] as const
-export type UserAppRelationType = (typeof userAppRelationTypes)[number]
-
-export type UserWithRelations = UserGetPayload<{
-  include: typeof userWithRelationsInclude
-}> & {
-  impact: number
-}
-
-// -----------------------------------------------------------------------------
-// flowgpt
-// -----------------------------------------------------------------------------
-
 export const sortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow", "mostViewed"] as const
 export type SortOrder = (typeof sortOrders)[number]
 
-export const appInclude = {
-  creator: true,
-  actions: true, // note: unnecessary to track appActions
-  tags: true,
-  state: true,
-  comments: true,
+export type IMAGE_SIZE = "xs" | "md" | "raw"
+
+export interface INavItem {
+  title: string
+  link: string
+  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
 }
-type IAppInclude = typeof appInclude
-export type AppWithRelation = AppGetPayload<{
-  include: IAppInclude
-}>
 
 // -----------------------------------------------------------------------------
-// poketto
+// models
 // -----------------------------------------------------------------------------
-
-/**
- * - 判断是否用户消息取决于 user 类型，因此在 user 里实现
- */
-export interface IAppMessage extends Message {
-  type: "user" | "notification"
-  format: "text" | "image" | "audio" | "video" | "link" | "quote"
-
-  appId: ID //
-  userId?: ID // 1. 不要存user，这样可以保证批量更新 2. 通知等就没有 userId
-  parentId?: ID
-
-  interactions: Record<string, number>
-}
 
 export const selectUserProfile = validator<UserSelect>()({
   id: true,
@@ -117,6 +75,7 @@ export const selectAppForDetailView = validator<AppSelect>()({
   comments: true,
   modelArgs: true,
 })
+export type AppForDetailView = AppGetPayload<{ select: typeof selectAppForDetailView }>
 
 // ref: https://stackoverflow.com/a/69943634/9422455
 export const selectConvForListView = validator<ConversationSelect>()({
@@ -141,7 +100,7 @@ export const selectConvForListView = validator<ConversationSelect>()({
 export type ConvForListView = ConversationGetPayload<{ select: typeof selectConvForListView }>
 
 export const includeConvForDetailView = validator<ConversationInclude>()({
-  app: { include: appInclude },
+  app: { select: selectAppForDetailView },
   messages: {
     include: {
       user: true, // 获取每条信息的用户
@@ -151,7 +110,6 @@ export const includeConvForDetailView = validator<ConversationInclude>()({
 export type ConvForDetailView = ConversationGetPayload<{
   include: typeof includeConvForDetailView
 }>
-// & { latestMessage: ChatMessage }
 
 ///////////////////////////
 // next-auth
@@ -173,11 +131,3 @@ export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> 
 export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
   Component: NextComponentWithAuth
 }
-
-export interface INavItem {
-  title: string
-  link: string
-  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
-}
-
-export type IMAGE_SIZE = "xs" | "md" | "raw"
