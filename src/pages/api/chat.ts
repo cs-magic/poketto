@@ -10,7 +10,8 @@ import { type RootRouter } from "@/server/trpc.router"
 import superjson from "superjson"
 
 import { nanoid } from "@/lib/id"
-import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput // Create an OpenAI API client (that's edge friendly!)
+import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
+import _ from "lodash" // Create an OpenAI API client (that's edge friendly!)
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
@@ -20,6 +21,30 @@ const openai = new OpenAIApi(config)
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = "edge"
+
+export const validateRequest = async (req: Request) => {
+  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+    const ip = req.headers.get("x-forwarded-for")
+    const ratelimit = new Ratelimit({
+      redis: kv,
+      // rate limit to 1 requests per 20 seconds
+      limiter: Ratelimit.slidingWindow(3, "10s"),
+    })
+
+    const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
+
+    if (!success) {
+      return new Response("Hey man, you are too fast! Please slow down!", {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "X-RateLimit-Reset": reset.toString(),
+        },
+      })
+    }
+  }
+}
 
 export default async function (req: Request, res: Response) {
   const proxy = createTRPCProxyClient<RootRouter>({
@@ -47,64 +72,50 @@ export default async function (req: Request, res: Response) {
   }
   void pushMessage(messages[messages.length - 1])
 
-  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
-    const ip = req.headers.get("x-forwarded-for")
-    const ratelimit = new Ratelimit({
-      redis: kv,
-      // rate limit to 1 requests per 20 seconds
-      limiter: Ratelimit.slidingWindow(3, "10s"),
-    })
-
-    const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
-
-    if (!success) {
-      return new Response("Hey man, you are too fast! Please slow down!", {
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": limit.toString(),
-          "X-RateLimit-Remaining": remaining.toString(),
-          "X-RateLimit-Reset": reset.toString(),
-        },
-      })
-    }
-  }
+  if (await validateRequest(req)) return
 
   // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     stream: true,
-    messages: messages.map((message: { content: string; role: PromptRoleType }) => ({
-      content: message.content,
-      role: message.role,
-    })),
+    messages: messages.map((m) => _.pick(m, ["role", "content"])),
   })
 
   if (response.status !== 200) {
-    const {
-      error: { message },
-    } = await response.json()
+    const { error } = await response.json()
+    console.error(error)
+    const { message } = error
     return NextResponse.json(message, { status: 500 })
   }
 
   const replyId = nanoid(7)
+  const extraData = new experimental_StreamData()
+  extraData.append({ replyId })
+
   // Convert the response into a friendly text-stream
   const stream = OpenAIStream(response, {
+    // 这个和 onFinal 是一样的
     onCompletion: (data) => {
       // console.log("onCompletion: ", { data })
     },
-    onStart: () => {
-      console.log("onStart: ")
-    },
+
+    // 这个是按词的
     onToken: (data) => {
       // console.log("onToken: ", { data })
     },
-    onFinal: (data) => {
+
+    // !important
+    experimental_streamData: true,
+
+    onFinal: (completion) => {
       // console.log("onFinal: ", { data })
-      void pushMessage({ content: data, role: PromptRoleType.assistant, id: replyId })
+      void pushMessage({ content: completion, role: PromptRoleType.assistant, id: replyId })
+
+      // !important
+      extraData.close()
     },
   })
 
-  const headers = { replyId }
   // Respond with the stream
-  return new StreamingTextResponse(stream, { headers })
+  return new StreamingTextResponse(stream, {}, extraData)
 }

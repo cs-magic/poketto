@@ -45,7 +45,7 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
   // console.log({ userId, appId, conversationId })
   const ScrollContainer = AutoScrollContainer
 
-  const { isLoading, messages, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
+  const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
     body: { userId, conversationId: cid },
@@ -65,11 +65,18 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
       // const latestId = await getLatestId({ conversationId })
 
       // 以下办法似乎每次都只能拿到旧的数据
-      const n = messages.length
+      // const n = messages.length
       // setMessages([...messages.slice(0, n - 1), { ...messages[n - 1]!, id: refMessage.current }])
     },
     id: cid,
   })
+
+  const triggerSubmit = (event) => {
+    // isComposing, ref: https://github.com/facebook/react/issues/13104
+    if (!(event as KeyboardEvent).isComposing)
+      // request submit, ref: https://stackoverflow.com/a/71478740
+      refForm.current!.requestSubmit()
+  }
 
   useEffect(() => {
     stop() // 防止串台
@@ -132,15 +139,8 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
           onChange={handleInputChange}
           id={"input"}
           onKeyDown={getHotkeyHandler([
-            [
-              "Enter",
-              (event) => {
-                // isComposing, ref: https://github.com/facebook/react/issues/13104
-                if (!(event as KeyboardEvent).isComposing)
-                  // request submit, ref: https://stackoverflow.com/a/71478740
-                  refForm.current!.requestSubmit()
-              },
-            ],
+            ["mod+Enter", triggerSubmit],
+            ["shift+Enter", triggerSubmit],
           ])}
         />
         <input className={"hidden"} name={"conversationUserId"} value={userId} />
@@ -193,7 +193,7 @@ export const ConversationMessages = ({ messages }: { messages: SelectChatMessage
 
               <div
                 className={clsx(
-                  "chat-header  inline-flex items-center gap-2 pb-2 text-xs opacity-50",
+                  "chat-header  inline-flex items-center gap-2 pb-2 text-xs opacity-50"
 
                   // "invisible group-hover:visible" // 不要加 hover 功能，否则无法复制文字了！
                   // "cursor-pointer"
