@@ -70,8 +70,6 @@ export const ChatMessageActionScalarFieldEnumSchema = z.enum(['id','createdAt','
 
 export const ConversationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','isActive','userId','appId','pinned']);
 
-export const DocumentScalarFieldEnumSchema = z.enum(['id','content','namespace']);
-
 export const FollowRelationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','fromId','toId']);
 
 export const InvitationRelationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','status','fromId','toId']);
@@ -300,18 +298,6 @@ export const ConversationSchema = z.object({
 })
 
 export type Conversation = z.infer<typeof ConversationSchema>
-
-/////////////////////////////////////////
-// DOCUMENT SCHEMA
-/////////////////////////////////////////
-
-export const DocumentSchema = z.object({
-  id: z.string().cuid(),
-  content: z.string(),
-  namespace: z.string().nullable(),
-})
-
-export type Document = z.infer<typeof DocumentSchema>
 
 /////////////////////////////////////////
 // FOLLOW RELATION SCHEMA
@@ -752,15 +738,6 @@ export const ConversationSelectSchema: z.ZodType<Prisma.ConversationSelect> = z.
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   app: z.union([z.boolean(),z.lazy(() => AppArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ConversationCountOutputTypeArgsSchema)]).optional(),
-}).strict()
-
-// DOCUMENT
-//------------------------------------------------------
-
-export const DocumentSelectSchema: z.ZodType<Prisma.DocumentSelect> = z.object({
-  id: z.boolean().optional(),
-  content: z.boolean().optional(),
-  namespace: z.boolean().optional(),
 }).strict()
 
 // FOLLOW RELATION
@@ -1824,51 +1801,6 @@ export const ConversationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   appId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   pinned: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
-}).strict();
-
-export const DocumentWhereInputSchema: z.ZodType<Prisma.DocumentWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => DocumentWhereInputSchema),z.lazy(() => DocumentWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => DocumentWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => DocumentWhereInputSchema),z.lazy(() => DocumentWhereInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  content: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-}).strict();
-
-export const DocumentOrderByWithRelationInputSchema: z.ZodType<Prisma.DocumentOrderByWithRelationInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  content: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-}).strict();
-
-export const DocumentWhereUniqueInputSchema: z.ZodType<Prisma.DocumentWhereUniqueInput> = z.object({
-  id: z.string().cuid()
-})
-.and(z.object({
-  id: z.string().cuid().optional(),
-  AND: z.union([ z.lazy(() => DocumentWhereInputSchema),z.lazy(() => DocumentWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => DocumentWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => DocumentWhereInputSchema),z.lazy(() => DocumentWhereInputSchema).array() ]).optional(),
-  content: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-}).strict());
-
-export const DocumentOrderByWithAggregationInputSchema: z.ZodType<Prisma.DocumentOrderByWithAggregationInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  content: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  _count: z.lazy(() => DocumentCountOrderByAggregateInputSchema).optional(),
-  _max: z.lazy(() => DocumentMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => DocumentMinOrderByAggregateInputSchema).optional()
-}).strict();
-
-export const DocumentScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.DocumentScalarWhereWithAggregatesInput> = z.object({
-  AND: z.union([ z.lazy(() => DocumentScalarWhereWithAggregatesInputSchema),z.lazy(() => DocumentScalarWhereWithAggregatesInputSchema).array() ]).optional(),
-  OR: z.lazy(() => DocumentScalarWhereWithAggregatesInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => DocumentScalarWhereWithAggregatesInputSchema),z.lazy(() => DocumentScalarWhereWithAggregatesInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  content: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  namespace: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
 export const FollowRelationWhereInputSchema: z.ZodType<Prisma.FollowRelationWhereInput> = z.object({
@@ -3223,48 +3155,6 @@ export const ConversationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Conver
   pinned: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const DocumentCreateInputSchema: z.ZodType<Prisma.DocumentCreateInput> = z.object({
-  id: z.string().cuid().optional(),
-  content: z.string(),
-  namespace: z.string().optional().nullable()
-}).strict();
-
-export const DocumentUncheckedCreateInputSchema: z.ZodType<Prisma.DocumentUncheckedCreateInput> = z.object({
-  id: z.string().cuid().optional(),
-  content: z.string(),
-  namespace: z.string().optional().nullable()
-}).strict();
-
-export const DocumentUpdateInputSchema: z.ZodType<Prisma.DocumentUpdateInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
-export const DocumentUncheckedUpdateInputSchema: z.ZodType<Prisma.DocumentUncheckedUpdateInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
-export const DocumentCreateManyInputSchema: z.ZodType<Prisma.DocumentCreateManyInput> = z.object({
-  id: z.string().cuid().optional(),
-  content: z.string(),
-  namespace: z.string().optional().nullable()
-}).strict();
-
-export const DocumentUpdateManyMutationInputSchema: z.ZodType<Prisma.DocumentUpdateManyMutationInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
-export const DocumentUncheckedUpdateManyInputSchema: z.ZodType<Prisma.DocumentUncheckedUpdateManyInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  content: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
 export const FollowRelationCreateInputSchema: z.ZodType<Prisma.FollowRelationCreateInput> = z.object({
   id: z.string().cuid().optional(),
   createdAt: z.coerce.date().optional(),
@@ -4568,24 +4458,6 @@ export const ConversationMinOrderByAggregateInputSchema: z.ZodType<Prisma.Conver
   userId: z.lazy(() => SortOrderSchema).optional(),
   appId: z.lazy(() => SortOrderSchema).optional(),
   pinned: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const DocumentCountOrderByAggregateInputSchema: z.ZodType<Prisma.DocumentCountOrderByAggregateInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  content: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const DocumentMaxOrderByAggregateInputSchema: z.ZodType<Prisma.DocumentMaxOrderByAggregateInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  content: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const DocumentMinOrderByAggregateInputSchema: z.ZodType<Prisma.DocumentMinOrderByAggregateInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  content: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const FollowRelationCountOrderByAggregateInputSchema: z.ZodType<Prisma.FollowRelationCountOrderByAggregateInput> = z.object({
@@ -12210,63 +12082,6 @@ export const ConversationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Conversat
   where: ConversationWhereUniqueInputSchema,
 }).strict()
 
-export const DocumentFindFirstArgsSchema: z.ZodType<Prisma.DocumentFindFirstArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereInputSchema.optional(),
-  orderBy: z.union([ DocumentOrderByWithRelationInputSchema.array(),DocumentOrderByWithRelationInputSchema ]).optional(),
-  cursor: DocumentWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-  distinct: z.union([ DocumentScalarFieldEnumSchema,DocumentScalarFieldEnumSchema.array() ]).optional(),
-}).strict()
-
-export const DocumentFindFirstOrThrowArgsSchema: z.ZodType<Prisma.DocumentFindFirstOrThrowArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereInputSchema.optional(),
-  orderBy: z.union([ DocumentOrderByWithRelationInputSchema.array(),DocumentOrderByWithRelationInputSchema ]).optional(),
-  cursor: DocumentWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-  distinct: z.union([ DocumentScalarFieldEnumSchema,DocumentScalarFieldEnumSchema.array() ]).optional(),
-}).strict()
-
-export const DocumentFindManyArgsSchema: z.ZodType<Prisma.DocumentFindManyArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereInputSchema.optional(),
-  orderBy: z.union([ DocumentOrderByWithRelationInputSchema.array(),DocumentOrderByWithRelationInputSchema ]).optional(),
-  cursor: DocumentWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-  distinct: z.union([ DocumentScalarFieldEnumSchema,DocumentScalarFieldEnumSchema.array() ]).optional(),
-}).strict()
-
-export const DocumentAggregateArgsSchema: z.ZodType<Prisma.DocumentAggregateArgs> = z.object({
-  where: DocumentWhereInputSchema.optional(),
-  orderBy: z.union([ DocumentOrderByWithRelationInputSchema.array(),DocumentOrderByWithRelationInputSchema ]).optional(),
-  cursor: DocumentWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-}).strict()
-
-export const DocumentGroupByArgsSchema: z.ZodType<Prisma.DocumentGroupByArgs> = z.object({
-  where: DocumentWhereInputSchema.optional(),
-  orderBy: z.union([ DocumentOrderByWithAggregationInputSchema.array(),DocumentOrderByWithAggregationInputSchema ]).optional(),
-  by: DocumentScalarFieldEnumSchema.array(),
-  having: DocumentScalarWhereWithAggregatesInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-}).strict()
-
-export const DocumentFindUniqueArgsSchema: z.ZodType<Prisma.DocumentFindUniqueArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereUniqueInputSchema,
-}).strict()
-
-export const DocumentFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.DocumentFindUniqueOrThrowArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereUniqueInputSchema,
-}).strict()
-
 export const FollowRelationFindFirstArgsSchema: z.ZodType<Prisma.FollowRelationFindFirstArgs> = z.object({
   select: FollowRelationSelectSchema.optional(),
   include: FollowRelationIncludeSchema.optional(),
@@ -13104,43 +12919,6 @@ export const ConversationUpdateManyArgsSchema: z.ZodType<Prisma.ConversationUpda
 
 export const ConversationDeleteManyArgsSchema: z.ZodType<Prisma.ConversationDeleteManyArgs> = z.object({
   where: ConversationWhereInputSchema.optional(),
-}).strict()
-
-export const DocumentCreateArgsSchema: z.ZodType<Prisma.DocumentCreateArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  data: z.union([ DocumentCreateInputSchema,DocumentUncheckedCreateInputSchema ]),
-}).strict()
-
-export const DocumentUpsertArgsSchema: z.ZodType<Prisma.DocumentUpsertArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereUniqueInputSchema,
-  create: z.union([ DocumentCreateInputSchema,DocumentUncheckedCreateInputSchema ]),
-  update: z.union([ DocumentUpdateInputSchema,DocumentUncheckedUpdateInputSchema ]),
-}).strict()
-
-export const DocumentCreateManyArgsSchema: z.ZodType<Prisma.DocumentCreateManyArgs> = z.object({
-  data: z.union([ DocumentCreateManyInputSchema,DocumentCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict()
-
-export const DocumentDeleteArgsSchema: z.ZodType<Prisma.DocumentDeleteArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  where: DocumentWhereUniqueInputSchema,
-}).strict()
-
-export const DocumentUpdateArgsSchema: z.ZodType<Prisma.DocumentUpdateArgs> = z.object({
-  select: DocumentSelectSchema.optional(),
-  data: z.union([ DocumentUpdateInputSchema,DocumentUncheckedUpdateInputSchema ]),
-  where: DocumentWhereUniqueInputSchema,
-}).strict()
-
-export const DocumentUpdateManyArgsSchema: z.ZodType<Prisma.DocumentUpdateManyArgs> = z.object({
-  data: z.union([ DocumentUpdateManyMutationInputSchema,DocumentUncheckedUpdateManyInputSchema ]),
-  where: DocumentWhereInputSchema.optional(),
-}).strict()
-
-export const DocumentDeleteManyArgsSchema: z.ZodType<Prisma.DocumentDeleteManyArgs> = z.object({
-  where: DocumentWhereInputSchema.optional(),
 }).strict()
 
 export const FollowRelationCreateArgsSchema: z.ZodType<Prisma.FollowRelationCreateArgs> = z.object({

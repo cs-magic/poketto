@@ -1,5 +1,5 @@
 import { PlatformType, type User as PrismaUser } from ".prisma/client"
-import { allowDangerousEmailAccountLinking } from "@/config"
+import { allowDangerousEmailAccountLinking } from "@/config-const"
 import { env } from "@/env.mjs"
 import { prisma } from "@/server/db"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
@@ -35,6 +35,7 @@ declare module "next-auth" {
     platformId: string
     platformType: PlatformType
   }
+
   /**
    * Usually contains information about the provider being used
    * and also extends `TokenSet`, which is different tokens returned by OAuth Providers.
@@ -48,16 +49,23 @@ const { createUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as Prism
 
 const adapter: NextAuthAdapter = {
   /**
-     * example user:
-     image: "https://avatars.githubusercontent.com/u/33591398?v=4"
-     platformId: "33591398"
-     platformType: "Poketto"
-     emailVerified: null
-     */
+   * example user:
+   image: "https://avatars.githubusercontent.com/u/33591398?v=4"
+   platformId: "33591398"
+   platformType: "Poketto"
+   emailVerified: null
+   */
   createUser: async (user) => {
     console.log("creating user: ", { user })
     // 有可能会重新插入！！！
-    const existed = await prisma.user.findUnique({ where: { platform: { platformId: user.platformId, platformType: user.platformType } } })
+    const existed = await prisma.user.findUnique({
+      where: {
+        platform: {
+          platformId: user.platformId,
+          platformType: user.platformType,
+        },
+      },
+    })
     return (existed ? existed : await initUser(prisma, user)) as AdapterUser
   },
   ...adapterExtra,

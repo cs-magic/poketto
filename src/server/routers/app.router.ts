@@ -1,4 +1,4 @@
-import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
+import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config-const"
 import { selectAppForDetailView, selectAppForListView, sortOrders } from "@/ds"
 import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
 import { z } from "zod"

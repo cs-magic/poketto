@@ -1,7 +1,6 @@
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
-import { PrismaClient, Prisma, Document, ChatMessage } from "@prisma/client"
-import ChatMessageWhereInput = Prisma.ChatMessageWhereInput
+import { ChatMessage, Prisma, PrismaClient } from "@prisma/client"
 
 export const run = async () => {
   const db = new PrismaClient()

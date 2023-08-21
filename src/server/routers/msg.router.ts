@@ -5,14 +5,29 @@ import { PrismaVectorStore } from "langchain/vectorstores/prisma"
 import { ChatMessage } from "@prisma/client"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { Prisma } from ".prisma/client"
+import { DEFAULT_LATEST_COUNT } from "@/config-const"
+import _ from "lodash"
+import { CreateMessage } from "ai"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {
-    return prisma.chatMessage.create({ data: input })
+    const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
+      prisma: Prisma,
+      tableName: "ChatMessage",
+      vectorColumnName: "vector",
+      columns: {
+        id: PrismaVectorStore.IdColumn,
+        content: PrismaVectorStore.ContentColumn,
+        role: PrismaVectorStore.ContentColumn,
+      },
+    })
+    const model = await prisma.chatMessage.create({ data: input })
+    await vectorStore.addModels([model])
+    return model
   }),
 
-  searchSimilar: publicProcedure
+  getContext: publicProcedure
     .input(z.object({ conversationId: z.string(), content: z.string(), count: z.number().default(5) }))
     .query(async ({ ctx: { prisma }, input: { conversationId, content, count } }) => {
       const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
@@ -30,8 +45,15 @@ export const msgRouter = createTRPCRouter({
           },
         },
       })
-      const result = await vectorStore.similaritySearch(content, count)
-      return result.map((x) => x.metadata)
+      const similar = (await vectorStore.similaritySearch(content, count)).map((m) => m.metadata)
+      const latest = await prisma.chatMessage.findMany({
+        where: { conversationId },
+        take: DEFAULT_LATEST_COUNT,
+        orderBy: { id: "desc" },
+      })
+      // todo: max token control
+      // lodash 不能在 edge 里使用
+      return _.sortedUniqBy([...similar, ...latest.reverse()], "id") as CreateMessage[]
     }),
 
   list: protectedProcedure.input(ChatMessageWhereInputSchema).query(

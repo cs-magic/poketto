@@ -21,7 +21,8 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import _ from "lodash"
-import { COMMANDS, ICON_DIMENSION_SM, navs, PRODUCT } from "@/config"
+import { ICON_DIMENSION_SM, PRODUCT } from "@/config-const"
+import { COMMANDS, navs } from "@/config-utils"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()

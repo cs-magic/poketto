@@ -8,7 +8,7 @@ import clsx from "@/lib/clsx"
 
 import "@/styles/globals.css"
 import Head from "next/head"
-import { PRODUCT } from "@/config"
+import { PRODUCT } from "@/config-const"
 import { font } from "@/lib/assets"
 import { type ExtendedAppProps } from "@/ds"
 

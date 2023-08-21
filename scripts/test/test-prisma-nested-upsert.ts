@@ -1,4 +1,4 @@
-import { POKETTO_APP_ID, POKETTO_APP_NAME, POKETTO_SYSTEM_PROMPT, POKETTO_WELCOME_MESSAGE, USER_INVITATIONS_COUNT } from "@/config"
+import { POKETTO_APP_ID, POKETTO_APP_NAME, POKETTO_SYSTEM_PROMPT, POKETTO_WELCOME_MESSAGE, USER_INVITATIONS_COUNT } from "@/config-const"
 import { getWelcomeSystemNotification } from "@/lib/string"
 import { ChatMessageFormatType, PlatformType, Prisma, PrismaClient, PromptRoleType } from ".prisma/client"
 import _ from "lodash"

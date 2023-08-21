@@ -1,7 +1,7 @@
 import { api } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-import { DEFAULT_BATCH_CARDS, URI } from "@/config"
+import { DEFAULT_BATCH_CARDS, URI } from "@/config-const"
 import { Button } from "@/components/ui/button"
 import { ArrowRightIcon, SymbolIcon } from "@radix-ui/react-icons"
 import _ from "lodash"

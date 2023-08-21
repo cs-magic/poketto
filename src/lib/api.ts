@@ -9,7 +9,7 @@ import { createTRPCNext } from "@trpc/next"
 import { type inferRouterInputs, type inferRouterOutputs, type TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { type RootRouter } from "@/server/trpc.router"
-import { URI } from "@/config"
+import { URI } from "@/config-const"
 import { toast } from "sonner"
 
 const getBaseUrl = () => {

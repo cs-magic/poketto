@@ -5,7 +5,7 @@ import { api } from "@/lib/api"
 import { InvitationStatus } from ".prisma/client"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
-import { ICON_DIMENSION_MD, navs, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config"
+import { ICON_DIMENSION_MD, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config-const"
 import { useMustache } from "@/hooks/use-mustache"
 import { useAppStore } from "@/store"
 import { useSessionUser } from "@/hooks/use-user"
@@ -16,6 +16,7 @@ import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
+import { navs } from "@/config-utils"
 
 export const InviteCard = () => {
   const { data = [] } = api.invitation.list.useQuery()

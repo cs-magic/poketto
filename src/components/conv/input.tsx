@@ -23,7 +23,6 @@ import { useMustache } from "@/hooks/use-mustache"
 import { useUrl } from "@/hooks/use-url"
 import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
 import clsx from "@/lib/clsx"
-import { contentStyleBasedOnRole } from "@/config"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +32,9 @@ import Link from "next/link"
 import { AutoScrollContainer } from "@/components/containers"
 import { ChatMessage } from "@prisma/client"
 import { nanoid } from "ai"
+import { contentStyleBasedOnRole } from "@/config-utils"
+import { Button } from "@/components/ui/button"
+import { SendIcon } from "lucide-react"
 
 export const ConversationInput = ({ cid }: { cid: string }) => {
   const userId = useUserId()
@@ -130,7 +132,7 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
 
       <form
         ref={refForm}
-        className={clsx("w-full  gap-2", "flex items-center justify-center")}
+        className={clsx("w-full gap-2 p-4", "flex items-center justify-center")}
         onSubmit={(event) => {
           console.log({ hasApp })
           if (!hasApp) {
@@ -143,7 +145,7 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
         <Textarea
           style={{ resize: "none" }} // 去掉尾部的 icon，不然视觉上不和谐
           name={"prompt"}
-          className={"w-full rounded-xl m-4"}
+          className={"w-full rounded-xl min-h-8 lg:min-h-16"}
           autoFocus
           value={input}
           onChange={handleInputChange}
@@ -155,6 +157,10 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
         />
         <input className={"hidden"} name={"conversationUserId"} value={userId} />
         <input className={"hidden"} name={"conversationAppId"} value={cid} />
+
+        <Button className={"lg:hidden flex items-center justify-center"} variant={"ghost"} type={"submit"}>
+          <SendIcon />
+        </Button>
       </form>
     </div>
   )
@@ -201,7 +207,8 @@ export const ConversationMessages = ({ messages }: { messages: AllMessage[] }) =
             <div
               className={clsx(
                 "chat-header  inline-flex items-center gap-2 pb-2 text-xs opacity-50",
-                "hidden group-hover:flex" // 不要加 hover 功能，否则无法复制文字了！
+                "hidden"
+                // "group-hover:flex" // 不要加 hover 功能，否则无法复制文字了！
                 // "cursor-pointer"
               )}
               // onClick={() => {

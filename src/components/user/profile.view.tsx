@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getLocalFlowgptImageUri } from "@/lib/string"
-import { DEFAULT_USER_AVATAR, DEFAULT_USER_ID, DEFAULT_USER_NAME } from "@/config"
+import { DEFAULT_USER_ID, DEFAULT_USER_NAME } from "@/config-const"
 import { IconUser } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -13,7 +13,7 @@ export const UserProfile = ({ user }: { user: UserForProfile }) => {
   return (
     <div className={"| mx-auto flex h-fit max-w-[375px] flex-col justify-around gap-4 rounded-2xl p-4"}>
       <Avatar className={"mx-auto wh-[256px]"}>
-        <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? DEFAULT_USER_AVATAR, "md")} className={""} />
+        <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? user.id, "md")} className={""} />
         <AvatarFallback>
           <IconUser />
         </AvatarFallback>

@@ -1,4 +1,4 @@
-import { CreateMessage, type Message, StreamingTextResponse } from "ai"
+import { type Message, StreamingTextResponse } from "ai"
 import { env } from "@/env.mjs"
 import { Prisma } from ".prisma/client"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
@@ -6,16 +6,20 @@ import { type RootRouter } from "@/server/trpc.router"
 import superjson from "superjson"
 
 import { nanoid } from "@/lib/id"
-import _ from "lodash" // Create an OpenAI API client (that's edge friendly!)
 import { PromptTemplate } from "langchain/prompts"
 import { ChatOpenAI } from "langchain/chat_models/openai"
 import { BytesOutputParser } from "langchain/schema/output_parser"
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
-import { CHAT_MESSAGE_CID_LEN, DEFAULT_LATEST_COUNT, DEFAULT_SIMILAR_COUNT, DEFAULT_TEMPERATURE } from "@/config"
-import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
+import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config-const"
+import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 
-// IMPORTANT! Set the runtime to edge
-export const runtime = "edge"
+// allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
+export const config = {
+  runtime: "edge", // IMPORTANT! Set the runtime to edge
+  unstable_allowDynamic: [
+    "**/node_modules/lodash/_root.js", // use a glob to allow anything in the function-bind 3rd party module
+  ],
+}
 
 export default async function (req: Request, res: Response) {
   /**
@@ -56,10 +60,8 @@ export default async function (req: Request, res: Response) {
    * 3. 读取 memory: p ∪ q 条记忆;  p=5: 过往最相关记忆; q=4: 最新记忆
    */
   const { content } = messages[messages.length - 1]
-  const similar = await proxy.message.searchSimilar.query({ content, conversationId, count: DEFAULT_SIMILAR_COUNT })
-  // todo: max token control
-  const context: CreateMessage[] = _.sortedUniqBy([...similar, ...messages.slice(-(DEFAULT_LATEST_COUNT + 1), -1)], "id")
-  console.log({ conversationId, content, similar, context })
+  const context = await proxy.message.getContext.query({ conversationId, content })
+  console.log({ conversationId, content, context })
 
   const model = new ChatOpenAI({
     openAIApiKey: env.OPENAI_API_KEY,

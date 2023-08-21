@@ -1,5 +1,5 @@
 import { capitalize } from "lodash"
-import { FLOWGPT_IMAGE_DIR } from "@/config"
+import { FLOWGPT_IMAGE_DIR } from "@/config-const"
 import hash from "js-sha1"
 
 import { type IMAGE_SIZE } from "@/ds"
@@ -41,5 +41,6 @@ export const getWelcomeSystemNotification = (userName: string, appName?: string)
 
 export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
   if (uri.startsWith("/") || size === "raw") return uri
-  return `${FLOWGPT_IMAGE_DIR}/thumbs/${size}/${hash(uri)}.jpg`
+  if (uri.startsWith("http")) return `${FLOWGPT_IMAGE_DIR}/thumbs/${size}/${hash(uri)}.jpg`
+  return getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
 }

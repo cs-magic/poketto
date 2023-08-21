@@ -2,13 +2,14 @@ import React, { type PropsWithChildren, ReactNode, useEffect } from "react"
 import Navbar from "@/layouts/navbar"
 import { useMount } from "@/hooks/use-mount"
 import clsx from "@/lib/clsx"
-import { navs, URI } from "@/config"
+import { URI } from "@/config-const"
 import { FooterNavItem } from "@/components/link"
 import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import { useAppStore } from "@/store"
 
 import { Sidebar } from "@/layouts/sidebar"
+import { navs } from "@/config-utils"
 
 export const MobileLayout = (props: PropsWithChildren) => {
   return (
