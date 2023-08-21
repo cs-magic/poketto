@@ -18,9 +18,9 @@ generator json {
   // (e.g.  export namespace PrismaJson { export type MyType = {a: 1, b: 2} }; will generate namespace.MyType["TYPE HERE"])
 }
 
- generator zod {
-   provider         = "zod-prisma-types"
- }
+generator zod {
+  provider = "zod-prisma-types"
+}
 
 datasource db {
   provider = "postgresql"
@@ -175,6 +175,7 @@ model ChatMessage {
   conversationId String
 
   shortId String @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
+
   @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
 }
 
@@ -257,6 +258,13 @@ model StarringApp {
   userId String
 }
 
+model Transcation {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @db.VarChar(5)
+}
+
 model User {
   id String @id @default(dbgenerated("nanoid()")) @db.VarChar(5)
 
@@ -299,6 +307,7 @@ model User {
   createdApps App[]
 
   conversations Conversation[]
+  Transcation   Transcation[]
 
   // maybe we only need one id
   @@unique([platformType, platformId], name: "platform")

@@ -194,7 +194,8 @@ export const ConversationMessages = ({ messages }: { messages: SelectChatMessage
               <div
                 className={clsx(
                   "chat-header  inline-flex items-center gap-2 pb-2 text-xs opacity-50",
-                  "invisible group-hover:visible"
+
+                  // "invisible group-hover:visible" // 不要加 hover 功能，否则无法复制文字了！
                   // "cursor-pointer"
                 )}
                 // onClick={() => {
