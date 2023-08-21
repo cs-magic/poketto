@@ -1,12 +1,38 @@
 import { z } from "zod"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
 import { ChatMessageWhereInputSchema, ChatMessageUncheckedCreateInputSchema } from "prisma/generated/zod"
+import { PrismaVectorStore } from "langchain/vectorstores/prisma"
+import { ChatMessage } from "@prisma/client"
+import { OpenAIEmbeddings } from "langchain/embeddings/openai"
+import { Prisma } from ".prisma/client"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {
     return prisma.chatMessage.create({ data: input })
   }),
+
+  searchSimilar: publicProcedure
+    .input(z.object({ conversationId: z.string(), content: z.string(), count: z.number().default(5) }))
+    .query(async ({ ctx: { prisma }, input: { conversationId, content, count } }) => {
+      const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
+        prisma: Prisma,
+        tableName: "ChatMessage",
+        vectorColumnName: "vector",
+        columns: {
+          id: PrismaVectorStore.IdColumn,
+          content: PrismaVectorStore.ContentColumn,
+          role: PrismaVectorStore.ContentColumn,
+        },
+        filter: {
+          conversationId: {
+            equals: conversationId,
+          },
+        },
+      })
+      const result = await vectorStore.similaritySearch(content, count)
+      return result.map((x) => x.metadata)
+    }),
 
   list: protectedProcedure.input(ChatMessageWhereInputSchema).query(
     async ({

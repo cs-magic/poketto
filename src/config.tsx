@@ -234,3 +234,8 @@ export const contentStyleBasedOnRole: Record<PromptRoleType, string> = {
   user: "bg-green-600 text-black",
   assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
 }
+
+export const DEFAULT_SIMILAR_COUNT = 5
+export const DEFAULT_LATEST_COUNT = 4
+export const DEFAULT_TEMPERATURE = 0.9
+export const CHAT_MESSAGE_CID_LEN = 7 // ai-sdk

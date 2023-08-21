@@ -1,0 +1,29 @@
+import { PrismaVectorStore } from "langchain/vectorstores/prisma"
+import { OpenAIEmbeddings } from "langchain/embeddings/openai"
+import { PrismaClient, Prisma, Document, ChatMessage } from "@prisma/client"
+import ChatMessageWhereInput = Prisma.ChatMessageWhereInput
+
+export const run = async () => {
+  const db = new PrismaClient()
+
+  console.log("init vector store")
+  const vectorStore = PrismaVectorStore.withModel<ChatMessage>(db).create(new OpenAIEmbeddings(), {
+    prisma: Prisma,
+    tableName: "ChatMessage",
+    vectorColumnName: "vector",
+    columns: {
+      id: PrismaVectorStore.IdColumn,
+      content: PrismaVectorStore.ContentColumn,
+      role: PrismaVectorStore.ContentColumn,
+    },
+  })
+
+  console.log("creating vectors")
+  await vectorStore.addModels(await db.chatMessage.findMany())
+
+  console.log("finding...")
+  const result = await vectorStore.similaritySearch("MarkShawn2020", 3)
+  console.log(result)
+}
+
+void run()

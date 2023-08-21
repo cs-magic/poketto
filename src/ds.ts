@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client"
+import { ChatMessageFormatType, Prisma, PromptRoleType } from ".prisma/client"
 import { type NextComponentType, type NextPage, type NextPageContext } from "next"
 import { type AppProps } from "next/app"
 import { type Session } from "next-auth"
@@ -14,6 +14,7 @@ import AppSelect = Prisma.AppSelect
 import UserSelect = Prisma.UserSelect
 import ChatMessageSelect = Prisma.ChatMessageSelect
 import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
+import { RoleTypeType } from "../prisma/generated/zod"
 
 // -----------------------------------------------------------------------------
 // general
@@ -129,6 +130,12 @@ export const selectChatMessageForListView = validator<ChatMessageSelect>()({
   },
 })
 export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeof selectChatMessageForListView }>
+export type AllMessage =
+  | SelectChatMessageForListView
+  | {
+      systemType: "notification" | "date"
+      content: string
+    }
 
 ///////////////////////////
 // next-auth

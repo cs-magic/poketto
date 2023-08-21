@@ -176,6 +176,10 @@ model ChatMessage {
 
   shortId String @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
 
+  // ref: https://js.langchain.com/docs/modules/data_connection/vectorstores/integrations/prisma
+  namespace String?                @default("default")
+  vector    Unsupported("vector")?
+
   @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
 }
 
