@@ -5,7 +5,7 @@ import { PrismaVectorStore } from "langchain/vectorstores/prisma"
 import { ChatMessage } from "@prisma/client"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { Prisma } from ".prisma/client"
-import { DEFAULT_LATEST_COUNT } from "@/config-const"
+import { DEFAULT_LATEST_COUNT } from "@/config"
 import _ from "lodash"
 import { CreateMessage } from "ai"
 

@@ -7,7 +7,7 @@ import clsx from "@/lib/clsx"
 
 import "@/styles/globals.css"
 import Head from "next/head"
-import { siteConfig } from "@/config-const"
+import { siteConfig } from "@/config"
 import { font } from "@/lib/assets"
 import { type ExtendedAppProps } from "@/ds"
 import { ThemeProvider } from "@/components/theme-provider"

@@ -18,6 +18,7 @@ export default function HomePage() {
     <RootLayout>
       <div className={"h-full w-full overflow-auto"}>
         <RecentConversations />
+
         <ExploreAppsWidget />
       </div>
     </RootLayout>

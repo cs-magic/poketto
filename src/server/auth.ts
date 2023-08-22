@@ -1,5 +1,5 @@
 import { PlatformType } from ".prisma/client"
-import { allowDangerousEmailAccountLinking, URI } from "@/config-const"
+import { allowDangerousEmailAccountLinking, URI } from "@/config"
 import { env } from "@/env.mjs"
 import { type GetServerSidePropsContext } from "next"
 import EmailProvider from "next-auth/providers/email"
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
     // },
 
     async session({ token, session }) {
-      console.log("session: ", { token, session })
+      // console.log("session: ", { token, session })
       if (token) {
         session.user.id = token.sub! // 不要 token.id 了，妈的
         session.user.name = token.name

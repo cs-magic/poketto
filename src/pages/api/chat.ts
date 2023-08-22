@@ -10,7 +10,7 @@ import { PromptTemplate } from "langchain/prompts"
 import { ChatOpenAI } from "langchain/chat_models/openai"
 import { BytesOutputParser } from "langchain/schema/output_parser"
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
-import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config-const"
+import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
@@ -96,6 +96,7 @@ AI:`)
     history: context.map((m) => `${m.role}: ${m.content}`).join("\n"),
     input: content,
 
+    // todo: !important fix onFinal of `langchain.stream`
     onFinal: (completion) => {
       console.log("onFinal: ", { data })
       void pushMessage({ content: completion, role: PromptRoleType.assistant, id: replyId })

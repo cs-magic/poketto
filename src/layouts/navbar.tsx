@@ -3,7 +3,7 @@ import { useTheme } from "next-themes"
 import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMount } from "@/hooks/use-mount"
-import { BellIcon, GearIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
+import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { SidebarNavItem } from "@/components/link"
 import { Button } from "@/components/ui/button"
@@ -20,9 +20,11 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import _ from "lodash"
-import { ICON_DIMENSION_SM, siteConfig } from "@/config-const"
+import { ICON_DIMENSION_SM, siteConfig } from "@/config"
 import { COMMANDS, navs } from "@/config-utils"
 import { Icons } from "@/components/icons"
+import { ChargeContainer } from "@/components/containers"
+import { todo } from "@/lib/helpers"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()
@@ -63,7 +65,19 @@ export default function Navbar() {
       <div className={"grow"} />
       <CommandDemo />
 
-      <div className={"hidden items-center md:flex"}>
+      <div className={"hidden items-center md:flex mx-2"}>
+        <ChargeContainer>
+          <IconContainer>
+            <LightningBoltIcon />
+          </IconContainer>
+        </ChargeContainer>
+
+        <ThemeSwitcher />
+
+        <IconContainer>
+          <BellIcon />
+        </IconContainer>
+
         <Popover>
           <PopoverTrigger>
             <IconContainer>
@@ -80,12 +94,6 @@ export default function Navbar() {
             </section>
           </PopoverContent>
         </Popover>
-
-        <ThemeSwitcher />
-
-        <IconContainer>
-          <BellIcon />
-        </IconContainer>
 
         <IconContainer>
           <GearIcon />

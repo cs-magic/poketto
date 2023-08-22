@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getLocalFlowgptImageUri } from "@/lib/string"
-import { DEFAULT_USER_ID, DEFAULT_USER_NAME } from "@/config-const"
+import { DEFAULT_USER_ID, DEFAULT_USER_NAME } from "@/config"
 import { IconUser } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -8,6 +8,9 @@ import { todo } from "@/lib/helpers"
 import { signIn, signOut } from "next-auth/react"
 import React from "react"
 import { type UserForProfile } from "@/ds"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import StripePricingTable from "@/components/stripe/pricing-table"
+import { ChargeContainer } from "@/components/containers"
 
 export const UserProfile = ({ user }: { user: UserForProfile }) => {
   return (
@@ -59,9 +62,11 @@ export const UserProfile = ({ user }: { user: UserForProfile }) => {
               编辑简介
             </Button>
 
-            <Button variant={"outline"} disabled={!user} onClick={todo}>
-              充值
-            </Button>
+            <ChargeContainer>
+              <Button variant={"outline"} disabled={!user}>
+                充值
+              </Button>
+            </ChargeContainer>
 
             <Button variant={"ghost"} onClick={() => void signOut()}>
               退出登录

@@ -3,7 +3,7 @@ import { IconEye, IconGitFork } from "@tabler/icons-react"
 import numeral from "numeral"
 import clsx from "@/lib/clsx"
 import { BookmarkFilledIcon, EyeOpenIcon, VideoIcon } from "@radix-ui/react-icons"
-import { ICON_DIMENSION_SM } from "@/config-const"
+import { ICON_DIMENSION_SM } from "@/config"
 
 export const ResponsiveField = ({
   icon,

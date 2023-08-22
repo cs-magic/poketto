@@ -16,7 +16,7 @@ import {
   POKETTO_SYSTEM_PROMPT,
   POKETTO_WELCOME_MESSAGE,
   USER_INVITATIONS_COUNT,
-} from "@/config-const"
+} from "@/config"
 import log from "@/lib/log"
 import { PlatformType, PromptRoleType } from "@prisma/client"
 import { getWelcomeSystemNotification } from "@/lib/string"

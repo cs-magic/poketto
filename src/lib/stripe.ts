@@ -3,7 +3,10 @@ import "server-only"
 
 import Stripe from "stripe"
 
-export const stripe = new Stripe(env.STRIPE_API_KEY as string, {
+const key = env.STRIPE_API_KEY as string
+console.log({ key })
+
+export const stripe = new Stripe(key, {
   // https://github.com/stripe/stripe-node#configuration
   apiVersion: "2023-08-16",
   appInfo: {

@@ -9,6 +9,8 @@ const config = {
 
   experimental: {
     // typedRoutes: true // too strict, since we have a dozen of json uri
+    serverActions: true
+
   },
 
   reactStrictMode: true,

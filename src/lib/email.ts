@@ -7,7 +7,7 @@ import { env } from "@/env.mjs"
 import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses"
 import path from "path"
 import fs from "fs"
-import { AWS_REGION, emailProvider, siteConfig } from "@/config-const"
+import { AWS_REGION, emailProvider, siteConfig } from "@/config"
 
 // @ts-ignore
 const isAws = emailProvider === "aws"

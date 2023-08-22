@@ -3,6 +3,8 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import clsx from "@/lib/clsx"
 import { type DEVICE_TYPE, DEVICES } from "@/lib/device"
 import ScrollToBottom from "react-scroll-to-bottom"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import StripePricingTable from "@/components/stripe/pricing-table"
 
 export const GridContainer = ({ children }: PropsWithChildren) => {
   return (
@@ -100,3 +102,14 @@ export const AutoScrollContainer = ({ children }: PropsWithChildren) => (
     {children}
   </ScrollToBottom>
 )
+
+export const ChargeContainer = ({ children }: PropsWithChildren) => {
+  return (
+    <Dialog>
+      <DialogTrigger>{children}</DialogTrigger>
+      <DialogContent className={"w-full max-w-[1080px] max-h-[80vh] overflow-auto"}>
+        <StripePricingTable />
+      </DialogContent>
+    </Dialog>
+  )
+}

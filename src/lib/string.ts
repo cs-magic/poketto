@@ -1,5 +1,5 @@
 import { capitalize } from "lodash"
-import { FLOWGPT_IMAGE_DIR } from "@/config-const"
+import { FLOWGPT_IMAGE_DIR } from "@/config"
 import hash from "js-sha1"
 
 import { type IMAGE_SIZE } from "@/ds"

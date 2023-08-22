@@ -1,3 +1,15 @@
+## stripe
+
+- pricing table (embedded)
+    - 重点参考里面的 react 环节，以及小心 typescript
+      部分的声明： https://stripe.com/docs/payments/checkout/pricing-table#embed
+    -
+
+- 捐款 demo （nextjs + Element): https://github.com/vercel/next.js/tree/canary/examples/with-stripe-typescript
+    - ![img.png](stripe-donate-demo.png)
+    - 但是里面的 `Element` 总是出不来：
+        - ![img.png](eleent-not-show.png)
+
 ## next-auth
 
 ### bug: server-error

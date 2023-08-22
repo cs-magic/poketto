@@ -3,7 +3,7 @@ import { IconLayoutDashboard } from "@tabler/icons-react"
 import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import React from "react"
 import { PromptRoleType } from ".prisma/client"
-import { NavKey, URI } from "@/config-const"
+import { NavKey, URI } from "@/config"
 import { Icons } from "@/components/icons"
 
 export const COMMANDS: ICommandItem[] = [
