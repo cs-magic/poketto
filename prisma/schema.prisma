@@ -357,6 +357,7 @@ enum PlatformType {
   OpenChat
 
   // align for next-auth
+  email
   github
   discord
   google
