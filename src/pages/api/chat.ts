@@ -11,10 +11,8 @@ import { ChatOpenAI } from "langchain/chat_models/openai"
 import { BytesOutputParser } from "langchain/schema/output_parser"
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
+import { LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
-import { BaseCallbackHandler } from "langchain/callbacks"
-import { Serialized } from "langchain/dist/load/serializable"
-import { AgentAction, AgentFinish, ChainValues, LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
 
@@ -66,22 +64,17 @@ export default async function (req: Request, res: Response) {
       {
         handleLLMEnd(output: LLMResult, runId: string, parentRunId?: string, tags?: string[]): Promise<void> | void {
           // console.log("LLMEnd: ", JSON.stringify({ output, runId, parentRunId, tags }, null, 2))
-          const content = output.generations // {text: string}[][]
+          const content = output.generations
             .flat()
             .map((g) => g.text)
             .join("\n\n---\n\n")
-          // console.log({ content })
           void pushMessage({ content, role: PromptRoleType.assistant, id: replyId })
         },
       },
     ],
     openAIApiKey: env.OPENAI_API_KEY,
     temperature: DEFAULT_TEMPERATURE,
-    modelName:
-      // userId === "-6SJi" // special for lara
-      //   ?
-      // "gpt-4",
-      "gpt-3.5-turbo",
+    modelName: "gpt-3.5-turbo",
   })
 
   // todo: customize our template? or using traditional conversation approach?

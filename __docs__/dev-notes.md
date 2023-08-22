@@ -1,3 +1,248 @@
+## chatbot streaming backend essential
+
+> by mark@cs-magic.com
+
+### approach 1. streaming (with callback) via openai + ai-sdk
+
+```typescript
+import { Configuration, OpenAIApi } from "openai-edge"
+
+export const runtime = "edge"
+
+const openai = new OpenAIApi(config)
+
+export default async function(req: Request, res: Response) {
+
+  const data = await req.json()
+  const { messages, conversationId } = data
+
+  // Ask OpenAI for a streaming chat completion given the prompt
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    // other model configuration
+    stream: true,
+    messages: messages.map((message: { content: string; role: PromptRoleType }) => ({
+      content: message.content,
+      role: message.role,
+    })),
+  })
+
+  // Convert the response into a friendly text-stream
+  const stream = OpenAIStream(response, {
+    onFinal: (data) => {
+      // console.log("onFinal: ", { data })
+    },
+  })
+}
+```
+
+### approach 2. streaming (with callback) via langchain(llm) + ai-sdk
+
+```typescript
+import { Configuration, OpenAIApi } from "openai-edge"
+
+export const runtime = "edge"
+
+const openai = new OpenAIApi(config)
+
+export default async function(req: Request, res: Response) {
+
+  const model = new ChatOpenAI({
+    modelName: "gpt-3.5-turbo",
+    // other model configuration
+
+    // stream / callback, ref: https://js.langchain.com/docs/modules/model_io/models/chat/how_to/streaming
+    callbacks: [
+      {
+        handleLLMEnd(output: LLMResult, runId: string, parentRunId?: string, tags?: string[]): Promise<void> | void {
+          // console.log("LLMEnd: ", JSON.stringify({ output, runId, parentRunId, tags }, null, 2))
+          const content = output.generations
+            .flat()
+            .map((g) => g.text)
+            .join("\n\n---\n\n")
+          void pushMessage({ content, role: PromptRoleType.assistant, id: replyId })
+        },
+      },
+    ],
+  })
+
+  const prompt =
+    PromptTemplate.fromTemplate(`The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.
+
+Relevant pieces of previous conversation:
+{history}
+
+(You do not need to use these pieces of information if not relevant)
+
+Current conversation:
+Human: {input}
+AI:`)
+
+  const outputParser = new BytesOutputParser()
+  const chain = prompt.pipe(model).pipe(outputParser)
+  const stream = await chain.stream({
+    history: context.map((m) => `${m.role}: ${m.content}`).join("\n"),
+    input: content,
+  })
+  return new StreamingTextResponse(stream)
+}
+```
+
+### (todo) approach 3. streaming via langchain(chat) + ai-sdk
+
+### extension 1. add rate limiter
+
+```typescript
+import { env } from "@/env.mjs"
+import { Ratelimit } from "@upstash/ratelimit"
+import { kv } from "@vercel/kv"
+
+export const validateRequest = async (req: Request) => {
+  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+    const ip = req.headers.get("x-forwarded-for")
+    const ratelimit = new Ratelimit({
+      redis: kv,
+      // rate limit to 1 requests per 20 seconds
+      limiter: Ratelimit.slidingWindow(3, "10s"),
+    })
+
+    const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
+
+    if (!success) {
+      return new Response("Hey man, you are too fast! Please slow down!", {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "X-RateLimit-Reset": reset.toString(),
+        },
+      })
+    }
+  }
+}
+```
+
+### extension 2: add error handler in approach 1
+
+```typescript
+
+// const response = await openai.createChatCompletion({...
+
+if (response.status !== 200) {
+  const {
+    error: { message },
+  } = await response.json()
+  return NextResponse.json(message, { status: 500 })
+}
+```
+
+### extension 3: get metadata from frontend, e.g. userId, conversationId
+
+```typescript
+// frontend
+const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
+  // ...,
+  sendExtraMessageFields: true, // 添加 id 信息
+  body: { userId, conversationId },
+// ...
+})
+
+```
+
+```typescript
+// backend
+const data = await req.json()
+const { messages, conversationId, userId } = data
+```
+
+### extension 4: add vector database search in approach 2
+
+> based on `trpc data proxy` + `prisma`
+
+```typescript
+// backend api router
+
+import superjson from "superjson"
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
+
+const proxy = createTRPCProxyClient<RootRouter>({
+  links: [
+    // loggerLink(),
+    httpBatchLink({ url: `${req.headers.get("origin")}/api/trpc` }),
+  ],
+  transformer: superjson,
+})
+
+const context = await proxy.message.getContext.query({ conversationId, content })
+```
+
+```typescript
+// trpc router
+
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
+import { ChatMessage } from "@prisma/client"
+import { CreateMessage } from "ai"
+import _ from "lodash"
+
+export const msgRouter = createTRPCRouter({
+  getContext: publicProcedure
+    .input(z.object({ conversationId: z.string(), content: z.string(), count: z.number().default(5) }))
+    .query(async ({ ctx: { prisma }, input: { conversationId, content, count } }) => {
+      const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
+        prisma: Prisma,
+        tableName: "ChatMessage",
+        vectorColumnName: "vector",
+        columns: {
+          id: PrismaVectorStore.IdColumn,
+          content: PrismaVectorStore.ContentColumn,
+          role: PrismaVectorStore.ContentColumn,
+        },
+        filter: {
+          conversationId: {
+            equals: conversationId,
+          },
+        },
+      })
+      const similar = (await vectorStore.similaritySearch(content, count)).map((m) => m.metadata)
+      const latest = await prisma.chatMessage.findMany({
+        where: { conversationId },
+        take: DEFAULT_LATEST_COUNT,
+        orderBy: { id: "desc" },
+      })
+      // todo: max token control
+      // lodash 不能在 edge 里使用
+      return _.sortedUniqBy([...similar, ...latest.reverse()], "id") as CreateMessage[]
+    }),
+})
+```
+
+### extension 5. persisting message to database
+
+> based on `trpc data proxy` + `prisma`
+
+```typescript
+
+/**
+ * call it when:
+ *  1. persist user request via `res.json().messages[-1]`
+ *  2. persist llm response in callback handler (differnet depends on implementation)
+ *
+ * @param msg: {role: string, content: string, id: string}
+ */
+const pushMessage = async (msg: Message) => {
+  const { id, role, content } = msg
+  const newMessage: ChatMessageUncheckedCreateInput = {
+    role,
+    content,
+    conversationId,
+    shortId: id,
+  }
+  console.log("pushing: ", newMessage)
+  await proxy.message.push.mutate(newMessage)
+}
+
+```
+
 ## stripe
 
 - references:
