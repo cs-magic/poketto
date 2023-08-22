@@ -75,13 +75,6 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
     id: cid,
   })
 
-  const triggerSubmit = (event) => {
-    // isComposing, ref: https://github.com/facebook/react/issues/13104
-    if (!(event as KeyboardEvent).isComposing)
-      // request submit, ref: https://stackoverflow.com/a/71478740
-      refForm.current!.requestSubmit()
-  }
-
   useEffect(() => {
     stop() // 防止串台
   }, [cid])
@@ -151,8 +144,15 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
           onChange={handleInputChange}
           id={"input"}
           onKeyDown={getHotkeyHandler([
-            ["mod+Enter", triggerSubmit],
-            ["shift+Enter", triggerSubmit],
+            [
+              "Enter",
+              (event) => {
+                // isComposing, ref: https://github.com/facebook/react/issues/13104
+                if (!(event as KeyboardEvent).isComposing)
+                  // request submit, ref: https://stackoverflow.com/a/71478740
+                  refForm.current!.requestSubmit()
+              },
+            ],
           ])}
         />
         <input className={"hidden"} name={"conversationUserId"} value={userId} />

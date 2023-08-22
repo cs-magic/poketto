@@ -11,9 +11,40 @@ import { ChatOpenAI } from "langchain/chat_models/openai"
 import { BytesOutputParser } from "langchain/schema/output_parser"
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
-import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
+import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
+import { BaseCallbackHandler } from "langchain/callbacks"
+import { Serialized } from "langchain/dist/load/serializable"
+import { AgentAction, AgentFinish, ChainValues } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
+
+export class MyCallbackHandler extends BaseCallbackHandler {
+  name = "MyCallbackHandler"
+
+  async handleChainStart(chain: Serialized) {
+    console.log(`handleChainStart: `, { chain })
+  }
+
+  async handleChainEnd(output: ChainValues) {
+    console.log("handleChainEnd: ", { _output: output })
+  }
+
+  async handleAgentAction(action: AgentAction) {
+    console.log("handleAgentAction: ", { action })
+  }
+
+  async handleToolEnd(output: string) {
+    console.log("handleToolEnd: ", { output })
+  }
+
+  async handleText(text: string) {
+    console.log("handleText: ", { text })
+  }
+
+  async handleAgentEnd(action: AgentFinish) {
+    console.log("handleAgentEnd: ", { action })
+  }
+}
 
 export default async function (req: Request, res: Response) {
   /**
@@ -55,16 +86,19 @@ export default async function (req: Request, res: Response) {
    */
   const { content } = messages[messages.length - 1]
   const context = await proxy.message.getContext.query({ conversationId, content })
-  console.log({ conversationId, content, context })
+  console.log({ conversationId, content, contextIds: context.map((c) => c.id) })
+
+  const callbackHandler = new MyCallbackHandler()
 
   const model = new ChatOpenAI({
+    callbacks: [callbackHandler],
     openAIApiKey: env.OPENAI_API_KEY,
     temperature: DEFAULT_TEMPERATURE,
     modelName:
       // userId === "-6SJi" // special for lara
       //   ?
-      "gpt-4",
-    // : "gpt-3.5",
+      // "gpt-4",
+      "gpt-3.5-turbo",
   })
 
   // todo: customize our template? or using traditional conversation approach?
@@ -98,7 +132,7 @@ AI:`)
 
     // todo: !important fix onFinal of `langchain.stream`
     onFinal: (completion) => {
-      console.log("onFinal: ", { data })
+      console.log("onFinal: ", { completion })
       void pushMessage({ content: completion, role: PromptRoleType.assistant, id: replyId })
     },
   })
