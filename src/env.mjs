@@ -35,8 +35,8 @@ export const env = createEnv({
     POSTMARK_SIGN_IN_TEMPLATE: z.string().min(1),
     POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1),
 
-    STRIPE_API_KEY: z.string().min(1)
-
+    STRIPE_API_KEY: z.string().min(1),
+    STRIPE_PUBLISHABLE_KEY: z.string().min(1)
   },
 
   /**
@@ -71,8 +71,8 @@ export const env = createEnv({
     POSTMARK_SIGN_IN_TEMPLATE: process.env.POSTMARK_SIGN_IN_TEMPLATE,
     POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE,
 
-    STRIPE_API_KEY: process.env.STRIPE_API_KEY
-
+    STRIPE_API_KEY: process.env.STRIPE_API_KEY,
+    STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validations.

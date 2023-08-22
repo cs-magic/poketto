@@ -61,9 +61,10 @@ export default async function (req: Request, res: Response) {
     openAIApiKey: env.OPENAI_API_KEY,
     temperature: DEFAULT_TEMPERATURE,
     modelName:
-      userId === "-6SJi" // special for lara
-        ? "gpt-4"
-        : "gpt-3.5",
+      // userId === "-6SJi" // special for lara
+      //   ?
+      "gpt-4",
+    // : "gpt-3.5",
   })
 
   // todo: customize our template? or using traditional conversation approach?
