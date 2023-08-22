@@ -28,7 +28,7 @@ export default async function (req: Request, res: Response) {
   })
 
   const data = await req.json()
-  const { messages, conversationId } = data
+  const { messages, conversationId, userId } = data
 
   // console.log("req: ", { data })
   const pushMessage = async (msg: Message) => {
@@ -60,6 +60,10 @@ export default async function (req: Request, res: Response) {
   const model = new ChatOpenAI({
     openAIApiKey: env.OPENAI_API_KEY,
     temperature: DEFAULT_TEMPERATURE,
+    modelName:
+      userId === "-6SJi" // special for lara
+        ? "gpt-4"
+        : "gpt-3.5",
   })
 
   // todo: customize our template? or using traditional conversation approach?

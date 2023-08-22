@@ -33,7 +33,9 @@ export const env = createEnv({
     AWS_SK: z.string().min(1),
     POSTMARK_API_TOKEN: z.string().min(1),
     POSTMARK_SIGN_IN_TEMPLATE: z.string().min(1),
-    POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1)
+    POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1),
+
+    STRIPE_API_KEY: z.string().min(1)
 
   },
 
@@ -67,7 +69,9 @@ export const env = createEnv({
     AWS_SK: process.env.AWS_SK,
     POSTMARK_API_TOKEN: process.env.POSTMARK_API_TOKEN,
     POSTMARK_SIGN_IN_TEMPLATE: process.env.POSTMARK_SIGN_IN_TEMPLATE,
-    POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE
+    POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE,
+
+    STRIPE_API_KEY: process.env.STRIPE_API_KEY
 
   },
   /**
