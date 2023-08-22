@@ -88,7 +88,7 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       },
     },
   })
-  log.info("Successfully inited poketto system ~")
+  log.info("✅ Successfully initialized poketto system ~")
   return result
 }
 
@@ -147,6 +147,6 @@ export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterU
     },
   })
 
-  log.info(`Successfully created user(id=${createdUser.id}, name=${createdUser.name}) ~`)
+  log.info(`✅ Successfully created user(id=${createdUser.id}, name=${createdUser.name}) ~`)
   return createdUser
 }

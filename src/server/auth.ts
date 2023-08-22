@@ -1,4 +1,4 @@
-import { PlatformType } from ".prisma/client"
+import { PlatformType, Prisma } from ".prisma/client"
 import { allowDangerousEmailAccountLinking, URI } from "@/config-const"
 import { env } from "@/env.mjs"
 import { prisma } from "@/server/db"
@@ -9,7 +9,7 @@ import DiscordProvider from "next-auth/providers/discord"
 import GithubProvider from "next-auth/providers/github"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
-import { getServerSession, NextAuthOptions } from "next-auth"
+import { getServerSession, NextAuthOptions, User as NextAuthUser } from "next-auth"
 import { emailFrom, emailServer, sendVerificationRequest } from "@/lib/email"
 
 /**
@@ -26,43 +26,43 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     signIn: async (signInParams) => {
-      const { user, email, profile } = signInParams
-      console.log("signIn: ", { user, email, profile }) // 这个文件里，不要用 pino 之类的异步 log 函数，否则会导致 debug 困难
+      const { user, email, profile, account, credentials } = signInParams
+      console.log("signIn: ", { user, email, profile, account, credentials }) // 这个文件里，不要用 pino 之类的异步 log 函数，否则会导致 debug 困难
       user.platformId = user.id
-      user.platformType = PlatformType.Poketto
+      user.platformType = account?.provider ?? PlatformType.Poketto
       if (profile) {
         user.email = profile?.email
       }
       return true
     },
 
-    async jwt({ token, user }) {
-      console.log("jwt: ", { token, user })
-      const dbUser = await prisma.user.findFirst({
-        where: {
-          email: token.email,
-        },
-      })
-
-      if (!dbUser) {
-        if (user) {
-          token.id = user?.id
-        }
-        return token
-      }
-
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        picture: dbUser.image,
-      }
-    },
+    // async jwt({ token, user }) {
+    //   console.log("jwt: ", { token, user })
+    //   const dbUser = await prisma.user.findUnique({
+    //     where: {
+    //       id: token.id as string,
+    //     },
+    //   })
+    //
+    //   if (!dbUser) {
+    //     if (user) {
+    //       token.id = user?.id
+    //     }
+    //     return token
+    //   }
+    //
+    //   return {
+    //     id: dbUser.id,
+    //     name: dbUser.name,
+    //     email: dbUser.email,
+    //     picture: dbUser.image,
+    //   }
+    // },
 
     async session({ token, session }) {
       console.log("session: ", { token, session })
       if (token) {
-        session.user.id = token.id as string
+        session.user.id = token.sub! // 不要 token.id 了，妈的
         session.user.name = token.name
         session.user.email = token.email
         session.user.image = token.picture
@@ -82,16 +82,16 @@ export const authOptions: NextAuthOptions = {
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
       allowDangerousEmailAccountLinking,
-      profile(profile) {
+      profile(profile): NextAuthUser {
         return {
           id: profile.id.toString(),
           name: profile.name || profile.login,
-          username: profile.login,
+          // username: profile.login, // 不能多加字段
           email: profile.email,
 
           image: profile.avatar_url,
           platformId: profile.id.toString(),
-          platformType: PlatformType.Github,
+          platformType: PlatformType.github,
         }
       },
     }),

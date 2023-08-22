@@ -355,8 +355,11 @@ enum PlatformType {
   MidJourney
   StableDiffusion
   OpenChat
-  Github
-  Discord
+
+  // align for next-auth
+  github
+  discord
+  google
 }
 
 enum PromptRoleType {

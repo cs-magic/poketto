@@ -102,7 +102,7 @@ export const InvitationStatusSchema = z.enum(['Idle','Pending','Accepted','Expir
 
 export type InvitationStatusType = `${z.infer<typeof InvitationStatusSchema>}`
 
-export const PlatformTypeSchema = z.enum(['Poketto','FlowGPT','OpenAI','MidJourney','StableDiffusion','OpenChat','Github','Discord']);
+export const PlatformTypeSchema = z.enum(['Poketto','FlowGPT','OpenAI','MidJourney','StableDiffusion','OpenChat','github','discord','google']);
 
 export type PlatformTypeType = `${z.infer<typeof PlatformTypeSchema>}`
 
