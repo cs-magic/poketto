@@ -1,0 +1,120 @@
+import { prisma } from "@/server/db"
+
+import Mustache from "mustache"
+import d from "@/lib/datetime"
+import { Client } from "postmark"
+import { env } from "@/env.mjs"
+import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses"
+import path from "path"
+import fs from "fs"
+import { AWS_REGION, emailProvider, siteConfig } from "@/config-const"
+
+// @ts-ignore
+const isAws = emailProvider === "aws"
+
+const postmarkClient = new Client(env.POSTMARK_API_TOKEN)
+const sesClient = new SESClient({ region: AWS_REGION })
+
+const t = fs.readFileSync(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
+
+export const emailServer = isAws ? env.AWS_SMTP_SERVER : ""
+export const emailFrom = isAws ? env.AWS_SMTP_FROM : env.POSTMARK_SMTP_FROM
+
+/**
+ *
+ * @param identifier 用户id，也就是填的邮箱号
+ * @param url 回调地址
+ * @param provider
+ * @param token
+ */
+export const sendVerificationRequest = async ({ identifier, url, provider, token }) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: identifier,
+    },
+    select: {
+      emailVerified: true,
+    },
+  })
+
+  let result
+
+  if (isAws) {
+    result = await sesClient.send(
+      new SendEmailCommand({
+        Destination: {
+          /* required */
+          CcAddresses: [
+            // 'EMAIL_ADDRESS',
+            /* more items */
+          ],
+          ToAddresses: [
+            identifier,
+            /* more items */
+          ],
+        },
+        Message: {
+          /* required */
+          Body: {
+            /* required */
+            Html: {
+              Charset: "UTF-8",
+              Data: Mustache.render(t, {
+                CompanyName: "CS Magic, Inc.",
+                ProductName: siteConfig.name,
+                username: identifier,
+                action_url: url,
+                login_url: siteConfig.loginUrl,
+                trial_length: " 7 Days",
+                trial_start_date: d(new Date()).toDate().toLocaleDateString(),
+                trial_end_date: d(new Date()).add(7, "days").toDate().toLocaleDateString(),
+                support_mail: "support@cs-maigc.com",
+              }),
+            },
+            Text: {
+              Charset: "UTF-8",
+              Data: "TEXT_FORMAT_BODY",
+            },
+          },
+          Subject: {
+            Charset: "UTF-8",
+            Data: `Welcome to ${siteConfig.name} !`,
+          },
+        },
+        Source: env.AWS_SMTP_FROM /* required */,
+        ReplyToAddresses: [
+          env.AWS_SMTP_FROM,
+          /* more items */
+        ],
+      })
+    )
+  } else {
+    const templateId = user?.emailVerified ? env.POSTMARK_SIGN_IN_TEMPLATE : env.POSTMARK_ACTIVATION_TEMPLATE
+    if (!templateId) {
+      throw new Error("Missing template id")
+    }
+
+    result = await postmarkClient.sendEmailWithTemplate({
+      TemplateId: parseInt(templateId),
+      To: identifier,
+      From: provider.from as string,
+      TemplateModel: {
+        action_url: url,
+        product_name: siteConfig.name,
+      },
+      Headers: [
+        {
+          // Set this to prevent Gmail from threading emails.
+          // See https://stackoverflow.com/questions/23434110/force-emails-not-to-be-grouped-into-conversations/25435722.
+          Name: "X-Entity-Ref-ID",
+          Value: new Date().getTime() + "",
+        },
+      ],
+    })
+  }
+
+  console.log({ result })
+  if (result.ErrorCode) {
+    throw new Error(result.Message)
+  }
+}

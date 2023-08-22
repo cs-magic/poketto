@@ -23,7 +23,7 @@ const init = async () => {
         platformId: p.id,
         platformType: PlatformType.FlowGPT,
         avatar: p.thumbnailURL,
-        desc: p.description,
+        description: p.description,
         language: p.language ?? "en",
         name: p.title,
         isOpenSource: p.visibility,
@@ -61,7 +61,7 @@ const init = async () => {
               platformId: p.User.id,
               platformType: PlatformType.FlowGPT,
               platformArgs: {
-                uri: p.User.uri,
+                url: p.User.uri,
               },
               image: p.User.image,
             },

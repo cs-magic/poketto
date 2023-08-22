@@ -23,7 +23,9 @@ export const UserProfile = ({ user }: { user: UserForProfile }) => {
       <div className={"flex flex-col  overflow-hidden"}>
         <h2 className={"text-2xl"}>{user?.name ?? DEFAULT_USER_NAME}</h2>
         <p className={"truncate text-muted-foreground"}>@{user?.id ?? DEFAULT_USER_ID}</p>
-        <p className={"lines-clamp-2 my-2 text-primary-foreground/75"}>{user?.desc ?? "You haven't said anything about yourself ~"}</p>
+        <p className={"lines-clamp-2 my-2 text-primary-foreground/75"}>
+          {user?.description ?? "You haven't said anything about yourself ~"}
+        </p>
       </div>
 
       {/*	stat */}

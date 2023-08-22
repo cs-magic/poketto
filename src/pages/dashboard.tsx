@@ -15,8 +15,9 @@ import { useUserId } from "@/hooks/use-user"
 
 export const DashboardPage: NextPageWithAuth = () => {
   const userId = useUserId()!
-  const { data: userProfile } = api.user.getProfile.useQuery({ userId })
-  const { data: convs } = api.conv.list.useQuery(undefined)
+  console.log("dashboard: ", { userId })
+  const { data: userProfile } = api.user.getProfile.useQuery({ userId }, { enabled: !!userId })
+  const { data: convs } = api.conv.list.useQuery(undefined, { enabled: !!userId })
 
   return (
     <RootLayout>

@@ -56,7 +56,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
         </div>
 
         {!userId ? (
-          <Link href={URI.user.auth.signin} className={"p-btn"}>
+          <Link href={URI.user.auth.signIn} className={"p-btn"}>
             Login to Get
           </Link>
         ) : (
@@ -110,7 +110,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
       </section>
 
       <section id={"desc"} className={"relative flex w-full flex-col"}>
-        <CollapsablePara content={app.desc} />
+        <CollapsablePara content={app.description} />
       </section>
 
       <section id={"ratings-reviews"} className={"flex w-full flex-col gap-4"}>

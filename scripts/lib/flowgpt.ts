@@ -20,7 +20,7 @@ export interface FlowgptPromptFull // todo: add comments
 export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   id: `${PlatformType.FlowGPT}_${u.id}`,
   name: u.name,
-  desc: null,
+  description: null,
   balance: 0,
   image: u.image,
   platformType: PlatformType.FlowGPT,
@@ -69,7 +69,7 @@ export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | Flow
     name: p.title,
     avatar: p.thumbnailURL,
     language: p.language,
-    desc: p.description,
+    description: p.description,
     updatedAt: dayjs(p.updatedAt).toDate(),
     createdAt: dayjs(p.createdAt).toDate(),
     platformType: PlatformType.FlowGPT,

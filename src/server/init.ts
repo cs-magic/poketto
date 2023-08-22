@@ -41,7 +41,7 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       platformType: PlatformType.Poketto,
       platformArgs: {},
       email: POKETTO_CREATOR_EMAIL,
-      desc: POKETTO_CREATOR_DESC,
+      description: POKETTO_CREATOR_DESC,
       name: POKETTO_CREATOR_NAME,
       image: POKETTO_CREATOR_AVATAR,
       createdApps: {

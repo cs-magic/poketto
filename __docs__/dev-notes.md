@@ -1,3 +1,16 @@
+## next-auth
+
+### bug: server-error
+
+![img.png](server-error.png)
+
+这个问题，主要是因为没有配置 `next-auth` 的秘钥，但又用了 middleware。
+
+参考：
+
+- https://next-auth.js.org/configuration/nextjs#prerequisites
+- https://stackoverflow.com/a/71093567/9422455
+
 ## UI / tailwind
 
 - 子元素

@@ -5,7 +5,7 @@ import { api } from "@/lib/api"
 import { InvitationStatus } from ".prisma/client"
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from "react-markdown"
-import { ICON_DIMENSION_MD, PRODUCT, URI, USER_INVITATIONS_COUNT } from "@/config-const"
+import { ICON_DIMENSION_MD, siteConfig, URI, USER_INVITATIONS_COUNT } from "@/config-const"
 import { useMustache } from "@/hooks/use-mustache"
 import { useAppStore } from "@/store"
 import { useSessionUser } from "@/hooks/use-user"
@@ -40,9 +40,9 @@ export const InviteCard = () => {
             {
               cnt: USER_INVITATIONS_COUNT,
               surplus,
-              appName: PRODUCT.name,
+              appName: siteConfig.name,
               appDoc: URI.app.docs.intro,
-              currencyName: PRODUCT.currency,
+              currencyName: siteConfig.currency,
               currencyDoc: URI.app.docs.currency,
             }
           )}

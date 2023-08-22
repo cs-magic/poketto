@@ -32,7 +32,7 @@ export const AppHorizontalCardView = ({ app }: { app: AppForListView | undefined
 
       <div className={"flex grow flex-col items-start gap-2 overflow-hidden"}>
         <p className={"truncate font-semibold text-primary-foreground"}>{app.name}</p>
-        <p className={"line-clamp-2 text-primary-foreground/75"}>{app.desc}</p>
+        <p className={"line-clamp-2 text-primary-foreground/75"}>{app.description}</p>
 
         <div className={"inline-flex w-full justify-between gap-4 overflow-hidden"}>
           <p className={"truncate"}>By {app.name}</p>

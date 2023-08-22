@@ -31,7 +31,7 @@ export const AppPlainListView = ({ app }: { app: AppForListView }) => {
             </Badge>
           </div>
         </div>
-        <div className={"line-clamp-3 text-muted-foreground"}>{app.desc}</div>
+        <div className={"line-clamp-3 text-muted-foreground"}>{app.description}</div>
         <div className={"| flex items-center gap-4 text-muted-foreground"}>
           <div className={"inline-flex items-center gap-2"}>
             <div className={"rounded-full bg-blue-500 wh-3"} />

@@ -13,12 +13,12 @@ import { useAppStore } from "@/store"
 import { Carousel } from "react-responsive-carousel"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import Image from "next/image"
-import { Order2icon } from "@/lib/assets"
 import { useIntersection } from "@mantine/hooks"
 import { CAROUSELS } from "@/config-const"
 import { AppDialogContainer } from "@/components/app/container"
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { sortOrders } from "@/ds"
+import { Order2icon } from "@/components/icons"
 
 export default function ExplorePage() {
   const { cardsLayout, sortOrder, setSortOrder } = useAppStore()

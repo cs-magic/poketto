@@ -25,8 +25,8 @@ function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
 
   console.warn("Redirecting to /sign-in since user is not authorized")
   toast.error("Redirecting to /sign-in since user is not authorized")
-  // void Router.push(URI.user.auth.signin) // todo: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528
-  window.location.href = URI.user.auth.signin
+  // void Router.push(URI.user.auth.signIn) // todo: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528
+  window.location.href = URI.user.auth.signIn
 
   return true
 }

@@ -4,7 +4,6 @@ import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMount } from "@/hooks/use-mount"
 import { BellIcon, GearIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
-import { Icons } from "@/lib/assets"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { SidebarNavItem } from "@/components/link"
 import { Button } from "@/components/ui/button"
@@ -21,8 +20,9 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import _ from "lodash"
-import { ICON_DIMENSION_SM, PRODUCT } from "@/config-const"
+import { ICON_DIMENSION_SM, siteConfig } from "@/config-const"
 import { COMMANDS, navs } from "@/config-utils"
+import { Icons } from "@/components/icons"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()
@@ -46,7 +46,7 @@ export const LogoWithName = () => {
     <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
       {/*<Logo height={24}/>*/}
       <Icons.logo />
-      <span className={"whitespace-nowrap text-lg tracking-widest"}>{PRODUCT.name}</span>
+      <span className={"whitespace-nowrap text-lg tracking-widest"}>{siteConfig.name}</span>
     </Button>
   )
 }

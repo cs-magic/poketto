@@ -35,14 +35,15 @@ export const URI = {
     },
   },
   user: {
-    dashboard: "/user/dashboard",
-    gallery: "/user/gallery",
-    integrations: "/user/integrations",
+    dashboard: "/dashboard",
+    gallery: "/gallery",
+    integrations: "/integrations",
 
     auth: {
-      signin: "/api/auth/signin",
-      login: "/auth/login",
-      register: "/auth/register",
+      signIn: "/login",
+      // signin: "/api/auth/signin",
+      login: "/login",
+      register: "/register",
     },
 
     seek: {
@@ -85,11 +86,18 @@ export const CAROUSELS = [
 // product
 // -----------------------------------------------------------------------------
 
-export const PRODUCT = {
+export const siteConfig = {
   name: "Poketto.AI", // name: 'Poketto.AI',
   currency: "甜甜圈", // currency: 'Dora',
-  desc: "每一个人的哆啦A梦", // '每个人都是魔法师',
+  description: "每一个人的哆啦A梦", // '每个人都是魔法师',
+  url: "https://poketto.ai",
+  loginUrl: "https://poketto.ai/login",
   icon: URI.images.favicon,
+  ogImage: "https://poketto.ai/images/logo/poketto/Your-Sole-Poketto_256.ico",
+  links: {
+    twitter: "https://twitter.com/cs-magic",
+    github: "https://github.com/cs-magic/poketto",
+  },
 }
 
 // -----------------------------------------------------------------------------
@@ -154,3 +162,7 @@ export const DEFAULT_SIMILAR_COUNT = 5
 export const DEFAULT_LATEST_COUNT = 4
 export const DEFAULT_TEMPERATURE = 0.9
 export const CHAT_MESSAGE_CID_LEN = 7 // ai-sdk
+
+export type EmailProvider = "aws" | "postmark"
+export const emailProvider: EmailProvider = "aws"
+export const AWS_REGION = "ap-southeast-1"
