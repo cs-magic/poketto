@@ -14,37 +14,9 @@ import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 import { BaseCallbackHandler } from "langchain/callbacks"
 import { Serialized } from "langchain/dist/load/serializable"
-import { AgentAction, AgentFinish, ChainValues } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
+import { AgentAction, AgentFinish, ChainValues, LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
-
-export class MyCallbackHandler extends BaseCallbackHandler {
-  name = "MyCallbackHandler"
-
-  async handleChainStart(chain: Serialized) {
-    console.log(`handleChainStart: `, { chain })
-  }
-
-  async handleChainEnd(output: ChainValues) {
-    console.log("handleChainEnd: ", { _output: output })
-  }
-
-  async handleAgentAction(action: AgentAction) {
-    console.log("handleAgentAction: ", { action })
-  }
-
-  async handleToolEnd(output: string) {
-    console.log("handleToolEnd: ", { output })
-  }
-
-  async handleText(text: string) {
-    console.log("handleText: ", { text })
-  }
-
-  async handleAgentEnd(action: AgentFinish) {
-    console.log("handleAgentEnd: ", { action })
-  }
-}
 
 export default async function (req: Request, res: Response) {
   /**
@@ -88,10 +60,21 @@ export default async function (req: Request, res: Response) {
   const context = await proxy.message.getContext.query({ conversationId, content })
   console.log({ conversationId, content, contextIds: context.map((c) => c.id) })
 
-  const callbackHandler = new MyCallbackHandler()
-
   const model = new ChatOpenAI({
-    callbacks: [callbackHandler],
+    // stream / callback, ref: https://js.langchain.com/docs/modules/model_io/models/chat/how_to/streaming
+    callbacks: [
+      {
+        handleLLMEnd(output: LLMResult, runId: string, parentRunId?: string, tags?: string[]): Promise<void> | void {
+          // console.log("LLMEnd: ", JSON.stringify({ output, runId, parentRunId, tags }, null, 2))
+          const content = output.generations // {text: string}[][]
+            .flat()
+            .map((g) => g.text)
+            .join("\n\n---\n\n")
+          // console.log({ content })
+          void pushMessage({ content, role: PromptRoleType.assistant, id: replyId })
+        },
+      },
+    ],
     openAIApiKey: env.OPENAI_API_KEY,
     temperature: DEFAULT_TEMPERATURE,
     modelName:
@@ -124,20 +107,13 @@ AI:`)
   // }
 
   const replyId = nanoid(CHAT_MESSAGE_CID_LEN)
+  const headers = new Headers()
+  headers.set("replyId", replyId)
 
   // Convert the response into a friendly text-stream
   const stream = await chain.stream({
     history: context.map((m) => `${m.role}: ${m.content}`).join("\n"),
     input: content,
-
-    // todo: !important fix onFinal of `langchain.stream`
-    onFinal: (completion) => {
-      console.log("onFinal: ", { completion })
-      void pushMessage({ content: completion, role: PromptRoleType.assistant, id: replyId })
-    },
   })
-
-  const headers = new Headers()
-  headers.set("replyId", replyId)
   return new StreamingTextResponse(stream, { headers })
 }
