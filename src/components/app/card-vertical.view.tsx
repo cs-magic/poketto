@@ -56,7 +56,7 @@ export const AppVerticalCardView = ({ app, cardsLayout, sort }: { app: AppForLis
         {/* title */}
         <div className={"truncate text-lg font-normal"}>{app.name}</div>
 
-        <div className={"text-md hidden transition-all group-hover:line-clamp-3"}>{app.description}</div>
+        <div className={"text-md hidden transition-all group-hover:line-clamp-3"}>{app.desc}</div>
 
         {/*	user - ranks */}
         <div className={"| flex justify-between text-xs text-gray-100  dark:text-primary-foreground/75 "}>

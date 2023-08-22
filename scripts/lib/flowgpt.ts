@@ -69,7 +69,7 @@ export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | Flow
     name: p.title,
     avatar: p.thumbnailURL,
     language: p.language,
-    description: p.description,
+    desc: p.description,
     updatedAt: dayjs(p.updatedAt).toDate(),
     createdAt: dayjs(p.createdAt).toDate(),
     platformType: PlatformType.FlowGPT,

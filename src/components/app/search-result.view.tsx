@@ -11,7 +11,7 @@ export const SearchResultView = ({ app }: { app: AppForListView }) => (
     </Avatar>
     <div className={"| flex grow flex-col gap-1 overflow-hidden"}>
       <p className={"| truncate text-sm font-semibold text-primary-foreground/75"}>{app.name}</p>
-      <p className={"| truncate "}>{app.description}</p>
+      <p className={"| truncate "}>{app.desc}</p>
     </div>
     <div className={"| flex w-20 shrink-0 flex-col gap-1 overflow-hidden whitespace-nowrap"}>
       <ViewsField value={app.state?.views ?? 0} />

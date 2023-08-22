@@ -110,7 +110,7 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
       </section>
 
       <section id={"desc"} className={"relative flex w-full flex-col"}>
-        <CollapsablePara content={app.description} />
+        <CollapsablePara content={app.desc} />
       </section>
 
       <section id={"ratings-reviews"} className={"flex w-full flex-col gap-4"}>

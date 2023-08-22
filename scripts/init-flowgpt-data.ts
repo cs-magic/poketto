@@ -23,7 +23,7 @@ const init = async () => {
         platformId: p.id,
         platformType: PlatformType.FlowGPT,
         avatar: p.thumbnailURL,
-        description: p.description,
+        desc: p.description,
         language: p.language ?? "en",
         name: p.title,
         isOpenSource: p.visibility,
