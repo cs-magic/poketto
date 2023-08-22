@@ -1,7 +1,6 @@
-import { PlatformType, Prisma } from ".prisma/client"
+import { PlatformType } from ".prisma/client"
 import { allowDangerousEmailAccountLinking, URI } from "@/config-const"
 import { env } from "@/env.mjs"
-import { prisma } from "@/server/db"
 import { type GetServerSidePropsContext } from "next"
 import EmailProvider from "next-auth/providers/email"
 
