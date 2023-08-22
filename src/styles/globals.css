@@ -147,11 +147,18 @@ html {
         @apply p-2 flex flex-col gap-1 w-full  items-center justify-between rounded-md text-sm  hover:bg-accent font-medium ring-offset-background transition-colors hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
     }
 
+    /* 全局 typography */
     .p-prose {
         @apply prose prose-sm dark:prose-invert;
     }
 
+    /* 让子元素居中 */
     .p-center {
-        @apply w-full h-full flex flex-col justify-center items-center;
+        @apply flex justify-center items-center;
+    }
+
+    /* 让子元素的外框尺寸都一样 */
+    .flex-equal {
+        @apply child:grow child:basis-0 child:whitespace-nowrap;
     }
 }

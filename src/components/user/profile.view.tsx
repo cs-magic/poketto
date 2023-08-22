@@ -50,15 +50,21 @@ export const UserProfile = ({ user }: { user: UserForProfile }) => {
       </div>
 
       {/*	collections */}
-      <div className={"grid grid-cols-2 gap-4"}>
-        <Button variant={"outline"} disabled={!user} onClick={todo}>
-          编辑简介
-        </Button>
-
+      <div className={"flex flex-equal gap-4"}>
         {user ? (
-          <Button variant={"ghost"} onClick={() => void signOut()}>
-            退出登录
-          </Button>
+          <>
+            <Button variant={"outline"} disabled={!user} onClick={todo}>
+              编辑简介
+            </Button>
+
+            <Button variant={"outline"} disabled={!user} onClick={todo}>
+              充值
+            </Button>
+
+            <Button variant={"ghost"} onClick={() => void signOut()}>
+              退出登录
+            </Button>
+          </>
         ) : (
           <Button variant={"destructive"} onClick={() => void signIn()}>
             立即登录
