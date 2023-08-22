@@ -88,6 +88,8 @@ export const CAROUSELS = [
 
 export const siteConfig = {
   name: "Poketto.AI", // name: 'Poketto.AI',
+  welcomeEmailAddress: "Poketto.AI Team <team@cs-magic.com>",
+  supportEmailAddress: "Poketto.AI Support <support@cs-magic.com>",
   currency: "甜甜圈", // currency: 'Dora',
   description: "每一个人的哆啦A梦", // '每个人都是魔法师',
   url: "https://poketto.ai",

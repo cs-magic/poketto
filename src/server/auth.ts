@@ -9,7 +9,7 @@ import GithubProvider from "next-auth/providers/github"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
 import { getServerSession, NextAuthOptions, User as NextAuthUser } from "next-auth"
-import { emailFrom, emailServer, sendVerificationRequest } from "@/lib/email"
+import { emailFrom, sendVerificationRequest } from "@/lib/email"
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -73,8 +73,9 @@ export const authOptions: NextAuthOptions = {
   adapter: pokettoPrismaAdapter,
   providers: [
     EmailProvider({
-      server: emailServer,
       from: emailFrom,
+      // 它之所以没有配置 server，是因为直接在 sendVerificationRequest 中完成邮箱的所有验证等操作了
+      // 而我在本地初始化 aws 客户端，之所以不需要输入 credentials 信息，是因为我本地有 ~/.aws 配置文件
       sendVerificationRequest,
     }),
     GithubProvider({

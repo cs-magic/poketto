@@ -23,8 +23,7 @@ const sesClient = new SESClient({
 
 const t = fs.readFileSync(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
 
-export const emailServer = isAws ? env.AWS_SMTP_SERVER : ""
-export const emailFrom = isAws ? env.AWS_SMTP_FROM : env.POSTMARK_SMTP_FROM
+export const emailFrom = siteConfig.welcomeEmailAddress
 
 /**
  *
@@ -87,9 +86,9 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
             Data: `Welcome to ${siteConfig.name} !`,
           },
         },
-        Source: env.AWS_SMTP_FROM /* required */,
+        Source: siteConfig.welcomeEmailAddress /* required */,
         ReplyToAddresses: [
-          env.AWS_SMTP_FROM,
+          siteConfig.supportEmailAddress,
           /* more items */
         ],
       })
