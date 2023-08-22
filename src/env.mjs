@@ -29,6 +29,8 @@ export const env = createEnv({
     KV_REST_API_URL: z.string(),
     KV_REST_API_TOKEN: z.string(),
 
+    AWS_AK: z.string().min(1),
+    AWS_SK: z.string().min(1),
     AWS_SMTP_SERVER: z.string().min(1),
     AWS_SMTP_FROM: z.string().min(1),
     POSTMARK_SMTP_FROM: z.string().min(1),
@@ -64,13 +66,15 @@ export const env = createEnv({
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
 
+    AWS_AK: process.env.AWS_AK,
+    AWS_SK: process.env.AWS_SK,
     AWS_SMTP_SERVER: process.env.AWS_SMTP_SERVER,
     AWS_SMTP_FROM: process.env.AWS_SMTP_FROM,
     POSTMARK_SMTP_FROM: process.env.POSTMARK_SMTP_FROM,
     POSTMARK_API_TOKEN: process.env.POSTMARK_API_TOKEN,
     POSTMARK_SIGN_IN_TEMPLATE: process.env.POSTMARK_SIGN_IN_TEMPLATE,
     POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE
-    
+
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validations.

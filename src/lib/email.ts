@@ -13,7 +13,13 @@ import { AWS_REGION, emailProvider, siteConfig } from "@/config-const"
 const isAws = emailProvider === "aws"
 
 const postmarkClient = new Client(env.POSTMARK_API_TOKEN)
-const sesClient = new SESClient({ region: AWS_REGION })
+const sesClient = new SESClient({
+  region: AWS_REGION,
+  credentials: {
+    accessKeyId: env.AWS_AK,
+    secretAccessKey: env.AWS_SK,
+  },
+})
 
 const t = fs.readFileSync(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
 
