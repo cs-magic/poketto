@@ -1,6 +1,3 @@
-import { Inter as FontSans } from "next/font/google"
-import localFont from "next/font/local"
-
 import "@/styles/globals.css"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
@@ -8,21 +5,8 @@ import { siteConfig } from "@/config"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Analytics } from "@/components/analytics"
 import { TailwindIndicator } from "@/components/tailwind-indicator"
-
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
-
-// Font files can be colocated inside of `pages`
-const fontHeading = localFont({
-  src: "../assets/fonts/CalSans-SemiBold.woff2",
-  variable: "--font-heading",
-})
-
-interface RootLayoutProps {
-  children: React.ReactNode
-}
+import { fontHeading, fontSans } from "@/lib/fonts"
+import { PropsWithChildren } from "react"
 
 export const metadata = {
   title: {
@@ -65,10 +49,9 @@ export const metadata = {
   manifest: `${siteConfig.url}/site.webmanifest`,
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
       <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable, fontHeading.variable)}>
         <ThemeProvider>
           {children}

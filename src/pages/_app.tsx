@@ -8,7 +8,6 @@ import clsx from "@/lib/clsx"
 import "@/styles/globals.css"
 import Head from "next/head"
 import { siteConfig } from "@/config"
-import { font } from "@/lib/assets"
 import { type ExtendedAppProps } from "@/ds"
 import { ThemeProvider } from "@/components/theme-provider"
 
@@ -28,8 +27,8 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
           <ErrorBoundary>
             <main
               className={clsx(
-                "max-w-screen h-screen w-auto min-w-[375px] bg-background text-sm font-light text-foreground", // 'bg-zinc-900',
-                font.className
+                "max-w-screen h-screen w-auto min-w-[375px] bg-background text-sm font-light text-foreground" // 'bg-zinc-900',
+                // fontChinese.className
               )}
             >
               {/*{Component.auth ? (*/}

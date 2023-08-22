@@ -1,15 +1,8 @@
-import React, { ElementType } from "react"
-
 import localFont from "next/font/local"
-import Image, { type ImageProps } from "next/image"
-import CSCoin from "../../public/images/cs-coin.svg"
-import OpenchatIcon from "../../public/brands/openchat.svg"
-import MidjourneyIcon from "../../public/brands/midjourney.svg"
-import CatLogo from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
-import { Order2icon } from "@/components/icons"
+import { Inter as FontSans } from "next/font/google"
 
 // const interFont = Inter({ subsets: ["latin"] })
-export const font = localFont({
+export const fontChinese = localFont({
   src: [
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Thin.otf', weight: '100', style: 'normal' },
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-ExtraLight.otf', weight: '200', style: 'normal' },
@@ -26,4 +19,15 @@ export const font = localFont({
     // { path: '../../public/fonts/weilaiyinghei/GlowSansSC-Normal-v0.93/GlowSansSC-Normal-Heavy.otf', weight: '900', style: 'normal' },
   ],
   fallback: ["system-ui", "arial"],
+})
+
+export const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
+
+// Font files can be colocated inside of `pages`
+export const fontHeading = localFont({
+  src: "../../public/fonts/CalSans-SemiBold.woff2",
+  variable: "--font-heading",
 })
