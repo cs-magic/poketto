@@ -43,9 +43,20 @@ export const ThemeSwitcher = () => {
   )
 }
 
-export const LogoWithName = () => {
+/**
+ * 晚点再开启公司模式，目前就一个业务，没有必要
+ *
+ * @constructor
+ */
+export const LogoWithName = ({ withCompany }: { withCompany?: false }) => {
   const { toggleSidebar } = useAppStore()
-  return (
+  const productLogo = (
+    <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
+      <Icons.productLogo />
+      <span className={"whitespace-nowrap text-lg tracking-widest"}>{siteConfig.name}</span>
+    </Button>
+  )
+  return withCompany ? (
     <div className={"flex items-center gap-2 h-8"}>
       <Link href={"https://cs-magic.com"} className={"hidden md:flex"}>
         <IconContainer>
@@ -55,11 +66,10 @@ export const LogoWithName = () => {
 
       <Separator orientation={"vertical"} className={"rotate-[30deg] mx-2 hidden md:flex"} />
 
-      <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
-        <Icons.productLogo />
-        <span className={"whitespace-nowrap text-lg tracking-widest"}>{siteConfig.name}</span>
-      </Button>
+      {productLogo}
     </div>
+  ) : (
+    productLogo
   )
 }
 
