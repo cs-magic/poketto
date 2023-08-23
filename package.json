@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "deploy": "t=.next-serve && rm -rf $t && mkdir $t && cp -r .next .env* $t && ln -s ../public $t && next start $t",
-    "pm2": "git stash && git pull -f && yarn && yarn build && p=poketto && pm2 del $p && pm2 start --name $p yarn deploy"
+    "update": "git stash && git pull -f && yarn && yarn build && yarn deploy"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.395.0",
