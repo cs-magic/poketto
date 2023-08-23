@@ -1,12 +1,8 @@
-import React, { type PropsWithChildren, ReactNode, useEffect } from "react"
+import React, { type PropsWithChildren } from "react"
 import Navbar from "@/layouts/navbar"
 import { useMount } from "@/hooks/use-mount"
 import clsx from "@/lib/clsx"
-import { URI } from "@/config"
 import { FooterNavItem } from "@/components/link"
-import { useUserId } from "@/hooks/use-user"
-import { api } from "@/lib/api"
-import { useAppStore } from "@/store"
 
 import { Sidebar } from "@/layouts/sidebar"
 import { navs } from "@/config-utils"

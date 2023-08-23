@@ -24,7 +24,6 @@ import { ICON_DIMENSION_SM, siteConfig } from "@/config"
 import { COMMANDS, navs } from "@/config-utils"
 import { Icons } from "@/components/icons"
 import { ChargeContainer } from "@/components/containers"
-import { todo } from "@/lib/helpers"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()
