@@ -13,16 +13,21 @@ in package.json:
 
 ```json
 {
-  "build": "next build",
-  "start": "next start",
-  "update": "git stash && git pull -f && yarn && DIST=.next-tmp yarn build && rm -rf .next && mv $DIST .next && next start"
+  "update": "DIST=.next-tmp && git stash && git pull -f && yarn && DIST=$DIST yarn build && rm -rf .next && mv $DIST .next"
 }
 ```
 
 then run in shell:
 
 ```shell
-p=poketto && pm2 del $p; pm2 start --name $p 'yarn update -p 30817' && pm2 log $p
+# before start
+yarn update
+
+# start
+p=poketto && pm2 start --name $p "yarn start -p 30817" && pm2 log $p
+
+# restart
+p=poketto && pm2 restart $p && pm2 log $p
 ```
 
 因为我测试了在运行 nextjs app 的过程中，重新编译 nextjs 其实还是会导致 500 error的：
