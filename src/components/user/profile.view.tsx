@@ -24,7 +24,7 @@ export const UserProfile = ({ user }: { user: UserForProfile }) => {
 
       {/* avatar info*/}
       <div className={"flex flex-col  overflow-hidden"}>
-        <h2 className={"text-2xl"}>{user?.name ?? DEFAULT_USER_NAME}</h2>
+        <h2 className={"text-2xl"}>{user?.name ?? user?.email ?? DEFAULT_USER_NAME}</h2>
         <p className={"truncate text-muted-foreground"}>@{user?.id ?? DEFAULT_USER_ID}</p>
         <p className={"lines-clamp-2 my-2 text-primary-foreground/75"}>
           {user?.description ?? "You haven't said anything about yourself ~"}
