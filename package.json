@@ -8,8 +8,7 @@
     "lint": "next lint",
     "build": "next build",
     "start": "next start",
-    "deploy": "t=.next-serve && rm -rf $t && mkdir $t && cp -r .next .env* $t && ln -s ../public $t && next start $t",
-    "update": "git stash && git pull -f && yarn && yarn build && yarn deploy"
+    "update": "git stash && git pull -f && yarn && DIST=.next-tmp yarn build && rm -rf .next && mv $DIST .next && next start"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.395.0",

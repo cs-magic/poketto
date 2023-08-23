@@ -1,3 +1,34 @@
+## nextjs deploy
+
+- todo: Deployment strategy best practices · Issue #4337 · vercel/next.js, https://github.com/vercel/next.js/issues/4337
+
+- gpt 说可以直接用 pm2 去控制程序，但其实是不行的：
+
+![img.png](your-sole-poketto_deploy.png)
+
+- 我目前先使用复制策略
+  （参考: [node.js - Zero downtime deployment with Next.js - Stack Overflow](https://stackoverflow.com/questions/73322929/zero-downtime-deployment-with-next-js)）：
+
+in package.json:
+
+```json
+{
+  "build": "next build",
+  "start": "next start",
+  "update": "git stash && git pull -f && yarn && DIST=.next-tmp yarn build && rm -rf .next && mv $DIST .next && next start"
+}
+```
+
+then run in shell:
+
+```shell
+p=poketto && pm2 del $p; pm2 start --name $p 'yarn update -p 30817' && pm2 log $p
+```
+
+因为我测试了在运行 nextjs app 的过程中，重新编译 nextjs 其实还是会导致 500 error的：
+
+![img.png](rebuild-500-error.png)
+
 ## chatbot streaming backend essential
 
 > by mark@cs-magic.com

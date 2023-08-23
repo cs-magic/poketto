@@ -12,6 +12,8 @@ const config = {
     serverActions: true
 
   },
+  
+  distDir: process.env.DIST ?? ".next",
 
   reactStrictMode: true,
 
