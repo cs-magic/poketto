@@ -8,7 +8,7 @@ import DiscordProvider from "next-auth/providers/discord"
 import GithubProvider from "next-auth/providers/github"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
-import { getServerSession, NextAuthOptions, User as NextAuthUser } from "next-auth"
+import { getServerSession, type NextAuthOptions, type User as NextAuthUser } from "next-auth"
 import { emailFrom, sendVerificationRequest } from "@/lib/email"
 
 /**

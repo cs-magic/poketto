@@ -24,10 +24,8 @@ const config = {
       }
     ],
     "@typescript-eslint/ban-ts-comment": ["warn"],
-    "@typescript-eslint/no-explicit-any": ["warn"],
     "react/display-name": ["warn"],
     "@next/next/no-html-link-for-pages": ["warn"],
-    "@typescript-eslint/no-unsafe-assignment": ["warn"],
     "@typescript-eslint/no-unsafe-call": ["off"],
     "@typescript-eslint/no-unsafe-argument": ["warn"],
     "@typescript-eslint/no-unsafe-member-access": ["off"],// zustand slice immer
@@ -47,7 +45,9 @@ const config = {
     // ref:
     // 1. https://stackoverflow.com/a/58271234/9422455
     // 2. https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/docs/rules/no-namespace.md
-    "@typescript-eslint/no-namespace": "off"
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-explicit-any": ["off"]
   }
 };
 

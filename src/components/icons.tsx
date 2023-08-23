@@ -12,7 +12,7 @@ import {
   Image as LucideImage,
   Laptop,
   Loader2,
-  LucideProps,
+  type LucideProps,
   Moon,
   MoreVertical,
   Pizza,
@@ -25,16 +25,16 @@ import {
   X,
 } from "lucide-react"
 import { DiscordLogoIcon } from "@radix-ui/react-icons"
-import { SortOrder } from "@/ds"
-import React, { ElementType } from "react"
+import { type SortOrder } from "@/ds"
+import React, { type ElementType } from "react"
 import { IconCalendarFilled, IconDownload, IconEye, IconStackPush, IconTelescope, IconThumbUp, IconTrendingUp } from "@tabler/icons-react"
-import Image, { ImageProps } from "next/image"
+import Image, { type ImageProps } from "next/image"
 
-// import CSCoin from "../../public/images/cs-coin.svg"
-// todo: svg
-import OpenchatIcon from "../../public/brands/openchat.png"
-import MidjourneyIcon from "../../public/brands/midjourney.png"
-import CatLogo from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
+import CSCoin from "../../public/images/cs-coin.svg"
+import OpenchatIcon from "../../public/brands/openchat.svg"
+import MidjourneyIcon from "../../public/brands/midjourney2.svg"
+import ProductLogo from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
+import CompanyLogo from "../../public/images/logo/m/256.svg"
 
 export const Order2icon: Record<SortOrder, ElementType> = {
   recommend: IconStackPush,
@@ -89,7 +89,8 @@ export const Icons = {
   twitter: Twitter,
   check: Check,
 
-  logo: ({ src = CatLogo, alt = "Cat Logo", width = 24, height = 24, ...props }: Partial<ImageProps>) => (
+  companyLogo: CompanyLogo,
+  productLogo: ({ src = ProductLogo, alt = "Cat Logo", width = 24, height = 24, ...props }: Partial<ImageProps>) => (
     <Image width={width} height={height} src={src} alt={alt} {...props} />
   ),
   // csCoin: CSCoin,

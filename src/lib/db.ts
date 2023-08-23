@@ -1,8 +1,8 @@
-import { Adapter as NextAuthAdapter, AdapterUser } from "next-auth/adapters"
+import { type Adapter as NextAuthAdapter, type AdapterUser } from "next-auth/adapters"
 import { prisma } from "@/server/db"
 import { initUser } from "@/server/init"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
+import { type PrismaClient } from "@prisma/client"
 
 const { createUser: prismaCreateUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 

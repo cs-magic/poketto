@@ -2,12 +2,12 @@ import { z } from "zod"
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
 import { ChatMessageWhereInputSchema, ChatMessageUncheckedCreateInputSchema } from "prisma/generated/zod"
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
-import { ChatMessage } from "@prisma/client"
+import { type ChatMessage } from "@prisma/client"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { Prisma } from ".prisma/client"
 import { DEFAULT_LATEST_COUNT } from "@/config"
 import _ from "lodash"
-import { CreateMessage } from "ai"
+import { type CreateMessage } from "ai"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend

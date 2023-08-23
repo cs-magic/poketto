@@ -24,6 +24,8 @@ import { ICON_DIMENSION_SM, siteConfig } from "@/config"
 import { COMMANDS, navs } from "@/config-utils"
 import { Icons } from "@/components/icons"
 import { ChargeContainer } from "@/components/containers"
+import { Separator } from "@/components/ui/separator"
+import Link from "next/link"
 
 export const ThemeSwitcher = () => {
   const { theme, setTheme, themes } = useTheme()
@@ -44,16 +46,25 @@ export const ThemeSwitcher = () => {
 export const LogoWithName = () => {
   const { toggleSidebar } = useAppStore()
   return (
-    <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
-      {/*<Logo height={24}/>*/}
-      <Icons.logo />
-      <span className={"whitespace-nowrap text-lg tracking-widest"}>{siteConfig.name}</span>
-    </Button>
+    <div className={"flex items-center gap-2 h-8"}>
+      <Link href={"https://cs-magic.com"} className={"hidden md:flex"}>
+        <IconContainer>
+          <Icons.companyLogo className={"wh-8"} />
+        </IconContainer>
+      </Link>
+
+      <Separator orientation={"vertical"} className={"rotate-[30deg] mx-2 hidden md:flex"} />
+
+      <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
+        <Icons.productLogo />
+        <span className={"whitespace-nowrap text-lg tracking-widest"}>{siteConfig.name}</span>
+      </Button>
+    </div>
   )
 }
 
 export const IconContainer = ({ children }: PropsWithChildren) => {
-  return <div className={"p-2 hover:bg-accent"}>{children}</div>
+  return <div className={"p-2 hover:bg-accent rounded-lg"}>{children}</div>
 }
 
 export default function Navbar() {

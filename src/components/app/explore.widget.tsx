@@ -19,6 +19,8 @@ export const ExploreAppsWidget = () => {
   )
   const apps = query.data?.pages.flatMap((item) => item.items)
 
+  console.log({ apps })
+
   return (
     <Card id={"explore"} variant={"ghost"} className={"w-full grow"}>
       <CardHeader>
@@ -34,15 +36,13 @@ export const ExploreAppsWidget = () => {
       </CardHeader>
       <CardContent className={"flex w-full justify-between"}>
         <div className={"flex w-full flex-col divide-y"}>
-          {apps && apps.length > limit ? (
+          {apps &&
+            apps.length >= limit &&
             _.sampleSize(_.range(limit), 3).map((i) => (
               <AppDialogContainer appId={apps[i]!.id} key={i}>
                 <AppHorizontalCardView app={apps[i]} key={i} />
               </AppDialogContainer>
-            ))
-          ) : (
-            <SymbolIcon />
-          )}
+            ))}
         </div>
       </CardContent>
     </Card>

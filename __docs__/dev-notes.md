@@ -1,10 +1,20 @@
+## nextjs svg
+
+看区别，要放松一下条件，才能通过：
+
+![img.png](imgs/svgr.png)
+
+## nextjs font
+
+- 这篇不错： https://blog.logrocket.com/next-js-font-optimization-custom-google-fonts/#using-locally-configured-fonts
+
 ## nextjs deploy
 
 - todo: Deployment strategy best practices · Issue #4337 · vercel/next.js, https://github.com/vercel/next.js/issues/4337
 
 - gpt 说可以直接用 pm2 去控制程序，但其实是不行的：
 
-![img.png](your-sole-poketto_deploy.png)
+![img.png](imgs/your-sole-poketto_deploy.png)
 
 - 我目前先使用复制策略
   （参考: [node.js - Zero downtime deployment with Next.js - Stack Overflow](https://stackoverflow.com/questions/73322929/zero-downtime-deployment-with-next-js)）：
@@ -32,7 +42,7 @@ p=poketto && pm2 restart $p && pm2 log $p
 
 因为我测试了在运行 nextjs app 的过程中，重新编译 nextjs 其实还是会导致 500 error的：
 
-![img.png](rebuild-500-error.png)
+![img.png](imgs/rebuild-500-error.png)
 
 ## chatbot streaming backend essential
 
@@ -303,15 +313,15 @@ const pushMessage = async (msg: Message) => {
     -
 
 - 捐款 demo （nextjs + Element): https://github.com/vercel/next.js/tree/canary/examples/with-stripe-typescript
-    - ![img.png](stripe-donate-demo.png)
+    - ![img.png](imgs/stripe-donate-demo.png)
     - 但是里面的 `Element` 总是出不来：
-        - ![img.png](eleent-not-show.png)
+        - ![img.png](imgs/eleent-not-show.png)
 
 ## next-auth
 
 ### bug: server-error
 
-![img.png](server-error.png)
+![img.png](imgs/server-error.png)
 
 这个问题，主要是因为没有配置 `next-auth` 的秘钥，但又用了 middleware。
 

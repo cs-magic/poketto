@@ -1,4 +1,4 @@
-import { SessionProvider, useSession } from "next-auth/react"
+import { SessionProvider } from "next-auth/react"
 import { api } from "@/lib/api"
 import React from "react"
 import { Toaster } from "sonner"
@@ -10,6 +10,10 @@ import Head from "next/head"
 import { siteConfig } from "@/config"
 import { type ExtendedAppProps } from "@/ds"
 import { ThemeProvider } from "@/components/theme-provider"
+
+export function reportWebVitals(metric) {
+  console.log(metric)
+}
 
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }: ExtendedAppProps) => {
   return (
@@ -31,13 +35,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
                 // fontChinese.className
               )}
             >
-              {/*{Component.auth ? (*/}
-              {/*  <Auth>*/}
               <Component {...pageProps} />
-              {/*</Auth>*/}
-              {/*) : (*/}
-              {/*  <Component {...pageProps} />*/}
-              {/*)}*/}
             </main>
           </ErrorBoundary>
           <Toaster richColors closeButton position={"top-right"} />
@@ -48,14 +46,3 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
 }
 
 export default api.withTRPC(MyApp)
-//
-// function Auth({ children }) {
-//   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
-//   const { status } = useSession({ required: true })
-//
-//   if (status === "loading") {
-//     return <div>Loading...</div>
-//   }
-//
-//   return children
-// }

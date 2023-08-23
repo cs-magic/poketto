@@ -25,7 +25,7 @@ export const pokettoAppRouter = createTRPCRouter({
     .query(async ({ ctx: { prisma }, input: { cursor, language, searchKey, limit, sortOrder, categoryMain, categorySub, tags } }) => {
       const items = await prisma.app.findMany({
         cursor: cursor ? { id: cursor } : undefined,
-        take: DEFAULT_BATCH_CARDS + 1,
+        take: limit + 1,
 
         select: selectAppForListView,
         where: {

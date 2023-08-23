@@ -40,7 +40,14 @@ export const getWelcomeSystemNotification = (userName: string, appName?: string)
   `Welcome ${userName}` + (appName ? `to join the ${appName}` : "") + " !"
 
 export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
-  if (uri.startsWith("/") || size === "raw") return uri
-  if (uri.startsWith("http")) return `${FLOWGPT_IMAGE_DIR}/thumbs/${size}/${hash(uri)}.jpg`
-  return getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
+  let result: string
+  if (uri.startsWith("/") || size === "raw") {
+    result = uri
+  } else if (uri.startsWith("http")) {
+    result = `${FLOWGPT_IMAGE_DIR}/thumbs/${size}/${hash(uri)}.jpg`
+  } else {
+    result = getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
+  }
+  console.log({ uri, size, result })
+  return result
 }

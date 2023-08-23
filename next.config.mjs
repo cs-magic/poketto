@@ -12,7 +12,7 @@ const config = {
     serverActions: true
 
   },
-  
+
   distDir: process.env.DIST ?? ".next",
 
   reactStrictMode: true,
@@ -36,16 +36,13 @@ const config = {
     ]
   },
 
-  webpack(config, { isServer }) {
-    config.module.rules.push(
-      // Convert all other *.svg imports to React components
-      {
-        test: /\.svg$/i,
-        issuer: /\.[jt]sx?$/,
-        resourceQuery: { not: /url/ }, // exclude if *.svg?url
-        use: ["@svgr/webpack"]
-      }
-    );
+  // 这个可以，ref: https://frontend-digest.com/how-to-import-svgs-into-nextjs-8ec6100e613f
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"]
+    });
+
     return config;
   }
 };

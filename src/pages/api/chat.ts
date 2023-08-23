@@ -11,7 +11,7 @@ import { ChatOpenAI } from "langchain/chat_models/openai"
 import { BytesOutputParser } from "langchain/schema/output_parser"
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
-import { LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
+import { type LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge

@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Analytics } from "@/components/analytics"
 import { TailwindIndicator } from "@/components/tailwind-indicator"
 import { fontHeading, fontSans } from "@/lib/fonts"
-import { PropsWithChildren } from "react"
+import { type PropsWithChildren } from "react"
 
 export const metadata = {
   title: {

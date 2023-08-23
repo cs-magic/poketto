@@ -3,7 +3,7 @@ import "server-only"
 
 import Stripe from "stripe"
 
-const key = env.STRIPE_API_KEY as string
+const key = env.STRIPE_API_KEY
 console.log({ key })
 
 export const stripe = new Stripe(key, {

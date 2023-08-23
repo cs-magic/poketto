@@ -1,15 +1,15 @@
-import { CommandType, ICommandItem, INavItem } from "@/ds"
+import { CommandType, type ICommandItem, type INavItem } from "@/ds"
 import { IconLayoutDashboard } from "@tabler/icons-react"
 import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import React from "react"
-import { PromptRoleType } from ".prisma/client"
-import { NavKey, URI } from "@/config"
+import { type PromptRoleType } from ".prisma/client"
+import { type NavKey, URI } from "@/config"
 import { Icons } from "@/components/icons"
 
 export const COMMANDS: ICommandItem[] = [
   {
     id: "Ask Poketto",
-    icon: <Icons.logo />,
+    icon: <Icons.productLogo />,
     category: CommandType.suggestion,
     kbd: "⌘ D",
   },

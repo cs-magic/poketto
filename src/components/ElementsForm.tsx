@@ -84,7 +84,7 @@ function CheckoutForm(): JSX.Element {
       const { client_secret: clientSecret } = await createPaymentIntent(new FormData(e.target as HTMLFormElement))
 
       // Use your card Element with other Stripe.js APIs
-      const { error: confirmError } = await stripe!.confirmPayment({
+      const { error: confirmError } = await stripe.confirmPayment({
         elements,
         clientSecret,
         confirmParams: {

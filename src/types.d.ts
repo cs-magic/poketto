@@ -1,10 +1,4 @@
 declare global {
-  module "*.svg" {
-    import type React from "react"
-    const SVG: React.VFC<React.SVGProps<SVGSVGElement>>
-    export default SVG
-  }
-
   namespace PrismaJson {
     // 要放在里面
     import { type Message } from "ai/react"
@@ -22,7 +16,7 @@ declare global {
    * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
    */
   module "next-auth" {
-    import { DefaultSession } from "next-auth"
+    import { type DefaultSession } from "next-auth"
 
     interface Session extends DefaultSession {
       user: DefaultSession["user"] & {
