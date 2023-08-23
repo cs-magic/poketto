@@ -45,8 +45,6 @@ export const ThemeSwitcher = () => {
 
 /**
  * 晚点再开启公司模式，目前就一个业务，没有必要
- *
- * @constructor
  */
 export const LogoWithName = ({ withCompany }: { withCompany?: false }) => {
   const { toggleSidebar } = useAppStore()
@@ -57,6 +55,7 @@ export const LogoWithName = ({ withCompany }: { withCompany?: false }) => {
     </Button>
   )
   return withCompany ? (
+    // 学 vercel 的，ref: https://nextjs.org/docs/messages/prerender-error
     <div className={"flex items-center gap-2 h-8"}>
       <Link href={"https://cs-magic.com"} className={"hidden md:flex"}>
         <IconContainer>
