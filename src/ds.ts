@@ -39,7 +39,6 @@ export const selectUserForListView = validator<UserSelect>()({
   id: true,
   name: true,
   image: true,
-  email: true,
 })
 export type UserForListView = UserGetPayload<{ select: typeof selectUserForListView }>
 
@@ -49,6 +48,7 @@ export const selectUserProfile = validator<UserSelect>()({
   followingCount: true,
   followedByCount: true,
   balance: true,
+  email: true,
 })
 export type UserForProfile = UserGetPayload<{ select: typeof selectUserProfile }>
 
