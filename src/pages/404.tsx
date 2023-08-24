@@ -10,7 +10,7 @@ export default function Custom404() {
         <h1 className={"mt-8 text-4xl"}>404</h1>
         <p>Poketto Note: You've come to the wilderness of knowledge.</p>
 
-        <ErrorImg className={"shrink-0 wh-[240px] md:wh-[480px]"} />
+        <ErrorImg width={480} className={"shrink-0 wh-[240px] md:wh-[480px]"} />
 
         <ExploreAppsWidget />
       </div>

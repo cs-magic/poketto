@@ -1,23 +1,23 @@
-import { api } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-import { DEFAULT_BATCH_CARDS, URI } from "@/config"
+import { URI } from "@/config"
 import { Button } from "@/components/ui/button"
-import { ArrowRightIcon, SymbolIcon } from "@radix-ui/react-icons"
+import { ArrowRightIcon } from "@radix-ui/react-icons"
 import _ from "lodash"
 import { AppDialogContainer } from "@/components/app/container"
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
+import { type AppForListView } from "@/ds"
 
 const limit = 5
 
 export const ExploreAppsWidget = () => {
-  const query = api.app.list.useInfiniteQuery(
-    { limit },
-    {
-      getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
-    }
-  )
-  const apps = query.data?.pages.flatMap((item) => item.items)
+  // const query = api.app.list.useInfiniteQuery(
+  //   { limit },
+  //   {
+  //     getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
+  //   }
+  // )
+  const apps: AppForListView[] = [] // query.data?.pages.flatMap((item) => item.items)
 
   console.log({ apps })
 
@@ -34,6 +34,7 @@ export const ExploreAppsWidget = () => {
           </Link>
         </div>
       </CardHeader>
+
       <CardContent className={"flex w-full justify-between"}>
         <div className={"flex w-full flex-col divide-y"}>
           {apps &&
