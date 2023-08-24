@@ -31,41 +31,47 @@ export async function POST(req: Request) {
   const session = event.data.object as Stripe.Checkout.Session
 
   if (event.type === "checkout.session.completed") {
-    // Retrieve the subscription details from Stripe.
-    const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-    console.log({ subscription })
+    const { mode } = session
+    const userId = session.client_reference_id ?? session?.metadata?.userId
 
-    // Update the user stripe into in our database.
-    // Since this is the initial subscription, we need to update
-    // the subscription id and customer id.
-    await prisma.user.update({
-      where: {
-        id: session?.metadata?.userId,
-      },
-      data: {
-        stripeSubscriptionId: subscription.id,
-        stripeCustomerId: subscription.customer as string,
-        stripePriceId: subscription.items.data[0]!.price.id,
-        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      },
-    })
-  }
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+    for (const item of lineItems.data) {
+      const productID = item.price?.product as string // get the product ID
+      const { quantity } = item // get the quantity
 
-  if (event.type === "invoice.payment_succeeded") {
-    // Retrieve the subscription details from Stripe.
-    const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-    console.log({ subscription })
+      console.log({ productID, quantity })
+    }
 
-    // Update the price id and set the new period end.
-    await prisma.user.update({
-      where: {
-        stripeSubscriptionId: subscription.id,
-      },
-      data: {
-        stripePriceId: subscription.items.data[0]!.price.id,
-        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      },
-    })
+    // todo: different modes
+
+    // if (mode === "payment") {
+    //   await stripe.paymentIntents.retrieve(session.payment_intent as string, { expand: [""] })
+    //   await prisma.user.update({
+    //     where: {
+    //       id: userId,
+    //     },
+    //     data: {
+    //       stripeCustomerId: subscription.customer as string,
+    //       stripePriceId: subscription.items.data[0]!.price.id,
+    //       stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    //     },
+    //   })
+    // }
+    //
+    // if (mode === "subscription") {
+    //   const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+    //   await prisma.user.update({
+    //     where: {
+    //       id: userId,
+    //     },
+    //     data: {
+    //       stripeSubscriptionId: subscription.id,
+    //       stripeCustomerId: subscription.customer as string,
+    //       stripePriceId: subscription.items.data[0]!.price.id,
+    //       stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+    //     },
+    //   })
+    // }
   }
 
   return new Response(null, { status: 200 })

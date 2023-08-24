@@ -37,10 +37,8 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   },
   followedByCount: 0,
   followingCount: 0,
-  stripeCurrentPeriodEnd: null,
-  stripePriceId: null,
   stripeCustomerId: null,
-  stripeSubscriptionId: null,
+  stripeSubscriptionEnd: null,
 })
 export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
   id: p.id,

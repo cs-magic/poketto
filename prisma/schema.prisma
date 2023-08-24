@@ -180,6 +180,9 @@ model ChatMessage {
   namespace String?                @default("default")
   vector    Unsupported("vector")?
 
+  // 每条 message 付费
+  cost Float? @default(0)
+
   @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
 }
 
@@ -262,11 +265,29 @@ model StarringApp {
   userId String
 }
 
-model Transcation {
-  id String @id @default(cuid())
+model StripeProduct {
+  id       String                   @id
+  price    Float
+  currency String
+  mode     StripeMode
+  // 订阅的期限
+  expire   Int?
+  level    StripeSubscriptionLevel?
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String @db.VarChar(5)
+  payments StripePayment[]
+}
+
+model StripePayment {
+  id         String        @id
+  // 记录要保留
+  product    StripeProduct @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  count      Int           @default(1)
+  // 优惠码
+  redeemCode String?
+
+  productId String
+  userId    String @db.VarChar(5)
 }
 
 model User {
@@ -286,8 +307,6 @@ model User {
   emailVerified DateTime?
   image         String?
   description   String?
-
-  balance Int @default(0)
 
   invitedFrom InvitationRelation[] @relation("from")
   invitedTo   InvitationRelation[] @relation("to")
@@ -311,12 +330,13 @@ model User {
   createdApps App[]
 
   conversations Conversation[]
-  Transcation   Transcation[]
 
-  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
-  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
-  stripePriceId          String?   @map(name: "stripe_price_id")
-  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+  balance               Int             @default(0)
+
+  // 应该要有个多模态，获取账单历史数据……
+  stripePayments        StripePayment[]
+  stripeSubscriptionEnd DateTime?
+  stripeCustomerId      String?         @unique
 
   // maybe we only need one id
   @@unique([platformType, platformId], name: "platform")
@@ -379,4 +399,19 @@ enum RoleType {
   admin
   manager
   normal
+}
+
+enum StripeMode {
+  payment
+  subscription
+}
+
+enum StripeSubscriptionLevel {
+  premidum
+  extreme
+}
+
+enum TransactionType {
+  charge
+  consume
 }

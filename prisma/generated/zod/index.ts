@@ -64,7 +64,7 @@ export const AppStateScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt
 
 export const AppTagScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','creatorId','name']);
 
-export const ChatMessageScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','role','content','format','conversationId','shortId','namespace']);
+export const ChatMessageScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','role','content','format','conversationId','shortId','namespace','cost']);
 
 export const ChatMessageActionScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','messageId','action']);
 
@@ -78,9 +78,11 @@ export const SessionScalarFieldEnumSchema = z.enum(['id','sessionToken','userId'
 
 export const StarringAppScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','appId','isActive','userId']);
 
-export const TranscationScalarFieldEnumSchema = z.enum(['id','userId']);
+export const StripeProductScalarFieldEnumSchema = z.enum(['id','price','currency','mode','expire','level']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','platformType','platformId','platformArgs','name','email','emailVerified','image','description','balance','followedByCount','followingCount','stripeCustomerId','stripeSubscriptionId','stripePriceId','stripeCurrentPeriodEnd']);
+export const StripePaymentScalarFieldEnumSchema = z.enum(['id','count','redeemCode','productId','userId']);
+
+export const UserScalarFieldEnumSchema = z.enum(['id','platformType','platformId','platformArgs','name','email','emailVerified','image','description','followedByCount','followingCount','balance','stripeSubscriptionEnd','stripeCustomerId']);
 
 export const VerificationTokenScalarFieldEnumSchema = z.enum(['identifier','token','expires']);
 
@@ -113,6 +115,18 @@ export type PromptRoleTypeType = `${z.infer<typeof PromptRoleTypeSchema>}`
 export const RoleTypeSchema = z.enum(['admin','manager','normal']);
 
 export type RoleTypeType = `${z.infer<typeof RoleTypeSchema>}`
+
+export const StripeModeSchema = z.enum(['payment','subscription']);
+
+export type StripeModeType = `${z.infer<typeof StripeModeSchema>}`
+
+export const StripeSubscriptionLevelSchema = z.enum(['premidum','extreme']);
+
+export type StripeSubscriptionLevelType = `${z.infer<typeof StripeSubscriptionLevelSchema>}`
+
+export const TransactionTypeSchema = z.enum(['charge','consume']);
+
+export type TransactionTypeType = `${z.infer<typeof TransactionTypeSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -264,6 +278,7 @@ export const ChatMessageSchema = z.object({
   conversationId: z.string(),
   shortId: z.string(),
   namespace: z.string().nullable(),
+  cost: z.number().nullable(),
 })
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>
@@ -357,15 +372,33 @@ export const StarringAppSchema = z.object({
 export type StarringApp = z.infer<typeof StarringAppSchema>
 
 /////////////////////////////////////////
-// TRANSCATION SCHEMA
+// STRIPE PRODUCT SCHEMA
 /////////////////////////////////////////
 
-export const TranscationSchema = z.object({
-  id: z.string().cuid(),
+export const StripeProductSchema = z.object({
+  mode: StripeModeSchema,
+  level: StripeSubscriptionLevelSchema.nullable(),
+  id: z.string(),
+  price: z.number(),
+  currency: z.string(),
+  expire: z.number().int().nullable(),
+})
+
+export type StripeProduct = z.infer<typeof StripeProductSchema>
+
+/////////////////////////////////////////
+// STRIPE PAYMENT SCHEMA
+/////////////////////////////////////////
+
+export const StripePaymentSchema = z.object({
+  id: z.string(),
+  count: z.number().int(),
+  redeemCode: z.string().nullable(),
+  productId: z.string(),
   userId: z.string(),
 })
 
-export type Transcation = z.infer<typeof TranscationSchema>
+export type StripePayment = z.infer<typeof StripePaymentSchema>
 
 /////////////////////////////////////////
 // USER SCHEMA
@@ -384,17 +417,15 @@ export const UserSchema = z.object({
   emailVerified: z.coerce.date().nullable(),
   image: z.string().nullable(),
   description: z.string().nullable(),
-  balance: z.number().int(),
   /**
    * note: 这里显式声明计数字段，是为了提高性能，以及 prisma 对 computed field 的 type support 还处于开始阶段
    * 我们为了对象的数据切片，故分开
    */
   followedByCount: z.number().int(),
   followingCount: z.number().int(),
+  balance: z.number().int(),
+  stripeSubscriptionEnd: z.coerce.date().nullable(),
   stripeCustomerId: z.string().nullable(),
-  stripeSubscriptionId: z.string().nullable(),
-  stripePriceId: z.string().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().nullable(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -677,6 +708,7 @@ export const ChatMessageSelectSchema: z.ZodType<Prisma.ChatMessageSelect> = z.ob
   conversationId: z.boolean().optional(),
   shortId: z.boolean().optional(),
   namespace: z.boolean().optional(),
+  cost: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   userActionOnMessage: z.union([z.boolean(),z.lazy(() => ChatMessageActionFindManyArgsSchema)]).optional(),
   conversation: z.union([z.boolean(),z.lazy(() => ConversationArgsSchema)]).optional(),
@@ -835,21 +867,58 @@ export const StarringAppSelectSchema: z.ZodType<Prisma.StarringAppSelect> = z.ob
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
-// TRANSCATION
+// STRIPE PRODUCT
 //------------------------------------------------------
 
-export const TranscationIncludeSchema: z.ZodType<Prisma.TranscationInclude> = z.object({
+export const StripeProductIncludeSchema: z.ZodType<Prisma.StripeProductInclude> = z.object({
+  payments: z.union([z.boolean(),z.lazy(() => StripePaymentFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => StripeProductCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+export const StripeProductArgsSchema: z.ZodType<Prisma.StripeProductDefaultArgs> = z.object({
+  select: z.lazy(() => StripeProductSelectSchema).optional(),
+  include: z.lazy(() => StripeProductIncludeSchema).optional(),
+}).strict();
+
+export const StripeProductCountOutputTypeArgsSchema: z.ZodType<Prisma.StripeProductCountOutputTypeDefaultArgs> = z.object({
+  select: z.lazy(() => StripeProductCountOutputTypeSelectSchema).nullish(),
+}).strict();
+
+export const StripeProductCountOutputTypeSelectSchema: z.ZodType<Prisma.StripeProductCountOutputTypeSelect> = z.object({
+  payments: z.boolean().optional(),
+}).strict();
+
+export const StripeProductSelectSchema: z.ZodType<Prisma.StripeProductSelect> = z.object({
+  id: z.boolean().optional(),
+  price: z.boolean().optional(),
+  currency: z.boolean().optional(),
+  mode: z.boolean().optional(),
+  expire: z.boolean().optional(),
+  level: z.boolean().optional(),
+  payments: z.union([z.boolean(),z.lazy(() => StripePaymentFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => StripeProductCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// STRIPE PAYMENT
+//------------------------------------------------------
+
+export const StripePaymentIncludeSchema: z.ZodType<Prisma.StripePaymentInclude> = z.object({
+  product: z.union([z.boolean(),z.lazy(() => StripeProductArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
-export const TranscationArgsSchema: z.ZodType<Prisma.TranscationDefaultArgs> = z.object({
-  select: z.lazy(() => TranscationSelectSchema).optional(),
-  include: z.lazy(() => TranscationIncludeSchema).optional(),
+export const StripePaymentArgsSchema: z.ZodType<Prisma.StripePaymentDefaultArgs> = z.object({
+  select: z.lazy(() => StripePaymentSelectSchema).optional(),
+  include: z.lazy(() => StripePaymentIncludeSchema).optional(),
 }).strict();
 
-export const TranscationSelectSchema: z.ZodType<Prisma.TranscationSelect> = z.object({
+export const StripePaymentSelectSchema: z.ZodType<Prisma.StripePaymentSelect> = z.object({
   id: z.boolean().optional(),
+  count: z.boolean().optional(),
+  redeemCode: z.boolean().optional(),
+  productId: z.boolean().optional(),
   userId: z.boolean().optional(),
+  product: z.union([z.boolean(),z.lazy(() => StripeProductArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
@@ -871,7 +940,7 @@ export const UserIncludeSchema: z.ZodType<Prisma.UserInclude> = z.object({
   StarringApp: z.union([z.boolean(),z.lazy(() => StarringAppFindManyArgsSchema)]).optional(),
   createdApps: z.union([z.boolean(),z.lazy(() => AppFindManyArgsSchema)]).optional(),
   conversations: z.union([z.boolean(),z.lazy(() => ConversationFindManyArgsSchema)]).optional(),
-  Transcation: z.union([z.boolean(),z.lazy(() => TranscationFindManyArgsSchema)]).optional(),
+  stripePayments: z.union([z.boolean(),z.lazy(() => StripePaymentFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -899,7 +968,7 @@ export const UserCountOutputTypeSelectSchema: z.ZodType<Prisma.UserCountOutputTy
   StarringApp: z.boolean().optional(),
   createdApps: z.boolean().optional(),
   conversations: z.boolean().optional(),
-  Transcation: z.boolean().optional(),
+  stripePayments: z.boolean().optional(),
 }).strict();
 
 export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
@@ -912,13 +981,11 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   emailVerified: z.boolean().optional(),
   image: z.boolean().optional(),
   description: z.boolean().optional(),
-  balance: z.boolean().optional(),
   followedByCount: z.boolean().optional(),
   followingCount: z.boolean().optional(),
+  balance: z.boolean().optional(),
+  stripeSubscriptionEnd: z.boolean().optional(),
   stripeCustomerId: z.boolean().optional(),
-  stripeSubscriptionId: z.boolean().optional(),
-  stripePriceId: z.boolean().optional(),
-  stripeCurrentPeriodEnd: z.boolean().optional(),
   accounts: z.union([z.boolean(),z.lazy(() => AccountFindManyArgsSchema)]).optional(),
   sessions: z.union([z.boolean(),z.lazy(() => SessionFindManyArgsSchema)]).optional(),
   invitedFrom: z.union([z.boolean(),z.lazy(() => InvitationRelationFindManyArgsSchema)]).optional(),
@@ -933,7 +1000,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   StarringApp: z.union([z.boolean(),z.lazy(() => StarringAppFindManyArgsSchema)]).optional(),
   createdApps: z.union([z.boolean(),z.lazy(() => AppFindManyArgsSchema)]).optional(),
   conversations: z.union([z.boolean(),z.lazy(() => ConversationFindManyArgsSchema)]).optional(),
-  Transcation: z.union([z.boolean(),z.lazy(() => TranscationFindManyArgsSchema)]).optional(),
+  stripePayments: z.union([z.boolean(),z.lazy(() => StripePaymentFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -1576,6 +1643,7 @@ export const ChatMessageWhereInputSchema: z.ZodType<Prisma.ChatMessageWhereInput
   conversationId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   shortId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  cost: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionListRelationFilterSchema).optional(),
   conversation: z.union([ z.lazy(() => ConversationRelationFilterSchema),z.lazy(() => ConversationWhereInputSchema) ]).optional(),
@@ -1592,6 +1660,7 @@ export const ChatMessageOrderByWithRelationInputSchema: z.ZodType<Prisma.ChatMes
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  cost: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionOrderByRelationAggregateInputSchema).optional(),
   conversation: z.lazy(() => ConversationOrderByWithRelationInputSchema).optional()
@@ -1624,6 +1693,7 @@ export const ChatMessageWhereUniqueInputSchema: z.ZodType<Prisma.ChatMessageWher
   conversationId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   shortId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  cost: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionListRelationFilterSchema).optional(),
   conversation: z.union([ z.lazy(() => ConversationRelationFilterSchema),z.lazy(() => ConversationWhereInputSchema) ]).optional(),
@@ -1640,9 +1710,12 @@ export const ChatMessageOrderByWithAggregationInputSchema: z.ZodType<Prisma.Chat
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  cost: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => ChatMessageCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => ChatMessageAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => ChatMessageMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => ChatMessageMinOrderByAggregateInputSchema).optional()
+  _min: z.lazy(() => ChatMessageMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => ChatMessageSumOrderByAggregateInputSchema).optional()
 }).strict();
 
 export const ChatMessageScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ChatMessageScalarWhereWithAggregatesInput> = z.object({
@@ -1659,6 +1732,7 @@ export const ChatMessageScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.C
   conversationId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   shortId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  cost: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageActionWhereInputSchema: z.ZodType<Prisma.ChatMessageActionWhereInput> = z.object({
@@ -2075,46 +2149,131 @@ export const StarringAppScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.S
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
 }).strict();
 
-export const TranscationWhereInputSchema: z.ZodType<Prisma.TranscationWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => TranscationWhereInputSchema),z.lazy(() => TranscationWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => TranscationWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => TranscationWhereInputSchema),z.lazy(() => TranscationWhereInputSchema).array() ]).optional(),
+export const StripeProductWhereInputSchema: z.ZodType<Prisma.StripeProductWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => StripeProductWhereInputSchema),z.lazy(() => StripeProductWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripeProductWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripeProductWhereInputSchema),z.lazy(() => StripeProductWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  price: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+  currency: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  mode: z.union([ z.lazy(() => EnumStripeModeFilterSchema),z.lazy(() => StripeModeSchema) ]).optional(),
+  expire: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  level: z.union([ z.lazy(() => EnumStripeSubscriptionLevelNullableFilterSchema),z.lazy(() => StripeSubscriptionLevelSchema) ]).optional().nullable(),
+  payments: z.lazy(() => StripePaymentListRelationFilterSchema).optional()
+}).strict();
+
+export const StripeProductOrderByWithRelationInputSchema: z.ZodType<Prisma.StripeProductOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  price: z.lazy(() => SortOrderSchema).optional(),
+  currency: z.lazy(() => SortOrderSchema).optional(),
+  mode: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  level: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  payments: z.lazy(() => StripePaymentOrderByRelationAggregateInputSchema).optional()
+}).strict();
+
+export const StripeProductWhereUniqueInputSchema: z.ZodType<Prisma.StripeProductWhereUniqueInput> = z.object({
+  id: z.string()
+})
+.and(z.object({
+  id: z.string().optional(),
+  AND: z.union([ z.lazy(() => StripeProductWhereInputSchema),z.lazy(() => StripeProductWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripeProductWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripeProductWhereInputSchema),z.lazy(() => StripeProductWhereInputSchema).array() ]).optional(),
+  price: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+  currency: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  mode: z.union([ z.lazy(() => EnumStripeModeFilterSchema),z.lazy(() => StripeModeSchema) ]).optional(),
+  expire: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
+  level: z.union([ z.lazy(() => EnumStripeSubscriptionLevelNullableFilterSchema),z.lazy(() => StripeSubscriptionLevelSchema) ]).optional().nullable(),
+  payments: z.lazy(() => StripePaymentListRelationFilterSchema).optional()
+}).strict());
+
+export const StripeProductOrderByWithAggregationInputSchema: z.ZodType<Prisma.StripeProductOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  price: z.lazy(() => SortOrderSchema).optional(),
+  currency: z.lazy(() => SortOrderSchema).optional(),
+  mode: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  level: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  _count: z.lazy(() => StripeProductCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => StripeProductAvgOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => StripeProductMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => StripeProductMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => StripeProductSumOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const StripeProductScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.StripeProductScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => StripeProductScalarWhereWithAggregatesInputSchema),z.lazy(() => StripeProductScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripeProductScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripeProductScalarWhereWithAggregatesInputSchema),z.lazy(() => StripeProductScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  price: z.union([ z.lazy(() => FloatWithAggregatesFilterSchema),z.number() ]).optional(),
+  currency: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  mode: z.union([ z.lazy(() => EnumStripeModeWithAggregatesFilterSchema),z.lazy(() => StripeModeSchema) ]).optional(),
+  expire: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  level: z.union([ z.lazy(() => EnumStripeSubscriptionLevelNullableWithAggregatesFilterSchema),z.lazy(() => StripeSubscriptionLevelSchema) ]).optional().nullable(),
+}).strict();
+
+export const StripePaymentWhereInputSchema: z.ZodType<Prisma.StripePaymentWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => StripePaymentWhereInputSchema),z.lazy(() => StripePaymentWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripePaymentWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripePaymentWhereInputSchema),z.lazy(() => StripePaymentWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  count: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  redeemCode: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  productId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  product: z.union([ z.lazy(() => StripeProductRelationFilterSchema),z.lazy(() => StripeProductWhereInputSchema) ]).optional(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
 }).strict();
 
-export const TranscationOrderByWithRelationInputSchema: z.ZodType<Prisma.TranscationOrderByWithRelationInput> = z.object({
+export const StripePaymentOrderByWithRelationInputSchema: z.ZodType<Prisma.StripePaymentOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  count: z.lazy(() => SortOrderSchema).optional(),
+  redeemCode: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  productId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
+  product: z.lazy(() => StripeProductOrderByWithRelationInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const TranscationWhereUniqueInputSchema: z.ZodType<Prisma.TranscationWhereUniqueInput> = z.object({
-  id: z.string().cuid()
+export const StripePaymentWhereUniqueInputSchema: z.ZodType<Prisma.StripePaymentWhereUniqueInput> = z.object({
+  id: z.string()
 })
 .and(z.object({
-  id: z.string().cuid().optional(),
-  AND: z.union([ z.lazy(() => TranscationWhereInputSchema),z.lazy(() => TranscationWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => TranscationWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => TranscationWhereInputSchema),z.lazy(() => TranscationWhereInputSchema).array() ]).optional(),
+  id: z.string().optional(),
+  AND: z.union([ z.lazy(() => StripePaymentWhereInputSchema),z.lazy(() => StripePaymentWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripePaymentWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripePaymentWhereInputSchema),z.lazy(() => StripePaymentWhereInputSchema).array() ]).optional(),
+  count: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  redeemCode: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  productId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  product: z.union([ z.lazy(() => StripeProductRelationFilterSchema),z.lazy(() => StripeProductWhereInputSchema) ]).optional(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
 }).strict());
 
-export const TranscationOrderByWithAggregationInputSchema: z.ZodType<Prisma.TranscationOrderByWithAggregationInput> = z.object({
+export const StripePaymentOrderByWithAggregationInputSchema: z.ZodType<Prisma.StripePaymentOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  count: z.lazy(() => SortOrderSchema).optional(),
+  redeemCode: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  productId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
-  _count: z.lazy(() => TranscationCountOrderByAggregateInputSchema).optional(),
-  _max: z.lazy(() => TranscationMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => TranscationMinOrderByAggregateInputSchema).optional()
+  _count: z.lazy(() => StripePaymentCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => StripePaymentAvgOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => StripePaymentMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => StripePaymentMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => StripePaymentSumOrderByAggregateInputSchema).optional()
 }).strict();
 
-export const TranscationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.TranscationScalarWhereWithAggregatesInput> = z.object({
-  AND: z.union([ z.lazy(() => TranscationScalarWhereWithAggregatesInputSchema),z.lazy(() => TranscationScalarWhereWithAggregatesInputSchema).array() ]).optional(),
-  OR: z.lazy(() => TranscationScalarWhereWithAggregatesInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => TranscationScalarWhereWithAggregatesInputSchema),z.lazy(() => TranscationScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+export const StripePaymentScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.StripePaymentScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => StripePaymentScalarWhereWithAggregatesInputSchema),z.lazy(() => StripePaymentScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripePaymentScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripePaymentScalarWhereWithAggregatesInputSchema),z.lazy(() => StripePaymentScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  count: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
+  redeemCode: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  productId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
 }).strict();
 
@@ -2131,13 +2290,11 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   emailVerified: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   image: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  balance: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   followedByCount: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   followingCount: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  balance: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   stripeCustomerId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  stripePriceId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   accounts: z.lazy(() => AccountListRelationFilterSchema).optional(),
   sessions: z.lazy(() => SessionListRelationFilterSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationListRelationFilterSchema).optional(),
@@ -2152,7 +2309,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   StarringApp: z.lazy(() => StarringAppListRelationFilterSchema).optional(),
   createdApps: z.lazy(() => AppListRelationFilterSchema).optional(),
   conversations: z.lazy(() => ConversationListRelationFilterSchema).optional(),
-  Transcation: z.lazy(() => TranscationListRelationFilterSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentListRelationFilterSchema).optional()
 }).strict();
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
@@ -2165,13 +2322,11 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   emailVerified: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   image: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
   followingCount: z.lazy(() => SortOrderSchema).optional(),
+  balance: z.lazy(() => SortOrderSchema).optional(),
+  stripeSubscriptionEnd: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   stripeCustomerId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  stripeSubscriptionId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  stripePriceId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  stripeCurrentPeriodEnd: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   accounts: z.lazy(() => AccountOrderByRelationAggregateInputSchema).optional(),
   sessions: z.lazy(() => SessionOrderByRelationAggregateInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationOrderByRelationAggregateInputSchema).optional(),
@@ -2186,7 +2341,7 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   StarringApp: z.lazy(() => StarringAppOrderByRelationAggregateInputSchema).optional(),
   createdApps: z.lazy(() => AppOrderByRelationAggregateInputSchema).optional(),
   conversations: z.lazy(() => ConversationOrderByRelationAggregateInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationOrderByRelationAggregateInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -2194,36 +2349,12 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
     id: z.string(),
     email: z.string(),
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
     platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema)
   }),
   z.object({
     id: z.string(),
     email: z.string(),
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    email: z.string(),
-    stripeCustomerId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    id: z.string(),
-    email: z.string(),
-    stripeCustomerId: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    email: z.string(),
-    stripeSubscriptionId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    id: z.string(),
-    email: z.string(),
-    stripeSubscriptionId: z.string(),
   }),
   z.object({
     id: z.string(),
@@ -2237,31 +2368,11 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   z.object({
     id: z.string(),
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
     platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
   }),
   z.object({
     id: z.string(),
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    stripeCustomerId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    id: z.string(),
-    stripeCustomerId: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    stripeSubscriptionId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    id: z.string(),
-    stripeSubscriptionId: z.string(),
   }),
   z.object({
     id: z.string(),
@@ -2273,31 +2384,11 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   z.object({
     email: z.string(),
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
     platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
   }),
   z.object({
     email: z.string(),
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
-  }),
-  z.object({
-    email: z.string(),
-    stripeCustomerId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    email: z.string(),
-    stripeCustomerId: z.string(),
-  }),
-  z.object({
-    email: z.string(),
-    stripeSubscriptionId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    email: z.string(),
-    stripeSubscriptionId: z.string(),
   }),
   z.object({
     email: z.string(),
@@ -2308,26 +2399,10 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   }),
   z.object({
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
     platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
   }),
   z.object({
     stripeCustomerId: z.string(),
-    stripeSubscriptionId: z.string(),
-  }),
-  z.object({
-    stripeCustomerId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    stripeCustomerId: z.string(),
-  }),
-  z.object({
-    stripeSubscriptionId: z.string(),
-    platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
-  }),
-  z.object({
-    stripeSubscriptionId: z.string(),
   }),
   z.object({
     platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema),
@@ -2337,7 +2412,6 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   id: z.string().optional(),
   email: z.string().optional(),
   stripeCustomerId: z.string().optional(),
-  stripeSubscriptionId: z.string().optional(),
   platform: z.lazy(() => UserPlatformCompoundUniqueInputSchema).optional(),
   AND: z.union([ z.lazy(() => UserWhereInputSchema),z.lazy(() => UserWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => UserWhereInputSchema).array().optional(),
@@ -2349,11 +2423,10 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   emailVerified: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   image: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  balance: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   followedByCount: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   followingCount: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
-  stripePriceId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  balance: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   accounts: z.lazy(() => AccountListRelationFilterSchema).optional(),
   sessions: z.lazy(() => SessionListRelationFilterSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationListRelationFilterSchema).optional(),
@@ -2368,7 +2441,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   StarringApp: z.lazy(() => StarringAppListRelationFilterSchema).optional(),
   createdApps: z.lazy(() => AppListRelationFilterSchema).optional(),
   conversations: z.lazy(() => ConversationListRelationFilterSchema).optional(),
-  Transcation: z.lazy(() => TranscationListRelationFilterSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentListRelationFilterSchema).optional()
 }).strict());
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
@@ -2381,13 +2454,11 @@ export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderBy
   emailVerified: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   image: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
   followingCount: z.lazy(() => SortOrderSchema).optional(),
+  balance: z.lazy(() => SortOrderSchema).optional(),
+  stripeSubscriptionEnd: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   stripeCustomerId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  stripeSubscriptionId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  stripePriceId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  stripeCurrentPeriodEnd: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => UserCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => UserAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => UserMaxOrderByAggregateInputSchema).optional(),
@@ -2408,13 +2479,11 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   emailVerified: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   image: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   description: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-  balance: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   followedByCount: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   followingCount: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
+  balance: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   stripeCustomerId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-  stripePriceId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
 }).strict();
 
 export const VerificationTokenWhereInputSchema: z.ZodType<Prisma.VerificationTokenWhereInput> = z.object({
@@ -3082,6 +3151,7 @@ export const ChatMessageCreateInputSchema: z.ZodType<Prisma.ChatMessageCreateInp
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutChatMessagesInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionCreateNestedManyWithoutMessageInputSchema).optional(),
   conversation: z.lazy(() => ConversationCreateNestedOneWithoutMessagesInputSchema)
@@ -3098,6 +3168,7 @@ export const ChatMessageUncheckedCreateInputSchema: z.ZodType<Prisma.ChatMessage
   conversationId: z.string(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
 
@@ -3110,6 +3181,7 @@ export const ChatMessageUpdateInputSchema: z.ZodType<Prisma.ChatMessageUpdateInp
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneWithoutChatMessagesNestedInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUpdateManyWithoutMessageNestedInputSchema).optional(),
   conversation: z.lazy(() => ConversationUpdateOneRequiredWithoutMessagesNestedInputSchema).optional()
@@ -3126,6 +3198,7 @@ export const ChatMessageUncheckedUpdateInputSchema: z.ZodType<Prisma.ChatMessage
   conversationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
 
@@ -3139,7 +3212,8 @@ export const ChatMessageCreateManyInputSchema: z.ZodType<Prisma.ChatMessageCreat
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   conversationId: z.string(),
   shortId: z.string().optional(),
-  namespace: z.string().optional().nullable()
+  namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable()
 }).strict();
 
 export const ChatMessageUpdateManyMutationInputSchema: z.ZodType<Prisma.ChatMessageUpdateManyMutationInput> = z.object({
@@ -3151,6 +3225,7 @@ export const ChatMessageUpdateManyMutationInputSchema: z.ZodType<Prisma.ChatMess
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ChatMessageUncheckedUpdateManyInput> = z.object({
@@ -3164,6 +3239,7 @@ export const ChatMessageUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ChatMes
   conversationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageActionCreateInputSchema: z.ZodType<Prisma.ChatMessageActionCreateInput> = z.object({
@@ -3523,37 +3599,124 @@ export const StarringAppUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Starrin
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const TranscationCreateInputSchema: z.ZodType<Prisma.TranscationCreateInput> = z.object({
-  id: z.string().cuid().optional(),
-  user: z.lazy(() => UserCreateNestedOneWithoutTranscationInputSchema)
+export const StripeProductCreateInputSchema: z.ZodType<Prisma.StripeProductCreateInput> = z.object({
+  id: z.string(),
+  price: z.number(),
+  currency: z.string(),
+  mode: z.lazy(() => StripeModeSchema),
+  expire: z.number().int().optional().nullable(),
+  level: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable(),
+  payments: z.lazy(() => StripePaymentCreateNestedManyWithoutProductInputSchema).optional()
 }).strict();
 
-export const TranscationUncheckedCreateInputSchema: z.ZodType<Prisma.TranscationUncheckedCreateInput> = z.object({
-  id: z.string().cuid().optional(),
+export const StripeProductUncheckedCreateInputSchema: z.ZodType<Prisma.StripeProductUncheckedCreateInput> = z.object({
+  id: z.string(),
+  price: z.number(),
+  currency: z.string(),
+  mode: z.lazy(() => StripeModeSchema),
+  expire: z.number().int().optional().nullable(),
+  level: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable(),
+  payments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutProductInputSchema).optional()
+}).strict();
+
+export const StripeProductUpdateInputSchema: z.ZodType<Prisma.StripeProductUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  price: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  currency: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  mode: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => EnumStripeModeFieldUpdateOperationsInputSchema) ]).optional(),
+  expire: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  level: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  payments: z.lazy(() => StripePaymentUpdateManyWithoutProductNestedInputSchema).optional()
+}).strict();
+
+export const StripeProductUncheckedUpdateInputSchema: z.ZodType<Prisma.StripeProductUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  price: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  currency: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  mode: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => EnumStripeModeFieldUpdateOperationsInputSchema) ]).optional(),
+  expire: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  level: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  payments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutProductNestedInputSchema).optional()
+}).strict();
+
+export const StripeProductCreateManyInputSchema: z.ZodType<Prisma.StripeProductCreateManyInput> = z.object({
+  id: z.string(),
+  price: z.number(),
+  currency: z.string(),
+  mode: z.lazy(() => StripeModeSchema),
+  expire: z.number().int().optional().nullable(),
+  level: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable()
+}).strict();
+
+export const StripeProductUpdateManyMutationInputSchema: z.ZodType<Prisma.StripeProductUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  price: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  currency: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  mode: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => EnumStripeModeFieldUpdateOperationsInputSchema) ]).optional(),
+  expire: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  level: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const StripeProductUncheckedUpdateManyInputSchema: z.ZodType<Prisma.StripeProductUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  price: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  currency: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  mode: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => EnumStripeModeFieldUpdateOperationsInputSchema) ]).optional(),
+  expire: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  level: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const StripePaymentCreateInputSchema: z.ZodType<Prisma.StripePaymentCreateInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  product: z.lazy(() => StripeProductCreateNestedOneWithoutPaymentsInputSchema),
+  user: z.lazy(() => UserCreateNestedOneWithoutStripePaymentsInputSchema)
+}).strict();
+
+export const StripePaymentUncheckedCreateInputSchema: z.ZodType<Prisma.StripePaymentUncheckedCreateInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  productId: z.string(),
   userId: z.string()
 }).strict();
 
-export const TranscationUpdateInputSchema: z.ZodType<Prisma.TranscationUpdateInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutTranscationNestedInputSchema).optional()
+export const StripePaymentUpdateInputSchema: z.ZodType<Prisma.StripePaymentUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  product: z.lazy(() => StripeProductUpdateOneRequiredWithoutPaymentsNestedInputSchema).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutStripePaymentsNestedInputSchema).optional()
 }).strict();
 
-export const TranscationUncheckedUpdateInputSchema: z.ZodType<Prisma.TranscationUncheckedUpdateInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const StripePaymentUncheckedUpdateInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  productId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const TranscationCreateManyInputSchema: z.ZodType<Prisma.TranscationCreateManyInput> = z.object({
-  id: z.string().cuid().optional(),
+export const StripePaymentCreateManyInputSchema: z.ZodType<Prisma.StripePaymentCreateManyInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  productId: z.string(),
   userId: z.string()
 }).strict();
 
-export const TranscationUpdateManyMutationInputSchema: z.ZodType<Prisma.TranscationUpdateManyMutationInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const StripePaymentUpdateManyMutationInputSchema: z.ZodType<Prisma.StripePaymentUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const TranscationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.TranscationUncheckedUpdateManyInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const StripePaymentUncheckedUpdateManyInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  productId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
@@ -3567,13 +3730,11 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -3588,7 +3749,7 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
@@ -3601,13 +3762,11 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -3622,7 +3781,7 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
@@ -3635,13 +3794,11 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -3656,7 +3813,7 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
@@ -3669,13 +3826,11 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -3690,7 +3845,7 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
@@ -3703,13 +3858,11 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
-  stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable()
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
+  stripeCustomerId: z.string().optional().nullable()
 }).strict();
 
 export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyMutationInput> = z.object({
@@ -3722,13 +3875,11 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyInput> = z.object({
@@ -3741,13 +3892,11 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const VerificationTokenCreateInputSchema: z.ZodType<Prisma.VerificationTokenCreateInput> = z.object({
@@ -4476,6 +4625,17 @@ export const EnumChatMessageFormatTypeFilterSchema: z.ZodType<Prisma.EnumChatMes
   not: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => NestedEnumChatMessageFormatTypeFilterSchema) ]).optional(),
 }).strict();
 
+export const FloatNullableFilterSchema: z.ZodType<Prisma.FloatNullableFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.number().array().optional().nullable(),
+  notIn: z.number().array().optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedFloatNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
 export const ChatMessageActionListRelationFilterSchema: z.ZodType<Prisma.ChatMessageActionListRelationFilter> = z.object({
   every: z.lazy(() => ChatMessageActionWhereInputSchema).optional(),
   some: z.lazy(() => ChatMessageActionWhereInputSchema).optional(),
@@ -4506,7 +4666,12 @@ export const ChatMessageCountOrderByAggregateInputSchema: z.ZodType<Prisma.ChatM
   format: z.lazy(() => SortOrderSchema).optional(),
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.lazy(() => SortOrderSchema).optional()
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  cost: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ChatMessageAvgOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageAvgOrderByAggregateInput> = z.object({
+  cost: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ChatMessageMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageMaxOrderByAggregateInput> = z.object({
@@ -4519,7 +4684,8 @@ export const ChatMessageMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMes
   format: z.lazy(() => SortOrderSchema).optional(),
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.lazy(() => SortOrderSchema).optional()
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  cost: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ChatMessageMinOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageMinOrderByAggregateInput> = z.object({
@@ -4532,7 +4698,12 @@ export const ChatMessageMinOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMes
   format: z.lazy(() => SortOrderSchema).optional(),
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
-  namespace: z.lazy(() => SortOrderSchema).optional()
+  namespace: z.lazy(() => SortOrderSchema).optional(),
+  cost: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ChatMessageSumOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageSumOrderByAggregateInput> = z.object({
+  cost: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const EnumPromptRoleTypeWithAggregatesFilterSchema: z.ZodType<Prisma.EnumPromptRoleTypeWithAggregatesFilter> = z.object({
@@ -4553,6 +4724,22 @@ export const EnumChatMessageFormatTypeWithAggregatesFilterSchema: z.ZodType<Pris
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedEnumChatMessageFormatTypeFilterSchema).optional(),
   _max: z.lazy(() => NestedEnumChatMessageFormatTypeFilterSchema).optional()
+}).strict();
+
+export const FloatNullableWithAggregatesFilterSchema: z.ZodType<Prisma.FloatNullableWithAggregatesFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.number().array().optional().nullable(),
+  notIn: z.number().array().optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedFloatNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _sum: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedFloatNullableFilterSchema).optional()
 }).strict();
 
 export const ChatMessageRelationFilterSchema: z.ZodType<Prisma.ChatMessageRelationFilter> = z.object({
@@ -4748,19 +4935,122 @@ export const StarringAppMinOrderByAggregateInputSchema: z.ZodType<Prisma.Starrin
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const TranscationCountOrderByAggregateInputSchema: z.ZodType<Prisma.TranscationCountOrderByAggregateInput> = z.object({
+export const EnumStripeModeFilterSchema: z.ZodType<Prisma.EnumStripeModeFilter> = z.object({
+  equals: z.lazy(() => StripeModeSchema).optional(),
+  in: z.lazy(() => StripeModeSchema).array().optional(),
+  notIn: z.lazy(() => StripeModeSchema).array().optional(),
+  not: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => NestedEnumStripeModeFilterSchema) ]).optional(),
+}).strict();
+
+export const EnumStripeSubscriptionLevelNullableFilterSchema: z.ZodType<Prisma.EnumStripeSubscriptionLevelNullableFilter> = z.object({
+  equals: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable(),
+  in: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  notIn: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  not: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NestedEnumStripeSubscriptionLevelNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
+export const StripePaymentListRelationFilterSchema: z.ZodType<Prisma.StripePaymentListRelationFilter> = z.object({
+  every: z.lazy(() => StripePaymentWhereInputSchema).optional(),
+  some: z.lazy(() => StripePaymentWhereInputSchema).optional(),
+  none: z.lazy(() => StripePaymentWhereInputSchema).optional()
+}).strict();
+
+export const StripePaymentOrderByRelationAggregateInputSchema: z.ZodType<Prisma.StripePaymentOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripeProductCountOrderByAggregateInputSchema: z.ZodType<Prisma.StripeProductCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  price: z.lazy(() => SortOrderSchema).optional(),
+  currency: z.lazy(() => SortOrderSchema).optional(),
+  mode: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.lazy(() => SortOrderSchema).optional(),
+  level: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripeProductAvgOrderByAggregateInputSchema: z.ZodType<Prisma.StripeProductAvgOrderByAggregateInput> = z.object({
+  price: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripeProductMaxOrderByAggregateInputSchema: z.ZodType<Prisma.StripeProductMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  price: z.lazy(() => SortOrderSchema).optional(),
+  currency: z.lazy(() => SortOrderSchema).optional(),
+  mode: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.lazy(() => SortOrderSchema).optional(),
+  level: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripeProductMinOrderByAggregateInputSchema: z.ZodType<Prisma.StripeProductMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  price: z.lazy(() => SortOrderSchema).optional(),
+  currency: z.lazy(() => SortOrderSchema).optional(),
+  mode: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.lazy(() => SortOrderSchema).optional(),
+  level: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripeProductSumOrderByAggregateInputSchema: z.ZodType<Prisma.StripeProductSumOrderByAggregateInput> = z.object({
+  price: z.lazy(() => SortOrderSchema).optional(),
+  expire: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const EnumStripeModeWithAggregatesFilterSchema: z.ZodType<Prisma.EnumStripeModeWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => StripeModeSchema).optional(),
+  in: z.lazy(() => StripeModeSchema).array().optional(),
+  notIn: z.lazy(() => StripeModeSchema).array().optional(),
+  not: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => NestedEnumStripeModeWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumStripeModeFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumStripeModeFilterSchema).optional()
+}).strict();
+
+export const EnumStripeSubscriptionLevelNullableWithAggregatesFilterSchema: z.ZodType<Prisma.EnumStripeSubscriptionLevelNullableWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable(),
+  in: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  notIn: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  not: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NestedEnumStripeSubscriptionLevelNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumStripeSubscriptionLevelNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumStripeSubscriptionLevelNullableFilterSchema).optional()
+}).strict();
+
+export const StripeProductRelationFilterSchema: z.ZodType<Prisma.StripeProductRelationFilter> = z.object({
+  is: z.lazy(() => StripeProductWhereInputSchema).optional(),
+  isNot: z.lazy(() => StripeProductWhereInputSchema).optional()
+}).strict();
+
+export const StripePaymentCountOrderByAggregateInputSchema: z.ZodType<Prisma.StripePaymentCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  count: z.lazy(() => SortOrderSchema).optional(),
+  redeemCode: z.lazy(() => SortOrderSchema).optional(),
+  productId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const TranscationMaxOrderByAggregateInputSchema: z.ZodType<Prisma.TranscationMaxOrderByAggregateInput> = z.object({
+export const StripePaymentAvgOrderByAggregateInputSchema: z.ZodType<Prisma.StripePaymentAvgOrderByAggregateInput> = z.object({
+  count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripePaymentMaxOrderByAggregateInputSchema: z.ZodType<Prisma.StripePaymentMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  count: z.lazy(() => SortOrderSchema).optional(),
+  redeemCode: z.lazy(() => SortOrderSchema).optional(),
+  productId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const TranscationMinOrderByAggregateInputSchema: z.ZodType<Prisma.TranscationMinOrderByAggregateInput> = z.object({
+export const StripePaymentMinOrderByAggregateInputSchema: z.ZodType<Prisma.StripePaymentMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  count: z.lazy(() => SortOrderSchema).optional(),
+  redeemCode: z.lazy(() => SortOrderSchema).optional(),
+  productId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const StripePaymentSumOrderByAggregateInputSchema: z.ZodType<Prisma.StripePaymentSumOrderByAggregateInput> = z.object({
+  count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AccountListRelationFilterSchema: z.ZodType<Prisma.AccountListRelationFilter> = z.object({
@@ -4787,12 +5077,6 @@ export const FollowRelationListRelationFilterSchema: z.ZodType<Prisma.FollowRela
   none: z.lazy(() => FollowRelationWhereInputSchema).optional()
 }).strict();
 
-export const TranscationListRelationFilterSchema: z.ZodType<Prisma.TranscationListRelationFilter> = z.object({
-  every: z.lazy(() => TranscationWhereInputSchema).optional(),
-  some: z.lazy(() => TranscationWhereInputSchema).optional(),
-  none: z.lazy(() => TranscationWhereInputSchema).optional()
-}).strict();
-
 export const AccountOrderByRelationAggregateInputSchema: z.ZodType<Prisma.AccountOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -4806,10 +5090,6 @@ export const InvitationRelationOrderByRelationAggregateInputSchema: z.ZodType<Pr
 }).strict();
 
 export const FollowRelationOrderByRelationAggregateInputSchema: z.ZodType<Prisma.FollowRelationOrderByRelationAggregateInput> = z.object({
-  _count: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const TranscationOrderByRelationAggregateInputSchema: z.ZodType<Prisma.TranscationOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -4828,19 +5108,17 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   image: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
   followingCount: z.lazy(() => SortOrderSchema).optional(),
-  stripeCustomerId: z.lazy(() => SortOrderSchema).optional(),
-  stripeSubscriptionId: z.lazy(() => SortOrderSchema).optional(),
-  stripePriceId: z.lazy(() => SortOrderSchema).optional(),
-  stripeCurrentPeriodEnd: z.lazy(() => SortOrderSchema).optional()
+  balance: z.lazy(() => SortOrderSchema).optional(),
+  stripeSubscriptionEnd: z.lazy(() => SortOrderSchema).optional(),
+  stripeCustomerId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserAvgOrderByAggregateInputSchema: z.ZodType<Prisma.UserAvgOrderByAggregateInput> = z.object({
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
-  followingCount: z.lazy(() => SortOrderSchema).optional()
+  followingCount: z.lazy(() => SortOrderSchema).optional(),
+  balance: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderByAggregateInput> = z.object({
@@ -4852,13 +5130,11 @@ export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderBy
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   image: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
   followingCount: z.lazy(() => SortOrderSchema).optional(),
-  stripeCustomerId: z.lazy(() => SortOrderSchema).optional(),
-  stripeSubscriptionId: z.lazy(() => SortOrderSchema).optional(),
-  stripePriceId: z.lazy(() => SortOrderSchema).optional(),
-  stripeCurrentPeriodEnd: z.lazy(() => SortOrderSchema).optional()
+  balance: z.lazy(() => SortOrderSchema).optional(),
+  stripeSubscriptionEnd: z.lazy(() => SortOrderSchema).optional(),
+  stripeCustomerId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderByAggregateInput> = z.object({
@@ -4870,19 +5146,17 @@ export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderBy
   emailVerified: z.lazy(() => SortOrderSchema).optional(),
   image: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
   followingCount: z.lazy(() => SortOrderSchema).optional(),
-  stripeCustomerId: z.lazy(() => SortOrderSchema).optional(),
-  stripeSubscriptionId: z.lazy(() => SortOrderSchema).optional(),
-  stripePriceId: z.lazy(() => SortOrderSchema).optional(),
-  stripeCurrentPeriodEnd: z.lazy(() => SortOrderSchema).optional()
+  balance: z.lazy(() => SortOrderSchema).optional(),
+  stripeSubscriptionEnd: z.lazy(() => SortOrderSchema).optional(),
+  stripeCustomerId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserSumOrderByAggregateInputSchema: z.ZodType<Prisma.UserSumOrderByAggregateInput> = z.object({
-  balance: z.lazy(() => SortOrderSchema).optional(),
   followedByCount: z.lazy(() => SortOrderSchema).optional(),
-  followingCount: z.lazy(() => SortOrderSchema).optional()
+  followingCount: z.lazy(() => SortOrderSchema).optional(),
+  balance: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const VerificationTokenIdentifierTokenCompoundUniqueInputSchema: z.ZodType<Prisma.VerificationTokenIdentifierTokenCompoundUniqueInput> = z.object({
@@ -5438,6 +5712,14 @@ export const EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema: z.ZodTyp
   set: z.lazy(() => ChatMessageFormatTypeSchema).optional()
 }).strict();
 
+export const NullableFloatFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableFloatFieldUpdateOperationsInput> = z.object({
+  set: z.number().optional().nullable(),
+  increment: z.number().optional(),
+  decrement: z.number().optional(),
+  multiply: z.number().optional(),
+  divide: z.number().optional()
+}).strict();
+
 export const UserUpdateOneWithoutChatMessagesNestedInputSchema: z.ZodType<Prisma.UserUpdateOneWithoutChatMessagesNestedInput> = z.object({
   create: z.union([ z.lazy(() => UserCreateWithoutChatMessagesInputSchema),z.lazy(() => UserUncheckedCreateWithoutChatMessagesInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutChatMessagesInputSchema).optional(),
@@ -5688,18 +5970,82 @@ export const UserUpdateOneRequiredWithoutStarringAppNestedInputSchema: z.ZodType
   update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutStarringAppInputSchema),z.lazy(() => UserUpdateWithoutStarringAppInputSchema),z.lazy(() => UserUncheckedUpdateWithoutStarringAppInputSchema) ]).optional(),
 }).strict();
 
-export const UserCreateNestedOneWithoutTranscationInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutTranscationInput> = z.object({
-  create: z.union([ z.lazy(() => UserCreateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedCreateWithoutTranscationInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutTranscationInputSchema).optional(),
+export const StripePaymentCreateNestedManyWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentCreateNestedManyWithoutProductInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutProductInputSchema),z.lazy(() => StripePaymentCreateWithoutProductInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyProductInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const StripePaymentUncheckedCreateNestedManyWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUncheckedCreateNestedManyWithoutProductInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutProductInputSchema),z.lazy(() => StripePaymentCreateWithoutProductInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyProductInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const EnumStripeModeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumStripeModeFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => StripeModeSchema).optional()
+}).strict();
+
+export const NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable()
+}).strict();
+
+export const StripePaymentUpdateManyWithoutProductNestedInputSchema: z.ZodType<Prisma.StripePaymentUpdateManyWithoutProductNestedInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutProductInputSchema),z.lazy(() => StripePaymentCreateWithoutProductInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutProductInputSchema),z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutProductInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyProductInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutProductInputSchema),z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutProductInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => StripePaymentUpdateManyWithWhereWithoutProductInputSchema),z.lazy(() => StripePaymentUpdateManyWithWhereWithoutProductInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const StripePaymentUncheckedUpdateManyWithoutProductNestedInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateManyWithoutProductNestedInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutProductInputSchema),z.lazy(() => StripePaymentCreateWithoutProductInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutProductInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutProductInputSchema),z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutProductInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyProductInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutProductInputSchema),z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutProductInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => StripePaymentUpdateManyWithWhereWithoutProductInputSchema),z.lazy(() => StripePaymentUpdateManyWithWhereWithoutProductInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const StripeProductCreateNestedOneWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductCreateNestedOneWithoutPaymentsInput> = z.object({
+  create: z.union([ z.lazy(() => StripeProductCreateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedCreateWithoutPaymentsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => StripeProductCreateOrConnectWithoutPaymentsInputSchema).optional(),
+  connect: z.lazy(() => StripeProductWhereUniqueInputSchema).optional()
+}).strict();
+
+export const UserCreateNestedOneWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutStripePaymentsInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedCreateWithoutStripePaymentsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutStripePaymentsInputSchema).optional(),
   connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
 }).strict();
 
-export const UserUpdateOneRequiredWithoutTranscationNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutTranscationNestedInput> = z.object({
-  create: z.union([ z.lazy(() => UserCreateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedCreateWithoutTranscationInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutTranscationInputSchema).optional(),
-  upsert: z.lazy(() => UserUpsertWithoutTranscationInputSchema).optional(),
+export const StripeProductUpdateOneRequiredWithoutPaymentsNestedInputSchema: z.ZodType<Prisma.StripeProductUpdateOneRequiredWithoutPaymentsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => StripeProductCreateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedCreateWithoutPaymentsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => StripeProductCreateOrConnectWithoutPaymentsInputSchema).optional(),
+  upsert: z.lazy(() => StripeProductUpsertWithoutPaymentsInputSchema).optional(),
+  connect: z.lazy(() => StripeProductWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => StripeProductUpdateToOneWithWhereWithoutPaymentsInputSchema),z.lazy(() => StripeProductUpdateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedUpdateWithoutPaymentsInputSchema) ]).optional(),
+}).strict();
+
+export const UserUpdateOneRequiredWithoutStripePaymentsNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutStripePaymentsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedCreateWithoutStripePaymentsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutStripePaymentsInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutStripePaymentsInputSchema).optional(),
   connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutTranscationInputSchema),z.lazy(() => UserUpdateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedUpdateWithoutTranscationInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutStripePaymentsInputSchema),z.lazy(() => UserUpdateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutStripePaymentsInputSchema) ]).optional(),
 }).strict();
 
 export const AccountCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.AccountCreateNestedManyWithoutUserInput> = z.object({
@@ -5800,11 +6146,11 @@ export const ConversationCreateNestedManyWithoutUserInputSchema: z.ZodType<Prism
   connect: z.union([ z.lazy(() => ConversationWhereUniqueInputSchema),z.lazy(() => ConversationWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const TranscationCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.TranscationCreateNestedManyWithoutUserInput> = z.object({
-  create: z.union([ z.lazy(() => TranscationCreateWithoutUserInputSchema),z.lazy(() => TranscationCreateWithoutUserInputSchema).array(),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema),z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => TranscationCreateManyUserInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
+export const StripePaymentCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentCreateNestedManyWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutUserInputSchema),z.lazy(() => StripePaymentCreateWithoutUserInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const AccountUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.AccountUncheckedCreateNestedManyWithoutUserInput> = z.object({
@@ -5905,11 +6251,11 @@ export const ConversationUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodT
   connect: z.union([ z.lazy(() => ConversationWhereUniqueInputSchema),z.lazy(() => ConversationWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const TranscationUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.TranscationUncheckedCreateNestedManyWithoutUserInput> = z.object({
-  create: z.union([ z.lazy(() => TranscationCreateWithoutUserInputSchema),z.lazy(() => TranscationCreateWithoutUserInputSchema).array(),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema),z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => TranscationCreateManyUserInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
+export const StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUncheckedCreateNestedManyWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutUserInputSchema),z.lazy(() => StripePaymentCreateWithoutUserInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const AccountUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.AccountUpdateManyWithoutUserNestedInput> = z.object({
@@ -6108,18 +6454,18 @@ export const ConversationUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prism
   deleteMany: z.union([ z.lazy(() => ConversationScalarWhereInputSchema),z.lazy(() => ConversationScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const TranscationUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.TranscationUpdateManyWithoutUserNestedInput> = z.object({
-  create: z.union([ z.lazy(() => TranscationCreateWithoutUserInputSchema),z.lazy(() => TranscationCreateWithoutUserInputSchema).array(),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema),z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => TranscationUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => TranscationUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => TranscationCreateManyUserInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => TranscationUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => TranscationUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => TranscationUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => TranscationUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => TranscationScalarWhereInputSchema),z.lazy(() => TranscationScalarWhereInputSchema).array() ]).optional(),
+export const StripePaymentUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.StripePaymentUpdateManyWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutUserInputSchema),z.lazy(() => StripePaymentCreateWithoutUserInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => StripePaymentUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => StripePaymentUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const AccountUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput> = z.object({
@@ -6318,18 +6664,18 @@ export const ConversationUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodT
   deleteMany: z.union([ z.lazy(() => ConversationScalarWhereInputSchema),z.lazy(() => ConversationScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const TranscationUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.TranscationUncheckedUpdateManyWithoutUserNestedInput> = z.object({
-  create: z.union([ z.lazy(() => TranscationCreateWithoutUserInputSchema),z.lazy(() => TranscationCreateWithoutUserInputSchema).array(),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema),z.lazy(() => TranscationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => TranscationUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => TranscationUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => TranscationCreateManyUserInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => TranscationWhereUniqueInputSchema),z.lazy(() => TranscationWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => TranscationUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => TranscationUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => TranscationUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => TranscationUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => TranscationScalarWhereInputSchema),z.lazy(() => TranscationScalarWhereInputSchema).array() ]).optional(),
+export const StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateManyWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutUserInputSchema),z.lazy(() => StripePaymentCreateWithoutUserInputSchema).array(),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => StripePaymentUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => StripePaymentCreateManyUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => StripePaymentUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => StripePaymentUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -6616,6 +6962,22 @@ export const NestedEnumChatMessageFormatTypeWithAggregatesFilterSchema: z.ZodTyp
   _max: z.lazy(() => NestedEnumChatMessageFormatTypeFilterSchema).optional()
 }).strict();
 
+export const NestedFloatNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedFloatNullableWithAggregatesFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.number().array().optional().nullable(),
+  notIn: z.number().array().optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedFloatNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _sum: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedFloatNullableFilterSchema).optional()
+}).strict();
+
 export const NestedEnumInvitationStatusFilterSchema: z.ZodType<Prisma.NestedEnumInvitationStatusFilter> = z.object({
   equals: z.lazy(() => InvitationStatusSchema).optional(),
   in: z.lazy(() => InvitationStatusSchema).array().optional(),
@@ -6633,6 +6995,40 @@ export const NestedEnumInvitationStatusWithAggregatesFilterSchema: z.ZodType<Pri
   _max: z.lazy(() => NestedEnumInvitationStatusFilterSchema).optional()
 }).strict();
 
+export const NestedEnumStripeModeFilterSchema: z.ZodType<Prisma.NestedEnumStripeModeFilter> = z.object({
+  equals: z.lazy(() => StripeModeSchema).optional(),
+  in: z.lazy(() => StripeModeSchema).array().optional(),
+  notIn: z.lazy(() => StripeModeSchema).array().optional(),
+  not: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => NestedEnumStripeModeFilterSchema) ]).optional(),
+}).strict();
+
+export const NestedEnumStripeSubscriptionLevelNullableFilterSchema: z.ZodType<Prisma.NestedEnumStripeSubscriptionLevelNullableFilter> = z.object({
+  equals: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable(),
+  in: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  notIn: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  not: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NestedEnumStripeSubscriptionLevelNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
+export const NestedEnumStripeModeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumStripeModeWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => StripeModeSchema).optional(),
+  in: z.lazy(() => StripeModeSchema).array().optional(),
+  notIn: z.lazy(() => StripeModeSchema).array().optional(),
+  not: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => NestedEnumStripeModeWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumStripeModeFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumStripeModeFilterSchema).optional()
+}).strict();
+
+export const NestedEnumStripeSubscriptionLevelNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumStripeSubscriptionLevelNullableWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable(),
+  in: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  notIn: z.lazy(() => StripeSubscriptionLevelSchema).array().optional().nullable(),
+  not: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NestedEnumStripeSubscriptionLevelNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumStripeSubscriptionLevelNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumStripeSubscriptionLevelNullableFilterSchema).optional()
+}).strict();
+
 export const UserCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateWithoutAccountsInput> = z.object({
   id: z.string().optional(),
   platformType: z.lazy(() => PlatformTypeSchema).optional(),
@@ -6643,13 +7039,11 @@ export const UserCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateWi
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
@@ -6663,7 +7057,7 @@ export const UserCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateWi
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAccountsInput> = z.object({
@@ -6676,13 +7070,11 @@ export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
@@ -6696,7 +7088,7 @@ export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAccountsInput> = z.object({
@@ -6725,13 +7117,11 @@ export const UserUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUpdateWi
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
@@ -6745,7 +7135,7 @@ export const UserUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUpdateWi
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAccountsInput> = z.object({
@@ -6758,13 +7148,11 @@ export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
@@ -6778,7 +7166,7 @@ export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreateWithoutCreatedAppsInput> = z.object({
@@ -6791,13 +7179,11 @@ export const UserCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreat
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -6811,7 +7197,7 @@ export const UserCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreat
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutCreatedAppsInput> = z.object({
@@ -6824,13 +7210,11 @@ export const UserUncheckedCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -6844,7 +7228,7 @@ export const UserUncheckedCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutCreatedAppsInput> = z.object({
@@ -7054,13 +7438,11 @@ export const UserUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7074,7 +7456,7 @@ export const UserUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUpdat
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutCreatedAppsInput> = z.object({
@@ -7087,13 +7469,11 @@ export const UserUncheckedUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7107,7 +7487,7 @@ export const UserUncheckedUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppTagUpsertWithWhereUniqueWithoutAppsInputSchema: z.ZodType<Prisma.AppTagUpsertWithWhereUniqueWithoutAppsInput> = z.object({
@@ -7322,13 +7702,11 @@ export const UserCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserCreate
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7342,7 +7720,7 @@ export const UserCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserCreate
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAppActionsInput> = z.object({
@@ -7355,13 +7733,11 @@ export const UserUncheckedCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7375,7 +7751,7 @@ export const UserUncheckedCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAppActionsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAppActionsInput> = z.object({
@@ -7456,13 +7832,11 @@ export const UserUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUpdate
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7476,7 +7850,7 @@ export const UserUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUpdate
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAppActionsInput> = z.object({
@@ -7489,13 +7863,11 @@ export const UserUncheckedUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7509,7 +7881,7 @@ export const UserUncheckedUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithoutActionsInputSchema: z.ZodType<Prisma.AppUpsertWithoutActionsInput> = z.object({
@@ -7674,13 +8046,11 @@ export const UserCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserCreat
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7694,7 +8064,7 @@ export const UserCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserCreat
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAppCommentsInput> = z.object({
@@ -7707,13 +8077,11 @@ export const UserUncheckedCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7727,7 +8095,7 @@ export const UserUncheckedCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAppCommentsInput> = z.object({
@@ -7808,13 +8176,11 @@ export const UserUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7828,7 +8194,7 @@ export const UserUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUpdat
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAppCommentsInput> = z.object({
@@ -7841,13 +8207,11 @@ export const UserUncheckedUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7861,7 +8225,7 @@ export const UserUncheckedUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithoutCommentsInputSchema: z.ZodType<Prisma.AppUpsertWithoutCommentsInput> = z.object({
@@ -8042,13 +8406,11 @@ export const UserCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserCreateWithou
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8062,7 +8424,7 @@ export const UserCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserCreateWithou
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTagsInput> = z.object({
@@ -8075,13 +8437,11 @@ export const UserUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8095,7 +8455,7 @@ export const UserUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutTagsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTagsInput> = z.object({
@@ -8176,13 +8536,11 @@ export const UserUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUpdateWithou
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8196,7 +8554,7 @@ export const UserUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUpdateWithou
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTagsInput> = z.object({
@@ -8209,13 +8567,11 @@ export const UserUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8229,7 +8585,7 @@ export const UserUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithWhereUniqueWithoutTagsInputSchema: z.ZodType<Prisma.AppUpsertWithWhereUniqueWithoutTagsInput> = z.object({
@@ -8258,13 +8614,11 @@ export const UserCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserCrea
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8278,7 +8632,7 @@ export const UserCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserCrea
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutChatMessagesInput> = z.object({
@@ -8291,13 +8645,11 @@ export const UserUncheckedCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8311,7 +8663,7 @@ export const UserUncheckedCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutChatMessagesInput> = z.object({
@@ -8391,13 +8743,11 @@ export const UserUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUpda
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8411,7 +8761,7 @@ export const UserUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUpda
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutChatMessagesInput> = z.object({
@@ -8424,13 +8774,11 @@ export const UserUncheckedUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8444,7 +8792,7 @@ export const UserUncheckedUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const ChatMessageActionUpsertWithWhereUniqueWithoutMessageInputSchema: z.ZodType<Prisma.ChatMessageActionUpsertWithWhereUniqueWithoutMessageInput> = z.object({
@@ -8516,13 +8864,11 @@ export const UserCreateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8536,7 +8882,7 @@ export const UserCreateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutChatMessageActionsInput> = z.object({
@@ -8549,13 +8895,11 @@ export const UserUncheckedCreateWithoutChatMessageActionsInputSchema: z.ZodType<
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8569,7 +8913,7 @@ export const UserUncheckedCreateWithoutChatMessageActionsInputSchema: z.ZodType<
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutChatMessageActionsInput> = z.object({
@@ -8586,6 +8930,7 @@ export const ChatMessageCreateWithoutUserActionOnMessageInputSchema: z.ZodType<P
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutChatMessagesInputSchema).optional(),
   conversation: z.lazy(() => ConversationCreateNestedOneWithoutMessagesInputSchema)
 }).strict();
@@ -8600,7 +8945,8 @@ export const ChatMessageUncheckedCreateWithoutUserActionOnMessageInputSchema: z.
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   conversationId: z.string(),
   shortId: z.string().optional(),
-  namespace: z.string().optional().nullable()
+  namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable()
 }).strict();
 
 export const ChatMessageCreateOrConnectWithoutUserActionOnMessageInputSchema: z.ZodType<Prisma.ChatMessageCreateOrConnectWithoutUserActionOnMessageInput> = z.object({
@@ -8629,13 +8975,11 @@ export const UserUpdateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8649,7 +8993,7 @@ export const UserUpdateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutChatMessageActionsInput> = z.object({
@@ -8662,13 +9006,11 @@ export const UserUncheckedUpdateWithoutChatMessageActionsInputSchema: z.ZodType<
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8682,7 +9024,7 @@ export const UserUncheckedUpdateWithoutChatMessageActionsInputSchema: z.ZodType<
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const ChatMessageUpsertWithoutUserActionOnMessageInputSchema: z.ZodType<Prisma.ChatMessageUpsertWithoutUserActionOnMessageInput> = z.object({
@@ -8705,6 +9047,7 @@ export const ChatMessageUpdateWithoutUserActionOnMessageInputSchema: z.ZodType<P
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneWithoutChatMessagesNestedInputSchema).optional(),
   conversation: z.lazy(() => ConversationUpdateOneRequiredWithoutMessagesNestedInputSchema).optional()
 }).strict();
@@ -8720,6 +9063,7 @@ export const ChatMessageUncheckedUpdateWithoutUserActionOnMessageInputSchema: z.
   conversationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageCreateWithoutConversationInputSchema: z.ZodType<Prisma.ChatMessageCreateWithoutConversationInput> = z.object({
@@ -8731,6 +9075,7 @@ export const ChatMessageCreateWithoutConversationInputSchema: z.ZodType<Prisma.C
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutChatMessagesInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
@@ -8745,6 +9090,7 @@ export const ChatMessageUncheckedCreateWithoutConversationInputSchema: z.ZodType
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
 
@@ -8768,13 +9114,11 @@ export const UserCreateWithoutConversationsInputSchema: z.ZodType<Prisma.UserCre
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8788,7 +9132,7 @@ export const UserCreateWithoutConversationsInputSchema: z.ZodType<Prisma.UserCre
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutConversationsInput> = z.object({
@@ -8801,13 +9145,11 @@ export const UserUncheckedCreateWithoutConversationsInputSchema: z.ZodType<Prism
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8821,7 +9163,7 @@ export const UserUncheckedCreateWithoutConversationsInputSchema: z.ZodType<Prism
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutConversationsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutConversationsInput> = z.object({
@@ -8911,6 +9253,7 @@ export const ChatMessageScalarWhereInputSchema: z.ZodType<Prisma.ChatMessageScal
   conversationId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   shortId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  cost: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
 }).strict();
 
 export const UserUpsertWithoutConversationsInputSchema: z.ZodType<Prisma.UserUpsertWithoutConversationsInput> = z.object({
@@ -8934,13 +9277,11 @@ export const UserUpdateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUpd
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8954,7 +9295,7 @@ export const UserUpdateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUpd
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutConversationsInput> = z.object({
@@ -8967,13 +9308,11 @@ export const UserUncheckedUpdateWithoutConversationsInputSchema: z.ZodType<Prism
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8987,7 +9326,7 @@ export const UserUncheckedUpdateWithoutConversationsInputSchema: z.ZodType<Prism
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithoutUsingInputSchema: z.ZodType<Prisma.AppUpsertWithoutUsingInput> = z.object({
@@ -9058,13 +9397,11 @@ export const UserCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreate
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9078,7 +9415,7 @@ export const UserCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreate
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutFollowedByInput> = z.object({
@@ -9091,13 +9428,11 @@ export const UserUncheckedCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9111,7 +9446,7 @@ export const UserUncheckedCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutFollowedByInput> = z.object({
@@ -9129,13 +9464,11 @@ export const UserCreateWithoutFollowingInputSchema: z.ZodType<Prisma.UserCreateW
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9149,7 +9482,7 @@ export const UserCreateWithoutFollowingInputSchema: z.ZodType<Prisma.UserCreateW
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutFollowingInput> = z.object({
@@ -9162,13 +9495,11 @@ export const UserUncheckedCreateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9182,7 +9513,7 @@ export const UserUncheckedCreateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutFollowingInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutFollowingInput> = z.object({
@@ -9211,13 +9542,11 @@ export const UserUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUpdate
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9231,7 +9560,7 @@ export const UserUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUpdate
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutFollowedByInput> = z.object({
@@ -9244,13 +9573,11 @@ export const UserUncheckedUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9264,7 +9591,7 @@ export const UserUncheckedUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutFollowingInputSchema: z.ZodType<Prisma.UserUpsertWithoutFollowingInput> = z.object({
@@ -9288,13 +9615,11 @@ export const UserUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUpdateW
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9308,7 +9633,7 @@ export const UserUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUpdateW
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutFollowingInput> = z.object({
@@ -9321,13 +9646,11 @@ export const UserUncheckedUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9341,7 +9664,7 @@ export const UserUncheckedUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreateWithoutInvitedFromInput> = z.object({
@@ -9354,13 +9677,11 @@ export const UserCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreat
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
@@ -9374,7 +9695,7 @@ export const UserCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreat
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutInvitedFromInput> = z.object({
@@ -9387,13 +9708,11 @@ export const UserUncheckedCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
@@ -9407,7 +9726,7 @@ export const UserUncheckedCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutInvitedFromInput> = z.object({
@@ -9425,13 +9744,11 @@ export const UserCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserCreateW
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9445,7 +9762,7 @@ export const UserCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserCreateW
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutInvitedToInput> = z.object({
@@ -9458,13 +9775,11 @@ export const UserUncheckedCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9478,7 +9793,7 @@ export const UserUncheckedCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutInvitedToInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutInvitedToInput> = z.object({
@@ -9507,13 +9822,11 @@ export const UserUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
@@ -9527,7 +9840,7 @@ export const UserUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUpdat
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutInvitedFromInput> = z.object({
@@ -9540,13 +9853,11 @@ export const UserUncheckedUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
@@ -9560,7 +9871,7 @@ export const UserUncheckedUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUpsertWithoutInvitedToInput> = z.object({
@@ -9584,13 +9895,11 @@ export const UserUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUpdateW
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9604,7 +9913,7 @@ export const UserUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUpdateW
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutInvitedToInput> = z.object({
@@ -9617,13 +9926,11 @@ export const UserUncheckedUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9637,7 +9944,7 @@ export const UserUncheckedUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWithoutSessionsInput> = z.object({
@@ -9650,13 +9957,11 @@ export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWi
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
@@ -9670,7 +9975,7 @@ export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWi
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSessionsInput> = z.object({
@@ -9683,13 +9988,11 @@ export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
@@ -9703,7 +10006,7 @@ export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSessionsInput> = z.object({
@@ -9732,13 +10035,11 @@ export const UserUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUpdateWi
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
@@ -9752,7 +10053,7 @@ export const UserUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUpdateWi
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSessionsInput> = z.object({
@@ -9765,13 +10066,11 @@ export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
@@ -9785,7 +10084,7 @@ export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppCreateWithoutStarringInputSchema: z.ZodType<Prisma.AppCreateWithoutStarringInput> = z.object({
@@ -9850,13 +10149,11 @@ export const UserCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserCreat
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9870,7 +10167,7 @@ export const UserCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserCreat
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutStarringAppInput> = z.object({
@@ -9883,13 +10180,11 @@ export const UserUncheckedCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9903,7 +10198,7 @@ export const UserUncheckedCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutStarringAppInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutStarringAppInput> = z.object({
@@ -9990,13 +10285,11 @@ export const UserUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10010,7 +10303,7 @@ export const UserUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUpdat
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutStarringAppInput> = z.object({
@@ -10023,13 +10316,11 @@ export const UserUncheckedUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10043,10 +10334,84 @@ export const UserUncheckedUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  Transcation: z.lazy(() => TranscationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
-export const UserCreateWithoutTranscationInputSchema: z.ZodType<Prisma.UserCreateWithoutTranscationInput> = z.object({
+export const StripePaymentCreateWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentCreateWithoutProductInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  user: z.lazy(() => UserCreateNestedOneWithoutStripePaymentsInputSchema)
+}).strict();
+
+export const StripePaymentUncheckedCreateWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUncheckedCreateWithoutProductInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  userId: z.string()
+}).strict();
+
+export const StripePaymentCreateOrConnectWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentCreateOrConnectWithoutProductInput> = z.object({
+  where: z.lazy(() => StripePaymentWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema) ]),
+}).strict();
+
+export const StripePaymentCreateManyProductInputEnvelopeSchema: z.ZodType<Prisma.StripePaymentCreateManyProductInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => StripePaymentCreateManyProductInputSchema),z.lazy(() => StripePaymentCreateManyProductInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
+export const StripePaymentUpsertWithWhereUniqueWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUpsertWithWhereUniqueWithoutProductInput> = z.object({
+  where: z.lazy(() => StripePaymentWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => StripePaymentUpdateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedUpdateWithoutProductInputSchema) ]),
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutProductInputSchema) ]),
+}).strict();
+
+export const StripePaymentUpdateWithWhereUniqueWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUpdateWithWhereUniqueWithoutProductInput> = z.object({
+  where: z.lazy(() => StripePaymentWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => StripePaymentUpdateWithoutProductInputSchema),z.lazy(() => StripePaymentUncheckedUpdateWithoutProductInputSchema) ]),
+}).strict();
+
+export const StripePaymentUpdateManyWithWhereWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUpdateManyWithWhereWithoutProductInput> = z.object({
+  where: z.lazy(() => StripePaymentScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => StripePaymentUpdateManyMutationInputSchema),z.lazy(() => StripePaymentUncheckedUpdateManyWithoutProductInputSchema) ]),
+}).strict();
+
+export const StripePaymentScalarWhereInputSchema: z.ZodType<Prisma.StripePaymentScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => StripePaymentScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  count: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  redeemCode: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  productId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+}).strict();
+
+export const StripeProductCreateWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductCreateWithoutPaymentsInput> = z.object({
+  id: z.string(),
+  price: z.number(),
+  currency: z.string(),
+  mode: z.lazy(() => StripeModeSchema),
+  expire: z.number().int().optional().nullable(),
+  level: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable()
+}).strict();
+
+export const StripeProductUncheckedCreateWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductUncheckedCreateWithoutPaymentsInput> = z.object({
+  id: z.string(),
+  price: z.number(),
+  currency: z.string(),
+  mode: z.lazy(() => StripeModeSchema),
+  expire: z.number().int().optional().nullable(),
+  level: z.lazy(() => StripeSubscriptionLevelSchema).optional().nullable()
+}).strict();
+
+export const StripeProductCreateOrConnectWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductCreateOrConnectWithoutPaymentsInput> = z.object({
+  where: z.lazy(() => StripeProductWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => StripeProductCreateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedCreateWithoutPaymentsInputSchema) ]),
+}).strict();
+
+export const UserCreateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserCreateWithoutStripePaymentsInput> = z.object({
   id: z.string().optional(),
   platformType: z.lazy(() => PlatformTypeSchema).optional(),
   platformId: z.string(),
@@ -10056,13 +10421,11 @@ export const UserCreateWithoutTranscationInputSchema: z.ZodType<Prisma.UserCreat
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -10079,7 +10442,7 @@ export const UserCreateWithoutTranscationInputSchema: z.ZodType<Prisma.UserCreat
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
-export const UserUncheckedCreateWithoutTranscationInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTranscationInput> = z.object({
+export const UserUncheckedCreateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutStripePaymentsInput> = z.object({
   id: z.string().optional(),
   platformType: z.lazy(() => PlatformTypeSchema).optional(),
   platformId: z.string(),
@@ -10089,13 +10452,11 @@ export const UserUncheckedCreateWithoutTranscationInputSchema: z.ZodType<Prisma.
   emailVerified: z.coerce.date().optional().nullable(),
   image: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  balance: z.number().int().optional(),
   followedByCount: z.number().int().optional(),
   followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
-  stripeSubscriptionId: z.string().optional().nullable(),
-  stripePriceId: z.string().optional().nullable(),
-  stripeCurrentPeriodEnd: z.coerce.date().optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -10112,23 +10473,52 @@ export const UserUncheckedCreateWithoutTranscationInputSchema: z.ZodType<Prisma.
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
-export const UserCreateOrConnectWithoutTranscationInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTranscationInput> = z.object({
+export const UserCreateOrConnectWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutStripePaymentsInput> = z.object({
   where: z.lazy(() => UserWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => UserCreateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedCreateWithoutTranscationInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedCreateWithoutStripePaymentsInputSchema) ]),
 }).strict();
 
-export const UserUpsertWithoutTranscationInputSchema: z.ZodType<Prisma.UserUpsertWithoutTranscationInput> = z.object({
-  update: z.union([ z.lazy(() => UserUpdateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedUpdateWithoutTranscationInputSchema) ]),
-  create: z.union([ z.lazy(() => UserCreateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedCreateWithoutTranscationInputSchema) ]),
+export const StripeProductUpsertWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductUpsertWithoutPaymentsInput> = z.object({
+  update: z.union([ z.lazy(() => StripeProductUpdateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedUpdateWithoutPaymentsInputSchema) ]),
+  create: z.union([ z.lazy(() => StripeProductCreateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedCreateWithoutPaymentsInputSchema) ]),
+  where: z.lazy(() => StripeProductWhereInputSchema).optional()
+}).strict();
+
+export const StripeProductUpdateToOneWithWhereWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductUpdateToOneWithWhereWithoutPaymentsInput> = z.object({
+  where: z.lazy(() => StripeProductWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => StripeProductUpdateWithoutPaymentsInputSchema),z.lazy(() => StripeProductUncheckedUpdateWithoutPaymentsInputSchema) ]),
+}).strict();
+
+export const StripeProductUpdateWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductUpdateWithoutPaymentsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  price: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  currency: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  mode: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => EnumStripeModeFieldUpdateOperationsInputSchema) ]).optional(),
+  expire: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  level: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const StripeProductUncheckedUpdateWithoutPaymentsInputSchema: z.ZodType<Prisma.StripeProductUncheckedUpdateWithoutPaymentsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  price: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  currency: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  mode: z.union([ z.lazy(() => StripeModeSchema),z.lazy(() => EnumStripeModeFieldUpdateOperationsInputSchema) ]).optional(),
+  expire: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  level: z.union([ z.lazy(() => StripeSubscriptionLevelSchema),z.lazy(() => NullableEnumStripeSubscriptionLevelFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const UserUpsertWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUpsertWithoutStripePaymentsInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutStripePaymentsInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedCreateWithoutStripePaymentsInputSchema) ]),
   where: z.lazy(() => UserWhereInputSchema).optional()
 }).strict();
 
-export const UserUpdateToOneWithWhereWithoutTranscationInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutTranscationInput> = z.object({
+export const UserUpdateToOneWithWhereWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutStripePaymentsInput> = z.object({
   where: z.lazy(() => UserWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => UserUpdateWithoutTranscationInputSchema),z.lazy(() => UserUncheckedUpdateWithoutTranscationInputSchema) ]),
+  data: z.union([ z.lazy(() => UserUpdateWithoutStripePaymentsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutStripePaymentsInputSchema) ]),
 }).strict();
 
-export const UserUpdateWithoutTranscationInputSchema: z.ZodType<Prisma.UserUpdateWithoutTranscationInput> = z.object({
+export const UserUpdateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUpdateWithoutStripePaymentsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   platformType: z.union([ z.lazy(() => PlatformTypeSchema),z.lazy(() => EnumPlatformTypeFieldUpdateOperationsInputSchema) ]).optional(),
   platformId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10138,13 +10528,11 @@ export const UserUpdateWithoutTranscationInputSchema: z.ZodType<Prisma.UserUpdat
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10161,7 +10549,7 @@ export const UserUpdateWithoutTranscationInputSchema: z.ZodType<Prisma.UserUpdat
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
-export const UserUncheckedUpdateWithoutTranscationInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTranscationInput> = z.object({
+export const UserUncheckedUpdateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutStripePaymentsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   platformType: z.union([ z.lazy(() => PlatformTypeSchema),z.lazy(() => EnumPlatformTypeFieldUpdateOperationsInputSchema) ]).optional(),
   platformId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10171,13 +10559,11 @@ export const UserUncheckedUpdateWithoutTranscationInputSchema: z.ZodType<Prisma.
   emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeSubscriptionId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripePriceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  stripeCurrentPeriodEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10365,6 +10751,7 @@ export const ChatMessageCreateWithoutUserInputSchema: z.ZodType<Prisma.ChatMessa
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionCreateNestedManyWithoutMessageInputSchema).optional(),
   conversation: z.lazy(() => ConversationCreateNestedOneWithoutMessagesInputSchema)
 }).strict();
@@ -10379,6 +10766,7 @@ export const ChatMessageUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.
   conversationId: z.string(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
 
@@ -10613,21 +11001,27 @@ export const ConversationCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.Con
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const TranscationCreateWithoutUserInputSchema: z.ZodType<Prisma.TranscationCreateWithoutUserInput> = z.object({
-  id: z.string().cuid().optional()
+export const StripePaymentCreateWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentCreateWithoutUserInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  product: z.lazy(() => StripeProductCreateNestedOneWithoutPaymentsInputSchema)
 }).strict();
 
-export const TranscationUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.TranscationUncheckedCreateWithoutUserInput> = z.object({
-  id: z.string().cuid().optional()
+export const StripePaymentUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUncheckedCreateWithoutUserInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  productId: z.string()
 }).strict();
 
-export const TranscationCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.TranscationCreateOrConnectWithoutUserInput> = z.object({
-  where: z.lazy(() => TranscationWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => TranscationCreateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema) ]),
+export const StripePaymentCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentCreateOrConnectWithoutUserInput> = z.object({
+  where: z.lazy(() => StripePaymentWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema) ]),
 }).strict();
 
-export const TranscationCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.TranscationCreateManyUserInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => TranscationCreateManyUserInputSchema),z.lazy(() => TranscationCreateManyUserInputSchema).array() ]),
+export const StripePaymentCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.StripePaymentCreateManyUserInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => StripePaymentCreateManyUserInputSchema),z.lazy(() => StripePaymentCreateManyUserInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
@@ -10907,28 +11301,20 @@ export const ConversationUpdateManyWithWhereWithoutUserInputSchema: z.ZodType<Pr
   data: z.union([ z.lazy(() => ConversationUpdateManyMutationInputSchema),z.lazy(() => ConversationUncheckedUpdateManyWithoutUserInputSchema) ]),
 }).strict();
 
-export const TranscationUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.TranscationUpsertWithWhereUniqueWithoutUserInput> = z.object({
-  where: z.lazy(() => TranscationWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => TranscationUpdateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedUpdateWithoutUserInputSchema) ]),
-  create: z.union([ z.lazy(() => TranscationCreateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedCreateWithoutUserInputSchema) ]),
+export const StripePaymentUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUpsertWithWhereUniqueWithoutUserInput> = z.object({
+  where: z.lazy(() => StripePaymentWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => StripePaymentUpdateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedUpdateWithoutUserInputSchema) ]),
+  create: z.union([ z.lazy(() => StripePaymentCreateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedCreateWithoutUserInputSchema) ]),
 }).strict();
 
-export const TranscationUpdateWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.TranscationUpdateWithWhereUniqueWithoutUserInput> = z.object({
-  where: z.lazy(() => TranscationWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => TranscationUpdateWithoutUserInputSchema),z.lazy(() => TranscationUncheckedUpdateWithoutUserInputSchema) ]),
+export const StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUpdateWithWhereUniqueWithoutUserInput> = z.object({
+  where: z.lazy(() => StripePaymentWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => StripePaymentUpdateWithoutUserInputSchema),z.lazy(() => StripePaymentUncheckedUpdateWithoutUserInputSchema) ]),
 }).strict();
 
-export const TranscationUpdateManyWithWhereWithoutUserInputSchema: z.ZodType<Prisma.TranscationUpdateManyWithWhereWithoutUserInput> = z.object({
-  where: z.lazy(() => TranscationScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => TranscationUpdateManyMutationInputSchema),z.lazy(() => TranscationUncheckedUpdateManyWithoutUserInputSchema) ]),
-}).strict();
-
-export const TranscationScalarWhereInputSchema: z.ZodType<Prisma.TranscationScalarWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => TranscationScalarWhereInputSchema),z.lazy(() => TranscationScalarWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => TranscationScalarWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => TranscationScalarWhereInputSchema),z.lazy(() => TranscationScalarWhereInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+export const StripePaymentUpdateManyWithWhereWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUpdateManyWithWhereWithoutUserInput> = z.object({
+  where: z.lazy(() => StripePaymentScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => StripePaymentUpdateManyMutationInputSchema),z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserInputSchema) ]),
 }).strict();
 
 export const AppActionCreateManyAppInputSchema: z.ZodType<Prisma.AppActionCreateManyAppInput> = z.object({
@@ -11284,7 +11670,8 @@ export const ChatMessageCreateManyConversationInputSchema: z.ZodType<Prisma.Chat
   content: z.string(),
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
-  namespace: z.string().optional().nullable()
+  namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable()
 }).strict();
 
 export const ChatMessageUpdateWithoutConversationInputSchema: z.ZodType<Prisma.ChatMessageUpdateWithoutConversationInput> = z.object({
@@ -11296,6 +11683,7 @@ export const ChatMessageUpdateWithoutConversationInputSchema: z.ZodType<Prisma.C
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneWithoutChatMessagesNestedInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
@@ -11310,6 +11698,7 @@ export const ChatMessageUncheckedUpdateWithoutConversationInputSchema: z.ZodType
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
 
@@ -11323,6 +11712,35 @@ export const ChatMessageUncheckedUpdateManyWithoutConversationInputSchema: z.Zod
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const StripePaymentCreateManyProductInputSchema: z.ZodType<Prisma.StripePaymentCreateManyProductInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  userId: z.string()
+}).strict();
+
+export const StripePaymentUpdateWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUpdateWithoutProductInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutStripePaymentsNestedInputSchema).optional()
+}).strict();
+
+export const StripePaymentUncheckedUpdateWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateWithoutProductInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const StripePaymentUncheckedUpdateManyWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateManyWithoutProductInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const AccountCreateManyUserInputSchema: z.ZodType<Prisma.AccountCreateManyUserInput> = z.object({
@@ -11385,7 +11803,8 @@ export const ChatMessageCreateManyUserInputSchema: z.ZodType<Prisma.ChatMessageC
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   conversationId: z.string(),
   shortId: z.string().optional(),
-  namespace: z.string().optional().nullable()
+  namespace: z.string().optional().nullable(),
+  cost: z.number().optional().nullable()
 }).strict();
 
 export const ChatMessageActionCreateManyUserInputSchema: z.ZodType<Prisma.ChatMessageActionCreateManyUserInput> = z.object({
@@ -11456,8 +11875,11 @@ export const ConversationCreateManyUserInputSchema: z.ZodType<Prisma.Conversatio
   pinned: z.boolean().optional()
 }).strict();
 
-export const TranscationCreateManyUserInputSchema: z.ZodType<Prisma.TranscationCreateManyUserInput> = z.object({
-  id: z.string().cuid().optional()
+export const StripePaymentCreateManyUserInputSchema: z.ZodType<Prisma.StripePaymentCreateManyUserInput> = z.object({
+  id: z.string(),
+  count: z.number().int().optional(),
+  redeemCode: z.string().optional().nullable(),
+  productId: z.string()
 }).strict();
 
 export const AccountUpdateWithoutUserInputSchema: z.ZodType<Prisma.AccountUpdateWithoutUserInput> = z.object({
@@ -11622,6 +12044,7 @@ export const ChatMessageUpdateWithoutUserInputSchema: z.ZodType<Prisma.ChatMessa
   format: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => EnumChatMessageFormatTypeFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUpdateManyWithoutMessageNestedInputSchema).optional(),
   conversation: z.lazy(() => ConversationUpdateOneRequiredWithoutMessagesNestedInputSchema).optional()
 }).strict();
@@ -11636,6 +12059,7 @@ export const ChatMessageUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.
   conversationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
 
@@ -11649,6 +12073,7 @@ export const ChatMessageUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Pri
   conversationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageActionUpdateWithoutUserInputSchema: z.ZodType<Prisma.ChatMessageActionUpdateWithoutUserInput> = z.object({
@@ -11870,16 +12295,25 @@ export const ConversationUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Pr
   pinned: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const TranscationUpdateWithoutUserInputSchema: z.ZodType<Prisma.TranscationUpdateWithoutUserInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const StripePaymentUpdateWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  product: z.lazy(() => StripeProductUpdateOneRequiredWithoutPaymentsNestedInputSchema).optional()
 }).strict();
 
-export const TranscationUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.TranscationUncheckedUpdateWithoutUserInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const StripePaymentUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  productId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const TranscationUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.TranscationUncheckedUpdateManyWithoutUserInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const StripePaymentUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUncheckedUpdateManyWithoutUserInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  productId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 /////////////////////////////////////////
@@ -12754,66 +13188,128 @@ export const StarringAppFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.StarringAp
   where: StarringAppWhereUniqueInputSchema,
 }).strict()
 
-export const TranscationFindFirstArgsSchema: z.ZodType<Prisma.TranscationFindFirstArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereInputSchema.optional(),
-  orderBy: z.union([ TranscationOrderByWithRelationInputSchema.array(),TranscationOrderByWithRelationInputSchema ]).optional(),
-  cursor: TranscationWhereUniqueInputSchema.optional(),
+export const StripeProductFindFirstArgsSchema: z.ZodType<Prisma.StripeProductFindFirstArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereInputSchema.optional(),
+  orderBy: z.union([ StripeProductOrderByWithRelationInputSchema.array(),StripeProductOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripeProductWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: z.union([ TranscationScalarFieldEnumSchema,TranscationScalarFieldEnumSchema.array() ]).optional(),
+  distinct: z.union([ StripeProductScalarFieldEnumSchema,StripeProductScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TranscationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TranscationFindFirstOrThrowArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereInputSchema.optional(),
-  orderBy: z.union([ TranscationOrderByWithRelationInputSchema.array(),TranscationOrderByWithRelationInputSchema ]).optional(),
-  cursor: TranscationWhereUniqueInputSchema.optional(),
+export const StripeProductFindFirstOrThrowArgsSchema: z.ZodType<Prisma.StripeProductFindFirstOrThrowArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereInputSchema.optional(),
+  orderBy: z.union([ StripeProductOrderByWithRelationInputSchema.array(),StripeProductOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripeProductWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: z.union([ TranscationScalarFieldEnumSchema,TranscationScalarFieldEnumSchema.array() ]).optional(),
+  distinct: z.union([ StripeProductScalarFieldEnumSchema,StripeProductScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TranscationFindManyArgsSchema: z.ZodType<Prisma.TranscationFindManyArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereInputSchema.optional(),
-  orderBy: z.union([ TranscationOrderByWithRelationInputSchema.array(),TranscationOrderByWithRelationInputSchema ]).optional(),
-  cursor: TranscationWhereUniqueInputSchema.optional(),
+export const StripeProductFindManyArgsSchema: z.ZodType<Prisma.StripeProductFindManyArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereInputSchema.optional(),
+  orderBy: z.union([ StripeProductOrderByWithRelationInputSchema.array(),StripeProductOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripeProductWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: z.union([ TranscationScalarFieldEnumSchema,TranscationScalarFieldEnumSchema.array() ]).optional(),
+  distinct: z.union([ StripeProductScalarFieldEnumSchema,StripeProductScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TranscationAggregateArgsSchema: z.ZodType<Prisma.TranscationAggregateArgs> = z.object({
-  where: TranscationWhereInputSchema.optional(),
-  orderBy: z.union([ TranscationOrderByWithRelationInputSchema.array(),TranscationOrderByWithRelationInputSchema ]).optional(),
-  cursor: TranscationWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-}).strict()
-
-export const TranscationGroupByArgsSchema: z.ZodType<Prisma.TranscationGroupByArgs> = z.object({
-  where: TranscationWhereInputSchema.optional(),
-  orderBy: z.union([ TranscationOrderByWithAggregationInputSchema.array(),TranscationOrderByWithAggregationInputSchema ]).optional(),
-  by: TranscationScalarFieldEnumSchema.array(),
-  having: TranscationScalarWhereWithAggregatesInputSchema.optional(),
+export const StripeProductAggregateArgsSchema: z.ZodType<Prisma.StripeProductAggregateArgs> = z.object({
+  where: StripeProductWhereInputSchema.optional(),
+  orderBy: z.union([ StripeProductOrderByWithRelationInputSchema.array(),StripeProductOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripeProductWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
 }).strict()
 
-export const TranscationFindUniqueArgsSchema: z.ZodType<Prisma.TranscationFindUniqueArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereUniqueInputSchema,
+export const StripeProductGroupByArgsSchema: z.ZodType<Prisma.StripeProductGroupByArgs> = z.object({
+  where: StripeProductWhereInputSchema.optional(),
+  orderBy: z.union([ StripeProductOrderByWithAggregationInputSchema.array(),StripeProductOrderByWithAggregationInputSchema ]).optional(),
+  by: StripeProductScalarFieldEnumSchema.array(),
+  having: StripeProductScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
 }).strict()
 
-export const TranscationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.TranscationFindUniqueOrThrowArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereUniqueInputSchema,
+export const StripeProductFindUniqueArgsSchema: z.ZodType<Prisma.StripeProductFindUniqueArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereUniqueInputSchema,
+}).strict()
+
+export const StripeProductFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.StripeProductFindUniqueOrThrowArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereUniqueInputSchema,
+}).strict()
+
+export const StripePaymentFindFirstArgsSchema: z.ZodType<Prisma.StripePaymentFindFirstArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereInputSchema.optional(),
+  orderBy: z.union([ StripePaymentOrderByWithRelationInputSchema.array(),StripePaymentOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripePaymentWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ StripePaymentScalarFieldEnumSchema,StripePaymentScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const StripePaymentFindFirstOrThrowArgsSchema: z.ZodType<Prisma.StripePaymentFindFirstOrThrowArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereInputSchema.optional(),
+  orderBy: z.union([ StripePaymentOrderByWithRelationInputSchema.array(),StripePaymentOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripePaymentWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ StripePaymentScalarFieldEnumSchema,StripePaymentScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const StripePaymentFindManyArgsSchema: z.ZodType<Prisma.StripePaymentFindManyArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereInputSchema.optional(),
+  orderBy: z.union([ StripePaymentOrderByWithRelationInputSchema.array(),StripePaymentOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripePaymentWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ StripePaymentScalarFieldEnumSchema,StripePaymentScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const StripePaymentAggregateArgsSchema: z.ZodType<Prisma.StripePaymentAggregateArgs> = z.object({
+  where: StripePaymentWhereInputSchema.optional(),
+  orderBy: z.union([ StripePaymentOrderByWithRelationInputSchema.array(),StripePaymentOrderByWithRelationInputSchema ]).optional(),
+  cursor: StripePaymentWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const StripePaymentGroupByArgsSchema: z.ZodType<Prisma.StripePaymentGroupByArgs> = z.object({
+  where: StripePaymentWhereInputSchema.optional(),
+  orderBy: z.union([ StripePaymentOrderByWithAggregationInputSchema.array(),StripePaymentOrderByWithAggregationInputSchema ]).optional(),
+  by: StripePaymentScalarFieldEnumSchema.array(),
+  having: StripePaymentScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const StripePaymentFindUniqueArgsSchema: z.ZodType<Prisma.StripePaymentFindUniqueArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereUniqueInputSchema,
+}).strict()
+
+export const StripePaymentFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.StripePaymentFindUniqueOrThrowArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereUniqueInputSchema,
 }).strict()
 
 export const UserFindFirstArgsSchema: z.ZodType<Prisma.UserFindFirstArgs> = z.object({
@@ -13509,45 +14005,86 @@ export const StarringAppDeleteManyArgsSchema: z.ZodType<Prisma.StarringAppDelete
   where: StarringAppWhereInputSchema.optional(),
 }).strict()
 
-export const TranscationCreateArgsSchema: z.ZodType<Prisma.TranscationCreateArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  data: z.union([ TranscationCreateInputSchema,TranscationUncheckedCreateInputSchema ]),
+export const StripeProductCreateArgsSchema: z.ZodType<Prisma.StripeProductCreateArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  data: z.union([ StripeProductCreateInputSchema,StripeProductUncheckedCreateInputSchema ]),
 }).strict()
 
-export const TranscationUpsertArgsSchema: z.ZodType<Prisma.TranscationUpsertArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereUniqueInputSchema,
-  create: z.union([ TranscationCreateInputSchema,TranscationUncheckedCreateInputSchema ]),
-  update: z.union([ TranscationUpdateInputSchema,TranscationUncheckedUpdateInputSchema ]),
+export const StripeProductUpsertArgsSchema: z.ZodType<Prisma.StripeProductUpsertArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereUniqueInputSchema,
+  create: z.union([ StripeProductCreateInputSchema,StripeProductUncheckedCreateInputSchema ]),
+  update: z.union([ StripeProductUpdateInputSchema,StripeProductUncheckedUpdateInputSchema ]),
 }).strict()
 
-export const TranscationCreateManyArgsSchema: z.ZodType<Prisma.TranscationCreateManyArgs> = z.object({
-  data: z.union([ TranscationCreateManyInputSchema,TranscationCreateManyInputSchema.array() ]),
+export const StripeProductCreateManyArgsSchema: z.ZodType<Prisma.StripeProductCreateManyArgs> = z.object({
+  data: z.union([ StripeProductCreateManyInputSchema,StripeProductCreateManyInputSchema.array() ]),
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const TranscationDeleteArgsSchema: z.ZodType<Prisma.TranscationDeleteArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  where: TranscationWhereUniqueInputSchema,
+export const StripeProductDeleteArgsSchema: z.ZodType<Prisma.StripeProductDeleteArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  where: StripeProductWhereUniqueInputSchema,
 }).strict()
 
-export const TranscationUpdateArgsSchema: z.ZodType<Prisma.TranscationUpdateArgs> = z.object({
-  select: TranscationSelectSchema.optional(),
-  include: TranscationIncludeSchema.optional(),
-  data: z.union([ TranscationUpdateInputSchema,TranscationUncheckedUpdateInputSchema ]),
-  where: TranscationWhereUniqueInputSchema,
+export const StripeProductUpdateArgsSchema: z.ZodType<Prisma.StripeProductUpdateArgs> = z.object({
+  select: StripeProductSelectSchema.optional(),
+  include: StripeProductIncludeSchema.optional(),
+  data: z.union([ StripeProductUpdateInputSchema,StripeProductUncheckedUpdateInputSchema ]),
+  where: StripeProductWhereUniqueInputSchema,
 }).strict()
 
-export const TranscationUpdateManyArgsSchema: z.ZodType<Prisma.TranscationUpdateManyArgs> = z.object({
-  data: z.union([ TranscationUpdateManyMutationInputSchema,TranscationUncheckedUpdateManyInputSchema ]),
-  where: TranscationWhereInputSchema.optional(),
+export const StripeProductUpdateManyArgsSchema: z.ZodType<Prisma.StripeProductUpdateManyArgs> = z.object({
+  data: z.union([ StripeProductUpdateManyMutationInputSchema,StripeProductUncheckedUpdateManyInputSchema ]),
+  where: StripeProductWhereInputSchema.optional(),
 }).strict()
 
-export const TranscationDeleteManyArgsSchema: z.ZodType<Prisma.TranscationDeleteManyArgs> = z.object({
-  where: TranscationWhereInputSchema.optional(),
+export const StripeProductDeleteManyArgsSchema: z.ZodType<Prisma.StripeProductDeleteManyArgs> = z.object({
+  where: StripeProductWhereInputSchema.optional(),
+}).strict()
+
+export const StripePaymentCreateArgsSchema: z.ZodType<Prisma.StripePaymentCreateArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  data: z.union([ StripePaymentCreateInputSchema,StripePaymentUncheckedCreateInputSchema ]),
+}).strict()
+
+export const StripePaymentUpsertArgsSchema: z.ZodType<Prisma.StripePaymentUpsertArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereUniqueInputSchema,
+  create: z.union([ StripePaymentCreateInputSchema,StripePaymentUncheckedCreateInputSchema ]),
+  update: z.union([ StripePaymentUpdateInputSchema,StripePaymentUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const StripePaymentCreateManyArgsSchema: z.ZodType<Prisma.StripePaymentCreateManyArgs> = z.object({
+  data: z.union([ StripePaymentCreateManyInputSchema,StripePaymentCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const StripePaymentDeleteArgsSchema: z.ZodType<Prisma.StripePaymentDeleteArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  where: StripePaymentWhereUniqueInputSchema,
+}).strict()
+
+export const StripePaymentUpdateArgsSchema: z.ZodType<Prisma.StripePaymentUpdateArgs> = z.object({
+  select: StripePaymentSelectSchema.optional(),
+  include: StripePaymentIncludeSchema.optional(),
+  data: z.union([ StripePaymentUpdateInputSchema,StripePaymentUncheckedUpdateInputSchema ]),
+  where: StripePaymentWhereUniqueInputSchema,
+}).strict()
+
+export const StripePaymentUpdateManyArgsSchema: z.ZodType<Prisma.StripePaymentUpdateManyArgs> = z.object({
+  data: z.union([ StripePaymentUpdateManyMutationInputSchema,StripePaymentUncheckedUpdateManyInputSchema ]),
+  where: StripePaymentWhereInputSchema.optional(),
+}).strict()
+
+export const StripePaymentDeleteManyArgsSchema: z.ZodType<Prisma.StripePaymentDeleteManyArgs> = z.object({
+  where: StripePaymentWhereInputSchema.optional(),
 }).strict()
 
 export const UserCreateArgsSchema: z.ZodType<Prisma.UserCreateArgs> = z.object({

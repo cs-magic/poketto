@@ -4,10 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { env } from "@/env.mjs"
 import "server-only"
-
 import Stripe from "stripe"
+
+import { env } from "@/env.mjs"
 
 const key = env.STRIPE_API_KEY
 console.log({ key })
