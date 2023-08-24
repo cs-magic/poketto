@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 "use client"
 
 import CustomDonationInput from "./CustomDonationInput"
@@ -18,13 +12,6 @@ import * as config from "@/config"
 import { createPaymentIntent } from "@/actions/stripe"
 import getStripe from "@/utils/get-stripejs"
 import { formatAmountForDisplay } from "@/utils/stripe-helpers"
-
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 
 function CheckoutForm(): JSX.Element {
   const [input, setInput] = React.useState<{

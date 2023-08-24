@@ -1,11 +1,15 @@
-import { type AppForListView } from "@/ds"
-import { type AppState, type AppTag, type User } from "@prisma/client"
-import dayjs from "dayjs"
 import { PlatformType } from ".prisma/client"
-import { DEFAULT_APP_VERSION } from "@/config"
-import type sampleConversation from "@/data/flowgpt/conversation.json"
+import dayjs from "dayjs"
+
+import { type AppState, type AppTag, type User } from "@prisma/client"
+
 import type sampleComment from "@/data/flowgpt/comment.getComments/comment.json"
+import type sampleConversation from "@/data/flowgpt/conversation.json"
 import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
+
+import { DEFAULT_APP_VERSION } from "@/config"
+
+import { type AppForListView } from "@/ds"
 
 export type IFlowgptPromptBasic = typeof sampleBasicPrompt
 export type IFlowgptUserBasic = typeof sampleBasicPrompt.User
@@ -33,6 +37,10 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   },
   followedByCount: 0,
   followingCount: 0,
+  stripeCurrentPeriodEnd: null,
+  stripePriceId: null,
+  stripeCustomerId: null,
+  stripeSubscriptionId: null,
 })
 export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
   id: p.id,
@@ -63,29 +71,27 @@ export const transFlowgptPrompt2Tags = (p: IFlowgptPromptBasic): AppTag[] =>
     updatedAt: null,
     creatorId: null,
   }))
-export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppForListView => {
-  return {
-    id: p.id, // todo: we should not use this id, since it's not real
-    name: p.title,
-    avatar: p.thumbnailURL,
-    language: p.language,
-    desc: p.description,
-    updatedAt: dayjs(p.updatedAt).toDate(),
-    createdAt: dayjs(p.createdAt).toDate(),
-    platformType: PlatformType.FlowGPT,
-    version: DEFAULT_APP_VERSION,
-    creatorId: p.userId,
-    creator: transFlowgptUserBasic(p.User),
-    tags: transFlowgptPrompt2Tags(p),
-    state: transFlowgptPrompt2State(p),
-    modelName: p.model,
-    platformId: p.id,
-    isOpenSource: p.visibility,
-    category: {
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      main: p.categoryId,
-      sub: p.subCategoryId,
-    },
-  }
-}
+export const transformFlowgptPrompt2ForListView = (p: IFlowgptPromptBasic | FlowgptPromptFull): AppForListView => ({
+  id: p.id, // todo: we should not use this id, since it's not real
+  name: p.title,
+  avatar: p.thumbnailURL,
+  language: p.language,
+  desc: p.description,
+  updatedAt: dayjs(p.updatedAt).toDate(),
+  createdAt: dayjs(p.createdAt).toDate(),
+  platformType: PlatformType.FlowGPT,
+  version: DEFAULT_APP_VERSION,
+  creatorId: p.userId,
+  creator: transFlowgptUserBasic(p.User),
+  tags: transFlowgptPrompt2Tags(p),
+  state: transFlowgptPrompt2State(p),
+  modelName: p.model,
+  platformId: p.id,
+  isOpenSource: p.visibility,
+  category: {
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    main: p.categoryId,
+    sub: p.subCategoryId,
+  },
+})

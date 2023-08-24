@@ -209,18 +209,18 @@ module.exports = {
     "prefer-template": WARNING,
     yoda: WARNING,
 
-    "header/header": [
-      ERROR,
-      "block",
-      [
-        "*",
-        " * Copyright (c) CS-Magic, Inc. and its affiliates.",
-        " *",
-        " * This source code is licensed under the MIT license found in the",
-        " * LICENSE file in the root directory of this source tree.",
-        " "
-      ]
-    ],
+    // "header/header": [
+    //   ERROR,
+    //   "block",
+    //   [
+    //     "*",
+    //     " * Copyright (c) CS-Magic, Inc. and its affiliates.",
+    //     " *",
+    //     " * This source code is licensed under the MIT license found in the",
+    //     " * LICENSE file in the root directory of this source tree.",
+    //     " "
+    //   ]
+    // ],
 
     "import/extensions": OFF,
     // This rule doesn't yet support resolving .js imports when the actual file
@@ -386,7 +386,8 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": OFF,
     "no-multiple-empty-lines": [WARNING, {
       max: 1
-    }]
+    }],
+    "lines-around-directive": OFF,
   },
   overrides: [
     {

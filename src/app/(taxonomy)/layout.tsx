@@ -4,15 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import "@/styles/globals.css"
-import { cn } from "@/lib/utils"
-import { Toaster } from "@/components/ui/toaster"
+import { type PropsWithChildren } from "react"
+
 import { siteConfig } from "@/config"
-import { ThemeProvider } from "@/components/theme-provider"
+
 import { Analytics } from "@/components/analytics"
 import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+
 import { fontHeading, fontSans } from "@/lib/fonts"
-import { type PropsWithChildren } from "react"
+import { cn } from "@/lib/utils"
+
+import "@/styles/globals.css"
 
 export const metadata = {
   metadataBase: new URL(siteConfig.url),
