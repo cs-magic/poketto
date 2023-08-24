@@ -259,39 +259,10 @@ module.exports = {
             patternOptions: { matchBase: true },
             position: "after"
           },
-          { pattern: "@jest/globals", group: "builtin", position: "before" },
           { pattern: "react", group: "builtin", position: "before" },
           { pattern: "react-dom", group: "builtin", position: "before" },
           { pattern: "react-dom/**", group: "builtin", position: "before" },
-          { pattern: "stream", group: "builtin", position: "before" },
-          { pattern: "fs-extra", group: "builtin" },
-          { pattern: "lodash", group: "external", position: "before" },
-          { pattern: "clsx", group: "external", position: "before" }
-          // 'Bit weird to not use the `import/internal-regex` option, but this
-          // way, we can make `import type { Props } from "@theme/*"` appear
-          // before `import styles from "styles.module.css"`, which is what we
-          // always did. This should be removable once we stop using ambient
-          // module declarations for theme aliases.
-          // { pattern: "@/config**", group: "internal" , position: "before"},
-          // { pattern: "@/ds**", group: "internal" , position: "before"},
-          // { pattern: "@/lib**", group: "internal" , position: "before"},
-          // { pattern: "@/layout**", group: "internal" },
-          // { pattern: "@/components**", group: "internal" },
-          // { pattern: "@/**", group: "internal" , position: "after"},
         ],
-        pathGroupsExcludedImportTypes: [],
-        // example: let `import './nprogress.css';` after importing others
-        // in `packages/docusaurus-theme-classic/src/nprogress.ts`
-        // see more: https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/order.md#warnonunassignedimports-truefalse
-        warnOnUnassignedImports: true,
-        // "newlines-between": "always-and-inside-groups",
-        // "newlines-between": "always",
-        "distinctGroup": true
-        // alphabetize: {
-        //   order: 'asc', /* sort in ascending order. Options: ['ignore', 'asc', 'desc'] */
-        //   orderImportKind: "asc",
-        //   caseInsensitive: true /* ignore case. Options: [true, false] */
-        // }
       }
     ],
     "import/prefer-default-export": OFF,

@@ -4,23 +4,31 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 "use client"
 
-import * as React from "react"
-import { useSearchParams } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
+import * as React from "react"
 import { useForm } from "react-hook-form"
 import type * as z from "zod"
 
-import { cn } from "@/lib/utils"
-import { userAuthSchema } from "@/lib/validations/auth"
+import { zodResolver } from "@hookform/resolvers/zod"
+
+import { Icons } from "@/components/icons"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
-import { Icons } from "@/components/icons"
+
+import { cn } from "@/lib/utils"
+import { userAuthSchema } from "@/lib/validations/auth"
+
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -91,7 +99,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             />
             {errors?.email && <p className="px-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
-          <button type={"button"} className={cn(buttonVariants())} disabled={isLoading}>
+          <button type="button" className={cn(buttonVariants())} disabled={isLoading}>
             {isLoading && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
             Sign In with Email
           </button>

@@ -4,18 +4,20 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
+import { promises as fs } from "fs"
 import Mustache from "mustache"
+import path from "path"
 import { Client } from "postmark"
-import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses"
+
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses"
+
 import { prisma } from "@/server/db"
 
-import d from "@/lib/datetime"
 import { env } from "@/env.mjs"
+
 import { AWS_REGION, emailProvider, siteConfig } from "@/config"
 
-import { promises as fs } from "fs"
-import path from "path"
+import d from "@/lib/datetime"
 
 // @ts-ignore
 const isAws = emailProvider === "aws"

@@ -4,19 +4,26 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { useEffect, useRef, useState } from "react"
-import { useChat } from "ai/react"
-import { toast } from "sonner"
-import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
-import { ChevronDownIcon, Link2Icon } from "@radix-ui/react-icons"
-import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
 import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { nanoid } from "ai"
+import { useChat } from "ai/react"
+import { SendIcon } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
+import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
+import { toast } from "sonner"
+
+import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
+import { ChatMessage } from "@prisma/client"
+import { ChevronDownIcon, Link2Icon } from "@radix-ui/react-icons"
+
+import { contentStyleBasedOnRole } from "@/config-utils"
+
 import { type AllMessage, type AppForListView, type SelectChatMessageForListView } from "@/ds"
-import { useSessionUser, useUserId } from "@/hooks/use-user"
-import { api } from "@/lib/api"
-import { Textarea } from "@/components/ui/textarea"
+
+import { AutoScrollContainer } from "@/components/containers"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,19 +35,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+
 import { useMustache } from "@/hooks/use-mustache"
 import { useUrl } from "@/hooks/use-url"
+import { useSessionUser, useUserId } from "@/hooks/use-user"
+
+import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
-import { Badge } from "@/components/ui/badge"
 import d from "@/lib/datetime"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import Link from "next/link"
-import { AutoScrollContainer } from "@/components/containers"
-import { ChatMessage } from "@prisma/client"
-import { nanoid } from "ai"
-import { contentStyleBasedOnRole } from "@/config-utils"
-import { Button } from "@/components/ui/button"
-import { SendIcon } from "lucide-react"
 
 export function ConversationInput({ cid }: { cid: string }) {
   const userId = useUserId()

@@ -4,21 +4,27 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 "use client"
-
-
-import * as React from "react"
-import { useStripe, useElements, PaymentElement, Elements } from "@stripe/react-stripe-js"
 
 import CustomDonationInput from "./CustomDonationInput"
 import StripeTestCards from "./StripeTestCards"
+import * as React from "react"
+
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import type { StripeError } from "@stripe/stripe-js"
 
-import { formatAmountForDisplay } from "@/utils/stripe-helpers"
 import * as config from "@/config"
-import getStripe from "@/utils/get-stripejs"
+
 import { createPaymentIntent } from "@/actions/stripe"
+import getStripe from "@/utils/get-stripejs"
+import { formatAmountForDisplay } from "@/utils/stripe-helpers"
+
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 function CheckoutForm(): JSX.Element {
   const [input, setInput] = React.useState<{
@@ -73,8 +79,12 @@ function CheckoutForm(): JSX.Element {
     try {
       e.preventDefault()
       // Abort if form isn't valid
-      if (!e.currentTarget.reportValidity()) {return}
-      if (!elements || !stripe) {return}
+      if (!e.currentTarget.reportValidity()) {
+        return
+      }
+      if (!elements || !stripe) {
+        return
+      }
 
       setPayment({ status: "processing" })
 
