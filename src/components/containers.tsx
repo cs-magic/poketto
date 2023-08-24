@@ -7,10 +7,12 @@
 import React, { type HTMLProps, type PropsWithChildren, useCallback, useState } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ScrollToBottom from "react-scroll-to-bottom"
-import clsx from "@/lib/clsx"
-import { type DEVICE_TYPE, DEVICES } from "@/lib/device"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+
 import StripePricingTable from "@/components/stripe/pricing-table"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+
+import clsx from "@/lib/clsx"
+import { DEVICES, type DEVICE_TYPE } from "@/lib/device"
 
 export function GridContainer({ children }: PropsWithChildren) {
   return (
@@ -42,7 +44,9 @@ export function MarqueeContainer({ children, className, ...props }: PropsWithChi
   const ref = useCallback((node: HTMLDivElement | null) => {
     if (node) {
       const { scrollWidth, offsetWidth } = node
-      if (scrollWidth > offsetWidth) {setOverflow(true)}
+      if (scrollWidth > offsetWidth) {
+        setOverflow(true)
+      }
     }
   }, [])
 
@@ -106,9 +110,11 @@ export function NormalScrollContainer({ children }: PropsWithChildren) {
 }
 
 export function AutoScrollContainer({ children }: PropsWithChildren) {
-  return <ScrollToBottom className="grow overflow-auto" initialScrollBehavior="auto">
-    {children}
-  </ScrollToBottom>
+  return (
+    <ScrollToBottom className="grow overflow-auto" initialScrollBehavior="auto">
+      {children}
+    </ScrollToBottom>
+  )
 }
 
 export function ChargeContainer({ children }: PropsWithChildren) {

@@ -4,20 +4,24 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React, { Fragment, type PropsWithChildren } from "react"
 import _ from "lodash"
 import { useTheme } from "next-themes"
-import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
-import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
-import { useHotkeys } from "@mantine/hooks"
 import Link from "next/link"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useMount } from "@/hooks/use-mount"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import React, { Fragment, type PropsWithChildren } from "react"
+
+import { useHotkeys } from "@mantine/hooks"
+import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
+import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
+
+import { useAppStore } from "@/store"
+
+import { ICON_DIMENSION_SM, siteConfig } from "@/config"
+import { COMMANDS, navs } from "@/config-utils"
+
+import { ChargeContainer } from "@/components/containers"
+import { Icons } from "@/components/icons"
 import { SidebarNavItem } from "@/components/link"
 import { Button } from "@/components/ui/button"
-import { useAppStore } from "@/store"
-import { Input } from "@/components/ui/input"
 import {
   CommandDialog,
   CommandEmpty,
@@ -27,11 +31,13 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
-import { ICON_DIMENSION_SM, siteConfig } from "@/config"
-import { COMMANDS, navs } from "@/config-utils"
-import { Icons } from "@/components/icons"
-import { ChargeContainer } from "@/components/containers"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+
+import { useMount } from "@/hooks/use-mount"
+import { useUserId } from "@/hooks/use-user"
 
 export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
@@ -85,6 +91,7 @@ export function IconContainer({ children }: PropsWithChildren) {
 }
 
 export default function Navbar() {
+  const userId = useUserId()
   return (
     <div className="flex items-center border-b px-4 py-2">
       <LogoWithName />

@@ -4,9 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React from "react"
 import Head from "next/head"
+import React from "react"
+
 import { env } from "@/env.mjs"
+
+import { useSessionUser, useUserId } from "@/hooks/use-user"
 
 declare global {
   namespace JSX {
@@ -25,6 +28,10 @@ declare global {
  * id: https://dashboard.stripe.com/pricing-tables
  */
 function StripePricingTable() {
+  const user = useSessionUser()
+  if (!user) {
+    return <h1> You should login first to view the pricing table</h1>
+  }
   return (
     <>
       <Head>
@@ -34,7 +41,9 @@ function StripePricingTable() {
       <stripe-pricing-table
         pricing-table-id={env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
         publishable-key={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-       />
+        client-reference-id={user.id}
+        customer-email={user.email}
+      />
     </>
   )
 }

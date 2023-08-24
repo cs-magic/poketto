@@ -4,19 +4,22 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React from "react"
-import { IconUser } from "@tabler/icons-react"
 import { signIn, signOut } from "next-auth/react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getLocalFlowgptImageUri } from "@/lib/string"
+import React from "react"
+
+import { IconUser } from "@tabler/icons-react"
+
 import { DEFAULT_USER_ID, DEFAULT_USER_NAME } from "@/config"
+
+import { type UserForProfile } from "@/ds"
+
+import { ChargeContainer } from "@/components/containers"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+
 import { todo } from "@/lib/helpers"
-import { type UserForProfile } from "@/ds"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import StripePricingTable from "@/components/stripe/pricing-table"
-import { ChargeContainer } from "@/components/containers"
+import { getLocalFlowgptImageUri } from "@/lib/string"
 
 export function UserProfile({ user }: { user: UserForProfile }) {
   return (
