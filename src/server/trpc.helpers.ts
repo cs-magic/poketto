@@ -1,10 +1,8 @@
 /**
- * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
- * 1. You want to modify request context (see Part 1).
- * 2. You want to create a new middleware or type of procedure (see Part 3).
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
  *
- * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
- * need to use are documented accordingly near the end.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 import { initTRPC, TRPCError } from "@trpc/server"
@@ -37,12 +35,10 @@ interface CreateContextOptions {
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-export const createInnerTRPCContext = (opts: CreateContextOptions) => {
-  return {
+export const createInnerTRPCContext = (opts: CreateContextOptions) => ({
     session: opts.session,
     prisma,
-  }
-}
+  })
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request

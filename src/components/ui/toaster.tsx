@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 "use client"
 
 import {
@@ -15,8 +22,7 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
+      {toasts.map(({ id, title, description, action, ...props }) => (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
@@ -27,8 +33,7 @@ export function Toaster() {
             {action}
             <ToastClose />
           </Toast>
-        )
-      })}
+        ))}
       <ToastViewport />
     </ToastProvider>
   )

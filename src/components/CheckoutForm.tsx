@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 "use client"
 
 import React, { useState } from "react"
@@ -35,7 +42,7 @@ export default function CheckoutForm(): JSX.Element {
         onChange={handleInputChange}
         value={input.customDonation}
       />
-      {/*<StripeTestCards />*/}
+      {/* <StripeTestCards /> */}
       <button className="checkout-style-background" type="submit" disabled={loading}>
         Donate {formatAmountForDisplay(input.customDonation, config.CURRENCY)}
       </button>

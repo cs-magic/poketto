@@ -1,12 +1,19 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 "use client"
 
-import type { StripeError } from "@stripe/stripe-js"
 
 import * as React from "react"
 import { useStripe, useElements, PaymentElement, Elements } from "@stripe/react-stripe-js"
 
 import CustomDonationInput from "./CustomDonationInput"
 import StripeTestCards from "./StripeTestCards"
+import type { StripeError } from "@stripe/stripe-js"
 
 import { formatAmountForDisplay } from "@/utils/stripe-helpers"
 import * as config from "@/config"
@@ -30,7 +37,7 @@ function CheckoutForm(): JSX.Element {
   const stripe = useStripe()
   const elements = useElements()
 
-  const PaymentStatus = ({ status }: { status: string }) => {
+  function PaymentStatus({ status }: { status: string }) {
     switch (status) {
       case "processing":
       case "requires_payment_method":
@@ -66,8 +73,8 @@ function CheckoutForm(): JSX.Element {
     try {
       e.preventDefault()
       // Abort if form isn't valid
-      if (!e.currentTarget.reportValidity()) return
-      if (!elements || !stripe) return
+      if (!e.currentTarget.reportValidity()) {return}
+      if (!elements || !stripe) {return}
 
       setPayment({ status: "processing" })
 

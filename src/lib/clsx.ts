@@ -1,5 +1,8 @@
 /**
- * 这个库主要是因为，clsx 在 webstorm 里 move module 的时候总是会变成  import clsx from 'clsx/clsx' 然后出错！
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 import { clsx as clsxRaw } from "clsx"
 

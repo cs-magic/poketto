@@ -1,7 +1,13 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
 const cardVariants = cva("rounded-lg border bg-card text-card-foreground shadow-sm", {

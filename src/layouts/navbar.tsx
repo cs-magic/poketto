@@ -1,14 +1,22 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import React, { Fragment, type PropsWithChildren } from "react"
+import _ from "lodash"
 import { useTheme } from "next-themes"
 import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
+import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
+import { useHotkeys } from "@mantine/hooks"
+import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMount } from "@/hooks/use-mount"
-import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { SidebarNavItem } from "@/components/link"
 import { Button } from "@/components/ui/button"
 import { useAppStore } from "@/store"
-import { useHotkeys } from "@mantine/hooks"
 import { Input } from "@/components/ui/input"
 import {
   CommandDialog,
@@ -19,23 +27,23 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
-import _ from "lodash"
 import { ICON_DIMENSION_SM, siteConfig } from "@/config"
 import { COMMANDS, navs } from "@/config-utils"
 import { Icons } from "@/components/icons"
 import { ChargeContainer } from "@/components/containers"
 import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
 
-export const ThemeSwitcher = () => {
+export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
   const mounted = useMount()
 
-  if (!mounted || !theme) return <Skeleton className={"h-8 w-8"} />
+  if (!mounted || !theme) {
+    return <Skeleton className="h-8 w-8" />
+  }
 
   const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length]!
   return (
-    <div onClick={() => setTheme(nextTheme)} className={"p-2 hover:bg-accent"}>
+    <div onClick={() => setTheme(nextTheme)} className="p-2 hover:bg-accent">
       {theme === "light" && <IconSun className={ICON_DIMENSION_SM} />}
       {theme === "dark" && <IconMoon className={ICON_DIMENSION_SM} />}
       {theme === "system" && <IconBrightnessHalf className={ICON_DIMENSION_SM} />}
@@ -46,24 +54,24 @@ export const ThemeSwitcher = () => {
 /**
  * 晚点再开启公司模式，目前就一个业务，没有必要
  */
-export const LogoWithName = ({ withCompany }: { withCompany?: false }) => {
+export function LogoWithName({ withCompany }: { withCompany?: false }) {
   const { toggleSidebar } = useAppStore()
   const productLogo = (
-    <Button variant={"ghost"} className={"shrink-0 justify-start gap-2"} onClick={toggleSidebar}>
-      <Icons.productLogo />
-      <span className={"whitespace-nowrap text-lg tracking-widest"}>{siteConfig.name}</span>
+    <Button variant="ghost" className="shrink-0 justify-start gap-2" onClick={toggleSidebar}>
+      <Icons.Product />
+      <span className="whitespace-nowrap text-lg tracking-widest">{siteConfig.name}</span>
     </Button>
   )
   return withCompany ? (
     // 学 vercel 的，ref: https://nextjs.org/docs/messages/prerender-error
-    <div className={"flex items-center gap-2 h-8"}>
-      <Link href={"https://cs-magic.com"} className={"hidden md:flex"}>
+    <div className="flex items-center gap-2 h-8">
+      <Link href="https://cs-magic.com" className="hidden md:flex">
         <IconContainer>
-          <Icons.companyLogo className={"wh-8"} />
+          <Icons.Company className="wh-8" />
         </IconContainer>
       </Link>
 
-      <Separator orientation={"vertical"} className={"rotate-[30deg] mx-2 hidden md:flex"} />
+      <Separator orientation="vertical" className="rotate-[30deg] mx-2 hidden md:flex" />
 
       {productLogo}
     </div>
@@ -72,19 +80,19 @@ export const LogoWithName = ({ withCompany }: { withCompany?: false }) => {
   )
 }
 
-export const IconContainer = ({ children }: PropsWithChildren) => {
-  return <div className={"p-2 hover:bg-accent rounded-lg"}>{children}</div>
+export function IconContainer({ children }: PropsWithChildren) {
+  return <div className="p-2 hover:bg-accent rounded-lg">{children}</div>
 }
 
 export default function Navbar() {
   return (
-    <div className={"flex items-center border-b px-4 py-2"}>
+    <div className="flex items-center border-b px-4 py-2">
       <LogoWithName />
 
-      <div className={"grow"} />
+      <div className="grow" />
       <CommandDemo />
 
-      <div className={"hidden items-center md:flex mx-2"}>
+      <div className="hidden items-center md:flex mx-2">
         <ChargeContainer>
           <IconContainer>
             <LightningBoltIcon />
@@ -105,7 +113,7 @@ export default function Navbar() {
           </PopoverTrigger>
 
           <PopoverContent>
-            <section className={"flex flex-col"}>
+            <section className="flex flex-col">
               <SidebarNavItem {...navs.whatsPoketto} />
               <SidebarNavItem {...navs.whatsDora} />
               <SidebarNavItem {...navs.learningCenter} />
@@ -122,7 +130,7 @@ export default function Navbar() {
   )
 }
 
-const CommandDemo = () => {
+function CommandDemo() {
   const [open, setOpen] = React.useState(false)
   const { searchHistory: history, pushSearch: push } = useAppStore()
 
@@ -131,9 +139,9 @@ const CommandDemo = () => {
 
   return (
     <>
-      <div className={"| | relative flex w-[256px] items-center text-sm text-muted-foreground"}>
-        <IconSearch className={"absolute left-2 wh-5"} />
-        <Input className={"grow"} onFocus={() => setOpen(!open)} />
+      <div className="| | relative flex w-[256px] items-center text-sm text-muted-foreground">
+        <IconSearch className="absolute left-2 wh-5" />
+        <Input className="grow" onFocus={() => setOpen(!open)} />
         <kbd className="pointer-events-none absolute right-2 hidden h-6  shrink-0  select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground md:inline-flex">
           ⌘ {KEY}
         </kbd>
@@ -141,15 +149,15 @@ const CommandDemo = () => {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList className={"max-h-[600px]"}>
+        <CommandList className="max-h-[600px]">
           <CommandEmpty>No results found.</CommandEmpty>
 
           <CommandGroup heading="History">
-            <div className={"flex flex-wrap gap-2"}>
+            <div className="flex flex-wrap gap-2">
               {history
                 .map((id) => COMMANDS.find((command) => command.id === id)!)
                 .map((item) => (
-                  <CommandItem key={item.id} className={"flex items-center gap-2"}>
+                  <CommandItem key={item.id} className="flex items-center gap-2">
                     {item.icon}
                     <span>{item.title ?? item.id}</span>
                   </CommandItem>
@@ -164,7 +172,7 @@ const CommandDemo = () => {
                 {items.map((item) => (
                   <CommandItem
                     key={item.id}
-                    className={"flex items-center gap-2"}
+                    className="flex items-center gap-2"
                     onSelect={() => {
                       // ref: https://github.com/pacocoursey/cmdk#nested-items
                       console.log("selected ", item)

@@ -1,17 +1,23 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { type Message, StreamingTextResponse } from "ai"
-import { env } from "@/env.mjs"
 import { Prisma, PromptRoleType } from ".prisma/client"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
-import { type RootRouter } from "@/server/trpc.router"
 import superjson from "superjson"
 
-import { nanoid } from "@/lib/id"
 import { PromptTemplate } from "langchain/prompts"
 import { ChatOpenAI } from "langchain/chat_models/openai"
 import { BytesOutputParser } from "langchain/schema/output_parser"
+import { type LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
-import { type LLMResult } from "langchain/schema" // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
+import { nanoid } from "@/lib/id"
+import { type RootRouter } from "@/server/trpc.router"
+import { env } from "@/env.mjs"
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
@@ -49,7 +55,7 @@ export default async function (req: Request, res: Response) {
   /**
    * 2. 检查频率等相关
    */
-  if (await validateRequest(req)) return
+  if (await validateRequest(req)) {return}
 
   /**
    * 3. 读取 memory: p ∪ q 条记忆;  p=5: 过往最相关记忆; q=4: 最新记忆

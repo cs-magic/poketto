@@ -1,13 +1,21 @@
-import { prisma } from "@/server/db"
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 import Mustache from "mustache"
-import d from "@/lib/datetime"
 import { Client } from "postmark"
-import { env } from "@/env.mjs"
 import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses"
-import path from "path"
-import fs from "fs"
+import { prisma } from "@/server/db"
+
+import d from "@/lib/datetime"
+import { env } from "@/env.mjs"
 import { AWS_REGION, emailProvider, siteConfig } from "@/config"
+
+import { promises as fs } from "fs"
+import path from "path"
 
 // @ts-ignore
 const isAws = emailProvider === "aws"
@@ -21,7 +29,7 @@ const sesClient = new SESClient({
   },
 })
 
-const t = fs.readFileSync(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
+// const t = fs.readFileSync(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
 
 export const emailFrom = siteConfig.welcomeEmailAddress
 
@@ -45,6 +53,7 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
   let result
 
   if (isAws) {
+    const t = await fs.readFile(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
     result = await sesClient.send(
       new SendEmailCommand({
         Destination: {
@@ -112,7 +121,7 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
           // Set this to prevent Gmail from threading emails.
           // See https://stackoverflow.com/questions/23434110/force-emails-not-to-be-grouped-into-conversations/25435722.
           Name: "X-Entity-Ref-ID",
-          Value: new Date().getTime() + "",
+          Value: `${new Date().getTime()}`,
         },
       ],
     })

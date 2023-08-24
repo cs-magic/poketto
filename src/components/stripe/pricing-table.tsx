@@ -1,6 +1,12 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import React from "react"
-import { env } from "@/env.mjs"
 import Head from "next/head"
+import { env } from "@/env.mjs"
 
 declare global {
   namespace JSX {
@@ -18,17 +24,17 @@ declare global {
  *
  * id: https://dashboard.stripe.com/pricing-tables
  */
-const StripePricingTable = () => {
+function StripePricingTable() {
   return (
     <>
       <Head>
-        <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+        <script async src="https://js.stripe.com/v3/pricing-table.js" />
       </Head>
 
       <stripe-pricing-table
         pricing-table-id={env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
         publishable-key={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-      ></stripe-pricing-table>
+       />
     </>
   )
 }

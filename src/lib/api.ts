@@ -1,27 +1,27 @@
 /**
- * This is the client-side entrypoint for your tRPC API. It is used to create the `api` object which
- * contains the Next.js App-wrapper, as well as your type-safe React Query hooks.
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
  *
- * We also create a few inference helpers for input and output types.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client"
 import { createTRPCNext } from "@trpc/next"
 import { type inferRouterInputs, type inferRouterOutputs, type TRPCError } from "@trpc/server"
 import superjson from "superjson"
+import { toast } from "sonner"
 import { type RootRouter } from "@/server/trpc.router"
 import { URI } from "@/config"
-import { toast } from "sonner"
 
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") return "" // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // SSR should use vercel url
+  if (typeof window !== "undefined") {return ""} // browser should use relative url
+  if (process.env.VERCEL_URL) {return `https://${process.env.VERCEL_URL}`} // SSR should use vercel url
   return `http://localhost:${process.env.PORT ?? 3000}` // dev SSR should use localhost
 }
 
 function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
-  if (typeof window === "undefined") return false
-  if (!(error instanceof TRPCClientError)) return false
-  if (error.data?.code !== "UNAUTHORIZED") return false
+  if (typeof window === "undefined") {return false}
+  if (!(error instanceof TRPCClientError)) {return false}
+  if (error.data?.code !== "UNAUTHORIZED") {return false}
 
   console.warn("Redirecting to /sign-in since user is not authorized")
   toast.error("Redirecting to /sign-in since user is not authorized")
@@ -48,7 +48,7 @@ export const api = createTRPCNext<RootRouter>({
             // notifyOnChangeProps: "tracked",
 
             retry: (failureCount, error) => {
-              if (handleUnauthorizedErrorsOnClient(error)) return false
+              if (handleUnauthorizedErrorsOnClient(error)) {return false}
               return failureCount < 0 // ref: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528
             },
             // 这里可以获得从 server 拿过来的 error，然后在客户端反馈，因此可以在这里用 toast

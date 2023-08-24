@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
@@ -5,8 +11,7 @@ import { cn } from '@/lib/utils'
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, ...props }, ref) => {
-		return (
+	({ className, type, ...props }, ref) => (
 			<input
 				type={type}
 				className={cn(
@@ -16,8 +21,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				ref={ref}
 				{...props}
 			/>
-		)
-	},
+		),
 )
 Input.displayName = 'Input'
 

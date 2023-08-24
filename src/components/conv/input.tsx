@@ -1,13 +1,22 @@
-import { type AllMessage, type AppForListView, type SelectChatMessageForListView } from "@/ds"
-import { useSessionUser, useUserId } from "@/hooks/use-user"
-import { api } from "@/lib/api"
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { useEffect, useRef, useState } from "react"
 import { useChat } from "ai/react"
 import { toast } from "sonner"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import { ChevronDownIcon, Link2Icon } from "@radix-ui/react-icons"
-import { Textarea } from "@/components/ui/textarea"
 import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
+import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { type AllMessage, type AppForListView, type SelectChatMessageForListView } from "@/ds"
+import { useSessionUser, useUserId } from "@/hooks/use-user"
+import { api } from "@/lib/api"
+import { Textarea } from "@/components/ui/textarea"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,10 +30,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useMustache } from "@/hooks/use-mustache"
 import { useUrl } from "@/hooks/use-url"
-import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
 import clsx from "@/lib/clsx"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
 import { Badge } from "@/components/ui/badge"
 import d from "@/lib/datetime"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
@@ -36,7 +42,7 @@ import { contentStyleBasedOnRole } from "@/config-utils"
 import { Button } from "@/components/ui/button"
 import { SendIcon } from "lucide-react"
 
-export const ConversationInput = ({ cid }: { cid: string }) => {
+export function ConversationInput({ cid }: { cid: string }) {
   const userId = useUserId()
   const user = useSessionUser()
   const { data: conv } = api.conv.get.useQuery({ id: cid })
@@ -61,10 +67,10 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
       // console.log("onResponse:", {response })
       refMessage.current = response.headers.get("replyId")!
     },
-    onFinish: async (data) => {
+    onFinish: async (msg) => {
       void utils.conv.list.invalidate()
 
-      console.log("onFinish:", { data })
+      console.log("onFinish:", { msg })
       // 不能用以下的办法更新id，会与数据库不同步，性能也不好
       // const latestId = await getLatestId({ conversationId })
 
@@ -80,10 +86,14 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
   }, [cid])
 
   useEffect(() => {
-    if (initialMessages) setMessages([...initialMessages].reverse())
+    if (initialMessages) {
+      setMessages([...initialMessages].reverse())
+    }
   }, [initialMessages])
 
-  if (!conv) return null
+  if (!conv) {
+    return null
+  }
 
   const messagesWithDate: AllMessage[] = []
   let curDate = d(new Date(0, 0, 0))
@@ -117,8 +127,8 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
       {addDialogVisible && conv && <AddAppAlertDialog app={conv.app} />}
 
       <ScrollContainer>
-        <div className={"w-full bg-cyan-600 p-2 dark:bg-cyan-950 "}>
-          {/*因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序*/}
+        <div className="w-full bg-cyan-600 p-2 dark:bg-cyan-950 ">
+          {/* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序 */}
           {conv && <ConversationMessages messages={messagesWithDate.reverse()} />}
         </div>
       </ScrollContainer>
@@ -137,28 +147,29 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
       >
         <Textarea
           style={{ resize: "none" }} // 去掉尾部的 icon，不然视觉上不和谐
-          name={"prompt"}
-          className={"w-full rounded-xl min-h-8 lg:min-h-16"}
+          name="prompt"
+          className="w-full rounded-xl min-h-8 lg:min-h-16"
           autoFocus
           value={input}
           onChange={handleInputChange}
-          id={"input"}
+          id="input"
           onKeyDown={getHotkeyHandler([
             [
               "Enter",
               (event) => {
                 // isComposing, ref: https://github.com/facebook/react/issues/13104
-                if (!(event as KeyboardEvent).isComposing)
+                if (!(event as KeyboardEvent).isComposing) {
                   // request submit, ref: https://stackoverflow.com/a/71478740
                   refForm.current!.requestSubmit()
+                }
               },
             ],
           ])}
         />
-        <input className={"hidden"} name={"conversationUserId"} value={userId} />
-        <input className={"hidden"} name={"conversationAppId"} value={cid} />
+        <input className="hidden" name="conversationUserId" value={userId} />
+        <input className="hidden" name="conversationAppId" value={cid} />
 
-        <Button className={"lg:hidden flex items-center justify-center"} variant={"ghost"} type={"submit"}>
+        <Button className="lg:hidden flex items-center justify-center" variant="ghost" type="submit">
           <SendIcon />
         </Button>
       </form>
@@ -166,7 +177,7 @@ export const ConversationInput = ({ cid }: { cid: string }) => {
   )
 }
 
-export const ConversationMessages = ({ messages }: { messages: AllMessage[] }) => {
+export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
   const scrollToBottom = useScrollToBottom()
   const [sticky] = useSticky()
   const [hasUnread, setHasUnread] = useState(false)
@@ -174,21 +185,25 @@ export const ConversationMessages = ({ messages }: { messages: AllMessage[] }) =
   const clipboard = useClipboard({ timeout: 500 })
 
   useEffect(() => {
-    if (!sticky) setHasUnread(true)
+    if (!sticky) {
+      setHasUnread(true)
+    }
   }, [messages.length])
 
   useEffect(() => {
-    if (sticky) setHasUnread(false)
+    if (sticky) {
+      setHasUnread(false)
+    }
   }, [sticky])
 
   return (
     // 这里不能加 h-full 因为外层包了一个scroll，要超过容器高度，才可以滚动
     <div className={clsx("relative  w-full", "flex flex-col-reverse", "overflow-auto")}>
       {/* 这里为了把下面（倒序）的空间给撑起来，使聊天在不占满的情况下，也能从上显示到下（而非粘在底部，从下到上） */}
-      <div className={"grow"} />
+      <div className="grow" />
       {messages.map((msg, index) =>
         "systemType" in msg ? (
-          <div key={index} className={"mx-auto my-2 text-center text-muted-foreground"}>
+          <div key={index} className="mx-auto my-2 text-center text-muted-foreground">
             {m(msg.content)}
           </div>
         ) : (
@@ -217,11 +232,11 @@ export const ConversationMessages = ({ messages }: { messages: AllMessage[] }) =
               //   toast.success(`copied url`)
               // }}
             >
-              {/*<span className={"mx-2"}>#{msg.id}</span>*/}
+              {/* <span className={"mx-2"}>#{msg.id}</span> */}
               <time className="">{d(msg.createdAt).format("HH:MM")}</time>
               {/* 保留功能，复制按钮先不加 */}
-              {/*<Link2Icon />*/}
-              {/*<span>#{msg.id}</span>*/}
+              {/* <Link2Icon /> */}
+              {/* <span>#{msg.id}</span> */}
             </div>
 
             <ReactMarkdown className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])} remarkPlugins={[remarkGfm]}>
@@ -231,7 +246,7 @@ export const ConversationMessages = ({ messages }: { messages: AllMessage[] }) =
         )
       )}
       {hasUnread && !sticky && (
-        <Badge variant={"default"} className={"absolute bottom-4 right-4 cursor-pointer"} onClick={() => scrollToBottom()}>
+        <Badge variant="default" className="absolute bottom-4 right-4 cursor-pointer" onClick={() => scrollToBottom()}>
           New Message <ChevronDownIcon />
         </Badge>
       )}
@@ -239,7 +254,7 @@ export const ConversationMessages = ({ messages }: { messages: AllMessage[] }) =
   )
 }
 
-export const AddAppAlertDialog = ({ app }: { app: AppForListView }) => {
+export function AddAppAlertDialog({ app }: { app: AppForListView }) {
   const utils = api.useContext()
   const [addOpen, setAddOpen] = useState(false)
 

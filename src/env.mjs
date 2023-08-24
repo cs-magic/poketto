@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
@@ -35,7 +41,8 @@ export const env = createEnv({
     POSTMARK_SIGN_IN_TEMPLATE: z.string().min(1),
     POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1),
 
-    STRIPE_API_KEY: z.string().min(1)
+    STRIPE_API_KEY: z.string().min(1),
+    STRIPE_WEBHOOK_SECRET: z.string().min(1)
   },
 
   /**
@@ -73,6 +80,7 @@ export const env = createEnv({
     POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE,
 
     STRIPE_API_KEY: process.env.STRIPE_API_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID: process.env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   },

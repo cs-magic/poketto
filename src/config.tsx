@@ -1,6 +1,9 @@
-// -----------------------------------------------------------------------------
-// system
-// -----------------------------------------------------------------------------
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 export const FontWeightGlowSansSC = ["Thin", "ExtraLight", "Light", "Regular", "Book", "Medium", "Bold", "ExtraBold", "Heavy"] as const
 export const FontWeightTailwind = ["thin", "extralight", "light", "normal", "medium", "semibold", "bold", "extrabold", "black"] as const
@@ -169,9 +172,9 @@ export type EmailProvider = "aws" | "postmark"
 export const emailProvider: EmailProvider = "aws"
 export const AWS_REGION = "ap-southeast-1"
 
-//////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////
 // stripe
-//////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////
 export const CURRENCY = "usd"
 // Set your amount limits: Use float for decimal currencies and
 // Integer for zero-decimal currencies: https://stripe.com/docs/currencies#zero-decimal.

@@ -1,25 +1,32 @@
-import { useUserId } from "@/hooks/use-user"
-import { api } from "@/lib/api"
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import { type ReactNode, useCallback, useState } from "react"
+import _ from "lodash"
 import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
 import { toast } from "sonner"
+import Link from "next/link"
+import numeral from "numeral"
+import ReactMarkdown from "react-markdown"
+import { useRouter } from "next/router"
+import { Prisma } from ".prisma/client"
+import { useUserId } from "@/hooks/use-user"
+import { api } from "@/lib/api"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
-import Link from "next/link"
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { Separator } from "@/components/ui/separator"
 import clsx from "@/lib/clsx"
-import numeral from "numeral"
-import _ from "lodash"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import { vIsNumber } from "@/lib/number"
-import { type ReactNode, useCallback, useState } from "react"
 import { useMustache } from "@/hooks/use-mustache"
-import ReactMarkdown from "react-markdown"
 
-import { useRouter } from "next/router"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,33 +37,32 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Prisma } from ".prisma/client"
 import validator = Prisma.validator
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
-export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) => {
+export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
   const userId = useUserId()
   const { data: app, error: appError } = api.app.get.useQuery({ appId })
 
-  if (app === undefined) return <SymbolIcon />
-  if (appError) return null //toast.error(appError.message) // 已经在 lib/api 里handle了
+  if (app === undefined) {return <SymbolIcon />}
+  if (appError) {return null} // toast.error(appError.message) // 已经在 lib/api 里handle了
 
   return (
-    <div className={"flex h-full w-full flex-col gap-2 overflow-auto p-2"}>
-      <section id={"basic"} className={"| flex w-full items-center gap-2"}>
-        <Avatar className={"shrink-0 p-4  wh-28"}>
-          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className={"rounded-2xl"} />
+    <div className="flex h-full w-full flex-col gap-2 overflow-auto p-2">
+      <section id="basic" className="| flex w-full items-center gap-2">
+        <Avatar className="shrink-0 p-4  wh-28">
+          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className="rounded-2xl" />
         </Avatar>
 
-        <div className={"| flex grow flex-col gap-2 overflow-hidden"}>
-          <div className={"| flex w-full flex-col "}>
-            <h2 className={"line-clamp-2"}>{app.name}</h2>
-            <p className={"truncate text-primary-foreground/75"}>by {app.creator.name}</p>
+        <div className="| flex grow flex-col gap-2 overflow-hidden">
+          <div className="| flex w-full flex-col ">
+            <h2 className="line-clamp-2">{app.name}</h2>
+            <p className="truncate text-primary-foreground/75">by {app.creator.name}</p>
           </div>
         </div>
 
         {!userId ? (
-          <Link href={URI.user.auth.signIn} className={"p-btn"}>
+          <Link href={URI.user.auth.signIn} className="p-btn">
             Login to Get
           </Link>
         ) : (
@@ -64,67 +70,67 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
         )}
       </section>
 
-      <Separator orientation={"horizontal"} />
+      <Separator orientation="horizontal" />
 
-      <section id={"status"} className={clsx("w-full", "flex items-center justify-between gap-1")}>
-        <StatusItem a={"category"} b={`${app.category.main}-${app.category.sub}`} c={"of All 31"} />
-        <StatusItem a={"model"} b={app.modelName} c={app.creator.name} />
+      <section id="status" className={clsx("w-full", "flex items-center justify-between gap-1")}>
+        <StatusItem a="category" b={`${app.category.main}-${app.category.sub}`} c="of All 31" />
+        <StatusItem a="model" b={app.modelName} c={app.creator.name} />
         {POKETTO_DETAIL_RATINGS_ENABLED && (
           <StatusItem
-            a={"ratings"}
+            a="ratings"
             b={numeral(app.state?.stars).format("0.0")}
             c={
               <>
                 {_.range(Math.floor(app.state?.stars ?? 0)).map((i) => (
-                  <StarFilledIcon className={"vh-4 leading-none"} key={i} />
+                  <StarFilledIcon className="vh-4 leading-none" key={i} />
                 ))}
                 {_.range(5 - Math.floor(app.state?.stars ?? 0)).map((i) => (
-                  <StarIcon className={"vh-4 leading-none"} key={i} />
+                  <StarIcon className="vh-4 leading-none" key={i} />
                 ))}
               </>
             }
           />
         )}
-        <StatusItem a={"language"} b={app.language} c={"Universal"} />
+        <StatusItem a="language" b={app.language} c="Universal" />
       </section>
 
-      {/*<section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}>*/}
+      {/* <section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}> */}
       {/*	*/}
-      {/*	<DeviceContainer ratio={.6} device={isMobile ? 'iphone-14-pro' : 'surface-pro-2017'}>*/}
-      {/*		<div className={'w-full flex flex-col'}>*/}
-      {/*			<h2>heading 1</h2>*/}
-      {/*			<div>hhh</div>*/}
-      {/*			<h2>heading 2</h2>*/}
-      {/*			<div>hhh2</div>*/}
-      {/*		</div>*/}
-      {/*	</DeviceContainer>*/}
-      {/*</section>*/}
+      {/*	<DeviceContainer ratio={.6} device={isMobile ? 'iphone-14-pro' : 'surface-pro-2017'}> */}
+      {/*		<div className={'w-full flex flex-col'}> */}
+      {/*			<h2>heading 1</h2> */}
+      {/*			<div>hhh</div> */}
+      {/*			<h2>heading 2</h2> */}
+      {/*			<div>hhh2</div> */}
+      {/*		</div> */}
+      {/*	</DeviceContainer> */}
+      {/* </section> */}
 
       {/* tags */}
-      <section id={"tags"} className={"flex w-full flex-wrap gap-2"}>
+      <section id="tags" className="flex w-full flex-wrap gap-2">
         {app.tags.map((tag) => (
-          <Badge variant={"secondary"} key={tag.id}>
+          <Badge variant="secondary" key={tag.id}>
             {tag.name}
           </Badge>
         ))}
       </section>
 
-      <section id={"desc"} className={"relative flex w-full flex-col"}>
+      <section id="desc" className="relative flex w-full flex-col">
         <CollapsablePara content={app.desc} />
       </section>
 
-      <section id={"ratings-reviews"} className={"flex w-full flex-col gap-4"}>
-        <div className={"flex items-center justify-between"}>
+      <section id="ratings-reviews" className="flex w-full flex-col gap-4">
+        <div className="flex items-center justify-between">
           {/* todo: Ratings & */}
           <h2>Reviews</h2>
           {app.comments.length > 2 && (
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant={"ghost"}>See All</Button>
+                <Button variant="ghost">See All</Button>
               </DialogTrigger>
-              <DialogContent className={"h-[80vh]  max-w-[80vw] overflow-auto"}>
+              <DialogContent className="h-[80vh]  max-w-[80vw] overflow-auto">
                 <h2>All the comments</h2>
-                <MasonryContainer>{/*{comments.map((item) => (<PokettoComment comment={item} key={item.id}/>))}*/}</MasonryContainer>
+                <MasonryContainer>{/* {comments.map((item) => (<PokettoComment comment={item} key={item.id}/>))} */}</MasonryContainer>
               </DialogContent>
             </Dialog>
           )}
@@ -132,30 +138,30 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
         {app.comments.length === 0 && "No Comments Yet !"}
 
         {/* todo: rate level */}
-        {/*<div className={'grid grid-col-1 md:grid-cols-2 gap-4'}>*/}
-        {/*	<div className={'flex items-end justify-between'}>*/}
-        {/*		<p className={'flex items-end gap-2'}>*/}
-        {/*			<span className={'text-4xl font-bold'}>{numeral(poketto.state.ratedStars).format('0.0')}</span>*/}
-        {/*			<span className={'text-sm font-'}>out of 5</span>*/}
-        {/*		</p>*/}
-        {/*		<span>{numeral(poketto.state.ratedStars).format('0a')} Ratings</span>*/}
-        {/*	</div>*/}
-        {/*	<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/>*/}
-        {/*</div>*/}
-        <div className={"grid gap-2"}>{/*{comments.slice(0, 2).map((item) => (<PokettoComment comment={item} key={item.id}/>))}*/}</div>
+        {/* <div className={'grid grid-col-1 md:grid-cols-2 gap-4'}> */}
+        {/*	<div className={'flex items-end justify-between'}> */}
+        {/*		<p className={'flex items-end gap-2'}> */}
+        {/*			<span className={'text-4xl font-bold'}>{numeral(poketto.state.ratedStars).format('0.0')}</span> */}
+        {/*			<span className={'text-sm font-'}>out of 5</span> */}
+        {/*		</p> */}
+        {/*		<span>{numeral(poketto.state.ratedStars).format('0a')} Ratings</span> */}
+        {/*	</div> */}
+        {/*	<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/> */}
+        {/* </div> */}
+        <div className="grid gap-2">{/* {comments.slice(0, 2).map((item) => (<PokettoComment comment={item} key={item.id}/>))} */}</div>
       </section>
 
-      <section id={"information"} className={"flex w-full flex-col gap-4"}>
+      <section id="information" className="flex w-full flex-col gap-4">
         <h2>Information</h2>
-        <div className={"grid grid-cols-2 gap-4"}>
-          <InfoItem a={"provider"} b={app.creator.name} />
-          <InfoItem a={"Open Source"} b={app.isOpenSource.toString()} />
-          <InfoItem a={"category"} b={`${app.category.main}-${app.category.sub}`} />
-          <InfoItem a={"language"} b={app.language} />
+        <div className="grid grid-cols-2 gap-4">
+          <InfoItem a="provider" b={app.creator.name} />
+          <InfoItem a="Open Source" b={app.isOpenSource.toString()} />
+          <InfoItem a="category" b={`${app.category.main}-${app.category.sub}`} />
+          <InfoItem a="language" b={app.language} />
         </div>
 
-        <Separator orientation={"horizontal"} />
-        <div className={"grid grid-cols-2 gap-4"}>
+        <Separator orientation="horizontal" />
+        <div className="grid grid-cols-2 gap-4">
           {Object.entries(app.state ?? {})
             .filter(vIsNumber)
             .sort((a, b) => (a[0] < b[0] ? -1 : 1))
@@ -167,8 +173,8 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
 
       {POKETTO_DETAIL_FEATURES_ENABLED && (
         <>
-          <Separator orientation={"horizontal"} />
-          <section id={"collections"} className={"flex w-full flex-col gap-4"}>
+          <Separator orientation="horizontal" />
+          <section id="collections" className="flex w-full flex-col gap-4">
             <h2>Featured In</h2>
             <div>TODO</div>
           </section>
@@ -180,24 +186,24 @@ export const AppDetailView = ({ appId, setOpen }: { appId: string; setOpen?: (v:
   )
 }
 
-export const CollapsablePara = ({ content }: { content: string }) => {
+export function CollapsablePara({ content }: { content: string }) {
   const [shownMore, setShownMore] = useState(false)
   const [needMore, setNeedMore] = useState(false)
   const m = useMustache()
 
   const ref = useCallback((node: HTMLParagraphElement) => {
-    if (!node) return
+    if (!node) {return}
     setNeedMore(node.scrollHeight > node.offsetHeight)
   }, [])
 
   return (
-    <div className={"flex w-full flex-col"}>
+    <div className="flex w-full flex-col">
       <article className={clsx("p-prose", !shownMore && "line-clamp-4")} ref={ref}>
         <ReactMarkdown>{m(content)}</ReactMarkdown>
       </article>
 
       {needMore && ( // todo: better show-more effect with harmonious gradient
-        <Button variant={"link"} className={"ml-auto"} onClick={() => setShownMore(!shownMore)}>
+        <Button variant="link" className="ml-auto" onClick={() => setShownMore(!shownMore)}>
           {shownMore ? "Less" : "More"}
         </Button>
       )}
@@ -205,21 +211,21 @@ export const CollapsablePara = ({ content }: { content: string }) => {
   )
 }
 
-export const StatusItem = ({ a, b, c }: { a: string; b: ReactNode; c: ReactNode }) => {
+export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c: ReactNode }) {
   return (
-    <div className={"| flex w-full flex-col items-center justify-between gap-1 overflow-hidden whitespace-nowrap py-2"}>
-      <div className={"font-bold uppercase text-muted-foreground"}>{a}</div>
-      <MarqueeContainer className={"text-lg"}>{b}</MarqueeContainer>
-      <div className={"flex items-center justify-center text-primary-foreground/50"}>{c}</div>
+    <div className="| flex w-full flex-col items-center justify-between gap-1 overflow-hidden whitespace-nowrap py-2">
+      <div className="font-bold uppercase text-muted-foreground">{a}</div>
+      <MarqueeContainer className="text-lg">{b}</MarqueeContainer>
+      <div className="flex items-center justify-center text-primary-foreground/50">{c}</div>
     </div>
   )
 }
 
-export const InfoItem = ({ a, b }: { a: string; b: ReactNode }) => {
+export function InfoItem({ a, b }: { a: string; b: ReactNode }) {
   return (
-    <div className={"flex flex-col items-center gap-1"}>
-      <div className={"font-bold capitalize text-muted-foreground"}>{a}</div>
-      <div className={"text-primary-foreground/75"}>{b}</div>
+    <div className="flex flex-col items-center gap-1">
+      <div className="font-bold capitalize text-muted-foreground">{a}</div>
+      <div className="text-primary-foreground/75">{b}</div>
     </div>
   )
 }
@@ -275,13 +281,13 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
     },
   })
 
-  if (!hasApp) return null
+  if (!hasApp) {return null}
 
   return (
-    <section id={"collections"} className={"my-4 flex w-full flex-col gap-4"}>
+    <section id="collections" className="my-4 flex w-full flex-col gap-4">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant={"destructive"} disabled={appId === POKETTO_APP_ID}>
+          <Button variant="destructive" disabled={appId === POKETTO_APP_ID}>
             Clear
           </Button>
         </AlertDialogTrigger>
@@ -291,7 +297,7 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className={"bg-destructive"}
+              className="bg-destructive"
               onClick={() =>
                 delConv(
                   validator<ConversationWhereUniqueInput>()({

@@ -1,13 +1,19 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import _ from "lodash"
 import { z } from "zod"
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
 import { ChatMessageWhereInputSchema, ChatMessageUncheckedCreateInputSchema } from "prisma/generated/zod"
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
 import { type ChatMessage } from "@prisma/client"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { Prisma } from ".prisma/client"
-import { DEFAULT_LATEST_COUNT } from "@/config"
-import _ from "lodash"
 import { type CreateMessage } from "ai"
+import { DEFAULT_LATEST_COUNT } from "@/config"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
@@ -63,20 +69,18 @@ export const msgRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => {
+    }) => 
       // 不能只按照时间倒序排序，因为有些会相同，然后 id 会顺序，因为 msg 是基于 cuid 的，所以可以直接按照 id 逆序，已经包含时间
-      return prisma.chatMessage.findMany({ where: input, orderBy: { id: "desc" }, take: 10 })
-    }
+       prisma.chatMessage.findMany({ where: input, orderBy: { id: "desc" }, take: 10 })
+    
   ),
 
   syncLatestId: protectedProcedure
     .input(z.object({ conversationId: z.string() }))
-    .mutation(async ({ ctx: { prisma }, input: { conversationId } }) => {
-      return (
+    .mutation(async ({ ctx: { prisma }, input: { conversationId } }) => (
         await prisma.chatMessage.findFirstOrThrow({
           take: -1,
           where: { conversationId },
         })
-      ).id
-    }),
+      ).id),
 })

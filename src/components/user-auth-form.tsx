@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 "use client"
 
 import * as React from "react"
@@ -84,8 +91,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             />
             {errors?.email && <p className="px-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
-          <button className={cn(buttonVariants())} disabled={isLoading}>
-            {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+          <button type={"button"} className={cn(buttonVariants())} disabled={isLoading}>
+            {isLoading && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
             Sign In with Email
           </button>
         </div>
@@ -108,7 +115,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         }}
         disabled={isLoading || isGitHubLoading}
       >
-        {isGitHubLoading ? <Icons.spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.gitHub className="mr-2 h-4 w-4" />} Github
+        {isGitHubLoading ? <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.GitHub className="mr-2 h-4 w-4" />} Github
       </button>
 
       <button
@@ -120,7 +127,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         }}
         disabled={isLoading || isGitHubLoading}
       >
-        {isDiscordLoading ? <Icons.spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.discord className="mr-2 h-4 w-4" />} Discord
+        {isDiscordLoading ? <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.Discord className="mr-2 h-4 w-4" />} Discord
       </button>
     </div>
   )

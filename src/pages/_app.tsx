@@ -1,27 +1,33 @@
-import { SessionProvider } from "next-auth/react"
-import { api } from "@/lib/api"
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import React from "react"
+import { SessionProvider } from "next-auth/react"
 import { Toaster } from "sonner"
+import Head from "next/head"
+import { api } from "@/lib/api"
 import ErrorBoundary from "@/components/error-boundary"
 import clsx from "@/lib/clsx"
 
-import "@/styles/globals.css"
-import Head from "next/head"
 import { siteConfig } from "@/config"
 import { type ExtendedAppProps } from "@/ds"
 import { ThemeProvider } from "@/components/theme-provider"
+import "@/styles/globals.css"
 
 export function reportWebVitals(metric) {
   console.log(metric)
 }
 
-const MyApp = ({ Component, pageProps: { session, ...pageProps } }: ExtendedAppProps) => {
+function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppProps) {
   return (
     <>
       <Head>
         <title>{siteConfig.name}</title>
         <meta name="description" content={siteConfig.description} />
-        {/* prevent screen scale when input, ref: https://github.com/vercel/next.js/issues/7176#issuecomment-487350103*/}
+        {/* prevent screen scale when input, ref: https://github.com/vercel/next.js/issues/7176#issuecomment-487350103 */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="icon" href={siteConfig.icon} />
       </Head>
@@ -38,7 +44,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
               <Component {...pageProps} />
             </main>
           </ErrorBoundary>
-          <Toaster richColors closeButton position={"top-right"} />
+          <Toaster richColors closeButton position="top-right" />
         </SessionProvider>
       </ThemeProvider>
     </>

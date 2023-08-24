@@ -1,8 +1,14 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { createNextApiHandler } from "@trpc/server/adapters/next"
+import { toast } from "sonner"
 import { env } from "@/env.mjs"
 import { rootRouter } from "@/server/trpc.router"
 import { createTRPCContext } from "@/server/trpc.helpers"
-import { toast } from "sonner"
 
 // export API handler
 export default createNextApiHandler({

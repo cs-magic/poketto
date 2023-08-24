@@ -1,19 +1,25 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import React, { Fragment, useEffect } from "react"
+import _ from "lodash"
+import { FrameIcon } from "@radix-ui/react-icons"
+import { Carousel } from "react-responsive-carousel"
+import Image from "next/image"
+import { useIntersection } from "@mantine/hooks"
 import clsx from "@/lib/clsx"
 import { RootLayout } from "@/layouts/root.layout"
 import { api } from "@/lib/api"
 import { GridContainer, MasonryContainer } from "@/components/containers"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import _ from "lodash"
-import { FrameIcon } from "@radix-ui/react-icons"
 
 import { CardsLayoutType } from "@/store/ui.slice"
 import { useAppStore } from "@/store"
-import { Carousel } from "react-responsive-carousel"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
-import Image from "next/image"
-import { useIntersection } from "@mantine/hooks"
 import { CAROUSELS } from "@/config"
 import { AppDialogContainer } from "@/components/app/container"
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
@@ -37,31 +43,31 @@ export default function ExplorePage() {
     <RootLayout>
       {/* main (content - load more) */}
       <div className={clsx("| flex h-full w-full max-w-[1360px] flex-col gap-4 overflow-auto p-4 lg:p-8")}>
-        {/*<HomeCarousel/>*/}
+        {/* <HomeCarousel/> */}
 
         {/* title */}
-        <div className={"| flex w-full items-center gap-2 whitespace-nowrap px-2 "}>
+        <div className="| flex w-full items-center gap-2 whitespace-nowrap px-2 ">
           <FrameIcon />
-          <span className={"text-lg"}>玩法推荐</span>
+          <span className="text-lg">玩法推荐</span>
 
-          <div className={"grow"} />
-          {/*<span className={'hidden md:block'}>Sort By</span>*/}
-          <div className={"flex items-center"}>
+          <div className="grow" />
+          {/* <span className={'hidden md:block'}>Sort By</span> */}
+          <div className="flex items-center">
             {sortOrders.map((order) => {
               const Icon = Order2icon[order]
               return (
                 <Fragment key={order}>
-                  <Separator orientation={"vertical"} className={"h-4 first:hidden"} />
+                  <Separator orientation="vertical" className="h-4 first:hidden" />
                   <Button
-                    className={"flex items-center gap-1 px-2 hover:bg-transparent"}
-                    variant={"ghost"}
+                    className="flex items-center gap-1 px-2 hover:bg-transparent"
+                    variant="ghost"
                     key={order}
                     onClick={() => {
                       setSortOrder(order)
                     }}
                   >
-                    <Icon className={""} />
-                    <span className={"hidden lg:block"}>{_.startCase(_.capitalize(order))}</span>
+                    <Icon className="" />
+                    <span className="hidden lg:block">{_.startCase(_.capitalize(order))}</span>
                   </Button>
                 </Fragment>
               )
@@ -69,7 +75,7 @@ export default function ExplorePage() {
           </div>
         </div>
 
-        {/* content (carousel - cards)*/}
+        {/* content (carousel - cards) */}
 
         <Container>
           {apps.map((app) => (
@@ -79,9 +85,9 @@ export default function ExplorePage() {
           ))}
         </Container>
 
-        {/* load more*/}
+        {/* load more */}
         {query.hasNextPage === false ? ( // note: 显式指明
-          <div className={"| | m-auto flex w-80 items-center justify-center bg-destructive p-4 text-center text-destructive-foreground"}>
+          <div className="| | m-auto flex w-80 items-center justify-center bg-destructive p-4 text-center text-destructive-foreground">
             You have loaded ALL the data.
           </div>
         ) : (
@@ -92,7 +98,7 @@ export default function ExplorePage() {
   )
 }
 
-const HomeCarousel = () => {
+function HomeCarousel() {
   return (
     <Carousel
       className={clsx("mx-auto w-full rounded-2xl md:w-[788px]")}
@@ -101,13 +107,13 @@ const HomeCarousel = () => {
       autoPlay
       interval={3000}
       showStatus={false}
-      centerMode={true}
+      centerMode
       centerSlidePercentage={92}
       stopOnHover={false}
     >
       {CAROUSELS.map((item) => (
         <AspectRatio ratio={2} key={item.title}>
-          <Image src={item.src} className={"object-cover object-bottom"} alt={item.src} fill sizes={"w-full rounded-2xl"} />
+          <Image src={item.src} className="object-cover object-bottom" alt={item.src} fill sizes="w-full rounded-2xl" />
           <p className="legend">{item.title}</p>
         </AspectRatio>
       ))}
@@ -115,7 +121,7 @@ const HomeCarousel = () => {
   )
 }
 
-const ScrollTrigger = ({ trigger }: { trigger: any }) => {
+function ScrollTrigger({ trigger }: { trigger: any }) {
   const { ref, entry } = useIntersection({ rootMargin: "400px" })
 
   useEffect(() => {

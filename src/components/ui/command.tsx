@@ -1,12 +1,19 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 'use client'
 
 import * as React from 'react'
 import { type DialogProps } from '@radix-ui/react-dialog'
 import { Command as CommandPrimitive } from 'cmdk'
 
+import { IconSearch } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { IconSearch } from '@tabler/icons-react'
 
 const Search = IconSearch
 
@@ -27,7 +34,7 @@ Command.displayName = CommandPrimitive.displayName
 
 type CommandDialogProps = DialogProps
 
-const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
+function CommandDialog({ children, ...props }: CommandDialogProps) {
 	return (
 		<Dialog {...props}>
 			<DialogContent className="overflow-hidden p-0 shadow-lg">
@@ -128,10 +135,10 @@ const CommandItem = React.forwardRef<
 
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
-const CommandShortcut = ({
+function CommandShortcut({
 	                         className,
 	                         ...props
-                         }: React.HTMLAttributes<HTMLSpanElement>) => {
+                         }: React.HTMLAttributes<HTMLSpanElement>) {
 	return (
 		<span
 			className={cn(

@@ -1,6 +1,12 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import Link from "next/link"
 import type { Metadata } from "next"
 
-import Link from "next/link"
 
 import "./styles.css"
 import Image from "next/image"
@@ -33,11 +39,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <div className="container">
           <header>
             <div className="header-content">
-              <div className={"inline-flex items-center gap-8 flex-nowrap"}>
-                {/*<span className="light">Donate 🍩 to  ️</span>*/}
+              <div className="inline-flex items-center gap-8 flex-nowrap">
+                {/* <span className="light">Donate 🍩 to  ️</span> */}
                 <h1>{siteConfig.name}</h1>
                 <Link href="/" className="shrink-0 inline-flex items-center justify-center">
-                  <Image width={24} height={24} src="/logo.png" alt={"logo"} />
+                  <Image width={24} height={24} src="/logo.png" alt="logo" />
                 </Link>
               </div>
             </div>
@@ -47,7 +53,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <div className="banner">
           <span>
             Powered by{" "}
-            <a href={"https://stripe.com"} target={"_blank"}>
+            <a href="https://stripe.com" target="_blank" rel="noreferrer">
               stripe
             </a>
           </span>

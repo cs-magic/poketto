@@ -1,11 +1,17 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import React, { type HTMLProps, type ReactNode } from "react"
 import { IconEye, IconGitFork } from "@tabler/icons-react"
 import numeral from "numeral"
-import clsx from "@/lib/clsx"
 import { BookmarkFilledIcon, EyeOpenIcon, VideoIcon } from "@radix-ui/react-icons"
+import clsx from "@/lib/clsx"
 import { ICON_DIMENSION_SM } from "@/config"
 
-export const ResponsiveField = ({
+export function ResponsiveField({
   icon,
   value,
   suffix,
@@ -15,7 +21,7 @@ export const ResponsiveField = ({
   icon: ReactNode
   value: number
   suffix?: string
-} & HTMLProps<HTMLDivElement>) => {
+} & HTMLProps<HTMLDivElement>) {
   return (
     <div
       className={clsx("inline-flex cursor-pointer items-center gap-1 whitespace-nowrap hover:text-primary-foreground/75", className)}
@@ -23,11 +29,17 @@ export const ResponsiveField = ({
     >
       {icon}
       <span> {numeral(value).format("0a")}</span>
-      <span className={"hidden md:block"}>{suffix}</span>
+      <span className="hidden md:block">{suffix}</span>
     </div>
   )
 }
 
-export const UsesField = ({ value }: { value: number }) => <ResponsiveField icon={<VideoIcon />} value={value} />
-export const ViewsField = ({ value }: { value: number }) => <ResponsiveField icon={<EyeOpenIcon />} value={value} />
-export const SavesField = ({ value }: { value: number }) => <ResponsiveField icon={<BookmarkFilledIcon />} value={value} />
+export function UsesField({ value }: { value: number }) {
+  return <ResponsiveField icon={<VideoIcon />} value={value} />
+}
+export function ViewsField({ value }: { value: number }) {
+  return <ResponsiveField icon={<EyeOpenIcon />} value={value} />
+}
+export function SavesField({ value }: { value: number }) {
+  return <ResponsiveField icon={<BookmarkFilledIcon />} value={value} />
+}

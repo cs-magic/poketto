@@ -1,9 +1,16 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 import { ChatMessageFormatType, Prisma, PromptRoleType } from ".prisma/client"
 import { type NextComponentType, type NextPage, type NextPageContext } from "next"
 import { type AppProps } from "next/app"
 import { type Session } from "next-auth"
-import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
+import { RoleTypeType } from "../prisma/generated/zod"
 import UserGetPayload = Prisma.UserGetPayload
 import AppGetPayload = Prisma.AppGetPayload
 import ConversationGetPayload = Prisma.ConversationGetPayload
@@ -14,7 +21,6 @@ import AppSelect = Prisma.AppSelect
 import UserSelect = Prisma.UserSelect
 import ChatMessageSelect = Prisma.ChatMessageSelect
 import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
-import { RoleTypeType } from "../prisma/generated/zod"
 
 // -----------------------------------------------------------------------------
 // general
@@ -138,10 +144,10 @@ export type AllMessage =
       content: string
     }
 
-///////////////////////////
+/// ////////////////////////
 // next-auth
 // ref: https://stackoverflow.com/a/69968164/9422455
-///////////////////////////
+/// ////////////////////////
 
 // type PageAuth = {
 //   role: string

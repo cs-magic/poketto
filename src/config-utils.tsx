@@ -1,15 +1,21 @@
-import { CommandType, type ICommandItem, type INavItem } from "@/ds"
-import { IconLayoutDashboard } from "@tabler/icons-react"
-import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import React from "react"
+import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
+import { IconLayoutDashboard } from "@tabler/icons-react"
 import { type PromptRoleType } from ".prisma/client"
+import { CommandType, type ICommandItem, type INavItem } from "@/ds"
 import { type NavKey, URI } from "@/config"
 import { Icons } from "@/components/icons"
 
 export const COMMANDS: ICommandItem[] = [
   {
     id: "Ask Poketto",
-    icon: <Icons.productLogo />,
+    icon: <Icons.Product />,
     category: CommandType.suggestion,
     kbd: "⌘ D",
   },
@@ -26,13 +32,13 @@ export const COMMANDS: ICommandItem[] = [
     kbd: "⌘ E",
   },
 ]
-export const contentStyleBasedOnRole: Record<PromptRoleType, string> = {
+export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {
   system: "bg-slate-700",
   function: "bg-destructive",
   user: "bg-green-600 text-black",
   assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
 }
-export const navs: Record<NavKey, INavItem> = {
+export const navs: { [key in NavKey]: INavItem } = {
   home: {
     title: "home",
     link: URI.app.home,

@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import _ from "lodash"
+import { PlatformType, PromptRoleType } from "@prisma/client"
+import { ChatMessageFormatType, type User as PrismaUser } from ".prisma/client"
+import { type AdapterUser } from "next-auth/adapters"
 import { type ExtendedPrismaClient } from "@/server/db"
 import {
   POKETTO_APP_AVATAR,
@@ -18,11 +28,7 @@ import {
   USER_INVITATIONS_COUNT,
 } from "@/config"
 import log from "@/lib/log"
-import { PlatformType, PromptRoleType } from "@prisma/client"
 import { getWelcomeSystemNotification } from "@/lib/string"
-import { ChatMessageFormatType, type User as PrismaUser } from ".prisma/client"
-import _ from "lodash"
-import { type AdapterUser } from "next-auth/adapters"
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
   const result = await prisma.user.upsert({

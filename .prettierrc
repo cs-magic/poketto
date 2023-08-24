@@ -2,5 +2,22 @@
   "printWidth": 140,
   "semi": false,
   // 保留多行内尾部的逗号，方便开发时代码按行级别的 comment/uncomment
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "importOrder": [
+    "^[^@].*?$",
+    "^@[^/].*?$",
+    "^@/server.*?$",
+    "^@/store.*?$",
+    "^@/data.*?$",
+    "^@/env.*?$",
+    "^@/config.*?$",
+    "^@/ds.*?$",
+    "^@/layout.*?$",
+    "^@/components.*?$",
+    "^@/hooks.*?$",
+    "^@/lib.*?$",
+    "^.*?$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
 }

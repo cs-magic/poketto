@@ -1,5 +1,11 @@
-import { env } from "@/env.mjs"
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { type Stripe, loadStripe } from "@stripe/stripe-js"
+import { env } from "@/env.mjs"
 
 let stripePromise: Promise<Stripe | null>
 const getStripe = () => {

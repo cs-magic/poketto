@@ -1,3 +1,11 @@
+## eslint
+
+参考 docusaurus 的： https://github.com/facebook/docusaurus/blob/main/.eslintrc.js
+
+再做了一些修改：
+- 剔除了 docusaurus 自己的插件
+- 降低了很多规则的level
+
 ## nextjs svg
 
 看区别，要放松一下条件，才能通过：

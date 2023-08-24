@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { formatAmountForDisplay } from "@/utils/stripe-helpers"
 
 export default function CustomDonationInput({
@@ -22,7 +28,7 @@ export default function CustomDonationInput({
   return (
     <label>
       Custom donation amount ({formatAmountForDisplay(min, currency)}-{formatAmountForDisplay(max, currency)}):
-      <input type="range" name={name} min={min} max={max} step={step} onChange={onChange} value={value} className={className}></input>
+      <input type="range" name={name} min={min} max={max} step={step} onChange={onChange} value={value} className={className} />
     </label>
   )
 }

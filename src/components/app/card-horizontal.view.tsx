@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { type AppForListView } from "@/ds"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
@@ -5,45 +11,45 @@ import { getLocalFlowgptImageUri } from "@/lib/string"
 import { UsesField, ViewsField } from "@/components/field"
 import d from "@/lib/datetime"
 
-export const AppHorizontalCardView = ({ app }: { app: AppForListView | undefined }) => {
+export function AppHorizontalCardView({ app }: { app: AppForListView | undefined }) {
   if (!app)
-    return (
-      <div className={"| flex w-full gap-8 pb-3 pt-6 text-muted-foreground"}>
-        <Skeleton className={"wh-12"} />
-        <div className={"flex grow flex-col gap-2"}>
-          <Skeleton className={"h-4"} />
-          <Skeleton className={"h-8"} />
-          <Skeleton className={"h-4"} />
+    {return (
+      <div className="| flex w-full gap-8 pb-3 pt-6 text-muted-foreground">
+        <Skeleton className="wh-12" />
+        <div className="flex grow flex-col gap-2">
+          <Skeleton className="h-4" />
+          <Skeleton className="h-8" />
+          <Skeleton className="h-4" />
         </div>
 
-        <div className={"inline-flex shrink-0 gap-2"}>
-          <Skeleton className={"h-8 w-40"} />
+        <div className="inline-flex shrink-0 gap-2">
+          <Skeleton className="h-8 w-40" />
         </div>
       </div>
-    )
+    )}
 
   return (
-    <div className={"flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent"}>
-      <Avatar className={"rounded-sm wh-[64px]"}>
+    <div className="flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent">
+      <Avatar className="rounded-sm wh-[64px]">
         <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
       </Avatar>
 
-      <div className={"flex grow flex-col items-start gap-2 overflow-hidden"}>
-        <p className={"truncate font-semibold text-primary-foreground"}>{app.name}</p>
-        <p className={"line-clamp-2 text-primary-foreground/75"}>{app.desc}</p>
+      <div className="flex grow flex-col items-start gap-2 overflow-hidden">
+        <p className="truncate font-semibold text-primary-foreground">{app.name}</p>
+        <p className="line-clamp-2 text-primary-foreground/75">{app.desc}</p>
 
-        <div className={"inline-flex w-full justify-between gap-4 overflow-hidden"}>
-          <p className={"truncate"}>By {app.name}</p>
-          <p className={" truncate "} style={{ direction: "rtl" }}>
+        <div className="inline-flex w-full justify-between gap-4 overflow-hidden">
+          <p className="truncate">By {app.name}</p>
+          <p className=" truncate " style={{ direction: "rtl" }}>
             Updated on {d(app.updatedAt).format("DD MMM, YYYY")}
           </p>
         </div>
       </div>
 
-      <div className={"flex shrink-0 flex-col gap-2 md:flex-row"}>
+      <div className="flex shrink-0 flex-col gap-2 md:flex-row">
         <ViewsField value={app.state?.views ?? 0} />
         <UsesField value={app.state?.calls ?? 0} />
-        {/*<SavesField value={app.state?.stars ?? 0} />*/}
+        {/* <SavesField value={app.state?.stars ?? 0} /> */}
       </div>
     </div>
   )

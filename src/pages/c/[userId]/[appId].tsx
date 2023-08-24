@@ -1,8 +1,14 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import { useRouter } from "next/router"
 import { RootLayout } from "@/layouts/root.layout"
 import clsx from "@/lib/clsx"
 import { api } from "@/lib/api"
 import { ConversationList } from "@/components/conversations"
-import { useRouter } from "next/router"
 import { AppDetailView } from "@/components/app/detail.view"
 import { ConversationMain } from "@/components/conv/main"
 
@@ -23,7 +29,7 @@ export default function ConversationPage() {
   return (
     <RootLayout>
       <div className={clsx("flex h-full w-full", "overflow-hidden")}>
-        <section className={"hidden w-full shrink-[.1] lg:flex lg:w-[375px]"}>
+        <section className="hidden w-full shrink-[.1] lg:flex lg:w-[375px]">
           <ConversationList />
         </section>
 

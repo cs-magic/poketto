@@ -1,23 +1,30 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 'use client'
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 // import { X } from "lucide-react"
 
-import { cn } from '@/lib/utils'
 import { IconX } from '@tabler/icons-react'
+import { cn } from '@/lib/utils'
 
 const X = IconX
 const Dialog = DialogPrimitive.Root
 
 const DialogTrigger = DialogPrimitive.Trigger
 
-const DialogPortal = ({
+function DialogPortal({
 	                      className,
 	                      ...props
-                      }: DialogPrimitive.DialogPortalProps) => (
-	<DialogPrimitive.Portal className={cn(className)} {...props} />
-)
+                      }: DialogPrimitive.DialogPortalProps) {
+  return <DialogPrimitive.Portal className={cn(className)} {...props} />
+}
 DialogPortal.displayName = DialogPrimitive.Portal.displayName
 
 const DialogOverlay = React.forwardRef<
@@ -59,32 +66,32 @@ const DialogContent = React.forwardRef<
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
-const DialogHeader = ({
+function DialogHeader({
 	                      className,
 	                      ...props
-                      }: React.HTMLAttributes<HTMLDivElement>) => (
-	<div
+                      }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div
 		className={cn(
 			'flex flex-col space-y-1.5 text-center sm:text-left',
 			className,
 		)}
 		{...props}
 	/>
-)
+}
 DialogHeader.displayName = 'DialogHeader'
 
-const DialogFooter = ({
+function DialogFooter({
 	                      className,
 	                      ...props
-                      }: React.HTMLAttributes<HTMLDivElement>) => (
-	<div
+                      }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div
 		className={cn(
 			'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
 			className,
 		)}
 		{...props}
 	/>
-)
+}
 DialogFooter.displayName = 'DialogFooter'
 
 const DialogTitle = React.forwardRef<

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 export const DEVICE_TYPES = [
   "the-iphone",
   "iphone-x",
@@ -16,7 +22,7 @@ export interface IDevice {
   r?: number
 }
 
-export const DEVICES: Record<DEVICE_TYPE, IDevice> = {
+export const DEVICES: { [key in DEVICE_TYPE]: IDevice } = {
   "the-iphone": { w: 320, h: 610 },
   "iphone-x": { w: 428, h: 868 },
   "iphone-14-pro": { w: 428, h: 868, r: 68 },

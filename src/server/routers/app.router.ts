@@ -1,7 +1,13 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import { z } from "zod"
 import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
 import { selectAppForDetailView, selectAppForListView, sortOrders } from "@/ds"
 import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
-import { z } from "zod"
 
 export const pokettoAppRouter = createTRPCRouter({
   /**
@@ -48,7 +54,7 @@ export const pokettoAppRouter = createTRPCRouter({
           },
         },
       })
-      let nextCursor: typeof cursor | undefined = undefined
+      let nextCursor: typeof cursor | undefined
       if (items.length > limit) {
         const nextItem = items.pop()
         nextCursor = nextItem!.id

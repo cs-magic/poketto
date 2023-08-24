@@ -1,10 +1,16 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { z } from "zod"
-import { createTRPCRouter, protectedProcedure } from "@/server/trpc.helpers"
-import { includeConvForDetailView, selectAppForDetailView, selectConvForListView } from "@/ds"
 import { Prisma } from ".prisma/client"
 import { ConversationWhereUniqueInputSchema } from "prisma/generated/zod"
-import { getWelcomeSystemNotification } from "@/lib/string"
 import { ChatMessageFormatType } from "@prisma/client"
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc.helpers"
+import { includeConvForDetailView, selectAppForDetailView, selectConvForListView } from "@/ds"
+import { getWelcomeSystemNotification } from "@/lib/string"
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 import ChatMessageCreateInput = Prisma.ChatMessageCreateInput
 
@@ -19,9 +25,7 @@ export const convRouter = createTRPCRouter({
         prisma,
         session: { user },
       },
-    }) => {
-      return !!(await prisma.conversation.findUnique({ where: { conversation: { userId: user.id, appId } } }))
-    }
+    }) => !!(await prisma.conversation.findUnique({ where: { conversation: { userId: user.id, appId } } }))
   ),
 
   add: protectedProcedure
@@ -71,12 +75,10 @@ export const convRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => {
-      return prisma.conversation.findMany({
+    }) => prisma.conversation.findMany({
         select: selectConvForListView,
         where: { userId: user.id },
       })
-    }
   ),
 
   get: protectedProcedure.input(ConversationWhereUniqueInputSchema).query(
@@ -86,12 +88,10 @@ export const convRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => {
-      return prisma.conversation.findUnique({
+    }) => prisma.conversation.findUnique({
         include: includeConvForDetailView,
         where: input,
       })
-    }
   ),
 
   pin: protectedProcedure
@@ -123,9 +123,9 @@ export const convRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => {
+    }) => 
       //   todo: validate in zod
-      return prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
-    }
+       prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
+    
   ),
 })

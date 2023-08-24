@@ -1,9 +1,16 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 "use server"
 
-import type { Stripe } from "stripe"
 
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
+import type { Stripe } from "stripe"
 
 import { CURRENCY } from "@/config"
 import { formatAmountForStripe } from "@/utils/stripe-helpers"

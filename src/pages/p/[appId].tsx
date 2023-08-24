@@ -1,8 +1,14 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import superjson from "superjson"
+import { type GetServerSideProps } from "next"
 import { type AppForListView, selectAppForListView } from "@/ds"
 import { RootLayout } from "@/layouts/root.layout"
 import clsx from "@/lib/clsx"
-import { type GetServerSideProps } from "next"
 import { prisma } from "@/server/db"
 import { AppDetailView } from "@/components/app/detail.view"
 
@@ -11,7 +17,7 @@ export default function ConversationPage({ appStr }: { appStr: string }) {
 
   return (
     <RootLayout>
-      <div className={"| flex h-full w-full divide-x overflow-hidden"}>
+      <div className="| flex h-full w-full divide-x overflow-hidden">
         <section
           className={clsx(" w-full shrink-[.1] overflow-x-hidden md:w-[375px] lg:flex", "h-full gap-4 overflow-y-auto p-4", "flex-col ")}
         >

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import pino from 'pino'
 import { logflarePinoVercel } from 'pino-logflare'
 
@@ -18,13 +24,13 @@ const log = pino({
 		// ref: https://github.com/pinojs/pino-pretty#cli-arguments
 		options: {
 			colorize: true,
-			translateTime: 'SYS:standard', //'SYS:yyyy-mm-dd HH:MM:ss', //yyyy-mm-dd HH:MM:ss',
+			translateTime: 'SYS:standard', // 'SYS:yyyy-mm-dd HH:MM:ss', //yyyy-mm-dd HH:MM:ss',
 		},
 	},
 	browser: {
 		transmit: {
 			level: 'info',
-			send: send,
+			send,
 		},
 	},
 	level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
