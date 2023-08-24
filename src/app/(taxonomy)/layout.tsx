@@ -9,6 +9,7 @@ import { fontHeading, fontSans } from "@/lib/fonts"
 import { type PropsWithChildren } from "react"
 
 export const metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,

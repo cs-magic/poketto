@@ -4,12 +4,11 @@ import Link from "next/link"
 
 import "./styles.css"
 import Image from "next/image"
-
-interface LayoutProps {
-  children: React.ReactNode
-}
+import { type PropsWithChildren } from "react"
+import { siteConfig } from "@/config"
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: "TypeScript Next.js Stripe Example",
     template: "%s | Next.js + TypeScript Example",
@@ -27,7 +26,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: LayoutProps) {
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <body>
@@ -36,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps) {
             <div className="header-content">
               <div className={"inline-flex items-center gap-8 flex-nowrap"}>
                 {/*<span className="light">Donate 🍩 to  ️</span>*/}
-                <h1>Poketto.AI</h1>
+                <h1>{siteConfig.name}</h1>
                 <Link href="/" className="shrink-0 inline-flex items-center justify-center">
                   <Image width={24} height={24} src="/logo.png" alt={"logo"} />
                 </Link>
