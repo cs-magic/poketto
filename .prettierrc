@@ -4,8 +4,7 @@
   // 保留多行内尾部的逗号，方便开发时代码按行级别的 comment/uncomment
   "trailingComma": "all",
   "importOrder": [
-    "^[^@].*?$",
-    "^@[^/].*?$",
+    "^([^@]|@[^/]).*?$",
     "^@/server.*?$",
     "^@/store.*?$",
     "^@/data.*?$",

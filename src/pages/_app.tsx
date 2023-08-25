@@ -4,17 +4,22 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React from "react"
 import { SessionProvider } from "next-auth/react"
-import { Toaster } from "sonner"
 import Head from "next/head"
-import { api } from "@/lib/api"
-import ErrorBoundary from "@/components/error-boundary"
-import clsx from "@/lib/clsx"
+import React from "react"
+import { Toaster } from "sonner"
 
 import { siteConfig } from "@/config"
+
 import { type ExtendedAppProps } from "@/ds"
+
+import ErrorBoundary from "@/components/error-boundary"
 import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
+
 import "@/styles/globals.css"
 
 export function reportWebVitals(metric) {
@@ -35,14 +40,16 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
       <ThemeProvider>
         <SessionProvider session={session}>
           <ErrorBoundary>
-            <main
-              className={clsx(
-                "max-w-screen h-screen w-auto min-w-[375px] bg-background text-sm font-light text-foreground" // 'bg-zinc-900',
-                // fontChinese.className
-              )}
-            >
-              <Component {...pageProps} />
-            </main>
+            <TooltipProvider>
+              <main
+                className={clsx(
+                  "max-w-screen h-screen w-auto min-w-[375px] bg-background text-sm font-light text-foreground" // 'bg-zinc-900',
+                  // fontChinese.className
+                )}
+              >
+                <Component {...pageProps} />
+              </main>
+            </TooltipProvider>
           </ErrorBoundary>
           <Toaster richColors closeButton position="top-right" />
         </SessionProvider>

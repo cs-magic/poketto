@@ -10,23 +10,15 @@ import React from "react"
 
 import { type INavItem } from "@/ds"
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ResponsiveTooltip } from "@/components/containers"
 
 export function SidebarNavItem({ Icon, link, title }: INavItem) {
-  const textContent = title ?? _.startCase(_.capitalize(title))
   return (
-    <TooltipProvider>
-      <Tooltip delayDuration={100}>
-        <TooltipTrigger>
-          <Link href={link ?? `/${title}`} className="p-btn-horizontal">
-            {Icon && <Icon />}
-            <span className="hidden lg:flex">{textContent}</span>
-          </Link>
-        </TooltipTrigger>
-
-        <TooltipContent>{textContent}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Link href={link ?? `/${title}`}>
+      <ResponsiveTooltip content={title ?? _.startCase(_.capitalize(title))}>
+        {Icon && <Icon className="wh-12 p-btn-horizontal" />}
+      </ResponsiveTooltip>
+    </Link>
   )
 }
 

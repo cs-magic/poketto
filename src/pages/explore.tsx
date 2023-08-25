@@ -4,13 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { useIntersection } from "@mantine/hooks"
+import { FrameIcon } from "@radix-ui/react-icons"
 import _ from "lodash"
 import Image from "next/image"
 import React, { Fragment, useEffect, useState } from "react"
 import { Carousel } from "react-responsive-carousel"
-
-import { useIntersection } from "@mantine/hooks"
-import { FrameIcon } from "@radix-ui/react-icons"
 
 import { useAppStore } from "@/store"
 
@@ -24,11 +23,10 @@ import { RootLayout } from "@/layouts/root.layout"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { AppDialogContainer } from "@/components/app/container"
-import { GridContainer, MasonryContainer } from "@/components/containers"
+import { GridContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
 import { Order2icon } from "@/components/icons"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
@@ -65,24 +63,17 @@ export default function ExplorePage() {
               return (
                 <Fragment key={order}>
                   <Separator orientation="vertical" className="h-4 first:hidden" />
-                  <TooltipProvider>
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger>
-                        <IconContainer
-                          className={clsx(sortOrder === order && "text-primary")}
-                          onClick={() => {
-                            setSortOrder(order)
-                          }}
-                        >
-                          <Icon />
-                          <span className="hidden md:block">{_.startCase(_.capitalize(order))}</span>
-                        </IconContainer>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{order}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+
+                  <IconContainer className={clsx(sortOrder === order && "text-primary")}>
+                    <ResponsiveTooltip
+                      content={_.startCase(_.capitalize(order))}
+                      onClick={() => {
+                        setSortOrder(order)
+                      }}
+                    >
+                      <Icon />
+                    </ResponsiveTooltip>
+                  </IconContainer>
                 </Fragment>
               )
             })}

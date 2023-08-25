@@ -4,12 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React, { type HTMLProps, type PropsWithChildren, useCallback, useState } from "react"
+import type { TooltipTriggerProps } from "@radix-ui/react-tooltip"
+import React, { type HTMLProps, type PropsWithChildren, type ReactNode, useCallback, useState } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ScrollToBottom from "react-scroll-to-bottom"
 
 import StripePricingTable from "@/components/stripe/pricing-table"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import clsx from "@/lib/clsx"
 import { DEVICES, type DEVICE_TYPE } from "@/lib/device"
@@ -125,5 +127,25 @@ export function ChargeContainer({ children }: PropsWithChildren) {
         <StripePricingTable />
       </DialogContent>
     </Dialog>
+  )
+}
+
+/**
+ *
+ * @param content 是 lg 下的 label，否则是悬浮内容
+ * @param children
+ * @param props
+ * @constructor
+ */
+export function ResponsiveTooltip({ content, children, ...props }: TooltipTriggerProps & { content?: ReactNode }) {
+  return (
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger className="flex justify-between items-center gap-2" {...props}>
+        {children}
+        <span className="hidden lg:flex">{content}</span>
+      </TooltipTrigger>
+
+      <TooltipContent className="lg:hidden">{content}</TooltipContent>
+    </Tooltip>
   )
 }
