@@ -48,13 +48,13 @@ export default function ExplorePage() {
   return (
     <RootLayout>
       {/* main (content - load more) */}
-      <div className={clsx("| flex h-full w-full max-w-[1360px] flex-col gap-4 overflow-auto p-4 lg:p-8")}>
+      <div className={clsx("flex h-full w-full max-w-[1360px] flex-col gap-4 overflow-hidden p-4 lg:p-8")}>
         {/* <HomeCarousel/> */}
 
         {/* title */}
-        <div className="| flex w-full items-center gap-2 whitespace-nowrap px-2 ">
+        <div className=" w-full px-2 | flex items-center gap-2 | whitespace-nowrap">
           <FrameIcon />
-          <span className="text-lg">玩法推荐</span>
+          <span className="text-lg">Poketto App Store</span>
 
           <div className="grow" />
           <div className="flex items-center gap-2">
@@ -82,22 +82,24 @@ export default function ExplorePage() {
 
         {/* content (carousel - cards) */}
 
-        <Container>
-          {apps.map((app) => (
-            <AppDialogContainer key={app.id} appId={app.id}>
-              <AppVerticalCardView app={app} cardsLayout={cardsLayout} sort={sortOrder} />
-            </AppDialogContainer>
-          ))}
-        </Container>
+        <div className="w-full grow overflow-auto | flex flex-col gap-2 ">
+          <Container>
+            {apps.map((app) => (
+              <AppDialogContainer key={app.id} appId={app.id}>
+                <AppVerticalCardView app={app} cardsLayout={cardsLayout} sort={sortOrder} />
+              </AppDialogContainer>
+            ))}
+          </Container>
 
-        {/* load more */}
-        {query.hasNextPage === false ? ( // note: 显式指明
-          <div className="| | m-auto flex w-80 items-center justify-center bg-destructive p-4 text-center text-destructive-foreground">
-            You have loaded ALL the data.
-          </div>
-        ) : (
-          <ScrollTrigger trigger={query.fetchNextPage} />
-        )}
+          {/* load more */}
+          {query.hasNextPage === false ? ( // note: 显式指明
+            <div className="| | m-auto flex w-80 items-center justify-center bg-destructive p-4 text-center text-destructive-foreground">
+              You have loaded ALL the data.
+            </div>
+          ) : (
+            <ScrollTrigger trigger={query.fetchNextPage} />
+          )}
+        </div>
       </div>
     </RootLayout>
   )

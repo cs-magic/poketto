@@ -4,29 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { type ReactNode, useCallback, useState } from "react"
-import _ from "lodash"
-import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
-import { toast } from "sonner"
-import Link from "next/link"
-import numeral from "numeral"
-import ReactMarkdown from "react-markdown"
-import { useRouter } from "next/router"
 import { Prisma } from ".prisma/client"
-import { useUserId } from "@/hooks/use-user"
-import { api } from "@/lib/api"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
-import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
-import { Separator } from "@/components/ui/separator"
-import clsx from "@/lib/clsx"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { MarqueeContainer, MasonryContainer } from "@/components/containers"
-import { vIsNumber } from "@/lib/number"
-import { useMustache } from "@/hooks/use-mustache"
+import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
+import _ from "lodash"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import numeral from "numeral"
+import { type ReactNode, useCallback, useState } from "react"
+import ReactMarkdown from "react-markdown"
+import { toast } from "sonner"
 
+import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
+
+import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +27,20 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
+
+import { useMustache } from "@/hooks/use-mustache"
+import { useUserId } from "@/hooks/use-user"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
+import { vIsNumber } from "@/lib/number"
+import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+
 import validator = Prisma.validator
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
@@ -44,8 +48,12 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
   const userId = useUserId()
   const { data: app, error: appError } = api.app.get.useQuery({ appId })
 
-  if (app === undefined) {return <SymbolIcon />}
-  if (appError) {return null} // toast.error(appError.message) // 已经在 lib/api 里handle了
+  if (app === undefined) {
+    return <SymbolIcon />
+  }
+  if (appError) {
+    return null
+  } // toast.error(appError.message) // 已经在 lib/api 里handle了
 
   return (
     <div className="flex h-full w-full flex-col gap-2 overflow-auto p-2">
@@ -73,25 +81,11 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
       <Separator orientation="horizontal" />
 
       <section id="status" className={clsx("w-full", "flex items-center justify-between gap-1")}>
-        <StatusItem a="category" b={`${app.category.main}-${app.category.sub}`} c="of All 31" />
-        <StatusItem a="model" b={app.modelName} c={app.creator.name} />
-        {POKETTO_DETAIL_RATINGS_ENABLED && (
-          <StatusItem
-            a="ratings"
-            b={numeral(app.state?.stars).format("0.0")}
-            c={
-              <>
-                {_.range(Math.floor(app.state?.stars ?? 0)).map((i) => (
-                  <StarFilledIcon className="vh-4 leading-none" key={i} />
-                ))}
-                {_.range(5 - Math.floor(app.state?.stars ?? 0)).map((i) => (
-                  <StarIcon className="vh-4 leading-none" key={i} />
-                ))}
-              </>
-            }
-          />
-        )}
-        <StatusItem a="language" b={app.language} c="Universal" />
+        <StatusItem a="category" b={`${app.category.main}-${app.category.sub}`} />
+        <StatusItem a="model" b={app.modelName} />
+        {POKETTO_DETAIL_RATINGS_ENABLED && <StatusItem a="ratings" b={numeral(app.state?.stars).format("0.0")} />}
+        <StatusItem a="language" b={app.language} />
+        <StatusItem a="platform" b={app.platformType} />
       </section>
 
       {/* <section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}> */}
@@ -192,7 +186,9 @@ export function CollapsablePara({ content }: { content: string }) {
   const m = useMustache()
 
   const ref = useCallback((node: HTMLParagraphElement) => {
-    if (!node) {return}
+    if (!node) {
+      return
+    }
     setNeedMore(node.scrollHeight > node.offsetHeight)
   }, [])
 
@@ -211,12 +207,12 @@ export function CollapsablePara({ content }: { content: string }) {
   )
 }
 
-export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c: ReactNode }) {
+export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c?: ReactNode }) {
   return (
     <div className="| flex w-full flex-col items-center justify-between gap-1 overflow-hidden whitespace-nowrap py-2">
       <div className="font-bold uppercase text-muted-foreground">{a}</div>
       <MarqueeContainer className="text-lg">{b}</MarqueeContainer>
-      <div className="flex items-center justify-center text-primary-foreground/50">{c}</div>
+      {c && <div className="flex items-center justify-center text-primary-foreground/50">{c}</div>}
     </div>
   )
 }
@@ -281,7 +277,9 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
     },
   })
 
-  if (!hasApp) {return null}
+  if (!hasApp) {
+    return null
+  }
 
   return (
     <section id="collections" className="my-4 flex w-full flex-col gap-4">

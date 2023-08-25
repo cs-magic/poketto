@@ -11,7 +11,7 @@ import ScrollToBottom from "react-scroll-to-bottom"
 
 import StripePricingTable from "@/components/stripe/pricing-table"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 import clsx from "@/lib/clsx"
 import { DEVICES, type DEVICE_TYPE } from "@/lib/device"
