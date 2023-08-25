@@ -37,6 +37,9 @@ export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForLis
           className="object-fill transition-all group-hover:scale-125"
           alt={app.name}
           style={{ width: "100%", height: "auto" }}
+          onError={(error) => {
+            console.log({ error })
+          }}
         />
       )}
 

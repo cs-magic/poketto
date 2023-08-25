@@ -4,6 +4,13 @@ import path from "path"
 
 import type { IMAGE_SIZE } from "@/ds"
 
+// ref: https://github.com/vercel/next.js/discussions/40270#discussioncomment-3571223
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   // Extract the filename from the URL
   const filename = req.query.filename as string
@@ -12,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   // console.log("file api: ", req.query)
 
   if (!filename) {
-    res.status(400).send("Filename is required")
+    res.status(404)
     return
   }
 
@@ -20,13 +27,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const imagesDir = path.join(process.cwd(), "../scrapy_flowgpt/__data__/images")
   const imagePath = path.join(imagesDir, filesize, `${filename}.jpg`)
 
+  // console.log({ imagePath })
   try {
     await fs.promises.access(imagePath)
     const readStream = fs.createReadStream(imagePath)
     readStream.pipe(res)
   } catch (err) {
-    console.warn({ imagePath })
+    // 有些图片是找不到的
+    // console.warn({ imagePath })
     // If error, file doesn't exist or there's an access issue
-    res.status(404)
+    res.status(404).end()
   }
 }
