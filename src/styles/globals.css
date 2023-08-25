@@ -110,10 +110,11 @@ colors:
     }
 }
 
-/* ref: https://github.com/vercel/next.js/issues/44295#issuecomment-1624628595 */
-html {
-    --scroll-behavior: smooth !important;
-    scroll-behavior: smooth !important;
+
+main {
+    height: 100vh;
+    /*height: -webkit-fill-available;*/
+    height: var(--app-height);
 }
 
 @layer base {
@@ -129,10 +130,6 @@ html {
 
     h2 {
         @apply text-lg font-semibold;
-    }
-
-    body {
-        @apply bg-background text-foreground;
     }
 
     .show-more {

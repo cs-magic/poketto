@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import Navbar from "./navbar"
-import React, { type PropsWithChildren } from "react"
+import React, { type PropsWithChildren, useEffect } from "react"
 
 import { navs } from "@/config-utils"
 
@@ -19,12 +19,12 @@ import { useMount } from "@/hooks/use-mount"
 
 export function MobileLayout(props: PropsWithChildren) {
   return (
-    <div className="| flex h-full w-full flex-col overflow-hidden md:hidden">
+    <div className="md:hidden | h-full w-full | flex flex-col">
       <Navbar />
 
-      <div className="| flex h-full grow flex-col items-center justify-center gap-2 overflow-hidden">{props.children}</div>
+      <div className="w-full grow overflow-hidden | flex flex-col items-center justify-center gap-2">{props.children}</div>
 
-      <footer className="fixed bottom-0 w-full bg-background grid shrink-0 grid-cols-4">
+      <footer className="w-full shrink-0 | grid grid-cols-4">
         <FooterNavItem {...navs.home} />
         <FooterNavItem {...navs.explore} />
         <FooterNavItem {...navs.gallery} />
@@ -48,6 +48,24 @@ export function DesktopLayout(props: PropsWithChildren) {
 
 export function RootLayout({ children }: PropsWithChildren) {
   const mounted = useMount()
+
+  /**
+   * set height for mobile browser (safari, chrome ...) to be full of inner height (but invalid !)
+   */
+  useEffect(() => {
+    const setInnerHeight = () => {
+      console.log("add setInnerHeight")
+      document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`)
+    }
+    window.addEventListener("resize", setInnerHeight)
+
+    setInnerHeight()
+    return () => {
+      console.log("remove setInnerHeight")
+      window.removeEventListener("resize", setInnerHeight)
+    }
+  }, [])
+
   if (!mounted) {
     return null
   }

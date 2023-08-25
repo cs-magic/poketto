@@ -43,7 +43,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
             <TooltipProvider>
               <main
                 className={clsx(
-                  "max-w-screen h-screen w-auto min-w-[375px] bg-background text-sm font-light text-foreground" // 'bg-zinc-900',
+                  "min-w-[375px] max-w-screen w-auto | bg-background text-foreground text-sm font-light" // 'bg-zinc-900',
                   // fontChinese.className
                 )}
               >
