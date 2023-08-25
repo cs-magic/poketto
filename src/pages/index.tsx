@@ -4,20 +4,25 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ArrowRightIcon } from "@radix-ui/react-icons"
-import Link from "next/link"
 import { signIn } from "next-auth/react"
+import Link from "next/link"
+
+import { ArrowRightIcon } from "@radix-ui/react-icons"
+
+import { CardsLayoutType } from "@/ds"
+
 import { RootLayout } from "@/layouts/root.layout"
+
+import { AppVerticalCardView } from "@/components/app/card-vertical.view"
+import { ExploreAppsWidget } from "@/components/app/explore.widget"
 import { Button } from "@/components/ui/button"
-import { api } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-import { todo } from "@/lib/helpers"
-import { CardsLayoutType } from "@/store/ui.slice"
-import { getConversationLink } from "@/lib/string"
-import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { useSessionUser } from "@/hooks/use-user"
-import { ExploreAppsWidget } from "@/components/app/explore.widget"
+
+import { api } from "@/lib/api"
+import { todo } from "@/lib/helpers"
+import { getConversationLink } from "@/lib/string"
 
 export default function HomePage() {
   return (
@@ -44,7 +49,9 @@ export function RecentConversations() {
             variant="link"
             className="| flex h-fit items-center gap-2 py-0 text-xs"
             onClick={() => {
-              if (!user) {return void signIn()}
+              if (!user) {
+                return void signIn()
+              }
               todo()
             }}
           >
@@ -63,11 +70,11 @@ export function RecentConversations() {
           </div>
         ) : (
           conversations.slice(0, 10).map((c) => (
-              //   正常情况下，我们应该用 PopContent，然后进入，不过这里是已经安装好的app，因此直接link过去比较好
-              <Link className="w-48 shrink-0" key={c.appId} href="/c/[userId]/[appId]" as={getConversationLink(c.userId, c.appId)}>
-                <AppVerticalCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort="new" key={c.appId} />
-              </Link>
-            ))
+            //   正常情况下，我们应该用 PopContent，然后进入，不过这里是已经安装好的app，因此直接link过去比较好
+            <Link className="w-48 shrink-0" key={c.appId} href="/c/[userId]/[appId]" as={getConversationLink(c.userId, c.appId)}>
+              <AppVerticalCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort="new" key={c.appId} />
+            </Link>
+          ))
         )}
       </CardContent>
     </Card>

@@ -4,25 +4,29 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React from "react"
-import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { InvitationStatus } from ".prisma/client"
-import ReactMarkdown from "react-markdown"
-import Link from "next/link"
 import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { api } from "@/lib/api"
-import { Badge } from "@/components/ui/badge"
-import { ICON_DIMENSION_MD, siteConfig, URI, USER_INVITATIONS_COUNT } from "@/config"
-import { useMustache } from "@/hooks/use-mustache"
-import { useAppStore } from "@/store"
-import { useSessionUser } from "@/hooks/use-user"
-import clsx from "@/lib/clsx"
-import { SidebarNavItem } from "@/components/link"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Link from "next/link"
+import React from "react"
+import ReactMarkdown from "react-markdown"
+
+import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
+
+import { ICON_DIMENSION_MD, URI, USER_INVITATIONS_COUNT, siteConfig } from "@/config"
 import { navs } from "@/config-utils"
+
+import { SidebarNavItem } from "@/components/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+
+import { useMustache } from "@/hooks/use-mustache"
+import { useSessionUser } from "@/hooks/use-user"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
 
 export function InviteCard() {
   const { data = [] } = api.invitation.list.useQuery()
@@ -31,7 +35,7 @@ export function InviteCard() {
   const m = useMustache()
 
   return (
-    <div className="| flex flex-col gap-2 whitespace-normal rounded-xl border p-4 text-sm">
+    <div className="hidden lg:flex flex-col gap-2 whitespace-normal rounded-xl border p-4 text-sm">
       <div className="flex items-center justify-between">
         <Badge className="w-fit" variant="secondary">
           Tips
@@ -60,7 +64,6 @@ export function InviteCard() {
 }
 
 export function Sidebar() {
-  const { sidebarVisible } = useAppStore()
   const user = useSessionUser()
 
   return (
@@ -89,7 +92,7 @@ export function Sidebar() {
       {/* footer */}
       <div className="grow" />
 
-      {sidebarVisible && user && <InviteCard />}
+      {user && <InviteCard />}
 
       {user ? (
         <Link href={URI.user.dashboard} className="flex items-center justify-center gap-2 border-t py-4">
@@ -100,15 +103,11 @@ export function Sidebar() {
             </AvatarFallback>
           </Avatar>
 
-          {sidebarVisible && (
-            <>
-              <div className="flex grow flex-col gap-0 overflow-hidden">
-                <span className="text-xs">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">{user.id}</span>
-              </div>
-              <ChevronRightIcon className="shrink-0" />
-            </>
-          )}
+          <div className="hidden lg:flex grow flex-col gap-0 overflow-hidden">
+            <span className="text-xs">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{user.id}</span>
+          </div>
+          <ChevronRightIcon className="hidden lg:flex shrink-0" />
         </Link>
       ) : (
         <Button variant="destructive" className="my-2" onClick={() => void signIn()}>

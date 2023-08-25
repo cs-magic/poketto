@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
-import { type NextComponentType, type NextPage, type NextPageContext } from "next"
-import { type Session } from "next-auth"
-import { type AppProps } from "next/app"
+import type { NextComponentType, NextPage, NextPageContext } from "next"
+import type { Session } from "next-auth"
+import type { AppProps } from "next/app"
 import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
@@ -25,7 +25,32 @@ import UserSelect = Prisma.UserSelect
 import validator = Prisma.validator
 
 // -----------------------------------------------------------------------------
-// general
+// next-auth, ref: https://stackoverflow.com/a/69968164/9422455
+// -----------------------------------------------------------------------------
+
+export type NextPageWithAuth<P = {}, IP = P> = NextPage<P, IP> & {
+  auth?: boolean
+}
+
+export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> & Partial<NextPageWithAuth>
+
+export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
+  Component: NextComponentWithAuth
+}
+
+// -----------------------------------------------------------------------------
+// UI
+// -----------------------------------------------------------------------------
+
+export type IMAGE_SIZE = "xs" | "md" | "raw"
+
+export enum CardsLayoutType {
+  masonry = "masonry",
+  grid = "grid",
+}
+
+// -----------------------------------------------------------------------------
+// User Preference (which can be managed via either by store or api)
 // -----------------------------------------------------------------------------
 
 export const sortOrders = [
@@ -39,15 +64,8 @@ export const sortOrders = [
   // "trending",
   // "follow",
 ] as const
+
 export type SortOrder = (typeof sortOrders)[number]
-
-export type IMAGE_SIZE = "xs" | "md" | "raw"
-
-export interface INavItem {
-  title: string
-  link: string
-  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
-}
 
 // -----------------------------------------------------------------------------
 // models
@@ -149,32 +167,15 @@ export const selectChatMessageForListView = validator<ChatMessageSelect>()({
   },
 })
 export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeof selectChatMessageForListView }>
-export type AllMessage =
-  | SelectChatMessageForListView
-  | {
-      systemType: "notification" | "date"
-      content: string
-    }
 
-/// ////////////////////////
-// next-auth
-// ref: https://stackoverflow.com/a/69968164/9422455
-/// ////////////////////////
+// -----------------------------------------------------------------------------
+// general
+// -----------------------------------------------------------------------------
 
-// type PageAuth = {
-//   role: string
-//   loading?: JSX.Element
-//   unauthorized?: string
-// }
-
-export type NextPageWithAuth<P = {}, IP = P> = NextPage<P, IP> & {
-  auth?: boolean
-}
-
-export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> & Partial<NextPageWithAuth>
-
-export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
-  Component: NextComponentWithAuth
+export interface INavItem {
+  title: string
+  link: string
+  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
 }
 
 export enum CommandType {

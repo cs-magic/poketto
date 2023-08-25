@@ -5,10 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
-import { nanoid } from "ai"
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
-import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
@@ -16,12 +14,11 @@ import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 
 import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
-import { ChatMessage } from "@prisma/client"
-import { ChevronDownIcon, Link2Icon } from "@radix-ui/react-icons"
+import { ChevronDownIcon } from "@radix-ui/react-icons"
 
 import { contentStyleBasedOnRole } from "@/config-utils"
 
-import { type AllMessage, type AppForListView, type SelectChatMessageForListView } from "@/ds"
+import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
 
 import { AutoScrollContainer } from "@/components/containers"
 import {
@@ -41,12 +38,18 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
-import { useUrl } from "@/hooks/use-url"
 import { useSessionUser, useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
+
+type AllMessage =
+  | SelectChatMessageForListView
+  | {
+      systemType: "notification" | "date"
+      content: string
+    }
 
 export function ConversationInput({ cid }: { cid: string }) {
   const userId = useUserId()

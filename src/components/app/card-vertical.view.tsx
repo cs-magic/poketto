@@ -6,16 +6,19 @@
  */
 import _ from "lodash"
 import Image from "next/image"
+
 import { IconDotsVertical } from "@tabler/icons-react"
-import { type AppForListView, type SortOrder } from "@/ds"
-import { CardsLayoutType } from "@/store/ui.slice"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Badge } from "@/components/ui/badge"
-import clsx from "@/lib/clsx"
-import { Button } from "@/components/ui/button"
-import { getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
+
+import { type AppForListView, CardsLayoutType, type SortOrder } from "@/ds"
+
 import { UsesField, ViewsField } from "@/components/field"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+
+import clsx from "@/lib/clsx"
+import { getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
 
 export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) {
   return (

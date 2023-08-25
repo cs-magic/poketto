@@ -13,12 +13,11 @@ import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
 
 import { useAppStore } from "@/store"
-import { CardsLayoutType } from "@/store/ui.slice"
 
 import { CAROUSELS } from "@/config"
 
 import type { SortOrder } from "@/ds"
-import { sortOrders } from "@/ds"
+import { CardsLayoutType, sortOrders } from "@/ds"
 
 import { IconContainer } from "@/layouts/navbar"
 import { RootLayout } from "@/layouts/root.layout"
