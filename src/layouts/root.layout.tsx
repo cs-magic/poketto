@@ -24,7 +24,7 @@ export function MobileLayout(props: PropsWithChildren) {
 
       <div className="| flex h-full grow flex-col items-center justify-center gap-2 overflow-hidden">{props.children}</div>
 
-      <footer className="grid shrink-0 grid-cols-4">
+      <footer className="fixed bottom-0 w-full bg-background grid shrink-0 grid-cols-4">
         <FooterNavItem {...navs.home} />
         <FooterNavItem {...navs.explore} />
         <FooterNavItem {...navs.gallery} />

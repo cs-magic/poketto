@@ -74,8 +74,8 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
         </div>
 
         {!userId ? (
-          <Link href={URI.user.auth.signIn} className="p-btn">
-            Login to Get
+          <Link href={URI.user.auth.signIn}>
+            <Badge className="whitespace-nowrap">获取</Badge>
           </Link>
         ) : (
           <InstallButton userId={userId} appId={appId} setOpen={setOpen} />

@@ -5,13 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { InvitationStatus } from ".prisma/client"
+import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
 import ReactMarkdown from "react-markdown"
-
-import { ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 
 import { ICON_DIMENSION_MD, URI, USER_INVITATIONS_COUNT, siteConfig } from "@/config"
 import { navs } from "@/config-utils"
@@ -69,7 +68,7 @@ export function Sidebar() {
   return (
     <div
       className={clsx(
-        "hidden h-full max-w-[240px] shrink-0 flex-col gap-6 whitespace-nowrap bg-sidebar px-4 pt-8 text-sm text-primary-foreground md:flex"
+        "hidden md:flex | max-w-[240px] shrink-0 h-full overflow-auto px-4 pt-8 | flex-col gap-6 | whitespace-nowrap bg-sidebar text-sm text-primary-foreground"
       )}
     >
       <section className="flex flex-col">
