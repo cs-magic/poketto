@@ -41,7 +41,7 @@ export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
 // UI
 // -----------------------------------------------------------------------------
 
-export type IMAGE_SIZE = "xs" | "md" | "raw"
+export type IMAGE_SIZE = "xs" | "md" | "raw" | "full"
 
 export enum CardsLayoutType {
   masonry = "masonry",

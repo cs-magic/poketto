@@ -52,7 +52,7 @@ export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs"): s
   if (uri.startsWith("/") || size === "raw") {
     result = uri
   } else if (uri.startsWith("http")) {
-    result = `${FLOWGPT_IMAGE_DIR}/thumbs/${size}/${hash(uri)}.jpg`
+    result = `/api/file?filename=${hash(uri)}&filesize=${size}`
   } else {
     result = getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
   }

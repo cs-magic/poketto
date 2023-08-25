@@ -17,6 +17,8 @@ export const POKETTO_DETAIL_FEATURES_ENABLED = false as const
 
 export const allowDangerousEmailAccountLinking = true as const // ref: https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
 
+export const FLOWGPT_IMAGE_DIR = "/images/flowgpt" as const
+
 export const TAG_SEPARATOR = "|" as const
 
 export const ICON_DIMENSION_SM = "wh-4"

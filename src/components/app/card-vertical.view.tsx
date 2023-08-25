@@ -20,27 +20,22 @@ import clsx from "@/lib/clsx"
 import { getFlowgptUserLink, getLocalFlowgptImageUri } from "@/lib/string"
 
 export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) {
+  // console.log("app avatar: ", app.avatar)
+  const appAvatar = getLocalFlowgptImageUri(app.avatar, "md")
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (
         <AspectRatio ratio={3 / 4} className="overflow-hidden rounded-2xl">
-          <Image
-            src={app.avatar}
-            priority
-            fill
-            className="object-fill transition-all group-hover:scale-125"
-            alt={app.avatar}
-            sizes="300px"
-          />
+          <Image src={appAvatar} priority fill className="object-fill transition-all group-hover:scale-125" alt={app.name} sizes="300px" />
         </AspectRatio>
       ) : (
         <Image
-          src={app.avatar}
+          src={appAvatar}
           priority
           width={300}
           height={400}
           className="object-fill transition-all group-hover:scale-125"
-          alt={app.avatar}
+          alt={app.name}
           style={{ width: "100%", height: "auto" }}
         />
       )}

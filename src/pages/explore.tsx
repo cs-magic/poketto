@@ -53,7 +53,7 @@ export default function ExplorePage() {
       {/* main (content - load more) */}
       <div className={clsx("flex h-full w-full max-w-[1360px] flex-col gap-4 overflow-hidden p-4 lg:p-8")}>
         {/* <HomeCarousel/> */}
-
+        xxx yyy zzzz aaa
         {/* title */}
         <div className=" w-full px-2 | flex items-center gap-2 | whitespace-nowrap">
           <FrameIcon />
@@ -95,9 +95,7 @@ export default function ExplorePage() {
             })}
           </div>
         </div>
-
         {/* content (carousel - cards) */}
-
         <div className="w-full grow overflow-auto | flex flex-col gap-2 ">
           <Container>
             {apps.map((app) => (
