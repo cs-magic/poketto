@@ -56,7 +56,8 @@ export default function ExplorePage() {
 
         {/* title */}
         <div className=" w-full px-2 | flex items-center gap-2 | whitespace-nowrap">
-          {/* <FrameIcon /> */}
+          <FrameIcon />
+          <span>应用广场</span>
           <Select onValueChange={setLanguage}>
             <SelectTrigger className="w-24">
               <SelectValue placeholder="语言" />

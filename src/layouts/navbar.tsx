@@ -4,15 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { useHotkeys } from "@mantine/hooks"
+import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
+import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
 import _ from "lodash"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import type { HTMLProps, PropsWithChildren } from "react"
 import React, { Fragment } from "react"
-
-import { useHotkeys } from "@mantine/hooks"
-import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
-import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
 
 import { useAppStore } from "@/store"
 
@@ -64,12 +63,11 @@ export function ThemeSwitcher() {
  * 晚点再开启公司模式，目前就一个业务，没有必要
  */
 export function LogoWithName({ withCompany }: { withCompany?: false }) {
-  const { toggleSidebar } = useAppStore()
   const productLogo = (
-    <Button variant="ghost" className="shrink-0 justify-start gap-2" onClick={toggleSidebar}>
+    <Link className="p-btn-horizontal w-fit" href="/">
       <Icons.Product />
       <span className="whitespace-nowrap text-lg tracking-widest">{siteConfig.name}</span>
-    </Button>
+    </Link>
   )
   return withCompany ? (
     // 学 vercel 的，ref: https://nextjs.org/docs/messages/prerender-error
