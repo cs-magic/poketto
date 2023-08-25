@@ -4,10 +4,28 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { Prisma } from ".prisma/client"
 import { z } from "zod"
-import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
-import { selectAppForDetailView, selectAppForListView, sortOrders } from "@/ds"
+
 import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
+
+import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
+
+import type { SortOrder } from "@/ds"
+import { selectAppForDetailView, selectAppForListView, sortOrders } from "@/ds"
+
+import AppOrderByWithRelationInput = Prisma.AppOrderByWithRelationInput
+
+const orderByMap: { [key in SortOrder]: AppOrderByWithRelationInput } = {
+  mostViewed: { state: { views: "desc" } },
+  mostUsed: { state: { calls: "desc" } },
+  // mostSaved: { state: { stars: "desc" } },
+  // mostShared: { state: { shares: "desc" } },
+  new: { state: { createdAt: "desc" } },
+  // top: { state: { calls: "desc" } },
+  // trending: { state: { shares: "desc" } },
+  // recommend
+}
 
 export const pokettoAppRouter = createTRPCRouter({
   /**
@@ -25,7 +43,7 @@ export const pokettoAppRouter = createTRPCRouter({
         categorySub: z.number().optional(),
         tags: z.string().optional(), // use | to space
         searchKey: z.string().optional(),
-        sortOrder: z.enum(sortOrders).default("mostViewed"),
+        sortOrder: z.enum(sortOrders).default("mostUsed"),
       })
     )
     .query(async ({ ctx: { prisma }, input: { cursor, language, searchKey, limit, sortOrder, categoryMain, categorySub, tags } }) => {
@@ -47,12 +65,7 @@ export const pokettoAppRouter = createTRPCRouter({
           },
           OR: [{ name: { contains: searchKey } }, { desc: { contains: searchKey } }, { creator: { name: { contains: searchKey } } }],
         },
-        orderBy: {
-          // todo: other sorts
-          state: {
-            views: "desc",
-          },
-        },
+        orderBy: orderByMap[sortOrder],
       })
       let nextCursor: typeof cursor | undefined
       if (items.length > limit) {

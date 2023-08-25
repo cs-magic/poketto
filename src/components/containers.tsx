@@ -30,7 +30,7 @@ export function GridContainer({ children }: PropsWithChildren) {
 
 export function MasonryContainer({ children }: PropsWithChildren) {
   return (
-    <ResponsiveMasonry columnsCountBreakPoints={{ 300: 1, 600: 2, 900: 3, 1200: 4, 1500: 5 }}>
+    <ResponsiveMasonry columnsCountBreakPoints={{ 600: 2, 900: 3, 1200: 4, 1500: 5 }}>
       <Masonry gutter="1rem">{children}</Masonry>
     </ResponsiveMasonry>
   )

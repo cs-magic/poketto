@@ -7,7 +7,8 @@
 import _ from "lodash"
 import { useTheme } from "next-themes"
 import Link from "next/link"
-import React, { Fragment, type PropsWithChildren } from "react"
+import type { HTMLProps, PropsWithChildren } from "react"
+import React, { Fragment } from "react"
 
 import { useHotkeys } from "@mantine/hooks"
 import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
@@ -38,6 +39,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMount } from "@/hooks/use-mount"
 import { useUserId } from "@/hooks/use-user"
+
+import clsx from "@/lib/clsx"
 
 export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
@@ -86,8 +89,12 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
   )
 }
 
-export function IconContainer({ children }: PropsWithChildren) {
-  return <div className="p-2 hover:bg-accent rounded-lg">{children}</div>
+export function IconContainer({ children, className, ...props }: PropsWithChildren & HTMLProps<HTMLDivElement>) {
+  return (
+    <div className={clsx("p-2 hover:bg-accent rounded-lg inline-flex items-center gap-1", className)} {...props}>
+      {children}
+    </div>
+  )
 }
 
 export default function Navbar() {

@@ -4,29 +4,41 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
-import { ChatMessageFormatType, Prisma, PromptRoleType } from ".prisma/client"
+import { Prisma } from ".prisma/client"
 import { type NextComponentType, type NextPage, type NextPageContext } from "next"
-import { type AppProps } from "next/app"
 import { type Session } from "next-auth"
+import { type AppProps } from "next/app"
+import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
+
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
-import { RoleTypeType } from "../prisma/generated/zod"
-import UserGetPayload = Prisma.UserGetPayload
+
 import AppGetPayload = Prisma.AppGetPayload
-import ConversationGetPayload = Prisma.ConversationGetPayload
-import validator = Prisma.validator
-import ConversationSelect = Prisma.ConversationSelect
-import ConversationInclude = Prisma.ConversationInclude
 import AppSelect = Prisma.AppSelect
-import UserSelect = Prisma.UserSelect
-import ChatMessageSelect = Prisma.ChatMessageSelect
 import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
+import ChatMessageSelect = Prisma.ChatMessageSelect
+import ConversationGetPayload = Prisma.ConversationGetPayload
+import ConversationInclude = Prisma.ConversationInclude
+import ConversationSelect = Prisma.ConversationSelect
+
+import UserGetPayload = Prisma.UserGetPayload
+import UserSelect = Prisma.UserSelect
+import validator = Prisma.validator
 
 // -----------------------------------------------------------------------------
 // general
 // -----------------------------------------------------------------------------
 
-export const sortOrders = ["recommend", "top", "most-saved", "new", "trending", "follow", "mostViewed"] as const
+export const sortOrders = [
+  "mostViewed",
+  "mostUsed",
+  // "mostSaved",
+  // "mostShared",
+  "new",
+  // "recommend",
+  // "top",
+  // "trending",
+  // "follow",
+] as const
 export type SortOrder = (typeof sortOrders)[number]
 
 export type IMAGE_SIZE = "xs" | "md" | "raw"

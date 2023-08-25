@@ -6,24 +6,28 @@
  */
 import _ from "lodash"
 import Link from "next/link"
+
 import { ArrowRightIcon } from "@radix-ui/react-icons"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { URI } from "@/config"
-import { Button } from "@/components/ui/button"
-import { AppDialogContainer } from "@/components/app/container"
+
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
-import { type AppForListView } from "@/ds"
+import { AppDialogContainer } from "@/components/app/container"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+import { api } from "@/lib/api"
 
 const limit = 5
 
 export function ExploreAppsWidget() {
-  // const query = api.app.list.useInfiniteQuery(
-  //   { limit },
-  //   {
-  //     getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
-  //   }
-  // )
-  const apps: AppForListView[] = [] // query.data?.pages.flatMap((item) => item.items)
+  const query = api.app.list.useInfiniteQuery(
+    { limit },
+    {
+      getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
+    }
+  )
+  const apps = query.data?.pages.flatMap((item) => item.items)
 
   console.log({ apps })
 

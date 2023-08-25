@@ -4,21 +4,24 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React, { type ElementType } from "react"
+import MidJourney from "../../public/brands/midjourney2.svg"
+import OpenChat from "../../public/brands/openchat.svg"
+import CSCoin from "../../public/images/cs-coin.svg"
+import Company from "../../public/images/logo/m/256.svg"
+import Product from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
 import {
   AlertTriangle,
   ArrowRight,
   Check,
   ChevronLeft,
   ChevronRight,
-  Command,
   CreditCard,
   File,
   FileText,
   HelpCircle,
-  Image as LucideImage,
   Laptop,
   Loader2,
+  Image as LucideImage,
   type LucideProps,
   Moon,
   MoreVertical,
@@ -31,25 +34,27 @@ import {
   User,
   X,
 } from "lucide-react"
-import { DiscordLogoIcon } from "@radix-ui/react-icons"
-import { IconCalendarFilled, IconDownload, IconEye, IconStackPush, IconTelescope, IconThumbUp, IconTrendingUp } from "@tabler/icons-react"
 import Image, { type ImageProps } from "next/image"
+import React, { type ElementType } from "react"
 
-import CSCoin from "../../public/images/cs-coin.svg"
-import OpenChat from "../../public/brands/openchat.svg"
-import MidJourney from "../../public/brands/midjourney2.svg"
-import Product from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
-import Company from "../../public/images/logo/m/256.svg"
+import { DiscordLogoIcon } from "@radix-ui/react-icons"
+import { IconCalendarFilled, IconDownload, IconEye, IconStackPush, IconTrendingUp } from "@tabler/icons-react"
+
 import { type SortOrder } from "@/ds"
 
 export const Order2icon: { [key in SortOrder]: ElementType } = {
-  recommend: IconStackPush,
-  top: IconThumbUp,
-  "most-saved": IconDownload,
-  trending: IconTrendingUp,
-  new: IconCalendarFilled,
-  follow: IconTelescope,
   mostViewed: IconEye,
+  mostUsed: IconStackPush,
+  // mostSaved: IconDownload,
+  // mostShared: IconTrendingUp,
+  new: IconCalendarFilled,
+
+  // recommend: IconStackPush,
+  // top: IconThumbUp,
+  // mostViewed: IconEye,
+  // "most-saved": IconDownload,
+  // trending: IconTrendingUp,
+  // follow: IconTelescope,
 }
 
 export const Icons = {

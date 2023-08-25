@@ -4,34 +4,43 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React, { Fragment, useEffect } from "react"
 import _ from "lodash"
-import { FrameIcon } from "@radix-ui/react-icons"
-import { Carousel } from "react-responsive-carousel"
 import Image from "next/image"
-import { useIntersection } from "@mantine/hooks"
-import clsx from "@/lib/clsx"
-import { RootLayout } from "@/layouts/root.layout"
-import { api } from "@/lib/api"
-import { GridContainer, MasonryContainer } from "@/components/containers"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
+import React, { Fragment, useEffect, useState } from "react"
+import { Carousel } from "react-responsive-carousel"
 
-import { CardsLayoutType } from "@/store/ui.slice"
+import { useIntersection } from "@mantine/hooks"
+import { FrameIcon } from "@radix-ui/react-icons"
+
 import { useAppStore } from "@/store"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { CardsLayoutType } from "@/store/ui.slice"
+
 import { CAROUSELS } from "@/config"
-import { AppDialogContainer } from "@/components/app/container"
-import { AppVerticalCardView } from "@/components/app/card-vertical.view"
+
+import type { SortOrder } from "@/ds"
 import { sortOrders } from "@/ds"
+
+import { IconContainer } from "@/layouts/navbar"
+import { RootLayout } from "@/layouts/root.layout"
+
+import { AppVerticalCardView } from "@/components/app/card-vertical.view"
+import { AppDialogContainer } from "@/components/app/container"
+import { GridContainer, MasonryContainer } from "@/components/containers"
 import { Order2icon } from "@/components/icons"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Separator } from "@/components/ui/separator"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
 
 export default function ExplorePage() {
-  const { cardsLayout, sortOrder, setSortOrder } = useAppStore()
+  const [sortOrder, setSortOrder] = useState<SortOrder>("mostViewed")
+  const { cardsLayout } = useAppStore()
   const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 
   const query = api.app.list.useInfiniteQuery(
-    {},
+    { sortOrder },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
@@ -51,24 +60,30 @@ export default function ExplorePage() {
           <span className="text-lg">玩法推荐</span>
 
           <div className="grow" />
-          {/* <span className={'hidden md:block'}>Sort By</span> */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             {sortOrders.map((order) => {
               const Icon = Order2icon[order]
               return (
                 <Fragment key={order}>
                   <Separator orientation="vertical" className="h-4 first:hidden" />
-                  <Button
-                    className="flex items-center gap-1 px-2 hover:bg-transparent"
-                    variant="ghost"
-                    key={order}
-                    onClick={() => {
-                      setSortOrder(order)
-                    }}
-                  >
-                    <Icon className="" />
-                    <span className="hidden lg:block">{_.startCase(_.capitalize(order))}</span>
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip delayDuration={100}>
+                      <TooltipTrigger>
+                        <IconContainer
+                          className={clsx(sortOrder === order && "text-primary")}
+                          onClick={() => {
+                            setSortOrder(order)
+                          }}
+                        >
+                          <Icon />
+                          <span className="hidden md:block">{_.startCase(_.capitalize(order))}</span>
+                        </IconContainer>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{order}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </Fragment>
               )
             })}
