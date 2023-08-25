@@ -11,6 +11,8 @@ import { FLOWGPT_IMAGE_DIR } from "@/config"
 
 import { type IMAGE_SIZE } from "@/ds"
 
+import { FLOWGPT_HOMEPAGE } from "@/const"
+
 export const getShortName = (s: string, len: number = 2) =>
   s
     .split(/\s+/)
@@ -38,7 +40,9 @@ export const getConversationsLink = (userId: string) => `/c/${userId}`
 export const getConversationLink = (userId: string, appId: string) => `/c/${userId}/${appId}`
 export const getAppLink = (appId: string) => `/p/${appId}`
 
-export const getUserLink = (userId: string) => `https://flowgpt.com/user/${userId}`
+// export const getFlowgptUserLink = (userId: string) => `${FLOWGPT_URL}/user/${userId}`
+export const getFlowgptUserLink = (userId: string) => `${FLOWGPT_HOMEPAGE}/@${userId}`
+export const getUserLink = (userId: string) => `/u/${userId}`
 
 export const getWelcomeSystemNotification = (userName: string, appName?: string) =>
   `Welcome ${userName}${appName ? `to join the ${appName}` : ""} !`

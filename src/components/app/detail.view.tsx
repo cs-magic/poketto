@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
+import { platform } from "@floating-ui/dom"
 import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
 import _ from "lodash"
 import Link from "next/link"
@@ -15,6 +16,7 @@ import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
 
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
+import { platformMap } from "@/config-utils"
 
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import {
@@ -39,7 +41,9 @@ import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
-import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+import { getConversationLink, getConversationsLink, getFlowgptUserLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+
+import { FLOWGPT_HOMEPAGE } from "@/const"
 
 import validator = Prisma.validator
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
@@ -80,7 +84,7 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
 
       <Separator orientation="horizontal" />
 
-      <section id="status" className={clsx("w-full", "flex items-center justify-between gap-1")}>
+      <section id="status" className={clsx("w-full", "flex items-center justify-between gap-1 overflow-auto")}>
         <StatusItem a="category" b={`${app.category.main}-${app.category.sub}`} />
         <StatusItem a="model" b={app.modelName} />
         {POKETTO_DETAIL_RATINGS_ENABLED && <StatusItem a="ratings" b={numeral(app.state?.stars).format("0.0")} />}
@@ -148,7 +152,23 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
       <section id="information" className="flex w-full flex-col gap-4">
         <h2>Information</h2>
         <div className="grid grid-cols-2 gap-4">
-          <InfoItem a="provider" b={app.creator.name} />
+          <InfoItem
+            a="platform"
+            b={
+              <Link className="underline" href={platformMap[app.platformType]!.homepage} target="_blank">
+                {app.platformType}
+              </Link>
+            }
+          />
+          <InfoItem
+            a="owner"
+            b={
+              <Link className="underline" href={getUserLink(app.creator.id)} target="_blank">
+                {app.creator.id}
+              </Link>
+            }
+          />
+          <InfoItem a="model" b={app.modelName} />
           <InfoItem a="Open Source" b={app.isOpenSource.toString()} />
           <InfoItem a="category" b={`${app.category.main}-${app.category.sub}`} />
           <InfoItem a="language" b={app.language} />
@@ -209,7 +229,7 @@ export function CollapsablePara({ content }: { content: string }) {
 
 export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c?: ReactNode }) {
   return (
-    <div className="| flex w-full flex-col items-center justify-between gap-1 overflow-hidden whitespace-nowrap py-2">
+    <div className="w-24 shrink-0 overflow-hidden | flex flex-col items-center justify-between gap-1 | whitespace-nowrap py-2">
       <div className="font-bold uppercase text-muted-foreground">{a}</div>
       <MarqueeContainer className="text-lg">{b}</MarqueeContainer>
       {c && <div className="flex items-center justify-center text-primary-foreground/50">{c}</div>}

@@ -11,8 +11,12 @@ declare global {
     import { type Message } from "ai/react"
 
     // you can use typical basic types
-    type ModelArgs = {
+    type ModelPlatformArgs = {
       prompts: Message[]
+    }
+
+    type UserPlatformArgs = {
+      uri: string
     }
   }
 

@@ -6,6 +6,7 @@
  */
 import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
+import { SelectIcon } from "@radix-ui/react-select"
 import _ from "lodash"
 import Image from "next/image"
 import React, { Fragment, useEffect, useState } from "react"
@@ -26,6 +27,7 @@ import { AppDialogContainer } from "@/components/app/container"
 import { GridContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
 import { Order2icon } from "@/components/icons"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 
 import { api } from "@/lib/api"
@@ -33,11 +35,12 @@ import clsx from "@/lib/clsx"
 
 export default function ExplorePage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("mostViewed")
+  const [language, setLanguage] = useState<string>("all")
   const { cardsLayout } = useAppStore()
   const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 
   const query = api.app.list.useInfiniteQuery(
-    { sortOrder },
+    { sortOrder, language: language === "all" ? undefined : language },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
@@ -53,10 +56,22 @@ export default function ExplorePage() {
 
         {/* title */}
         <div className=" w-full px-2 | flex items-center gap-2 | whitespace-nowrap">
-          <FrameIcon />
-          <span className="text-lg">Poketto App Store</span>
+          {/* <FrameIcon /> */}
+          <Select onValueChange={setLanguage}>
+            <SelectTrigger className="w-24">
+              <SelectValue placeholder="语言" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="zh">中文</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
 
           <div className="grow" />
+
           <div className="flex items-center gap-2">
             {sortOrders.map((order) => {
               const Icon = Order2icon[order]

@@ -4,10 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { IconDotsVertical } from "@tabler/icons-react"
 import _ from "lodash"
 import Image from "next/image"
-
-import { IconDotsVertical } from "@tabler/icons-react"
 
 import { type AppForListView, CardsLayoutType, type SortOrder } from "@/ds"
 
@@ -18,7 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 import clsx from "@/lib/clsx"
-import { getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+import { getFlowgptUserLink, getLocalFlowgptImageUri } from "@/lib/string"
 
 export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) {
   return (
@@ -74,7 +73,7 @@ export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForLis
             variant="link"
             className="| flex w-1/2 items-center gap-2"
             onClick={() => {
-              window.location.href = getUserLink(app.creatorId)
+              window.location.href = getFlowgptUserLink(app.creatorId)
             }}
           >
             <Avatar className="wh-5">

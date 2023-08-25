@@ -5,12 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
+import { type IconProps } from "@radix-ui/react-icons/dist/types"
 import type { NextComponentType, NextPage, NextPageContext } from "next"
 import type { Session } from "next-auth"
 import type { AppProps } from "next/app"
 import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
-
-import { type IconProps } from "@radix-ui/react-icons/dist/types"
 
 import AppGetPayload = Prisma.AppGetPayload
 import AppSelect = Prisma.AppSelect
@@ -85,6 +84,9 @@ export const selectUserProfile = validator<UserSelect>()({
   followedByCount: true,
   balance: true,
   email: true,
+  platformType: true,
+  platformId: true,
+  platformArgs: true,
 })
 export type UserForProfile = UserGetPayload<{ select: typeof selectUserProfile }>
 
@@ -109,6 +111,9 @@ export const selectAppForListView = validator<AppSelect>()({
     select: {
       id: true,
       name: true,
+      platformType: true,
+      platformId: true,
+      platformArgs: true,
     },
   },
 })

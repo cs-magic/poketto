@@ -175,7 +175,7 @@ export const AppSchema = z.object({
   modelName: z.string(),
   isOpenSource: z.boolean(),
   /**
-   * [ModelArgs]
+   * [ModelPlatformArgs]
    */
   modelArgs: NullableJsonValue.optional(),
 })
@@ -409,7 +409,7 @@ export const UserSchema = z.object({
   id: z.string(),
   platformId: z.string(),
   /**
-   * [PlatformArgs]
+   * [UserPlatformArgs]
    */
   platformArgs: NullableJsonValue.optional(),
   name: z.string().nullable(),

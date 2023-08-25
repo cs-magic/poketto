@@ -84,7 +84,7 @@ model App {
 
   modelName    String
   isOpenSource Boolean @default(true)
-  /// [ModelArgs]
+  /// [ModelPlatformArgs]
   modelArgs    Json?
 
   @@unique([platformType, platformId], name: "platform")
@@ -296,7 +296,7 @@ model User {
   platformType PlatformType @default(Poketto)
   platformId   String
 
-  /// [PlatformArgs]
+  /// [UserPlatformArgs]
   platformArgs Json?
 
   accounts Account[]

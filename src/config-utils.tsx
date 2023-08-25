@@ -4,13 +4,18 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React from "react"
+import type { PlatformType, PromptRoleType } from ".prisma/client"
 import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import { IconLayoutDashboard } from "@tabler/icons-react"
-import { type PromptRoleType } from ".prisma/client"
+import React from "react"
+
+import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
+
 import { CommandType, type ICommandItem, type INavItem } from "@/ds"
-import { type NavKey, URI } from "@/config"
+
 import { Icons } from "@/components/icons"
+
+import { FLOWGPT_HOMEPAGE } from "@/const"
 
 export const COMMANDS: ICommandItem[] = [
   {
@@ -84,5 +89,14 @@ export const navs: { [key in NavKey]: INavItem } = {
   supportCenter: {
     title: "Support Center",
     link: URI.app.docs.support,
+  },
+}
+
+export const platformMap: { [key in PlatformType]?: { homepage: string } } = {
+  Poketto: {
+    homepage: POKETTO_HOMEPAGE,
+  },
+  FlowGPT: {
+    homepage: FLOWGPT_HOMEPAGE,
   },
 }
