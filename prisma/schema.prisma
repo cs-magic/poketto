@@ -265,6 +265,7 @@ model StarringApp {
   userId String
 }
 
+// todo: stripe 自己的 api 是不是够用了
 model StripeProduct {
   id       String                   @id
   price    Float

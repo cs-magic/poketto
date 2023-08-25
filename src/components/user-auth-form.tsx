@@ -1,12 +1,11 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import type * as z from "zod"
-
-import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Icons } from "@/components/icons"
 import { buttonVariants } from "@/components/ui/button"
@@ -76,7 +75,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <Input
               id="email"
               placeholder="name@example.com"
-              defaultValue="cto@cs-magic.com"
               type="email"
               autoCapitalize="none"
               autoComplete="email"
