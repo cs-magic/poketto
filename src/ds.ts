@@ -190,7 +190,7 @@ export enum CommandType {
 
 export interface ICommandItem {
   id: string
-  icon: ReactNode
+  Icon: (props: any) => ReactNode
   title?: string
   category: CommandType
   kbd?: string

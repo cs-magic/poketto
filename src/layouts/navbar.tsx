@@ -168,10 +168,10 @@ function CommandDemo() {
             <div className="flex flex-wrap gap-2">
               {history
                 .map((id) => COMMANDS.find((command) => command.id === id)!)
-                .map((item) => (
-                  <CommandItem key={item.id} className="flex items-center gap-2">
-                    {item.icon}
-                    <span>{item.title ?? item.id}</span>
+                .map((Item) => (
+                  <CommandItem key={Item.id} className="flex items-center gap-2">
+                    <Item.Icon />
+                    <span>{Item.title ?? Item.id}</span>
                   </CommandItem>
                 ))}
             </div>
@@ -181,18 +181,18 @@ function CommandDemo() {
             <Fragment key={cat}>
               <CommandSeparator />
               <CommandGroup heading={cat} key={cat}>
-                {items.map((item) => (
+                {items.map((Item) => (
                   <CommandItem
-                    key={item.id}
+                    key={Item.id}
                     className="flex items-center gap-2"
                     onSelect={() => {
                       // ref: https://github.com/pacocoursey/cmdk#nested-items
-                      console.log("selected ", item)
-                      push(item.id)
+                      console.log("selected ", Item)
+                      push(Item.id)
                     }}
                   >
-                    {item.icon}
-                    <span>{item.title ?? item.id}</span>
+                    <Item.Icon />
+                    <span>{Item.title ?? Item.id}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>

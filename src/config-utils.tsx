@@ -20,19 +20,19 @@ import { FLOWGPT_HOMEPAGE } from "@/const"
 export const COMMANDS: ICommandItem[] = [
   {
     id: "Ask Poketto",
-    icon: <Icons.Product />,
+    Icon: <Icons.Product />,
     category: CommandType.suggestion,
     kbd: "⌘ D",
   },
   {
     id: "Dashboard",
-    icon: <IconLayoutDashboard />,
+    Icon: <IconLayoutDashboard />,
     category: CommandType.settings,
     kbd: "⌘ D",
   },
   {
     id: "Explore",
-    icon: <GearIcon />,
+    Icon: <GearIcon />,
     category: CommandType.settings,
     kbd: "⌘ E",
   },

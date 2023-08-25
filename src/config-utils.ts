@@ -4,7 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
+// import { Icons } from "@/components/icons"
 import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import { IconLayoutDashboard } from "@tabler/icons-react"
 
@@ -12,25 +14,24 @@ import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
 
 import { CommandType, type ICommandItem, type INavItem } from "@/ds"
 
-// import { Icons } from "@/components/icons"
 import { FLOWGPT_HOMEPAGE } from "@/const"
 
 export const COMMANDS: ICommandItem[] = [
   {
     id: "Ask Poketto",
-    icon: () => null, // Icons.Product,
+    Icon: Icons.Product,
     category: CommandType.suggestion,
     kbd: "⌘ D",
   },
   {
     id: "Dashboard",
-    icon: IconLayoutDashboard,
+    Icon: IconLayoutDashboard,
     category: CommandType.settings,
     kbd: "⌘ D",
   },
   {
     id: "Explore",
-    icon: GearIcon,
+    Icon: GearIcon,
     category: CommandType.settings,
     kbd: "⌘ E",
   },

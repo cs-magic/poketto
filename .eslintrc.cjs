@@ -78,7 +78,7 @@ module.exports = {
       {
         code: Infinity, // Code width is already enforced by Prettier
         tabWidth: 2,
-        comments: 80,
+        // comments: 80, // 我有时候需要注释代码！
         ignoreUrls: true,
         ignorePattern: "(eslint-disable|@)"
       }

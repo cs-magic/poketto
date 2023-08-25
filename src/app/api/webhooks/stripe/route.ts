@@ -7,8 +7,6 @@
 import { headers } from "next/headers"
 import type Stripe from "stripe"
 
-import { prisma } from "@/server/db"
-
 import { env } from "@/env.mjs"
 
 import { stripe } from "@/lib/stripe"
