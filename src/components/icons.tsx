@@ -4,11 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import MidJourney from "../../public/brands/midjourney2.svg"
-import OpenChat from "../../public/brands/openchat.svg"
-import CSCoin from "../../public/images/cs-coin.svg"
-import Company from "../../public/images/logo/m/256.svg"
-import Product from "../../public/images/logo/poketto/Your-Sole-Poketto.png"
+import { Crosshair2Icon, CubeIcon, DiscordLogoIcon, EyeOpenIcon } from "@radix-ui/react-icons"
 import {
   AlertTriangle,
   ArrowRight,
@@ -37,17 +33,21 @@ import {
 import Image, { type ImageProps } from "next/image"
 import React, { type ElementType } from "react"
 
-import { DiscordLogoIcon } from "@radix-ui/react-icons"
-import { IconCalendarFilled, IconDownload, IconEye, IconStackPush, IconTrendingUp } from "@tabler/icons-react"
-
 import { type SortOrder } from "@/ds"
 
+import MidJourney from "@/../public/brands/midjourney2.svg"
+import OpenChat from "@/../public/brands/openchat.svg"
+import CSCoin from "@/../public/images/cs-coin.svg"
+import Company from "@/../public/images/logo/m/256.svg"
+import Product from "@/../public/images/logo/poketto/Your-Sole-Poketto.png"
+import Error from "@/../public/images/timed-out-error.svg"
+
 export const Order2icon: { [key in SortOrder]: ElementType } = {
-  mostViewed: IconEye,
-  mostUsed: IconStackPush,
+  mostViewed: EyeOpenIcon,
+  mostUsed: CubeIcon,
   // mostSaved: IconDownload,
   // mostShared: IconTrendingUp,
-  new: IconCalendarFilled,
+  new: Crosshair2Icon,
 
   // recommend: IconStackPush,
   // top: IconThumbUp,
@@ -107,5 +107,6 @@ export const Icons = {
   CSCoin,
   OpenChat,
   MidJourney,
+  Error,
   ...Order2icon,
 }

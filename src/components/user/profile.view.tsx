@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { IconUser } from "@tabler/icons-react"
+import { AvatarIcon } from "@radix-ui/react-icons"
 import { signIn, signOut } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
@@ -33,7 +33,7 @@ export function UserProfile({ user }: { user: UserForProfile }) {
       <Avatar className="mx-auto wh-[256px]">
         <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? user.id, "md")} className="" />
         <AvatarFallback>
-          <IconUser />
+          <AvatarIcon />
         </AvatarFallback>
       </Avatar>
 

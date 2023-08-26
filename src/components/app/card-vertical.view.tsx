@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { IconDotsVertical } from "@tabler/icons-react"
+import { DotsVerticalIcon } from "@radix-ui/react-icons"
 import _ from "lodash"
 import Image from "next/image"
 
@@ -48,7 +48,7 @@ export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForLis
         <div className="flex items-center gap-2">
           {app.tags.length && <Badge variant="destructive">{_.startCase(_.capitalize(app.tags[0]?.name))}</Badge>}
         </div>
-        <IconDotsVertical className="hidden group-hover:flex" />
+        <DotsVerticalIcon className="hidden group-hover:flex" />
       </div>
 
       {/* footer desc */}

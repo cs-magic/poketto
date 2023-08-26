@@ -10,7 +10,6 @@ import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
-import ReactMarkdown from "react-markdown"
 
 import { ICON_DIMENSION_MD, URI, USER_INVITATIONS_COUNT, siteConfig } from "@/config"
 import { navs } from "@/config-utils"
@@ -42,20 +41,18 @@ export function InviteCard() {
         <Cross1Icon className="text-muted-foreground wh-4" />
       </div>
       <article className="p-prose">
-        <ReactMarkdown>
-          {m(
-            "每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})" +
-              " 赠送哦！当前剩余：[{{surplus}}](/dashboard)",
-            {
-              cnt: USER_INVITATIONS_COUNT,
-              surplus,
-              appName: siteConfig.name,
-              appDoc: URI.app.docs.intro,
-              currencyName: siteConfig.currency,
-              currencyDoc: URI.app.docs.currency,
-            }
-          )}
-        </ReactMarkdown>
+        {m(
+          "每位 [{{appName}}]({{appDoc}}) 用户都拥有 **{{cnt}}** 张邀请码，分享给您的好友注册成功后将有 [{{currencyName}}]({{currencyDoc}})" +
+            " 赠送哦！当前剩余：[{{surplus}}](/dashboard)",
+          {
+            cnt: USER_INVITATIONS_COUNT,
+            surplus,
+            appName: siteConfig.name,
+            appDoc: URI.app.docs.intro,
+            currencyName: siteConfig.currency,
+            currencyDoc: URI.app.docs.currency,
+          }
+        )}
       </article>
       <Button className="bg-blue-500/75 hover:bg-blue-500">Invite</Button>
     </div>

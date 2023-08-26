@@ -5,8 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 import type { PlatformType, PromptRoleType } from ".prisma/client"
-import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
-import { IconLayoutDashboard } from "@tabler/icons-react"
+import {
+  DashboardIcon,
+  EnvelopeOpenIcon,
+  GearIcon,
+  HomeIcon,
+  LightningBoltIcon,
+  MixIcon,
+  RocketIcon,
+  TargetIcon,
+} from "@radix-ui/react-icons"
 import React from "react"
 
 import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
@@ -26,7 +34,7 @@ export const COMMANDS: ICommandItem[] = [
   },
   {
     id: "Dashboard",
-    Icon: <IconLayoutDashboard />,
+    Icon: <DashboardIcon />,
     category: CommandType.settings,
     kbd: "⌘ D",
   },

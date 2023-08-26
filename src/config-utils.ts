@@ -7,8 +7,16 @@
 import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
 // import { Icons } from "@/components/icons"
-import { EnvelopeOpenIcon, GearIcon, HomeIcon, LightningBoltIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
-import { IconLayoutDashboard } from "@tabler/icons-react"
+import {
+  DashboardIcon,
+  EnvelopeOpenIcon,
+  GearIcon,
+  HomeIcon,
+  LightningBoltIcon,
+  MixIcon,
+  RocketIcon,
+  TargetIcon,
+} from "@radix-ui/react-icons"
 
 import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
 
@@ -25,7 +33,7 @@ export const COMMANDS: ICommandItem[] = [
   },
   {
     id: "Dashboard",
-    Icon: IconLayoutDashboard,
+    Icon: DashboardIcon,
     category: CommandType.settings,
     kbd: "⌘ D",
   },

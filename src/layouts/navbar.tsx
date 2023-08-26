@@ -5,8 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { useHotkeys } from "@mantine/hooks"
-import { BellIcon, GearIcon, LightningBoltIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons"
-import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons-react"
+import {
+  BellIcon,
+  GearIcon,
+  LapTimerIcon,
+  LightningBoltIcon,
+  MagnifyingGlassIcon,
+  MoonIcon,
+  QuestionMarkCircledIcon,
+  SunIcon,
+} from "@radix-ui/react-icons"
 import _ from "lodash"
 import { useTheme } from "next-themes"
 import Link from "next/link"
@@ -48,9 +56,9 @@ export function ThemeSwitcher() {
   const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length]!
   return (
     <div onClick={() => setTheme(nextTheme)} className="p-2 hover:bg-accent">
-      {theme === "light" && <IconSun className={ICON_DIMENSION_SM} />}
-      {theme === "dark" && <IconMoon className={ICON_DIMENSION_SM} />}
-      {theme === "system" && <IconBrightnessHalf className={ICON_DIMENSION_SM} />}
+      {theme === "light" && <SunIcon className={ICON_DIMENSION_SM} />}
+      {theme === "dark" && <MoonIcon className={ICON_DIMENSION_SM} />}
+      {theme === "system" && <LapTimerIcon className={ICON_DIMENSION_SM} />}
     </div>
   )
 }
@@ -140,7 +148,7 @@ function CommandDemo() {
   return (
     <>
       <div className="| | relative flex w-[256px] items-center text-sm text-muted-foreground">
-        <IconSearch className="absolute left-2 wh-5" />
+        <MagnifyingGlassIcon className="absolute left-2 wh-5" />
         <Input className="grow" onFocus={() => setOpen(!open)} />
         <kbd className="pointer-events-none absolute right-2 hidden h-6  shrink-0  select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground md:inline-flex">
           ⌘ {KEY}
