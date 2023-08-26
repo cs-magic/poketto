@@ -44,7 +44,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    ".eslintrc.cjs",
+    ".eslintrc.json",
     "next-env.d.ts",
     ".next/types/**/*.ts",
     ".build/types/**/*.ts",
