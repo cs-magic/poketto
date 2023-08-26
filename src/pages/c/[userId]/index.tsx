@@ -5,7 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { RootLayout } from "@/layouts/root.layout"
-import { ConversationList } from "@/components/conversations"
+
+import { ConversationList } from "@/components/conv/list"
 
 export default function ConversationPage() {
   return (

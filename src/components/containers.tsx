@@ -149,3 +149,11 @@ export function ResponsiveTooltip({ content, children, ...props }: TooltipTrigge
     </Tooltip>
   )
 }
+
+export function IconContainer({ children, className, ...props }: PropsWithChildren & HTMLProps<HTMLDivElement>) {
+  return (
+    <div className={clsx("p-2 hover:bg-accent rounded-0 inline-flex items-center gap-1", className)} {...props}>
+      {children}
+    </div>
+  )
+}

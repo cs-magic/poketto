@@ -5,12 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { useRouter } from "next/router"
+
 import { RootLayout } from "@/layouts/root.layout"
-import clsx from "@/lib/clsx"
-import { api } from "@/lib/api"
-import { ConversationList } from "@/components/conversations"
+
 import { AppDetailView } from "@/components/app/detail.view"
-import { ConversationMain } from "@/components/conv/main"
+import { ConversationCore } from "@/components/conv/core"
+import { ConversationList } from "@/components/conv/list"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
 
 export default function ConversationPage() {
   const router = useRouter()
@@ -34,7 +37,7 @@ export default function ConversationPage() {
         </section>
 
         <section className={clsx("relative w-full lg:grow", " overflow-hidden")}>
-          {curConv && <ConversationMain cid={curConv.id} />}
+          {curConv && <ConversationCore cid={curConv.id} />}
         </section>
 
         <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>{curConv && <AppDetailView appId={curConv.appId} />}</section>

@@ -10,7 +10,6 @@ import { IconBrightnessHalf, IconMoon, IconSearch, IconSun } from "@tabler/icons
 import _ from "lodash"
 import { useTheme } from "next-themes"
 import Link from "next/link"
-import type { HTMLProps, PropsWithChildren } from "react"
 import React, { Fragment } from "react"
 
 import { useAppStore } from "@/store"
@@ -18,10 +17,9 @@ import { useAppStore } from "@/store"
 import { ICON_DIMENSION_SM, siteConfig } from "@/config"
 import { COMMANDS, navs } from "@/config-utils"
 
-import { ChargeContainer } from "@/components/containers"
+import { ChargeContainer, IconContainer } from "@/components/containers"
 import { Icons } from "@/components/icons"
 import { SidebarNavItem } from "@/components/link"
-import { Button } from "@/components/ui/button"
 import {
   CommandDialog,
   CommandEmpty,
@@ -38,8 +36,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMount } from "@/hooks/use-mount"
 import { useUserId } from "@/hooks/use-user"
-
-import clsx from "@/lib/clsx"
 
 export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
@@ -84,14 +80,6 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
     </div>
   ) : (
     productLogo
-  )
-}
-
-export function IconContainer({ children, className, ...props }: PropsWithChildren & HTMLProps<HTMLDivElement>) {
-  return (
-    <div className={clsx("p-2 hover:bg-accent rounded-lg inline-flex items-center gap-1", className)} {...props}>
-      {children}
-    </div>
   )
 }
 

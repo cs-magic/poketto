@@ -19,7 +19,7 @@ import { CAROUSELS } from "@/config"
 import type { SortOrder } from "@/ds"
 import { CardsLayoutType, sortOrders } from "@/ds"
 
-import { IconContainer } from "@/layouts/navbar"
+import { IconContainer } from "@/layouts/IconContainer"
 import { RootLayout } from "@/layouts/root.layout"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"

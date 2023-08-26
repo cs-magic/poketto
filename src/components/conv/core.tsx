@@ -5,22 +5,36 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { getHotkeyHandler, useClipboard, useFullscreen } from "@mantine/hooks"
+import {
+  ChevronDownIcon,
+  CodeSandboxLogoIcon,
+  DotsVerticalIcon,
+  DrawingPinFilledIcon,
+  DrawingPinIcon,
+  EnterFullScreenIcon,
+  ExitFullScreenIcon,
+  HamburgerMenuIcon,
+  Link2Icon,
+  SymbolIcon,
+} from "@radix-ui/react-icons"
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 
-import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
-import { ChevronDownIcon } from "@radix-ui/react-icons"
-
 import { contentStyleBasedOnRole } from "@/config-utils"
 
 import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
 
-import { AutoScrollContainer } from "@/components/containers"
+import { LogoWithName } from "@/layouts/navbar"
+
+import { AppDialogContainer } from "@/components/app/container"
+import { AutoScrollContainer, IconContainer } from "@/components/containers"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +49,8 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
@@ -43,6 +59,7 @@ import { useSessionUser, useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
+import { getConversationsLink } from "@/lib/string"
 
 type AllMessage =
   | SelectChatMessageForListView
@@ -50,6 +67,88 @@ type AllMessage =
       systemType: "notification" | "date"
       content: string
     }
+
+export function ConversationCore({ cid }: { cid: string }) {
+  const { data: c } = api.conv.get.useQuery({ id: cid })
+
+  const utils = api.useContext()
+  const { mutate: pinConv } = api.conv.pin.useMutation({
+    onSuccess: () => {
+      void utils.conv.list.invalidate()
+      void utils.conv.get.invalidate()
+    },
+  })
+  const { ref, toggle, fullscreen } = useFullscreen()
+
+  if (!c) {
+    return <SymbolIcon />
+  }
+
+  return (
+    <div className={clsx("flex h-full w-full flex-col items-center", "overflow-hidden ")} ref={ref}>
+      <div className={clsx("flex h-full w-full max-w-[1080px] flex-col  !backdrop-blur-lg", "overflow-hidden")}>
+        <div className={clsx("flex w-full items-center justify-between gap-4  bg-muted px-0 py-5 overflow-hidden")}>
+          {fullscreen ? <LogoWithName /> : <div />}
+          <h2 className="truncate text-center">{c.app.name}</h2>
+
+          {fullscreen ? (
+            <span className="text-muted-foreground px-4">ESC to exit</span>
+          ) : (
+            <Popover>
+              <PopoverTrigger className="shrink-0">
+                <IconContainer>
+                  <DotsVerticalIcon />
+                </IconContainer>
+              </PopoverTrigger>
+              <PopoverContent className="flex flex-col gap-2">
+                <Button variant="ghost" onClick={toggle} className="flex w-full justify-between">
+                  <span>{fullscreen ? "窗口模式" : "全屏模式"}</span>
+                  {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+                </Button>
+
+                <Separator orientation="horizontal" className="hidden md:flex" />
+
+                <Link href="/c/[userId]" as={getConversationsLink(c.userId)} className="p-btn-horizontal justify-between lg:hidden">
+                  <span>List</span> <HamburgerMenuIcon />
+                </Link>
+
+                <AppDialogContainer appId={c.appId}>
+                  <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
+                    <span>Detail</span> <CodeSandboxLogoIcon />
+                  </Button>
+                </AppDialogContainer>
+
+                <Separator orientation="horizontal" className="xl:hidden" />
+
+                <Button className="justify-between" variant="ghost" onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}>
+                  {c.pinned ? (
+                    <>
+                      <span>Unpin</span>
+                      <DrawingPinIcon />
+                    </>
+                  ) : (
+                    <>
+                      <span>Pin</span>
+                      <DrawingPinFilledIcon />
+                    </>
+                  )}
+                </Button>
+
+                <Button className="justify-between" variant="ghost">
+                  <span>Share (todo)</span> <Link2Icon />
+                </Button>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+
+        <div className={clsx("w-full grow ", "overflow-auto")}>
+          <ConversationInput cid={c.id} />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function ConversationInput({ cid }: { cid: string }) {
   const userId = useUserId()
