@@ -6,7 +6,6 @@
  */
 import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
-import { SelectIcon } from "@radix-ui/react-select"
 import _ from "lodash"
 import Image from "next/image"
 import React, { Fragment, useEffect, useState } from "react"
@@ -19,15 +18,14 @@ import { CAROUSELS } from "@/config"
 import type { SortOrder } from "@/ds"
 import { CardsLayoutType, sortOrders } from "@/ds"
 
-import { IconContainer } from "@/layouts/IconContainer"
 import { RootLayout } from "@/layouts/root.layout"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { AppDialogContainer } from "@/components/app/container"
-import { GridContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
+import { GridContainer, IconContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
 import { Order2icon } from "@/components/icons"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 
 import { api } from "@/lib/api"
