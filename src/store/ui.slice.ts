@@ -11,6 +11,9 @@ import { CardsLayoutType } from "@/ds"
 export interface UIState {
   cardsLayout: CardsLayoutType
   setCardsLayout: (v: CardsLayoutType) => void
+
+  fullscreen: boolean
+  switchFullscreen: () => void
 }
 
 export const createUISlice: StoreSlice<UIState> = (setState, getState, store) => ({
@@ -18,5 +21,10 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
   setCardsLayout: (v) =>
     setState((state) => {
       state.cardsLayout = v
+    }),
+  fullscreen: false,
+  switchFullscreen: () =>
+    setState((state) => {
+      state.fullscreen = !state.fullscreen
     }),
 })

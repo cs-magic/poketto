@@ -25,7 +25,7 @@ import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
 
-export default async function (req: Request, res: Response) {
+export default async function handler(req: Request, res: Response) {
   /**
    * 1. 先存储用户的消息，谨防丢失
    */

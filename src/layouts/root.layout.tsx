@@ -7,6 +7,8 @@
 import Navbar from "./navbar"
 import React, { type PropsWithChildren, useEffect } from "react"
 
+import { useAppStore } from "@/store"
+
 import { navs } from "@/config-utils"
 
 import { Sidebar } from "@/layouts/sidebar"
@@ -15,21 +17,25 @@ import { FooterNavItem } from "@/components/link"
 
 import { useMount } from "@/hooks/use-mount"
 
-// import clsx from "@/lib/clsx"
+export const Footer = () => (
+  <footer className="w-full shrink-0 | grid grid-cols-4">
+    <FooterNavItem {...navs.home} />
+    <FooterNavItem {...navs.explore} />
+    <FooterNavItem {...navs.gallery} />
+    <FooterNavItem {...navs.dashboard} />
+  </footer>
+)
 
 export function MobileLayout(props: PropsWithChildren) {
+  const { fullscreen } = useAppStore()
+
   return (
     <div className="md:hidden | h-full w-full | flex flex-col">
-      <Navbar />
+      {!fullscreen && <Navbar />}
 
       <div className="w-full grow overflow-hidden | flex flex-col items-center justify-center gap-2">{props.children}</div>
 
-      <footer className="w-full shrink-0 | grid grid-cols-4">
-        <FooterNavItem {...navs.home} />
-        <FooterNavItem {...navs.explore} />
-        <FooterNavItem {...navs.gallery} />
-        <FooterNavItem {...navs.dashboard} />
-      </footer>
+      {!fullscreen && <Footer />}
     </div>
   )
 }

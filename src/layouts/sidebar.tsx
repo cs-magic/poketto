@@ -82,7 +82,7 @@ export function Sidebar() {
       <Separator />
       <section className="flex flex-col">
         <SidebarNavItem {...navs.waitlist} />
-        <SidebarNavItem {...navs.enterprise} />
+        {/*<SidebarNavItem {...navs.enterprise} />*/}
       </section>
 
       {/* footer */}

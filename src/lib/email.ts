@@ -4,12 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses"
 import { promises as fs } from "fs"
 import Mustache from "mustache"
 import path from "path"
 import { Client } from "postmark"
-
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses"
 
 import { prisma } from "@/server/db"
 
@@ -43,6 +42,8 @@ export const emailFrom = siteConfig.welcomeEmailAddress
  * @param token
  */
 export const sendVerificationRequest = async ({ identifier, url, provider, token }) => {
+  console.log({ identifier, url, provider, token })
+
   const user = await prisma.user.findUnique({
     where: {
       email: identifier,

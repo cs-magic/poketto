@@ -34,6 +34,16 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
         <meta name="description" content={siteConfig.description} />
         {/* prevent screen scale when input, ref: https://github.com/vercel/next.js/issues/7176#issuecomment-487350103 */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+        {/*// <!-- Define the web app capable of running in full-screen mode -->*/}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+
+        {/*// <!-- Define the status bar style: default, black, or black-translucent -->*/}
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        {/*// <!-- Provide a title for the home screen icon -->*/}
+        <meta name="apple-mobile-web-app-title" content="Your App Name" />
+
         <link rel="icon" href={siteConfig.icon} />
       </Head>
 

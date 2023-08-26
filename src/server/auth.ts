@@ -6,15 +6,16 @@
  */
 import { PlatformType } from ".prisma/client"
 import { type GetServerSidePropsContext } from "next"
-import EmailProvider from "next-auth/providers/email"
-
+import { type NextAuthOptions, type User as NextAuthUser, getServerSession } from "next-auth"
 import DiscordProvider from "next-auth/providers/discord"
+import EmailProvider from "next-auth/providers/email"
 import GithubProvider from "next-auth/providers/github"
 
-import { getServerSession, type NextAuthOptions, type User as NextAuthUser } from "next-auth"
-import { pokettoPrismaAdapter } from "@/lib/db"
 import { env } from "@/env.mjs"
-import { allowDangerousEmailAccountLinking, URI } from "@/config"
+
+import { URI, allowDangerousEmailAccountLinking } from "@/config"
+
+import { pokettoPrismaAdapter } from "@/lib/db"
 import { emailFrom, sendVerificationRequest } from "@/lib/email"
 
 /**
@@ -134,4 +135,5 @@ export const authOptions: NextAuthOptions = {
  *
  * @see https://next-auth.js.org/configuration/nextjs
  */
-export const getServerAuthSession = (ctx: { req: GetServerSidePropsContext["req"]; res: GetServerSidePropsContext["res"] }) => getServerSession(ctx.req, ctx.res, authOptions)
+export const getServerAuthSession = (ctx: { req: GetServerSidePropsContext["req"]; res: GetServerSidePropsContext["res"] }) =>
+  getServerSession(ctx.req, ctx.res, authOptions)

@@ -70,7 +70,7 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
   const productLogo = (
     <Link className="p-btn-horizontal w-fit shrink-0" href="/">
       <Icons.Product />
-      <span className="whitespace-nowrap text-lg tracking-widest">{siteConfig.name}</span>
+      <span className="hidden md:flex whitespace-nowrap text-lg tracking-widest">{siteConfig.name}</span>
     </Link>
   )
   return withCompany ? (

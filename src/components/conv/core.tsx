@@ -26,6 +26,8 @@ import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 
+import { useAppStore } from "@/store"
+
 import { contentStyleBasedOnRole } from "@/config-utils"
 
 import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
@@ -78,19 +80,27 @@ export function ConversationCore({ cid }: { cid: string }) {
       void utils.conv.get.invalidate()
     },
   })
-  const { ref, toggle, fullscreen } = useFullscreen()
+
+  const { switchFullscreen, fullscreen } = useAppStore()
+  const { ref, toggle } = useFullscreen()
+  const toggleAll = () => {
+    void toggle()
+    switchFullscreen()
+  }
 
   if (!c) return <Loading />
 
   return (
-    <div className={clsx("flex h-full w-full flex-col items-center", "overflow-hidden ")} ref={ref}>
-      <div className={clsx("flex h-full w-full max-w-[1080px] flex-col  !backdrop-blur-lg", "overflow-hidden")}>
-        <div className={clsx("flex w-full items-center justify-between gap-4  bg-muted px-0 py-5 overflow-hidden")}>
+    <div className={clsx("flex h-full w-full flex-col items-center overflow-hidden ")} ref={ref}>
+      <div className={clsx("flex h-full w-full max-w-[1080px] flex-col overflow-hidden")}>
+        <div className={clsx("flex w-full items-center justify-between gap-4 bg-muted px-2 py-5 overflow-hidden")}>
           {fullscreen ? <LogoWithName /> : <div />}
           <h2 className="truncate text-center">{c.app.name}</h2>
 
           {fullscreen ? (
-            <span className="text-muted-foreground px-4">ESC to exit</span>
+            <IconContainer onClick={toggleAll}>
+              <ExitFullScreenIcon />
+            </IconContainer>
           ) : (
             <Popover>
               <PopoverTrigger className="shrink-0">
@@ -99,7 +109,7 @@ export function ConversationCore({ cid }: { cid: string }) {
                 </IconContainer>
               </PopoverTrigger>
               <PopoverContent className="flex flex-col gap-2">
-                <Button variant="ghost" onClick={toggle} className="flex w-full justify-between">
+                <Button variant="ghost" onClick={toggleAll} className="flex w-full justify-between">
                   <span>{fullscreen ? "窗口模式" : "全屏模式"}</span>
                   {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
                 </Button>
