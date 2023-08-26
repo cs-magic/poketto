@@ -6,11 +6,11 @@
  */
 import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
-// import { Icons } from "@/components/icons"
 import {
   DashboardIcon,
   EnvelopeOpenIcon,
   GearIcon,
+  HandIcon,
   HomeIcon,
   LightningBoltIcon,
   MixIcon,
@@ -74,7 +74,7 @@ export const navs: { [key in NavKey]: INavItem } = {
   waitlist: {
     title: "Join Platform Waitlist",
     link: URI.user.seek.waitlist,
-    Icon: LightningBoltIcon,
+    Icon: HandIcon,
   },
   enterprise: {
     title: "poketto enterprise",
