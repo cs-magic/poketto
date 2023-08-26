@@ -27,7 +27,7 @@ export default function HomePage() {
   return (
     <RootLayout>
       <div className="h-full w-full overflow-auto">
-        sss aaa ssc sxs
+        sss aaa ssc sxs sxs xsxa xsxa
         <RecentConversations />
         <ExploreAppsWidget />
       </div>
