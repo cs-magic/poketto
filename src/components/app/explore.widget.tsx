@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ArrowRightIcon } from "@radix-ui/react-icons"
-import _ from "lodash"
+import range from "lodash/range"
+// import _ from "lodash"
+import sampleSize from "lodash/sampleSize"
 import Link from "next/link"
 
 import { URI } from "@/config"
@@ -48,7 +50,7 @@ export function ExploreAppsWidget() {
         <div className="flex w-full flex-col divide-y">
           {apps &&
             apps.length >= limit &&
-            _.sampleSize(_.range(limit), 3).map((i) => (
+            sampleSize(range(limit), 3).map((i) => (
               <AppDialogContainer appId={apps[i]!.id} key={i}>
                 <AppHorizontalCardView app={apps[i]} key={i} />
               </AppDialogContainer>

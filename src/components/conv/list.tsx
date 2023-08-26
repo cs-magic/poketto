@@ -4,24 +4,29 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { type PropsWithChildren, useState } from "react"
-import _ from "lodash"
+// import _ from "lodash"
 import { useDebouncedValue } from "@mantine/hooks"
+import orderBy from "lodash/orderBy"
 import { XIcon } from "lucide-react"
 import Link from "next/link"
-import { api } from "@/lib/api"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { type PropsWithChildren, useState } from "react"
+
 import { type ConvForListView } from "@/ds"
-import { useMustache } from "@/hooks/use-mustache"
-import { useUserId } from "@/hooks/use-user"
-import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
-import clsx from "@/lib/clsx"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import d from "@/lib/datetime"
+
 import { AppDialogContainer } from "@/components/app/container"
 import { SearchResultView } from "@/components/app/search-result.view"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
+
+import { useMustache } from "@/hooks/use-mustache"
+import { useUserId } from "@/hooks/use-user"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
+import d from "@/lib/datetime"
+import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
 
 export function ConversationList() {
   const { data: convs } = api.conv.list.useQuery()
@@ -34,7 +39,7 @@ export function ConversationList() {
     {
       enabled: toSearch !== "",
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
-    },
+    }
   )
   const searchedApps = queryApps.data?.pages.flatMap((item) => item.items) ?? []
 
@@ -78,7 +83,7 @@ export function ConversationList() {
         ) : (
           <>
             <SectionTitle>Poketto Apps</SectionTitle>
-            {_.orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
+            {orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
               <ConversationListView key={c.appId} c={c} />
             ))}
           </>

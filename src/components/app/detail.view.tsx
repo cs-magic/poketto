@@ -5,9 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
-import { platform } from "@floating-ui/dom"
-import { StarFilledIcon, StarIcon, SymbolIcon } from "@radix-ui/react-icons"
-import _ from "lodash"
+import { SymbolIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import numeral from "numeral"
@@ -29,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
@@ -41,12 +39,11 @@ import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
-import { getConversationLink, getConversationsLink, getFlowgptUserLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
 
-import { FLOWGPT_HOMEPAGE } from "@/const"
+import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
 import validator = Prisma.validator
-import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
 export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
   const userId = useUserId()

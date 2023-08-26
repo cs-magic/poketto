@@ -6,7 +6,9 @@
  */
 import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
-import _ from "lodash"
+// import { capitalize, startCase } from "lodash"
+import capitalize from "lodash/capitalize"
+import startCase from "lodash/startCase"
 import Image from "next/image"
 import React, { Fragment, useEffect, useState } from "react"
 import { Carousel } from "react-responsive-carousel"
@@ -79,7 +81,7 @@ export default function ExplorePage() {
 
                   <IconContainer className={clsx(sortOrder === order && "text-primary")}>
                     <ResponsiveTooltip
-                      content={_.startCase(_.capitalize(order))}
+                      content={startCase(capitalize(order))}
                       onClick={() => {
                         setSortOrder(order)
                       }}

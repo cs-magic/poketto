@@ -4,11 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import _ from "lodash"
+// import _ from "lodash"
+import { ChatMessageFormatType } from ".prisma/client"
 import { PlatformType, PromptRoleType } from "@prisma/client"
-import { ChatMessageFormatType, type User as PrismaUser } from ".prisma/client"
+import range from "lodash/range"
 import { type AdapterUser } from "next-auth/adapters"
+
 import { type ExtendedPrismaClient } from "@/server/db"
+
 import {
   POKETTO_APP_AVATAR,
   POKETTO_APP_DESC,
@@ -27,7 +30,7 @@ import {
   POKETTO_WELCOME_MESSAGE,
   USER_INVITATIONS_COUNT,
 } from "@/config"
-import log from "@/lib/log"
+
 import { getWelcomeSystemNotification } from "@/lib/string"
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
@@ -147,7 +150,7 @@ export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterU
       },
       invitedFrom: {
         createMany: {
-          data: _.range(USER_INVITATIONS_COUNT).map(() => ({})),
+          data: range(USER_INVITATIONS_COUNT).map(() => ({})),
         },
       },
     },

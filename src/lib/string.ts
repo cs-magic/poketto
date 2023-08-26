@@ -5,9 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import hash from "js-sha1"
-import { capitalize } from "lodash"
-
-import { FLOWGPT_IMAGE_DIR } from "@/config"
+import capitalize from "lodash/capitalize"
 
 import { type IMAGE_SIZE } from "@/ds"
 

@@ -15,7 +15,8 @@ import {
   QuestionMarkCircledIcon,
   SunIcon,
 } from "@radix-ui/react-icons"
-import _ from "lodash"
+import groupBy from "lodash/groupBy"
+// import _ from "lodash"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import React, { Fragment } from "react"
@@ -173,7 +174,7 @@ function CommandDemo() {
             </div>
           </CommandGroup>
 
-          {Object.entries(_.groupBy(COMMANDS, "category")).map(([cat, items]) => (
+          {Object.entries(groupBy(COMMANDS, "category")).map(([cat, items]) => (
             <Fragment key={cat}>
               <CommandSeparator />
               <CommandGroup heading={cat} key={cat}>

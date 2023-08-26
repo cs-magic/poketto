@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { DotsVerticalIcon } from "@radix-ui/react-icons"
-import _ from "lodash"
+// import _ from "lodash"
+import capitalize from "lodash/capitalize"
+import startCase from "lodash/startCase"
 import Image from "next/image"
 
 import { type AppForListView, CardsLayoutType, type SortOrder } from "@/ds"
@@ -46,7 +48,7 @@ export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForLis
       {/* header desc */}
       <div className="| absolute top-0 flex w-full justify-between p-4">
         <div className="flex items-center gap-2">
-          {app.tags.length && <Badge variant="destructive">{_.startCase(_.capitalize(app.tags[0]?.name))}</Badge>}
+          {app.tags.length && <Badge variant="destructive">{startCase(capitalize(app.tags[0]?.name))}</Badge>}
         </div>
         <DotsVerticalIcon className="hidden group-hover:flex" />
       </div>

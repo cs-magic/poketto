@@ -25,6 +25,8 @@
     "jsx": "preserve",
     "incremental": true,
     "noUncheckedIndexedAccess": true,
+//    for lodash partial import
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
