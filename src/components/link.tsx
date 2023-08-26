@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-// import _ from "lodash"
 import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
 import Link from "next/link"

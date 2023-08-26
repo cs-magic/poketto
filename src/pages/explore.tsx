@@ -6,7 +6,6 @@
  */
 import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
-// import { capitalize, startCase } from "lodash"
 import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
 import Image from "next/image"

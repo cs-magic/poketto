@@ -16,7 +16,6 @@ import {
   SunIcon,
 } from "@radix-ui/react-icons"
 import groupBy from "lodash/groupBy"
-// import _ from "lodash"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import React, { Fragment } from "react"

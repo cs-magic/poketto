@@ -4,10 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React from "react"
-
 import { useElementSize } from "@mantine/hooks"
-import { ChevronDownIcon, Pencil2Icon, SymbolIcon } from "@radix-ui/react-icons"
+import { ChevronDownIcon, Pencil2Icon } from "@radix-ui/react-icons"
+import React from "react"
 
 import { MAX_MOBILE_WIDTH } from "@/config"
 
@@ -16,6 +15,7 @@ import { type NextPageWithAuth } from "@/ds"
 import { RootLayout } from "@/layouts/root.layout"
 
 import { AppPlainListView } from "@/components/app/plain.view"
+import { Loading } from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { UserProfile } from "@/components/user/profile.view"
@@ -34,11 +34,11 @@ export const DashboardPage: NextPageWithAuth = () => {
   return (
     <RootLayout>
       <div className="grid grid-cols-1 gap-4 overflow-auto p-4 md:grid-cols-2">
-        {!userProfile ? <SymbolIcon /> : <UserProfile user={userProfile} />}
+        {!userProfile ? <Loading /> : <UserProfile user={userProfile} />}
 
         <div className="flex flex-col gap-2">
           <ConversationsToolView />
-          {!convs ? <SymbolIcon /> : convs.map((c) => <AppPlainListView app={c.app} key={c.appId} />)}
+          {!convs ? <Loading /> : convs.map((c) => <AppPlainListView app={c.app} key={c.appId} />)}
         </div>
       </div>
     </RootLayout>

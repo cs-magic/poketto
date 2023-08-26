@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
-import { SymbolIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import numeral from "numeral"
@@ -17,6 +16,7 @@ import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS
 import { platformMap } from "@/config-utils"
 
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
+import { Loading } from "@/components/loading"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,12 +49,10 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
   const userId = useUserId()
   const { data: app, error: appError } = api.app.get.useQuery({ appId })
 
-  if (app === undefined) {
-    return <SymbolIcon />
-  }
-  if (appError) {
-    return null
-  } // toast.error(appError.message) // 已经在 lib/api 里handle了
+  if (app === undefined) return <Loading />
+
+  // toast.error(appError.message) // 已经在 lib/api 里handle了
+  if (appError) return null
 
   return (
     <div className="flex h-full w-full flex-col gap-2 overflow-auto p-2">

@@ -16,7 +16,6 @@ import {
   ExitFullScreenIcon,
   HamburgerMenuIcon,
   Link2Icon,
-  SymbolIcon,
 } from "@radix-ui/react-icons"
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
@@ -35,6 +34,7 @@ import { LogoWithName } from "@/layouts/navbar"
 
 import { AppDialogContainer } from "@/components/app/container"
 import { AutoScrollContainer, IconContainer } from "@/components/containers"
+import { Loading } from "@/components/loading"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,9 +80,7 @@ export function ConversationCore({ cid }: { cid: string }) {
   })
   const { ref, toggle, fullscreen } = useFullscreen()
 
-  if (!c) {
-    return <SymbolIcon />
-  }
+  if (!c) return <Loading />
 
   return (
     <div className={clsx("flex h-full w-full flex-col items-center", "overflow-hidden ")} ref={ref}>

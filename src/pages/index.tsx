@@ -26,8 +26,7 @@ import { getConversationLink } from "@/lib/string"
 export default function HomePage() {
   return (
     <RootLayout>
-      <div className="h-full w-full overflow-auto">
-        sss aaa ssc sxs sxs xsxa xsxa
+      <div className="h-full w-full overflow-auto | flex flex-col">
         <RecentConversations />
         <ExploreAppsWidget />
       </div>

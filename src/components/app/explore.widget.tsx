@@ -6,7 +6,6 @@
  */
 import { ArrowRightIcon } from "@radix-ui/react-icons"
 import range from "lodash/range"
-// import _ from "lodash"
 import sampleSize from "lodash/sampleSize"
 import Link from "next/link"
 
@@ -14,6 +13,7 @@ import { URI } from "@/config"
 
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
 import { AppDialogContainer } from "@/components/app/container"
+import { Loading } from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -33,7 +33,7 @@ export function ExploreAppsWidget() {
   // console.log({ apps })
 
   return (
-    <Card id="explore" variant="ghost" className="w-full grow">
+    <Card id="explore" variant="ghost" className="w-full grow | flex flex-col">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
           <CardTitle>Explore trending apps</CardTitle>
@@ -46,15 +46,18 @@ export function ExploreAppsWidget() {
         </div>
       </CardHeader>
 
-      <CardContent className="flex w-full justify-between">
-        <div className="flex w-full flex-col divide-y">
-          {apps &&
+      <CardContent className="w-full grow | flex justify-between">
+        <div className="w-full h-full | flex flex-col divide-y">
+          {!apps ? (
+            <Loading />
+          ) : (
             apps.length >= limit &&
             sampleSize(range(limit), 3).map((i) => (
               <AppDialogContainer appId={apps[i]!.id} key={i}>
                 <AppHorizontalCardView app={apps[i]} key={i} />
               </AppDialogContainer>
-            ))}
+            ))
+          )}
         </div>
       </CardContent>
     </Card>

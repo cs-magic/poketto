@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { DotsVerticalIcon } from "@radix-ui/react-icons"
-// import _ from "lodash"
 import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
 import Image from "next/image"
