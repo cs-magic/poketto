@@ -47,7 +47,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       setIsLoading(false)
 
       console.log("signInResult: ", { signInResult })
-      if (!signInResult?.ok) {
+      if (!signInResult?.ok || signInResult.error !== null) {
         return toast({
           title: "Something went wrong.",
           description: "Your sign in request failed. Please try again.",
