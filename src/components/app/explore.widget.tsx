@@ -4,10 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { ArrowRightIcon } from "@radix-ui/react-icons"
 import _ from "lodash"
 import Link from "next/link"
-
-import { ArrowRightIcon } from "@radix-ui/react-icons"
 
 import { URI } from "@/config"
 
@@ -29,7 +28,7 @@ export function ExploreAppsWidget() {
   )
   const apps = query.data?.pages.flatMap((item) => item.items)
 
-  console.log({ apps })
+  // console.log({ apps })
 
   return (
     <Card id="explore" variant="ghost" className="w-full grow">

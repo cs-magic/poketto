@@ -17,15 +17,18 @@ import {
   SymbolIcon,
 } from "@radix-ui/react-icons"
 import Link from "next/link"
-import { api } from "@/lib/api"
-import clsx from "@/lib/clsx"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { getConversationsLink } from "@/lib/string"
+
+import { LogoWithName } from "@/layouts/navbar"
+
 import { AppDialogContainer } from "@/components/app/container"
 import { ConversationInput } from "@/components/conv/input"
-import { LogoWithName } from "@/layouts/navbar"
+import { Button } from "@/components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
+import { getConversationsLink } from "@/lib/string"
 
 export function ConversationMain({ cid }: { cid: string }) {
   const { data: c } = api.conv.get.useQuery({ id: cid })
@@ -39,7 +42,9 @@ export function ConversationMain({ cid }: { cid: string }) {
   })
   const { ref, toggle, fullscreen } = useFullscreen()
 
-  if (!c) {return <SymbolIcon />}
+  if (!c) {
+    return <SymbolIcon />
+  }
 
   return (
     <div className={clsx("flex h-full w-full flex-col items-center", "overflow-hidden ")} ref={ref}>
@@ -56,7 +61,7 @@ export function ConversationMain({ cid }: { cid: string }) {
                 <DotsVerticalIcon />
               </PopoverTrigger>
               <PopoverContent className="flex flex-col gap-2">
-                <Button variant="ghost" onClick={toggle} className="hidden w-full justify-between md:flex">
+                <Button variant="ghost" onClick={toggle} className="flex w-full justify-between">
                   <span>{fullscreen ? "窗口模式" : "全屏模式"}</span>
                   {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
                 </Button>
@@ -75,11 +80,7 @@ export function ConversationMain({ cid }: { cid: string }) {
 
                 <Separator orientation="horizontal" className="xl:hidden" />
 
-                <Button
-                  className="justify-between"
-                  variant="ghost"
-                  onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}
-                >
+                <Button className="justify-between" variant="ghost" onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}>
                   {c.pinned ? (
                     <>
                       <span>Unpin</span>

@@ -13,15 +13,15 @@ import { type RootRouter } from "@/server/trpc.router"
 import { URI } from "@/config"
 
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") {return ""} // browser should use relative url
-  if (process.env.VERCEL_URL) {return `https://${process.env.VERCEL_URL}`} // SSR should use vercel url
+  if (typeof window !== "undefined") { return "" } // browser should use relative url
+  if (process.env.VERCEL_URL) { return `https://${process.env.VERCEL_URL}` } // SSR should use vercel url
   return `http://localhost:${process.env.PORT ?? 3000}` // dev SSR should use localhost
 }
 
 function handleUnauthorizedErrorsOnClient(error: unknown): boolean {
-  if (typeof window === "undefined") {return false}
-  if (!(error instanceof TRPCClientError)) {return false}
-  if (error.data?.code !== "UNAUTHORIZED") {return false}
+  if (typeof window === "undefined") { return false }
+  if (!(error instanceof TRPCClientError)) { return false }
+  if (error.data?.code !== "UNAUTHORIZED") { return false }
 
   console.warn("Redirecting to /sign-in since user is not authorized")
   toast.error("Redirecting to /sign-in since user is not authorized")
@@ -45,10 +45,13 @@ export const api = createTRPCNext<RootRouter>({
             refetchOnWindowFocus: false,
             refetchOnmount: false,
             refetchOnReconnect: false,
+
+            networkMode:
+              process.env.NODE_ENV === "development" ? "always" : "online",
             // notifyOnChangeProps: "tracked",
 
             retry: (failureCount, error) => {
-              if (handleUnauthorizedErrorsOnClient(error)) {return false}
+              if (handleUnauthorizedErrorsOnClient(error)) { return false }
               return failureCount < 0 // ref: https://github.com/trpc/trpc/discussions/2036#discussioncomment-4722528
             },
             // 这里可以获得从 server 拿过来的 error，然后在客户端反馈，因此可以在这里用 toast
