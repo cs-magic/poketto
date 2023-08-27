@@ -48,7 +48,7 @@ export function ConversationList() {
       <div className="relative w-full">
         <Input
           value={searchKey}
-          placeholder="Search: Title / Description / Init Prompt"
+          placeholder="搜索: 标题 / 描述 / Prompt"
           className="mx-auto my-2 w-[95%] rounded-2xl bg-accent"
           onChange={(event) => {
             setSearchKey(event.currentTarget.value)

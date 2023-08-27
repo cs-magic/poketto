@@ -36,10 +36,10 @@ export function ExploreAppsWidget() {
     <Card id="explore" variant="ghost" className="w-full grow | flex flex-col">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>Explore trending apps</CardTitle>
+          <CardTitle>探索当下最流行的 Apps</CardTitle>
           <Link href={URI.app.explore}>
             <Button variant="link" className="| flex h-fit items-center gap-2 py-0 text-xs">
-              <span>Explore all</span>
+              <span>探索全部</span>
               <ArrowRightIcon />
             </Button>
           </Link>

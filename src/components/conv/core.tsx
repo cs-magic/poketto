@@ -20,7 +20,7 @@ import {
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
@@ -33,8 +33,9 @@ import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
 import { LogoWithName } from "@/layouts/navbar"
 
 import { AppDialogContainer } from "@/components/app/container"
-import { AutoScrollContainer, IconContainer } from "@/components/containers"
+import { AutoScrollContainer, ChargeContainer, IconContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
+import StripePricingTable from "@/components/stripe/pricing-table"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +50,7 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
@@ -61,6 +63,8 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
 import { getConversationsLink } from "@/lib/string"
+
+import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
 
 type AllMessage =
   | SelectChatMessageForListView
@@ -155,6 +159,7 @@ export function ConversationCore({ cid }: { cid: string }) {
 export function ConversationInput({ cid }: { cid: string }) {
   const userId = useUserId()
   const user = useSessionUser()
+  const { data: balanceOk } = api.user.validateBalance.useQuery({ id: userId })
   const { data: conv } = api.conv.get.useQuery({ id: cid })
   const { data: hasApp } = api.conv.has.useQuery({ appId: conv?.appId ?? "" }, { enabled: !!conv })
   const { data: initialMessages } = api.message.list.useQuery({ conversationId: cid }, { enabled: !!userId })
@@ -164,6 +169,7 @@ export function ConversationInput({ cid }: { cid: string }) {
   const refMessage = useRef<string>("")
   // console.log({ userId, appId, conversationId })
   const ScrollContainer = AutoScrollContainer
+  const [alertVisible, setAlertVisible] = useState(false)
 
   const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages: [],
@@ -234,6 +240,27 @@ export function ConversationInput({ cid }: { cid: string }) {
 
   return (
     <div className={clsx("relative  h-full w-full", "flex  flex-col", "overflow-hidden")}>
+      <Dialog>
+        <AlertDialog open={alertVisible} onOpenChange={setAlertVisible}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>账号提醒</AlertDialogTitle>
+              <AlertDialogDescription>哎呀，您的账户余额不足啦，请确认充值才能继续使用哦！</AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>取消</AlertDialogCancel>
+              <DialogTrigger>
+                <AlertDialogAction>确认</AlertDialogAction>
+              </DialogTrigger>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <DialogContent className="w-full max-w-[1080px] max-h-[80vh] overflow-auto">
+          <StripePricingTable />
+        </DialogContent>
+      </Dialog>
+
       {addDialogVisible && conv && <AddAppAlertDialog app={conv.app} />}
 
       <ScrollContainer>
@@ -247,10 +274,13 @@ export function ConversationInput({ cid }: { cid: string }) {
         ref={refForm}
         className={clsx("w-full gap-2 p-4", "flex items-center justify-center")}
         onSubmit={(event) => {
-          console.log({ hasApp })
+          event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
+          console.log({ hasApp, balanceOk })
           if (!hasApp) {
-            event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
             return setAddDialogVisible(true)
+          }
+          if (!balanceOk) {
+            return setAlertVisible(true)
           }
           handleSubmit(event)
         }}

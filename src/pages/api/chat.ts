@@ -6,6 +6,8 @@
  */
 import { Prisma, PromptRoleType } from ".prisma/client"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
+import { Ratelimit } from "@upstash/ratelimit"
+import { kv } from "@vercel/kv"
 import { type Message, StreamingTextResponse } from "ai"
 import { ChatOpenAI } from "langchain/chat_models/openai"
 import { PromptTemplate } from "langchain/prompts"
@@ -15,21 +17,23 @@ import superjson from "superjson"
 
 import { type RootRouter } from "@/server/trpc.router"
 
+import { env } from "@/env.mjs"
+
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 
 // allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
-import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
 import { nanoid } from "@/lib/id"
 
+import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge
 
 export default async function handler(req: Request, res: Response) {
-  /**
-   * 1. 先存储用户的消息，谨防丢失
-   */
+  const data = await req.json()
+  const { messages, conversationId, userId } = data
+
   const proxy = createTRPCProxyClient<RootRouter>({
     links: [
       // loggerLink(),
@@ -37,9 +41,17 @@ export default async function handler(req: Request, res: Response) {
     ],
     transformer: superjson,
   })
-
-  const data = await req.json()
-  const { messages, conversationId, userId } = data
+  /**
+   * validate balance
+   */
+  const balanceOk = await proxy.user.validateBalance.query({ id: userId })
+  if (!balanceOk)
+    return new Response(ERR_MSG_BALANCE_NOT_ENOUGH, {
+      status: 406,
+    })
+  /**
+   * 1. 先存储用户的消息，谨防丢失
+   */
 
   // console.log("req: ", { data })
   const pushMessage = async (msg: Message) => {
@@ -59,8 +71,26 @@ export default async function handler(req: Request, res: Response) {
   /**
    * 2. 检查频率等相关
    */
-  if (await validateRequest(req)) {
-    return
+  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+    const ip = req.headers.get("x-forwarded-for")
+    const ratelimit = new Ratelimit({
+      redis: kv,
+      // rate limit to 1 requests per 20 seconds
+      limiter: Ratelimit.slidingWindow(3, "10s"),
+    })
+
+    const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
+
+    if (!success) {
+      return new Response("Hey man, you are too fast! Please slow down!", {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "X-RateLimit-Reset": reset.toString(),
+        },
+      })
+    }
   }
 
   /**

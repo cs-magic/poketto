@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ChatMessageFormatType } from ".prisma/client"
+import { $Enums, ChatMessageFormatType } from ".prisma/client"
 import { PlatformType, PromptRoleType } from "@prisma/client"
 import range from "lodash/range"
 import { type AdapterUser } from "next-auth/adapters"
@@ -31,6 +31,8 @@ import {
 } from "@/config"
 
 import { getWelcomeSystemNotification } from "@/lib/string"
+
+import StripeMode = $Enums.StripeMode
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
   const result = await prisma.user.upsert({
@@ -96,7 +98,42 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       },
     },
   })
+  await prisma.stripeProduct.upsert({
+    where: { id: "prod_OVgbKpNEmJJXIy" },
+    update: {},
+    create: {
+      id: "prod_OVgbKpNEmJJXIy",
+      price: 10,
+      currency: "USD",
+      mode: StripeMode.payment,
+    },
+  })
+  await prisma.stripeProduct.upsert({
+    where: { id: "prod_OVgYAVpLO6oLje" },
+    update: {},
+    create: {
+      id: "prod_OVgYAVpLO6oLje",
+      price: 9.99,
+      currency: "USD",
+      mode: StripeMode.subscription,
+      expire: 30,
+      level: "premium",
+    },
+  })
+  await prisma.stripeProduct.upsert({
+    where: { id: "prod_OVgZnKD7Fc2bsQ" },
+    update: {},
+    create: {
+      id: "prod_OVgZnKD7Fc2bsQ ",
+      price: 29.99,
+      currency: "USD",
+      mode: StripeMode.subscription,
+      expire: 30,
+      level: "extreme",
+    },
+  })
   console.log("✅ Successfully initialized poketto system ~")
+
   return result
 }
 

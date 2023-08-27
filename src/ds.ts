@@ -11,7 +11,6 @@ import type { Session } from "next-auth"
 import type { AppProps } from "next/app"
 import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 
-
 import AppGetPayload = Prisma.AppGetPayload
 import AppSelect = Prisma.AppSelect
 import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
@@ -66,6 +65,12 @@ export const sortOrders = [
 ] as const
 
 export type SortOrder = (typeof sortOrders)[number]
+
+export const orderTitle: Record<SortOrder, string> = {
+  mostViewed: "最多浏览",
+  mostUsed: "最多使用",
+  new: "最新发布",
+}
 
 // -----------------------------------------------------------------------------
 // models
@@ -180,7 +185,7 @@ export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeo
 
 export interface INavItem {
   title: string
-  link: string
+  link?: string
   Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
 }
 

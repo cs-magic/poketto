@@ -6,7 +6,17 @@
  */
 import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
-import { DashboardIcon, EnvelopeOpenIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
+import {
+  BellIcon,
+  DashboardIcon,
+  EnvelopeOpenIcon,
+  GearIcon,
+  HandIcon,
+  HomeIcon,
+  MixIcon,
+  RocketIcon,
+  TargetIcon,
+} from "@radix-ui/react-icons"
 
 import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
 
@@ -42,27 +52,27 @@ export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {
 }
 export const navs: { [key in NavKey]: INavItem } = {
   home: {
-    title: "home",
+    title: "首页",
     link: URI.app.home,
     Icon: HomeIcon,
   },
   explore: {
-    title: "explore",
+    title: "探索",
     link: URI.app.explore,
     Icon: RocketIcon,
   },
   dashboard: {
-    title: "dashboard",
+    title: "我的空间",
     link: URI.user.dashboard,
     Icon: MixIcon,
   },
   gallery: {
-    title: "gallery",
+    title: "我的画廊",
     link: URI.user.gallery,
     Icon: TargetIcon,
   },
   waitlist: {
-    title: "Join Platform Waitlist",
+    title: "反馈",
     link: URI.user.seek.waitlist,
     Icon: HandIcon,
   },
@@ -72,20 +82,20 @@ export const navs: { [key in NavKey]: INavItem } = {
     Icon: EnvelopeOpenIcon,
   },
   whatsPoketto: {
-    title: "What's Poketto.AI ?",
+    title: "什么是 Poketto.AI ?",
     link: URI.app.docs.intro,
   },
   whatsDora: {
-    title: "What's Dora ?",
+    title: "什么是 Dora ?",
     link: URI.app.docs.currency,
   },
   learningCenter: {
-    title: "Learning Center",
+    title: "文档/教程",
     link: URI.app.docs.learn,
   },
-  supportCenter: {
-    title: "Support Center",
-    link: URI.app.docs.support,
+  charge: {
+    title: "账号充值",
+    Icon: BellIcon,
   },
 }
 

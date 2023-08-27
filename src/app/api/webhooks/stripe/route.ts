@@ -7,10 +7,11 @@
 import { headers } from "next/headers"
 import type Stripe from "stripe"
 
+import { prisma } from "@/server/db"
+
 import { env } from "@/env.mjs"
 
 import { stripe } from "@/lib/stripe"
-
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -35,10 +36,30 @@ export async function POST(req: Request) {
 
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
     for (const item of lineItems.data) {
-      const productID = item.price?.product as string // get the product ID
+      const productId = item.price?.product as string // get the product ID
       const { quantity } = item // get the quantity
+      const count = quantity ?? 1
 
-      console.log({ productID, quantity })
+      console.log({ productId, count })
+
+      await prisma.user.update({
+        where: { id: userId },
+        include: {
+          stripePayments: true,
+        },
+        data: {
+          balance: {
+            increment: count * 1000, // 10 刀 --> 1000 dora
+          },
+          stripePayments: {
+            create: {
+              id: session.id,
+              productId,
+              count,
+            },
+          },
+        },
+      })
     }
 
     // todo: different modes

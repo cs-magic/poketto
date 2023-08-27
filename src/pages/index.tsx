@@ -22,7 +22,6 @@ import { useSessionUser } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import { getConversationLink, getConversationsLink } from "@/lib/string"
 
-
 export default function HomePage() {
   return (
     <RootLayout>
@@ -42,10 +41,10 @@ export function RecentConversations() {
     <Card id="recent-apps" variant="ghost" className="w-full">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>Recently used apps</CardTitle>
+          <CardTitle>最近使用的 Apps</CardTitle>
           {user && (
             <Link href={getConversationsLink(user.id)} className="h-fit | flex items-center gap-2 py-0 text-xs text-primary">
-              <span>See all</span>
+              <span>查看全部</span>
               <ArrowRightIcon />
             </Link>
           )}

@@ -14,13 +14,12 @@ import { type INavItem } from "@/ds"
 import { ResponsiveTooltip } from "@/components/containers"
 
 export function SidebarNavItem({ Icon, link, title }: INavItem) {
-  return (
-    <Link href={link ?? `/${title}`}>
-      <ResponsiveTooltip content={title ?? startCase(capitalize(title))}>
-        {Icon && <Icon className="wh-12 p-btn-horizontal" />}
-      </ResponsiveTooltip>
-    </Link>
+  const inner = (
+    <ResponsiveTooltip content={title ?? startCase(capitalize(title))}>
+      {Icon && <Icon className="wh-12 p-btn-horizontal" />}
+    </ResponsiveTooltip>
   )
+  return link ? <Link href={link}>{inner}</Link> : inner
 }
 
 export function FooterNavItem({ title, link, Icon }: INavItem) {

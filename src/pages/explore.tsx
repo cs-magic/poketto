@@ -17,7 +17,7 @@ import { useAppStore } from "@/store"
 import { CAROUSELS } from "@/config"
 
 import type { SortOrder } from "@/ds"
-import { CardsLayoutType, sortOrders } from "@/ds"
+import { CardsLayoutType, orderTitle, sortOrders } from "@/ds"
 
 import { RootLayout } from "@/layouts/root.layout"
 
@@ -32,10 +32,9 @@ import { Separator } from "@/components/ui/separator"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
-
 export default function ExplorePage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("mostViewed")
-  const [language, setLanguage] = useState<string>("all")
+  const [language, setLanguage] = useState<string>("zh")
   const { cardsLayout } = useAppStore()
   const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 
@@ -57,13 +56,14 @@ export default function ExplorePage() {
         <div className=" w-full px-2 | flex items-center gap-2 | whitespace-nowrap">
           <FrameIcon />
           <span>应用广场</span>
-          <Select onValueChange={setLanguage}>
+          <Select onValueChange={setLanguage} defaultValue={language}>
             <SelectTrigger className="w-24">
               <SelectValue placeholder="语言" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
-                <SelectItem value="all">All</SelectItem>
+              <SelectGroup className={"flex flex-col gap-2 py-2"}>
+                <SelectItem value="all">全部语言</SelectItem>
+                <Separator />
                 <SelectItem value="zh">中文</SelectItem>
                 <SelectItem value="en">English</SelectItem>
               </SelectGroup>
@@ -81,7 +81,7 @@ export default function ExplorePage() {
 
                   <IconContainer className={clsx(sortOrder === order && "text-primary")}>
                     <ResponsiveTooltip
-                      content={startCase(capitalize(order))}
+                      content={orderTitle[order]}
                       onClick={() => {
                         setSortOrder(order)
                       }}

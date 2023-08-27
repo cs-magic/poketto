@@ -101,17 +101,13 @@ export default function Navbar() {
       <CommandDemo />
 
       <div className="hidden items-center md:flex mx-2">
-        <ChargeContainer>
-          <IconContainer>
-            <LightningBoltIcon />
-          </IconContainer>
-        </ChargeContainer>
+        {/*<ChargeContainer>*/}
+        {/*  <IconContainer>*/}
+        {/*    <LightningBoltIcon />*/}
+        {/*  </IconContainer>*/}
+        {/*</ChargeContainer>*/}
 
         <ThemeSwitcher />
-
-        <IconContainer>
-          <BellIcon />
-        </IconContainer>
 
         <Popover>
           <PopoverTrigger>
@@ -121,11 +117,11 @@ export default function Navbar() {
           </PopoverTrigger>
 
           <PopoverContent>
-            <section className="flex flex-col">
+            <section className="flex flex-col gap-2">
               <SidebarNavItem {...navs.whatsPoketto} />
               <SidebarNavItem {...navs.whatsDora} />
               <SidebarNavItem {...navs.learningCenter} />
-              <SidebarNavItem {...navs.supportCenter} />
+              {/*<SidebarNavItem {...navs.supportCenter} />*/}
             </section>
           </PopoverContent>
         </Popover>

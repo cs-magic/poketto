@@ -11,16 +11,27 @@ import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
 import sortedUniqBy from "lodash/sortedUniqBy"
 import { ChatMessageUncheckedCreateInputSchema, ChatMessageWhereInputSchema } from "prisma/generated/zod"
+import { use } from "sswr"
 import { z } from "zod"
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
 
 import { DEFAULT_LATEST_COUNT } from "@/config"
 
-
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {
+    const { userId } = await prisma.conversation.findUniqueOrThrow({ where: { id: input.id } })
+    const ourToken = input.content.length / 1000
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        balance: {
+          decrement: ourToken,
+        },
+      },
+    })
+
     const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
       prisma: Prisma,
       tableName: "ChatMessage",

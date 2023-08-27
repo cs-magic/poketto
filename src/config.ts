@@ -75,7 +75,8 @@ export const navKeys = [
   "whatsPoketto",
   "whatsDora",
   "learningCenter",
-  "supportCenter",
+  // "supportCenter",
+  "charge",
 ] as const
 export type NavKey = (typeof navKeys)[number]
 

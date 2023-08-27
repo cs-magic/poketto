@@ -408,7 +408,7 @@ enum StripeMode {
 }
 
 enum StripeSubscriptionLevel {
-  premidum
+  premium
   extreme
 }
 
