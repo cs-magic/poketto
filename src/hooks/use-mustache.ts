@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import Mustache from "mustache"
+
 import { useSessionUser } from "@/hooks/use-user"
+
 
 export const useMustache = () => {
   const user = useSessionUser()

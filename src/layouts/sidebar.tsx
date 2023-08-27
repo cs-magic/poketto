@@ -26,6 +26,7 @@ import { useSessionUser } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
+
 export function InviteCard() {
   const { data = [] } = api.invitation.list.useQuery()
   // todo: include ? on enum type

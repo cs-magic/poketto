@@ -2,10 +2,9 @@
 
 import CustomDonationInput from "./CustomDonationInput"
 import StripeTestCards from "./StripeTestCards"
-import * as React from "react"
-
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import type { StripeError } from "@stripe/stripe-js"
+import * as React from "react"
 
 import * as config from "@/config"
 

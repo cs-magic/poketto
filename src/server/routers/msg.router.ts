@@ -17,6 +17,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 
 import { DEFAULT_LATEST_COUNT } from "@/config"
 
+
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {

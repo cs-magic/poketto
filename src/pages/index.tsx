@@ -20,8 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSessionUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
-import { todo } from "@/lib/helpers"
-import { getConversationLink, getConversationsLink, getUserLink } from "@/lib/string"
+import { getConversationLink, getConversationsLink } from "@/lib/string"
+
 
 export default function HomePage() {
   return (

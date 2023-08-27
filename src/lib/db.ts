@@ -4,11 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { type Adapter as NextAuthAdapter, type AdapterUser } from "next-auth/adapters"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { type PrismaClient } from "@prisma/client"
+import { type AdapterUser, type Adapter as NextAuthAdapter } from "next-auth/adapters"
+
 import { prisma } from "@/server/db"
 import { initUser } from "@/server/init"
+
 
 const { createUser: prismaCreateUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 
@@ -31,7 +33,7 @@ export const pokettoPrismaAdapter: NextAuthAdapter = {
         },
       },
     })
-    return (existed || await initUser(prisma, user)) as AdapterUser
+    return (existed || (await initUser(prisma, user))) as AdapterUser
   },
   ...adapterExtra,
 }

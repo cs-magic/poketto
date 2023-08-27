@@ -21,6 +21,7 @@ import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 import { validateRequest } from "@/lib/chat-plugins/rate-limit.plugin"
 import { nanoid } from "@/lib/id"
 
+
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
 export const runtime = "edge" // IMPORTANT! Set the runtime to edge

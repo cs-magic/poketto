@@ -4,15 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { z } from "zod"
 import { Prisma } from ".prisma/client"
-import { ConversationWhereUniqueInputSchema } from "prisma/generated/zod"
 import { ChatMessageFormatType } from "@prisma/client"
+import { ConversationWhereUniqueInputSchema } from "prisma/generated/zod"
+import { z } from "zod"
+
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc.helpers"
+
 import { includeConvForDetailView, selectAppForDetailView, selectConvForListView } from "@/ds"
+
 import { getWelcomeSystemNotification } from "@/lib/string"
+
+
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
-import ChatMessageCreateInput = Prisma.ChatMessageCreateInput
 
 export const convRouter = createTRPCRouter({
   /**
@@ -75,7 +79,8 @@ export const convRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => prisma.conversation.findMany({
+    }) =>
+      prisma.conversation.findMany({
         select: selectConvForListView,
         where: { userId: user.id },
       })
@@ -88,7 +93,8 @@ export const convRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => prisma.conversation.findUnique({
+    }) =>
+      prisma.conversation.findUnique({
         include: includeConvForDetailView,
         where: input,
       })
@@ -123,9 +129,8 @@ export const convRouter = createTRPCRouter({
         session: { user },
       },
       input,
-    }) => 
+    }) =>
       //   todo: validate in zod
-       prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
-    
+      prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
   ),
 })

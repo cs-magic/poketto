@@ -25,6 +25,7 @@ import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
+
 export const DashboardPage: NextPageWithAuth = () => {
   const userId = useUserId()!
   console.log("dashboard: ", { userId })

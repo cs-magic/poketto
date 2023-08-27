@@ -22,6 +22,7 @@ import clsx from "@/lib/clsx"
 
 import "@/styles/globals.css"
 
+
 export function reportWebVitals(metric) {
   console.log(metric)
 }

@@ -17,6 +17,7 @@ import { FooterNavItem } from "@/components/link"
 
 import { useMount } from "@/hooks/use-mount"
 
+
 export const Footer = () => (
   <footer className="w-full shrink-0 | grid grid-cols-4">
     <FooterNavItem {...navs.home} />

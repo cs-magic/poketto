@@ -9,7 +9,7 @@ import React from "react"
 
 import { env } from "@/env.mjs"
 
-import { useSessionUser, useUserId } from "@/hooks/use-user"
+import { useSessionUser } from "@/hooks/use-user"
 
 declare global {
   namespace JSX {

@@ -11,6 +11,7 @@ import { type IMAGE_SIZE } from "@/ds"
 
 import { FLOWGPT_HOMEPAGE } from "@/const"
 
+
 export const getShortName = (s: string, len: number = 2) =>
   s
     .split(/\s+/)

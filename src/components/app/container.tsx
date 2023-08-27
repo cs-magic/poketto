@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import React, { type PropsWithChildren, useState } from "react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 import { AppDetailView } from "@/components/app/detail.view"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 export function AppDialogContainer({ appId, children }: { appId: string } & PropsWithChildren) {
   const [open, setOpen] = useState(false)

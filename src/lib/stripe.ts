@@ -9,6 +9,7 @@ import Stripe from "stripe"
 
 import { env } from "@/env.mjs"
 
+
 const key = env.STRIPE_API_KEY
 console.log({ key })
 

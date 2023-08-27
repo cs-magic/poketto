@@ -24,6 +24,7 @@ import { UserProfile } from "@/components/user/profile.view"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
+
 export const DashboardPage: NextPageWithAuth = () => {
   const router = useRouter()
   const userId = router.query.id as string

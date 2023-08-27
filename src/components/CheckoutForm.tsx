@@ -4,17 +4,37 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 "use client"
 
 import React, { useState } from "react"
 
-import CustomDonationInput from "@/components/CustomDonationInput"
-import StripeTestCards from "@/components/StripeTestCards"
-
-import { formatAmountForDisplay } from "@/utils/stripe-helpers"
 import * as config from "@/config"
+
+import CustomDonationInput from "@/components/CustomDonationInput"
+
 import { createCheckoutSession } from "@/actions/stripe"
+import { formatAmountForDisplay } from "@/utils/stripe-helpers"
+
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 export default function CheckoutForm(): JSX.Element {
   const [loading] = useState<boolean>(false)

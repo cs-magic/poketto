@@ -5,9 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 import dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
 import calendar from "dayjs/plugin/calendar"
+import relativeTime from "dayjs/plugin/relativeTime"
 import updateLocale from "dayjs/plugin/updateLocale"
+
 
 dayjs.extend(relativeTime)
 dayjs.extend(calendar)

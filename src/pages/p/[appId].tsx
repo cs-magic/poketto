@@ -4,13 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import superjson from "superjson"
 import { type GetServerSideProps } from "next"
-import { type AppForListView, selectAppForListView } from "@/ds"
-import { RootLayout } from "@/layouts/root.layout"
-import clsx from "@/lib/clsx"
+import superjson from "superjson"
+
 import { prisma } from "@/server/db"
+
+import { type AppForListView, selectAppForListView } from "@/ds"
+
+import { RootLayout } from "@/layouts/root.layout"
+
 import { AppDetailView } from "@/components/app/detail.view"
+
+import clsx from "@/lib/clsx"
+
 
 export default function ConversationPage({ appStr }: { appStr: string }) {
   const app = superjson.parse<AppForListView>(appStr)

@@ -6,17 +6,7 @@
  */
 import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
-import {
-  DashboardIcon,
-  EnvelopeOpenIcon,
-  GearIcon,
-  HandIcon,
-  HomeIcon,
-  LightningBoltIcon,
-  MixIcon,
-  RocketIcon,
-  TargetIcon,
-} from "@radix-ui/react-icons"
+import { DashboardIcon, EnvelopeOpenIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 
 import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
 

@@ -4,14 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
-import { initTRPC, TRPCError } from "@trpc/server"
+import { TRPCError, initTRPC } from "@trpc/server"
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next"
 import { type Session } from "next-auth"
 import superjson from "superjson"
 import { ZodError } from "zod"
+
 import { getServerAuthSession } from "@/server/auth"
 import { prisma } from "@/server/db"
+
 
 /**
  * 1. CONTEXT
@@ -36,9 +37,9 @@ interface CreateContextOptions {
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
 export const createInnerTRPCContext = (opts: CreateContextOptions) => ({
-    session: opts.session,
-    prisma,
-  })
+  session: opts.session,
+  prisma,
+})
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request

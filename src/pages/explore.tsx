@@ -32,6 +32,7 @@ import { Separator } from "@/components/ui/separator"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
+
 export default function ExplorePage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("mostViewed")
   const [language, setLanguage] = useState<string>("all")

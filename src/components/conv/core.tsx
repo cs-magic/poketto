@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
-import { getHotkeyHandler, useClipboard, useFullscreen } from "@mantine/hooks"
+import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
 import {
   ChevronDownIcon,
   CodeSandboxLogoIcon,
@@ -25,8 +25,6 @@ import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
-
-import { useAppStore } from "@/store"
 
 import { contentStyleBasedOnRole } from "@/config-utils"
 

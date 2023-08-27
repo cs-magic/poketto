@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { type Stripe, loadStripe } from "@stripe/stripe-js"
+
 import { env } from "@/env.mjs"
+
 
 let stripePromise: Promise<Stripe | null>
 const getStripe = () => {

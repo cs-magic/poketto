@@ -4,7 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import NextAuth from "next-auth";
-import { authOptions } from "@/server/auth";
+import NextAuth from "next-auth"
 
-export default NextAuth(authOptions);
+import { authOptions } from "@/server/auth"
+
+
+export default NextAuth(authOptions)

@@ -12,6 +12,7 @@ import { type PropsWithChildren } from "react"
 
 import { siteConfig } from "@/config"
 
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {

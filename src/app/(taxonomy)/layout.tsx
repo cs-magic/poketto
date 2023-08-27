@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
 
+
 export const metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {

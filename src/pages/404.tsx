@@ -8,6 +8,7 @@ import { RootLayout } from "@/layouts/root.layout"
 
 import { Icons } from "@/components/icons"
 
+
 export default function Custom404() {
   return (
     <RootLayout>

@@ -5,15 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { type AppForListView } from "@/ds"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { getLocalFlowgptImageUri } from "@/lib/string"
+
 import { UsesField, ViewsField } from "@/components/field"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
+
 import d from "@/lib/datetime"
+import { getLocalFlowgptImageUri } from "@/lib/string"
 
 export function AppHorizontalCardView({ app }: { app: AppForListView | undefined }) {
-  if (!app)
-    {return (
+  if (!app) {
+    return (
       <div className="| flex w-full gap-8 pb-3 pt-6 text-muted-foreground">
         <Skeleton className="wh-12" />
         <div className="flex grow flex-col gap-2">
@@ -26,7 +28,8 @@ export function AppHorizontalCardView({ app }: { app: AppForListView | undefined
           <Skeleton className="h-8 w-40" />
         </div>
       </div>
-    )}
+    )
+  }
 
   return (
     <div className="flex w-full cursor-pointer items-center gap-8 overflow-hidden p-3 pt-6 text-muted-foreground hocus:bg-accent">

@@ -18,6 +18,7 @@ import { URI, allowDangerousEmailAccountLinking } from "@/config"
 import { pokettoPrismaAdapter } from "@/lib/db"
 import { emailFrom, sendVerificationRequest } from "@/lib/email"
 
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *

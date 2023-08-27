@@ -5,20 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { RootLayout } from "@/layouts/root.layout"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-import clsx from "@/lib/clsx"
 
 const issueTypes = ["bug-report", "puzzle", "feature-request", "business"] as const
 type IssueType = (typeof issueTypes)[number]

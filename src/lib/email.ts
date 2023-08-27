@@ -18,6 +18,7 @@ import { AWS_REGION, emailProvider, siteConfig } from "@/config"
 
 import d from "@/lib/datetime"
 
+
 // @ts-ignore
 const isAws = emailProvider === "aws"
 

@@ -10,6 +10,7 @@ import { stripe } from "@/lib/stripe"
 
 import { formatAmountForStripe } from "@/utils/stripe-helpers"
 
+
 export async function createCheckoutSession(data: FormData): Promise<void> {
   const checkoutSession: Stripe.Checkout.Session = await stripe.checkout.sessions.create({
     mode: "payment",

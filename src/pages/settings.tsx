@@ -12,6 +12,7 @@ import { CardsLayoutType } from "@/ds"
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
 

@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { useViewportSize } from "@mantine/hooks"
+
 import { MAX_MOBILE_WIDTH } from "@/config"
+
 
 export const useMobile = () => {
   const { width } = useViewportSize()
