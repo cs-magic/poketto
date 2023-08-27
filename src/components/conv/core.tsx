@@ -56,6 +56,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
+import { useUniversalFullscreen } from "@/hooks/use-universal-fullscreen"
 import { useSessionUser, useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
@@ -81,12 +82,7 @@ export function ConversationCore({ cid }: { cid: string }) {
     },
   })
 
-  const { switchFullscreen, fullscreen } = useAppStore()
-  const { ref, toggle } = useFullscreen()
-  const toggleAll = () => {
-    void toggle()
-    switchFullscreen()
-  }
+  const { ref, toggle, fullscreen } = useUniversalFullscreen()
 
   if (!c) return <Loading />
 
@@ -98,7 +94,7 @@ export function ConversationCore({ cid }: { cid: string }) {
           <h2 className="truncate text-center">{c.app.name}</h2>
 
           {fullscreen ? (
-            <IconContainer onClick={toggleAll}>
+            <IconContainer onClick={toggle}>
               <ExitFullScreenIcon />
             </IconContainer>
           ) : (
@@ -109,7 +105,7 @@ export function ConversationCore({ cid }: { cid: string }) {
                 </IconContainer>
               </PopoverTrigger>
               <PopoverContent className="flex flex-col gap-2">
-                <Button variant="ghost" onClick={toggleAll} className="flex w-full justify-between">
+                <Button variant="ghost" onClick={toggle} className="flex w-full justify-between">
                   <span>{fullscreen ? "窗口模式" : "全屏模式"}</span>
                   {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
                 </Button>

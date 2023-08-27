@@ -21,7 +21,7 @@ import { useSessionUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import { todo } from "@/lib/helpers"
-import { getConversationLink } from "@/lib/string"
+import { getConversationLink, getConversationsLink, getUserLink } from "@/lib/string"
 
 export default function HomePage() {
   return (
@@ -43,19 +43,12 @@ export function RecentConversations() {
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
           <CardTitle>Recently used apps</CardTitle>
-          <Button
-            variant="link"
-            className="| flex h-fit items-center gap-2 py-0 text-xs"
-            onClick={() => {
-              if (!user) {
-                return void signIn()
-              }
-              todo()
-            }}
-          >
-            <span>See all</span>
-            <ArrowRightIcon />
-          </Button>
+          {user && (
+            <Link href={getConversationsLink(user.id)} className="h-fit | flex items-center gap-2 py-0 text-xs text-primary">
+              <span>See all</span>
+              <ArrowRightIcon />
+            </Link>
+          )}
         </div>
       </CardHeader>
       <CardContent className="flex w-full gap-2 overflow-auto">
