@@ -45,7 +45,7 @@ export const COMMANDS: ICommandItem[] = [
   },
 ]
 export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {
-  system: "bg-slate-700",
+  system: "bg-transparent ", // "bg-slate-700"
   function: "bg-destructive",
   user: "bg-green-600 text-black",
   assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",

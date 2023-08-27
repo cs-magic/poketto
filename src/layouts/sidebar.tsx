@@ -82,7 +82,7 @@ export function Sidebar() {
       {/* footer */}
       <div className="grow" />
 
-      {user && <InviteCard />}
+      {/*{user && <InviteCard />}*/}
 
       {user ? (
         <Link href={URI.user.dashboard} className="flex items-center justify-center gap-2 border-t py-4">

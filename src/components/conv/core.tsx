@@ -50,6 +50,7 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
@@ -264,7 +265,12 @@ export function ConversationInput({ cid }: { cid: string }) {
       {addDialogVisible && conv && <AddAppAlertDialog app={conv.app} />}
 
       <ScrollContainer>
-        <div className="w-full bg-cyan-600 p-2 dark:bg-cyan-950 ">
+        <div
+          className={clsx(
+            "w-full p-2 "
+            // "bg-cyan-600 dark:bg-cyan-950 "
+          )}
+        >
           {/* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序 */}
           {conv && <ConversationMessages messages={messagesWithDate.reverse()} />}
         </div>
@@ -342,10 +348,22 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
       {/* 这里为了把下面（倒序）的空间给撑起来，使聊天在不占满的情况下，也能从上显示到下（而非粘在底部，从下到上） */}
       <div className="grow" />
       {messages.map((msg, index) =>
-        "systemType" in msg ? (
+        "systemType" in msg || msg.format === "systemNotification" ? (
           <div key={index} className="mx-auto my-2 text-center text-muted-foreground">
             {m(msg.content)}
           </div>
+        ) : msg.role === "system" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>AI 人设</CardTitle>
+              <CardDescription>AI 的回答将基于此人设进行</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ReactMarkdown className={clsx("p-prose py-0", contentStyleBasedOnRole[msg.role])} remarkPlugins={[remarkGfm]}>
+                {m(msg.content)}
+              </ReactMarkdown>
+            </CardContent>
+          </Card>
         ) : (
           // normal messages
           <div
@@ -357,26 +375,6 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
               <Avatar>
                 <AvatarImage src={msg.user!.image!} />
               </Avatar>
-            </div>
-
-            <div
-              className={clsx(
-                "chat-header  inline-flex items-center gap-2 pb-2 text-xs opacity-50",
-                "hidden"
-                // "group-hover:flex" // 不要加 hover 功能，否则无法复制文字了！
-                // "cursor-pointer"
-              )}
-              // onClick={() => {
-              //   // clipboard.copy(`${baseUrl}#${msg.id}`)
-              //   clipboard.copy(`${msg.id}`)
-              //   toast.success(`copied url`)
-              // }}
-            >
-              {/* <span className={"mx-2"}>#{msg.id}</span> */}
-              <time className="">{d(msg.createdAt).format("HH:MM")}</time>
-              {/* 保留功能，复制按钮先不加 */}
-              {/* <Link2Icon /> */}
-              {/* <span>#{msg.id}</span> */}
             </div>
 
             <ReactMarkdown className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])} remarkPlugins={[remarkGfm]}>

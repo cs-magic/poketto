@@ -45,6 +45,10 @@ const init = async () => {
               role: PromptRoleType.system,
               content: p.initPrompt,
             },
+            {
+              role: PromptRoleType.assistant,
+              content: p.welcomeMessage
+            }
           ],
         },
         category: {
