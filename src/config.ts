@@ -182,3 +182,7 @@ export const CURRENCY = "usd"
 export const MIN_AMOUNT = 10.0
 export const MAX_AMOUNT = 5000.0
 export const AMOUNT_STEP = 5.0
+
+export const STRIPE_PAYMENT_PRODUCT_10_ID = "prod_OVgbKpNEmJJXIy"
+export const STRIPE_SUBSCRIBE_PRODUCT_10_ID = "prod_OVgYAVpLO6oLje"
+export const STRIPE_SUBSCRIBE_PRODUCT_30_ID = "prod_OVgZnKD7Fc2bsQ"

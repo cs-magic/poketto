@@ -11,6 +11,9 @@ import { prisma } from "@/server/db"
 
 import { env } from "@/env.mjs"
 
+import { STRIPE_SUBSCRIBE_PRODUCT_10_ID } from "@/config"
+
+import d from "@/lib/datetime"
 import { stripe } from "@/lib/stripe"
 
 export async function POST(req: Request) {
@@ -31,8 +34,9 @@ export async function POST(req: Request) {
   const session = event.data.object as Stripe.Checkout.Session
 
   if (event.type === "checkout.session.completed") {
-    const { mode } = session
+    const { mode, customer } = session
     const userId = session.client_reference_id ?? session?.metadata?.userId
+    const stripeCustomerId = customer as string
 
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
     for (const item of lineItems.data) {
@@ -40,58 +44,52 @@ export async function POST(req: Request) {
       const { quantity } = item // get the quantity
       const count = quantity ?? 1
 
-      console.log({ productId, count })
+      console.log({ customer, mode, userId, productId, quantity })
 
-      await prisma.user.update({
-        where: { id: userId },
-        include: {
-          stripePayments: true,
-        },
-        data: {
-          balance: {
-            increment: count * 1000, // 10 刀 --> 1000 dora
+      if (mode === "payment") {
+        await prisma.user.update({
+          where: { id: userId },
+          include: {
+            stripePayments: true,
           },
-          stripePayments: {
-            create: {
-              id: session.id,
-              productId,
-              count,
+          data: {
+            balance: {
+              increment: count * 1000, // 10 刀 --> 1000 dora
+            },
+            stripeCustomerId,
+            stripePayments: {
+              create: {
+                id: session.id,
+                productId,
+                count,
+              },
             },
           },
-        },
-      })
+        })
+      }
+
+      if (mode === "subscription") {
+        await prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            balance: {
+              increment: (productId === STRIPE_SUBSCRIBE_PRODUCT_10_ID ? 1 : 3) * count * 1000,
+            },
+            stripeSubscriptionEnd: d(new Date()).add(30, "days").toDate(),
+            stripeCustomerId,
+            stripePayments: {
+              create: {
+                id: session.id,
+                productId,
+                count,
+              },
+            },
+          },
+        })
+      }
     }
-
-    // todo: different modes
-
-    // if (mode === "payment") {
-    //   await stripe.paymentIntents.retrieve(session.payment_intent as string, { expand: [""] })
-    //   await prisma.user.update({
-    //     where: {
-    //       id: userId,
-    //     },
-    //     data: {
-    //       stripeCustomerId: subscription.customer as string,
-    //       stripePriceId: subscription.items.data[0]!.price.id,
-    //       stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    //     },
-    //   })
-    // }
-    //
-    // if (mode === "subscription") {
-    //   const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-    //   await prisma.user.update({
-    //     where: {
-    //       id: userId,
-    //     },
-    //     data: {
-    //       stripeSubscriptionId: subscription.id,
-    //       stripeCustomerId: subscription.customer as string,
-    //       stripePriceId: subscription.items.data[0]!.price.id,
-    //       stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    //     },
-    //   })
-    // }
   }
 
   return new Response(null, { status: 200 })

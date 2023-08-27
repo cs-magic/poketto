@@ -27,6 +27,9 @@ import {
   POKETTO_MODEL_NAME,
   POKETTO_SYSTEM_PROMPT,
   POKETTO_WELCOME_MESSAGE,
+  STRIPE_PAYMENT_PRODUCT_10_ID,
+  STRIPE_SUBSCRIBE_PRODUCT_10_ID,
+  STRIPE_SUBSCRIBE_PRODUCT_30_ID,
   USER_INVITATIONS_COUNT,
 } from "@/config"
 
@@ -99,20 +102,20 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     },
   })
   await prisma.stripeProduct.upsert({
-    where: { id: "prod_OVgbKpNEmJJXIy" },
+    where: { id: STRIPE_PAYMENT_PRODUCT_10_ID },
     update: {},
     create: {
-      id: "prod_OVgbKpNEmJJXIy",
+      id: STRIPE_PAYMENT_PRODUCT_10_ID,
       price: 10,
       currency: "USD",
       mode: StripeMode.payment,
     },
   })
   await prisma.stripeProduct.upsert({
-    where: { id: "prod_OVgYAVpLO6oLje" },
+    where: { id: STRIPE_SUBSCRIBE_PRODUCT_10_ID },
     update: {},
     create: {
-      id: "prod_OVgYAVpLO6oLje",
+      id: STRIPE_SUBSCRIBE_PRODUCT_10_ID,
       price: 9.99,
       currency: "USD",
       mode: StripeMode.subscription,
@@ -121,10 +124,10 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     },
   })
   await prisma.stripeProduct.upsert({
-    where: { id: "prod_OVgZnKD7Fc2bsQ" },
+    where: { id: STRIPE_SUBSCRIBE_PRODUCT_30_ID },
     update: {},
     create: {
-      id: "prod_OVgZnKD7Fc2bsQ ",
+      id: STRIPE_SUBSCRIBE_PRODUCT_30_ID,
       price: 29.99,
       currency: "USD",
       mode: StripeMode.subscription,
