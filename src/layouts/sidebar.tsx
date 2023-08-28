@@ -87,7 +87,7 @@ export function Sidebar() {
 
           <div className="hidden lg:flex grow flex-col gap-0 overflow-hidden">
             <span className="text-xs">{user.name}</span>
-            <span className="truncate text-xs text-muted-foreground">{user.id}</span>
+            <span className="truncate text-xs text-muted-foreground italic">@{user.id}</span>
           </div>
           <IconContainer className="hidden lg:flex shrink-0">
             <BellIcon />

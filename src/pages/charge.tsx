@@ -5,11 +5,20 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
+import React from "react"
 
 import { RootLayout } from "@/layouts/root.layout"
 
+import StripePricingTable from "@/components/stripe/pricing-table"
+
 export default function GalleryPage() {
-  return <RootLayout>From Poketto Official: 很快就会上线，请再耐心等等吧！</RootLayout>
+  return (
+    <RootLayout>
+      <div className={"w-full max-w-[1080px] m-auto h-[90%] overflow-auto"}>
+        <StripePricingTable />
+      </div>
+    </RootLayout>
+  )
 }
 
 export async function getStaticProps({ locale }) {

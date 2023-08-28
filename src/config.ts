@@ -52,7 +52,7 @@ export const URI = {
     },
 
     seek: {
-      feedback: "/seek/waitlist",
+      feedback: "/feedback",
       enterprise: "/seek/enterprise",
     },
   },

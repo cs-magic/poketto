@@ -54,7 +54,7 @@ export function RecentConversations() {
           )}
         </div>
       </CardHeader>
-      <CardContent className="flex w-full gap-2 overflow-auto">
+      <CardContent className="flex w-full gap-2 p-2 overflow-auto">
         {!conversations ? (
           <div>
             <Button variant="link" onClick={() => void signIn()}>

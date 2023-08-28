@@ -66,6 +66,7 @@ export const LocaleSwitcher = () => {
 
   return (
     <TbLanguage
+      className={"wh-5"}
       onClick={() => {
         void router.push(router.pathname, router.asPath, { locale: nextLanguage })
         // i18n.changeLanguage(nextLanguage)

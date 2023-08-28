@@ -7,6 +7,7 @@
 import { useDebouncedValue } from "@mantine/hooks"
 import orderBy from "lodash/orderBy"
 import { XIcon } from "lucide-react"
+import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import { type PropsWithChildren, useState } from "react"
 
@@ -100,6 +101,9 @@ export function ConversationListView({ c }: { c: ConvForListView }) {
   const m = useMustache()
   const userId = useUserId()!
   const latestMessage = c.messages[0]!
+  const {
+    i18n: { language },
+  } = useTranslation()
   return (
     <Link
       href="/c/[userId]/[appId]"
@@ -114,7 +118,8 @@ export function ConversationListView({ c }: { c: ConvForListView }) {
         <div className="| flex grow flex-col gap-2 overflow-hidden">
           <div className="| flex w-full justify-between gap-2">
             <span className="truncate ">{c.app.name}</span>
-            <span>{d(latestMessage.updatedAt).calendar()}</span>
+            {/* todo: dayjs locale calendar */}
+            <span>{d(latestMessage.updatedAt).locale(language).calendar()}</span>
           </div>
           <div className="flex gap-2">
             {/* 只有 group 才需要打开 */}
