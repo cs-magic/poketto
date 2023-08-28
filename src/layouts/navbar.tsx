@@ -16,7 +16,7 @@ import { TbLanguage } from "react-icons/tb"
 
 import { useAppStore } from "@/store"
 
-import { ICON_DIMENSION_SM } from "@/config"
+import { ICON_DIMENSION_SM, URI } from "@/config"
 import { COMMANDS, menuGroups, menuItems } from "@/config-utils"
 
 import { IconContainer } from "@/components/containers"
@@ -122,27 +122,29 @@ export default function Navbar() {
           <ThemeSwitcher />
         </IconContainer>
 
-        <Popover>
-          <PopoverTrigger>
-            <IconContainer>
-              <QuestionMarkCircledIcon />
-            </IconContainer>
-          </PopoverTrigger>
+        {/*<Popover>*/}
+        {/*  <PopoverTrigger>*/}
+        {/*    <IconContainer>*/}
+        {/*      <QuestionMarkCircledIcon />*/}
+        {/*    </IconContainer>*/}
+        {/*  </PopoverTrigger>*/}
 
-          <PopoverContent>
-            <section className="flex flex-col gap-2">
-              {menuItems
-                .filter((k) => menuGroups.question!.includes(k.field))
-                .map((item) => (
-                  <SidebarNavItem key={item.field} {...item} />
-                ))}
-            </section>
-          </PopoverContent>
-        </Popover>
+        {/*  <PopoverContent>*/}
+        {/*    <section className="flex flex-col gap-2">*/}
+        {/*      {menuItems*/}
+        {/*        .filter((k) => menuGroups.question!.includes(k.field))*/}
+        {/*        .map((item) => (*/}
+        {/*          <SidebarNavItem key={item.field} {...item} />*/}
+        {/*        ))}*/}
+        {/*    </section>*/}
+        {/*  </PopoverContent>*/}
+        {/*</Popover>*/}
 
-        <IconContainer>
-          <GearIcon />
-        </IconContainer>
+        {/*<Link href={URI.user.settings}>*/}
+        {/*  <IconContainer>*/}
+        {/*    <GearIcon />*/}
+        {/*  </IconContainer>*/}
+        {/*</Link>*/}
       </div>
     </div>
   )

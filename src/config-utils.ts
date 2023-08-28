@@ -43,7 +43,7 @@ export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {
 export const menuItems: IMenuItem[] = [
   { field: "homepage", link: URI.app.home, Icon: HomeIcon },
   { field: "explore", link: URI.app.explore, Icon: RocketIcon },
-  { field: "mySpace", link: URI.user.mySpace, Icon: MixIcon },
+  { field: "account", link: URI.user.mySpace, Icon: MixIcon },
   { field: "myGallery", link: URI.user.myGallery, Icon: TargetIcon },
   { field: "feedback", link: URI.user.seek.feedback, Icon: HandIcon },
   { field: "whatsPoketto", link: URI.app.docs.intro },
@@ -54,16 +54,19 @@ export const menuItems: IMenuItem[] = [
 ]
 export const menuGroups: Record<string, MenuKey[]> = {
   question: ["whatsPoketto", "whatsDora", "learningCenter"],
-  mobileFooters: ["homepage", "explore", "mySpace", "settings"],
+  mobileFooters: ["homepage", "explore", "account", "settings"],
 }
 export const sidebarSections: Record<string, MenuKey[]> = {
   section1: ["homepage", "explore"],
   section2: [
-    "mySpace",
+    "account",
     // "myGallery" // todo: myGallery
     "settings",
   ],
-  section3: ["charge", "feedback"],
+  section3: [
+    // "charge",
+    "feedback",
+  ],
 }
 
 export const platformMap: { [key in PlatformType]?: { homepage: string } } = {

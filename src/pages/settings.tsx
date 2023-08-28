@@ -11,8 +11,10 @@ import { useAppStore } from "@/store"
 
 import { CardsLayoutType } from "@/ds"
 
+import { LocaleSwitcher, ThemeSwitcher } from "@/layouts/navbar"
 import { RootLayout } from "@/layouts/root.layout"
 
+import { IconContainer } from "@/components/containers"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,7 +29,29 @@ export default function SettingsPage() {
       <div className={"w-full max-w-[512px] m-auto p-2 overflow-auto | flex flex-wrap gap-2"}>
         <Card className={"w-full"}>
           <CardHeader>
-            <CardTitle>UI</CardTitle>
+            <CardTitle>全局</CardTitle>
+          </CardHeader>
+
+          <CardContent className={"w-full flex flex-col p-4 gap-2"}>
+            <div className={"w-full | flex justify-between items-center gap-4"}>
+              <Label className={"whitespace-nowrap"}>语言</Label>
+              <IconContainer>
+                <LocaleSwitcher />
+              </IconContainer>
+            </div>
+
+            <div className={"w-full | flex justify-between items-center gap-4"}>
+              <Label className={"whitespace-nowrap"}>主题</Label>
+              <IconContainer>
+                <ThemeSwitcher />
+              </IconContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={"w-full"}>
+          <CardHeader>
+            <CardTitle>视觉</CardTitle>
           </CardHeader>
 
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>
@@ -51,7 +75,7 @@ export default function SettingsPage() {
 
         <Card className={"w-full"}>
           <CardHeader>
-            <CardTitle>Account</CardTitle>
+            <CardTitle>账号</CardTitle>
           </CardHeader>
 
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>

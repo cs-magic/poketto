@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
+import { CheckCircledIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import numeral from "numeral"
@@ -14,6 +15,8 @@ import { toast } from "sonner"
 
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { platformMap } from "@/config-utils"
+
+import { ConvForDetailView } from "@/ds"
 
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
@@ -40,10 +43,6 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
 import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
-
-import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
-
-import validator = Prisma.validator
 
 export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
   const userId = useUserId()
@@ -190,7 +189,7 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
         </>
       )}
 
-      {userId && <UninstallButton userId={userId} appId={appId} setOpen={setOpen} />}
+      {userId && appId && <UninstallButton userId={userId} appId={appId} setOpen={setOpen} />}
     </div>
   )
 }
@@ -246,30 +245,28 @@ export function InfoItem({ a, b }: { a: string; b: ReactNode }) {
  */
 export function InstallButton({ userId, appId, setOpen }: { userId: string; appId: string; setOpen?: (v: boolean) => void }) {
   const router = useRouter()
-
   const utils = api.useContext()
   const { data: hasApp } = api.conv.has.useQuery({ appId })
-  const go = () => void router.push(getConversationLink(userId, appId)) // app.id 进数据库后会生成新的
+  const go = () => {
+    void router.push(getConversationLink(userId, appId)) // app.id 进数据库后会生成新的
+    setOpen && setOpen(false)
+  }
 
   const { mutate: addApp } = api.conv.add.useMutation({
     onSuccess: (data) => {
       toast.success(`Successfully added one app`)
       void utils.conv.list.invalidate()
+      void utils.conv.get.invalidate()
       void utils.conv.has.invalidate()
       setOpen && setOpen(false)
-      go()
+      void go()
     },
   })
 
   return (
-    <Button
-      className={clsx(" h-6 rounded-3xl px-4 transition-all")}
-      onClick={() => {
-        hasApp ? go() : addApp({ appId })
-      }}
-    >
+    <Badge className={clsx(" h-6 rounded-3xl px-4 transition-all cursor-pointer")} onClick={hasApp ? go : () => addApp({ appId })}>
       {hasApp ? "Open" : "Get"}
-    </Button>
+    </Badge>
   )
 }
 
@@ -278,9 +275,9 @@ export function InstallButton({ userId, appId, setOpen }: { userId: string; appI
  */
 export function UninstallButton({ userId, appId, setOpen }: { userId: string; appId: string; setOpen?: (v: boolean) => void }) {
   const router = useRouter()
+  const { data: conv } = api.conv.get.useQuery({ conversation: { userId, appId } })
 
   const utils = api.useContext()
-  const { data: hasApp } = api.conv.has.useQuery({ appId })
 
   const { mutate: delConv, data: delResult } = api.conv.del.useMutation({
     onSuccess: (input) => {
@@ -292,15 +289,13 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
     },
   })
 
-  if (!hasApp) {
-    return null
-  }
+  if (!conv) return null
 
   return (
     <section id="collections" className="my-4 flex w-full flex-col gap-4">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive" disabled={appId === POKETTO_APP_ID}>
+          <Button variant="destructive" disabled={conv.app.platformId === POKETTO_APP_ID && conv.app.platformType === "Poketto"}>
             Clear
           </Button>
         </AlertDialogTrigger>
@@ -309,16 +304,7 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
           <AlertDialogDescription>⚠️该动作将不可撤销，您也将无法恢复所有过往记录</AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive"
-              onClick={() =>
-                delConv(
-                  validator<ConversationWhereUniqueInput>()({
-                    conversation: { appId, userId },
-                  })
-                )
-              }
-            >
+            <AlertDialogAction className="bg-destructive" onClick={() => delConv({ id: conv.id })}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

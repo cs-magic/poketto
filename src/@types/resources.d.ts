@@ -1,15 +1,19 @@
 interface Resources {
   "common": {
     "product": {
-      "name": "口袋 AI"
+      "name": "口袋 A I"
     },
     "menus": {
       "homepage": "首页",
       "explore": "探索",
-      "mySpace": "我的空间",
+      "account": "账号",
       "myGallery": "我的画廊",
       "charge": "账号充值",
-      "feedback": "反馈"
+      "feedback": "反馈",
+      "whatsPoketto": "什么是口袋AI？",
+      "whatsDora": "什么是 Dora？",
+      "learningCenter": "文档 / 教程",
+      "settings": "设置"
     },
     "general": {
       "seeAll": "查看全部",
@@ -33,6 +37,11 @@ interface Resources {
       "recentlyUsedApps": "最近使用的 Apps",
       "exploreTrendingApps": "探索当下最流行的 Apps",
       "exploreAll": "探索全部"
+    },
+    "sorts": {
+      "mostViewed": "最多浏览",
+      "mostUsed": "最多使用",
+      "newest": "最新发布"
     },
     "states": {
       "calls": {
@@ -60,6 +69,9 @@ interface Resources {
         "desc": "该 App 在广场内被用户看到的总次数"
       }
     }
+  },
+  "explore": {
+    "appPlayground": "应用广场"
   }
 }
 

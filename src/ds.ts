@@ -54,25 +54,8 @@ export enum CardsLayoutType {
 // User Preference (which can be managed via either by store or api)
 // -----------------------------------------------------------------------------
 
-export const sortOrders = [
-  "mostViewed",
-  "mostUsed",
-  // "mostSaved",
-  // "mostShared",
-  "new",
-  // "recommend",
-  // "top",
-  // "trending",
-  // "follow",
-] as const
-
-export type SortOrder = (typeof sortOrders)[number]
-
-export const orderTitle: Record<SortOrder, string> = {
-  mostViewed: "最多浏览",
-  mostUsed: "最多使用",
-  new: "最新发布",
-}
+export type SortOrder = keyof typeof resources.common.sorts
+export const sortOrders = Object.keys(resources.common.sorts) as SortOrder[]
 
 // -----------------------------------------------------------------------------
 // models

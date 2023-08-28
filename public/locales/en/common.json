@@ -5,7 +5,7 @@
   "menus": {
     "homepage": "Home",
     "explore": "Explore",
-    "mySpace": "My Space",
+    "account": "My Account",
     "myGallery": "My Gallery",
     "charge": "Charge",
     "feedback": "Feedback",
@@ -36,6 +36,11 @@
     "recentlyUsedApps": "Recently Used Apps",
     "exploreTrendingApps": "Explore Trending Apps",
     "exploreAll": "Explore All"
+  },
+  "sorts": {
+    "mostViewed": "Most Viewed",
+    "mostUsed": "Most Used",
+    "newest": "Newest"
   },
   "states": {
     "calls": {

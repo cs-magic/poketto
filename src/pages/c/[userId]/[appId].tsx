@@ -29,6 +29,7 @@ export default function ConversationPage() {
     },
     { enabled: !!(userId && appId) }
   )
+  console.log({ userId, appId, curConv })
 
   return (
     <RootLayout>

@@ -15,7 +15,6 @@ import { includeConvForDetailView, selectAppForDetailView, selectConvForListView
 
 import { getWelcomeSystemNotification } from "@/lib/string"
 
-
 import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
 export const convRouter = createTRPCRouter({
@@ -122,7 +121,7 @@ export const convRouter = createTRPCRouter({
       }
     ),
 
-  del: protectedProcedure.input(z.any()).mutation(
+  del: protectedProcedure.input(ConversationWhereUniqueInputSchema).mutation(
     async ({
       ctx: {
         prisma,
@@ -131,6 +130,6 @@ export const convRouter = createTRPCRouter({
       input,
     }) =>
       //   todo: validate in zod
-      prisma.conversation.delete({ where: input as unknown as ConversationWhereUniqueInput })
+      prisma.conversation.delete({ where: input })
   ),
 })

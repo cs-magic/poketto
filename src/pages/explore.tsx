@@ -6,8 +6,7 @@
  */
 import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
-import capitalize from "lodash/capitalize"
-import startCase from "lodash/startCase"
+import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Image from "next/image"
 import React, { Fragment, useEffect, useState } from "react"
@@ -18,7 +17,7 @@ import { useAppStore } from "@/store"
 import { CAROUSELS } from "@/config"
 
 import type { SortOrder } from "@/ds"
-import { CardsLayoutType, orderTitle, sortOrders } from "@/ds"
+import { CardsLayoutType, sortOrders } from "@/ds"
 
 import { RootLayout } from "@/layouts/root.layout"
 
@@ -34,19 +33,23 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
 export default function ExplorePage() {
+  const { t, i18n } = useTranslation()
   const [sortOrder, setSortOrder] = useState<SortOrder>("mostViewed")
-  const [language, setLanguage] = useState<string>("zh")
+  const [language, setLanguage] = useState<string>(i18n.language)
   const { cardsLayout } = useAppStore()
   const Container = cardsLayout === CardsLayoutType.grid ? GridContainer : MasonryContainer
 
   const query = api.app.list.useInfiniteQuery(
-    { sortOrder, language: language === "all" ? undefined : language },
+    { sortOrder, language: language === "all" ? undefined : language === "zh-CN" ? "zh" : language },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
   )
   const apps = query.data?.pages.flatMap((item) => item.items) ?? []
-  // log.info("[FlowGPT] ", apps)
+
+  useEffect(() => {
+    setLanguage(i18n.language)
+  }, [i18n.language])
 
   return (
     <RootLayout>
@@ -56,8 +59,8 @@ export default function ExplorePage() {
         {/* title */}
         <div className=" w-full px-2 | flex items-center gap-2 | whitespace-nowrap">
           <FrameIcon />
-          <span>应用广场</span>
-          <Select onValueChange={setLanguage} defaultValue={language}>
+          <span>{t("explore:appMarket")}</span>
+          <Select onValueChange={setLanguage} value={language}>
             <SelectTrigger className="w-24">
               <SelectValue placeholder="语言" />
             </SelectTrigger>
@@ -65,7 +68,7 @@ export default function ExplorePage() {
               <SelectGroup className={"flex flex-col gap-2 py-2"}>
                 <SelectItem value="all">全部语言</SelectItem>
                 <Separator />
-                <SelectItem value="zh">中文</SelectItem>
+                <SelectItem value="zh-CN">中文</SelectItem>
                 <SelectItem value="en">English</SelectItem>
               </SelectGroup>
             </SelectContent>
@@ -82,7 +85,7 @@ export default function ExplorePage() {
 
                   <IconContainer className={clsx(sortOrder === order && "text-primary")}>
                     <ResponsiveTooltip
-                      content={orderTitle[order]}
+                      content={t(`common:sorts.${order}`)}
                       onClick={() => {
                         setSortOrder(order)
                       }}
@@ -165,7 +168,7 @@ function ScrollTrigger({ trigger }: { trigger: any }) {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...(await serverSideTranslations(locale, ["common", "explore"])),
     },
   }
 }

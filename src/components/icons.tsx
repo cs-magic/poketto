@@ -47,7 +47,7 @@ export const Order2icon: { [key in SortOrder]: ElementType } = {
   mostUsed: CubeIcon,
   // mostSaved: IconDownload,
   // mostShared: IconTrendingUp,
-  new: Crosshair2Icon,
+  newest: Crosshair2Icon,
 
   // recommend: IconStackPush,
   // top: IconThumbUp,
