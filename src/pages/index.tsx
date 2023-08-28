@@ -5,7 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ArrowRightIcon } from "@radix-ui/react-icons"
+import { GetServerSideProps } from "next"
 import { signIn } from "next-auth/react"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
 
 import { CardsLayoutType } from "@/ds"
@@ -69,4 +71,13 @@ export function RecentConversations() {
       </CardContent>
     </Card>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Will be passed to the page component as props
+    },
+  }
 }

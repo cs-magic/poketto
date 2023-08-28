@@ -42,6 +42,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
     "**/*.cjs",
     "**/*.mjs",
     ".eslintrc.json",

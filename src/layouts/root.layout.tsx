@@ -9,7 +9,7 @@ import React, { type PropsWithChildren, useEffect } from "react"
 
 import { useAppStore } from "@/store"
 
-import { navs } from "@/config-utils"
+import { menuItems } from "@/config-utils"
 
 import { Sidebar } from "@/layouts/sidebar"
 
@@ -17,13 +17,12 @@ import { FooterNavItem } from "@/components/link"
 
 import { useMount } from "@/hooks/use-mount"
 
-
 export const Footer = () => (
   <footer className="w-full shrink-0 | grid grid-cols-4">
-    <FooterNavItem {...navs.home} />
-    <FooterNavItem {...navs.explore} />
-    <FooterNavItem {...navs.gallery} />
-    <FooterNavItem {...navs.dashboard} />
+    <FooterNavItem {...menuItems.home} />
+    <FooterNavItem {...menuItems.explore} />
+    <FooterNavItem {...menuItems.gallery} />
+    <FooterNavItem {...menuItems.dashboard} />
   </footer>
 )
 

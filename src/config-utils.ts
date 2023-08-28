@@ -18,9 +18,9 @@ import {
   TargetIcon,
 } from "@radix-ui/react-icons"
 
-import { type NavKey, POKETTO_HOMEPAGE, URI } from "@/config"
+import { POKETTO_HOMEPAGE, URI } from "@/config"
 
-import { CommandType, type ICommandItem, type INavItem } from "@/ds"
+import { CommandType, type ICommandItem, type IMenuItem, MenuKey } from "@/ds"
 
 import { FLOWGPT_HOMEPAGE } from "@/const"
 
@@ -50,53 +50,24 @@ export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {
   user: "bg-green-600 text-black",
   assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
 }
-export const navs: { [key in NavKey]: INavItem } = {
-  home: {
-    title: "首页",
-    link: URI.app.home,
-    Icon: HomeIcon,
-  },
-  explore: {
-    title: "探索",
-    link: URI.app.explore,
-    Icon: RocketIcon,
-  },
-  dashboard: {
-    title: "我的空间",
-    link: URI.user.dashboard,
-    Icon: MixIcon,
-  },
-  gallery: {
-    title: "我的画廊",
-    link: URI.user.gallery,
-    Icon: TargetIcon,
-  },
-  waitlist: {
-    title: "反馈",
-    link: URI.user.seek.waitlist,
-    Icon: HandIcon,
-  },
-  enterprise: {
-    title: "poketto enterprise",
-    link: URI.user.seek.enterprise,
-    Icon: EnvelopeOpenIcon,
-  },
-  whatsPoketto: {
-    title: "什么是 Poketto.AI ?",
-    link: URI.app.docs.intro,
-  },
-  whatsDora: {
-    title: "什么是 Dora ?",
-    link: URI.app.docs.currency,
-  },
-  learningCenter: {
-    title: "文档/教程",
-    link: URI.app.docs.learn,
-  },
-  charge: {
-    title: "账号充值",
-    Icon: BellIcon,
-  },
+export const menuItems: IMenuItem[] = [
+  { field: "homepage", link: URI.app.home, Icon: HomeIcon },
+  { field: "explore", link: URI.app.explore, Icon: RocketIcon },
+  { field: "mySpace", link: URI.user.mySpace, Icon: MixIcon },
+  { field: "myGallery", link: URI.user.myGallery, Icon: TargetIcon },
+  { field: "feedback", link: URI.user.seek.feedback, Icon: HandIcon },
+  { field: "whatsPoketto", link: URI.app.docs.intro },
+  { field: "whatsDora", link: URI.app.docs.currency },
+  { field: "learningCenter", link: URI.app.docs.learn },
+  { field: "charge", Icon: BellIcon, link: URI.user.charge },
+]
+export const menuGroups: Record<string, MenuKey[]> = {
+  question: ["whatsPoketto", "whatsDora", "learningCenter"],
+}
+export const sidebarSections: Record<string, MenuKey[]> = {
+  section1: ["homepage", "explore"],
+  section2: ["mySpace", "myGallery"],
+  section3: ["charge", "feedback"],
 }
 
 export const platformMap: { [key in PlatformType]?: { homepage: string } } = {

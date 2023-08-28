@@ -1,0 +1,66 @@
+interface Resources {
+  "common": {
+    "product": {
+      "name": "口袋 AI"
+    },
+    "menus": {
+      "homepage": "首页",
+      "explore": "探索",
+      "mySpace": "我的空间",
+      "myGallery": "我的画廊",
+      "charge": "账号充值",
+      "feedback": "反馈"
+    },
+    "general": {
+      "seeAll": "查看全部",
+      "appsList": "App 列表",
+      "fullscreenMode": "全屏模式",
+      "detail": "查看详情",
+      "pin": "置顶",
+      "unpin": "取消置顶",
+      "share": "分享",
+      "open": "打开",
+      "category": "分类",
+      "model": "模型",
+      "language": "语言",
+      "platform": "平台",
+      "reviews": "评价",
+      "information": "信息",
+      "owner": "所有者",
+      "openSource": "开源"
+    },
+    "homepage": {
+      "recentlyUsedApps": "最近使用的 Apps",
+      "exploreTrendingApps": "探索当下最流行的 Apps",
+      "exploreAll": "探索全部"
+    },
+    "states": {
+      "calls": {
+        "title": "调用",
+        "desc": "该 App 被用户使用的总次数"
+      },
+      "forks": {
+        "title": "引用",
+        "desc": "该 App 被用户引用并修改的总次数（待上线）"
+      },
+      "shares": {
+        "title": "分享",
+        "desc": "该 App 被用户分享的总次数"
+      },
+      "stars": {
+        "title": "收藏",
+        "desc": "该 App 被用户收藏的总次数"
+      },
+      "tips": {
+        "title": "打赏",
+        "desc": "该 App 被用户打赏的总额"
+      },
+      "views": {
+        "title": "浏览",
+        "desc": "该 App 在广场内被用户看到的总次数"
+      }
+    }
+  }
+}
+
+export default Resources;

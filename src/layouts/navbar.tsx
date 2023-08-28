@@ -23,7 +23,7 @@ import React, { Fragment } from "react"
 import { useAppStore } from "@/store"
 
 import { ICON_DIMENSION_SM, siteConfig } from "@/config"
-import { COMMANDS, navs } from "@/config-utils"
+import { COMMANDS, menuGroups, menuItems } from "@/config-utils"
 
 import { ChargeContainer, IconContainer } from "@/components/containers"
 import { Icons } from "@/components/icons"
@@ -118,10 +118,11 @@ export default function Navbar() {
 
           <PopoverContent>
             <section className="flex flex-col gap-2">
-              <SidebarNavItem {...navs.whatsPoketto} />
-              <SidebarNavItem {...navs.whatsDora} />
-              <SidebarNavItem {...navs.learningCenter} />
-              {/*<SidebarNavItem {...navs.supportCenter} />*/}
+              {menuItems
+                .filter((k) => menuGroups.question!.includes(k.field))
+                .map((item) => (
+                  <SidebarNavItem {...item} />
+                ))}
             </section>
           </PopoverContent>
         </Popover>

@@ -38,8 +38,9 @@ export const URI = {
     },
   },
   user: {
-    dashboard: "/dashboard",
-    gallery: "/gallery",
+    charge: "/charge",
+    mySpace: "/dashboard",
+    myGallery: "/gallery",
     integrations: "/integrations",
 
     auth: {
@@ -50,7 +51,7 @@ export const URI = {
     },
 
     seek: {
-      waitlist: "/seek/waitlist",
+      feedback: "/seek/waitlist",
       enterprise: "/seek/enterprise",
     },
   },
@@ -64,21 +65,6 @@ export const URI = {
     },
   },
 } as const
-
-export const navKeys = [
-  "home",
-  "explore",
-  "dashboard",
-  "gallery",
-  "waitlist",
-  "enterprise",
-  "whatsPoketto",
-  "whatsDora",
-  "learningCenter",
-  // "supportCenter",
-  "charge",
-] as const
-export type NavKey = (typeof navKeys)[number]
 
 export const CAROUSELS = [
   // { src: uri.images.AiMap, /* 色调太白了，不会让人喜欢的 */ title: 'AIGC 魔法能力评测' },

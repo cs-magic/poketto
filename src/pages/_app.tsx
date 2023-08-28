@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { SessionProvider } from "next-auth/react"
+import { appWithTranslation } from "next-i18next"
 import Head from "next/head"
 import React from "react"
 import { Toaster } from "sonner"
@@ -21,7 +22,6 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
 import "@/styles/globals.css"
-
 
 export function reportWebVitals(metric) {
   console.log(metric)
@@ -69,4 +69,4 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
   )
 }
 
-export default api.withTRPC(MyApp)
+export default api.withTRPC(appWithTranslation(MyApp))

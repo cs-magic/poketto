@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-
 const issueTypes = ["bug-report", "puzzle", "feature-request", "business"] as const
 type IssueType = (typeof issueTypes)[number]
 const appPlatforms = ["web", "desktop", "mobile", "mini-program"] as const

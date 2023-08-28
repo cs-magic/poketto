@@ -8,12 +8,13 @@ import { InvitationStatus } from ".prisma/client"
 import { BellIcon, ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
+import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import React from "react"
 import ReactMarkdown from "react-markdown"
 
 import { ICON_DIMENSION_MD, URI, siteConfig } from "@/config"
-import { navs } from "@/config-utils"
+import { menuItems, sidebarSections } from "@/config-utils"
 
 import { ChargeContainer, IconContainer } from "@/components/containers"
 import { SidebarNavItem } from "@/components/link"
@@ -59,25 +60,16 @@ export function Sidebar() {
         "hidden md:flex | max-w-[240px] shrink-0 h-full overflow-auto px-4 pt-8 | flex-col gap-6 | whitespace-nowrap bg-sidebar text-sm text-primary-foreground"
       )}
     >
-      <section className="flex flex-col">
-        <SidebarNavItem {...navs.home} />
-        <SidebarNavItem {...navs.explore} />
-        {/* <MenuLink field={'toolkits'}/> */}
-      </section>
-      <Separator />
-      <section className="flex flex-col">
-        <SidebarNavItem {...navs.dashboard} />
-        <SidebarNavItem {...navs.gallery} />
-        {/* <MenuLink field={'integrations'} link={uri.user.integrations}/> */}
-      </section>
-      <Separator />
-      <section className="flex flex-col">
-        <ChargeContainer>
-          <SidebarNavItem {...navs.charge} />
-        </ChargeContainer>
-        <SidebarNavItem {...navs.waitlist} />
-        {/*<SidebarNavItem {...navs.enterprise} />*/}
-      </section>
+      {Object.entries(sidebarSections).map(([key, keys]) => (
+        <>
+          <Separator className={"first:hidden"} />
+          <section className="flex flex-col">
+            {keys.map((key) => (
+              <SidebarNavItem key={key} {...menuItems.find((i) => i.field === key)!} />
+            ))}
+          </section>
+        </>
+      ))}
 
       {/* footer */}
       <div className="grow" />
@@ -85,7 +77,7 @@ export function Sidebar() {
       {/*{user && <InviteCard />}*/}
 
       {user ? (
-        <Link href={URI.user.dashboard} className="flex items-center justify-center gap-2 border-t py-4">
+        <Link href={URI.user.mySpace} className="flex items-center justify-center gap-2 border-t py-4">
           <Avatar className={ICON_DIMENSION_MD}>
             <AvatarImage src={user?.image ?? undefined} />
             <AvatarFallback>

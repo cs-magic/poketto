@@ -11,6 +11,8 @@ import type { Session } from "next-auth"
 import type { AppProps } from "next/app"
 import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 
+import resources from "@/@types/resources"
+
 import AppGetPayload = Prisma.AppGetPayload
 import AppSelect = Prisma.AppSelect
 import ChatMessageGetPayload = Prisma.ChatMessageGetPayload
@@ -183,9 +185,11 @@ export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeo
 // general
 // -----------------------------------------------------------------------------
 
-export interface INavItem {
-  title: string
-  link?: string
+export type MenuKey = keyof typeof resources.common.menus
+
+export interface IMenuItem {
+  field: MenuKey
+  link: string
   Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
 }
 

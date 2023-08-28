@@ -4,11 +4,12 @@
  */
 await import("./src/env.mjs");
 
-import bundleAnalyzer from '@next/bundle-analyzer'
+import bundleAnalyzer from "@next/bundle-analyzer";
+
 
 const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-})
+  enabled: process.env.ANALYZE === "true"
+});
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -24,14 +25,13 @@ const config = {
   reactStrictMode: true,
 
   /**
-   * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
-   * out.
-   *
-   * @see https://github.com/vercel/next.js/issues/41980
+   * 1. If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
+   * out. @see https://github.com/vercel/next.js/issues/41980
+   * 2. i18n mjs 支持，@see https://github.com/t3-oss/create-t3-app/issues/332#issuecomment-1243022020, https://github.com/jmarianski/t3-i18n
    */
   i18n: {
-    locales: ["en"],
-    defaultLocale: "en"
+    defaultLocale: "zh-CN",
+    locales: ["zh-CN", "en"]
   },
 
   // ref: https://nextjs.org/docs/api-reference/next/image#remote-patterns
@@ -50,7 +50,7 @@ const config = {
     });
 
     return config;
-  },
+  }
 };
 
 export default withBundleAnalyzer(config);
