@@ -164,6 +164,15 @@ export const selectChatMessageForListView = validator<ChatMessageSelect>()({
 })
 export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeof selectChatMessageForListView }>
 
+export const selectChatMessageForDetailView = validator<ChatMessageSelect>()({
+  ...selectChatMessageForListView,
+  cost: true,
+  conversation: {
+    select: selectConvForListView,
+  },
+})
+export type SelectChatMessageForDetailView = ChatMessageGetPayload<{ select: typeof selectChatMessageForDetailView }>
+
 // -----------------------------------------------------------------------------
 // general
 // -----------------------------------------------------------------------------

@@ -15,6 +15,8 @@ import { type NextPageWithAuth } from "@/ds"
 
 import { RootLayout } from "@/layouts/root.layout"
 
+import { consumptionHistoryColumns } from "@/components/consumption-history"
+import { DataTable } from "@/components/data-table"
 import { Loading } from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -57,16 +59,18 @@ export const DashboardPage: NextPageWithAuth = () => {
             <CardTitle>使用记录</CardTitle>
           </CardHeader>
           <CardContent className={"p-4"}>
-            <AsyncListContainer
-              items={messages ? messages.filter((m) => m.role === "user") : messages}
-              style={(p) => (
-                <div className={"w-full flex items-center overflow-hidden gap-2"}>
-                  <div className={"whitespace-nowrap"}>{d(p.createdAt).format("YYYY-MM-DD HH:mm")}</div>
-                  <div className={""}>{p.role}</div>
-                  <div className={"truncate"}>{p.content}</div>
-                </div>
-              )}
-            />
+            {messages ? <DataTable columns={consumptionHistoryColumns} data={messages} /> : <Loading />}
+
+            {/*<AsyncListContainer*/}
+            {/*  items={messages ? messages.filter((m) => m.role === "user") : messages}*/}
+            {/*  style={(p) => (*/}
+            {/*    <div className={"w-full flex items-center overflow-hidden gap-2"}>*/}
+            {/*      <div className={"whitespace-nowrap"}>{d(p.createdAt).format("YYYY-MM-DD HH:mm")}</div>*/}
+            {/*      <div>{p.conversation.app.name}</div>*/}
+            {/*      <div className={"truncate"}>{p.content}</div>*/}
+            {/*    </div>*/}
+            {/*  )}*/}
+            {/*/>*/}
           </CardContent>
         </Card>
       </div>
