@@ -6,17 +6,7 @@
  */
 import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
-import {
-  BellIcon,
-  DashboardIcon,
-  EnvelopeOpenIcon,
-  GearIcon,
-  HandIcon,
-  HomeIcon,
-  MixIcon,
-  RocketIcon,
-  TargetIcon,
-} from "@radix-ui/react-icons"
+import { BellIcon, DashboardIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 
 import { POKETTO_HOMEPAGE, URI } from "@/config"
 
@@ -60,9 +50,11 @@ export const menuItems: IMenuItem[] = [
   { field: "whatsDora", link: URI.app.docs.currency },
   { field: "learningCenter", link: URI.app.docs.learn },
   { field: "charge", Icon: BellIcon, link: URI.user.charge },
+  { field: "settings", Icon: GearIcon, link: URI.user.settings },
 ]
 export const menuGroups: Record<string, MenuKey[]> = {
   question: ["whatsPoketto", "whatsDora", "learningCenter"],
+  mobileFooters: ["homepage", "explore", "mySpace", "settings"],
 }
 export const sidebarSections: Record<string, MenuKey[]> = {
   section1: ["homepage", "explore"],

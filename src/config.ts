@@ -38,6 +38,7 @@ export const URI = {
     },
   },
   user: {
+    settings: "/settings",
     charge: "/charge",
     mySpace: "/dashboard",
     myGallery: "/gallery",

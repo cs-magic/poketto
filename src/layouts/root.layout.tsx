@@ -9,7 +9,7 @@ import React, { type PropsWithChildren, useEffect } from "react"
 
 import { useAppStore } from "@/store"
 
-import { menuItems } from "@/config-utils"
+import { menuGroups, menuItems } from "@/config-utils"
 
 import { Sidebar } from "@/layouts/sidebar"
 
@@ -19,10 +19,11 @@ import { useMount } from "@/hooks/use-mount"
 
 export const Footer = () => (
   <footer className="w-full shrink-0 | grid grid-cols-4">
-    <FooterNavItem {...menuItems.home} />
-    <FooterNavItem {...menuItems.explore} />
-    <FooterNavItem {...menuItems.gallery} />
-    <FooterNavItem {...menuItems.dashboard} />
+    {menuGroups
+      .mobileFooters!.map((f) => menuItems.find((i) => i.field === f)!)
+      .map((k) => (
+        <FooterNavItem key={k.field} {...k} />
+      ))}
   </footer>
 )
 
