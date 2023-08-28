@@ -7,6 +7,7 @@
 import { ArrowRightIcon } from "@radix-ui/react-icons"
 import { GetServerSideProps } from "next"
 import { signIn } from "next-auth/react"
+import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
 
@@ -36,6 +37,7 @@ export default function HomePage() {
 }
 
 export function RecentConversations() {
+  const { t } = useTranslation()
   const user = useSessionUser()
   const { data: conversations } = api.conv.list.useQuery(undefined, { enabled: !!user })
 
@@ -43,10 +45,10 @@ export function RecentConversations() {
     <Card id="recent-apps" variant="ghost" className="w-full">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>最近使用的 Apps</CardTitle>
+          <CardTitle>{t("homepage.recentlyUsedApps")}</CardTitle>
           {user && (
             <Link href={getConversationsLink(user.id)} className="h-fit | flex items-center gap-2 py-0 text-xs text-primary">
-              <span>查看全部</span>
+              <span>{t("general.seeAll")}</span>
               <ArrowRightIcon />
             </Link>
           )}
@@ -77,7 +79,6 @@ export async function getStaticProps({ locale }) {
   return {
     props: {
       ...(await serverSideTranslations(locale, ["common"])),
-      // Will be passed to the page component as props
     },
   }
 }

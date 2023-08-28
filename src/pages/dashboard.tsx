@@ -6,6 +6,7 @@
  */
 import { useElementSize } from "@mantine/hooks"
 import { ChevronDownIcon, Pencil2Icon } from "@radix-ui/react-icons"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import React from "react"
 
 import { MAX_MOBILE_WIDTH } from "@/config"
@@ -24,7 +25,6 @@ import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
-
 
 export const DashboardPage: NextPageWithAuth = () => {
   const userId = useUserId()!
@@ -70,4 +70,12 @@ export function ConversationsToolView() {
       </div>
     </div>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  }
 }

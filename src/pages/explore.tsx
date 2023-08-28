@@ -8,6 +8,7 @@ import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
 import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Image from "next/image"
 import React, { Fragment, useEffect, useState } from "react"
 import { Carousel } from "react-responsive-carousel"
@@ -159,4 +160,12 @@ function ScrollTrigger({ trigger }: { trigger: any }) {
       {entry?.isIntersecting && "Loading More Data ..."}
     </p>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  }
 }

@@ -6,6 +6,7 @@
  */
 import { useElementSize } from "@mantine/hooks"
 import { ChevronDownIcon, Pencil2Icon } from "@radix-ui/react-icons"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
 import React from "react"
 
@@ -23,7 +24,6 @@ import { UserProfile } from "@/components/user/profile.view"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
-
 
 export const DashboardPage: NextPageWithAuth = () => {
   const router = useRouter()
@@ -68,4 +68,12 @@ export function ConversationsToolView() {
       </div>
     </div>
   )
+}
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  }
 }

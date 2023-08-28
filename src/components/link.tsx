@@ -21,6 +21,7 @@ export function SidebarNavItem({ field, Icon, link }: IMenuItem) {
 
 export function FooterNavItem({ field, link, Icon }: IMenuItem) {
   const { t } = useTranslation()
+
   const inner = (
     <>
       {Icon && <Icon className="wh-[20px]" />}

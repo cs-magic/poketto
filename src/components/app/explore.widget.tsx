@@ -7,6 +7,7 @@
 import { ArrowRightIcon } from "@radix-ui/react-icons"
 import range from "lodash/range"
 import sampleSize from "lodash/sampleSize"
+import { useTranslation } from "next-i18next"
 import Link from "next/link"
 
 import { URI } from "@/config"
@@ -22,8 +23,13 @@ import { api } from "@/lib/api"
 const limit = 5
 
 export function ExploreAppsWidget() {
+  const { i18n, t } = useTranslation()
+
   const query = api.app.list.useInfiniteQuery(
-    { limit },
+    {
+      limit,
+      language: i18n.language === "zh-CN" ? "zh" : "en",
+    },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
     }
@@ -36,10 +42,10 @@ export function ExploreAppsWidget() {
     <Card id="explore" variant="ghost" className="w-full grow | flex flex-col">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>探索当下最流行的 Apps</CardTitle>
+          <CardTitle>{t("homepage.exploreTrendingApps")}</CardTitle>
           <Link href={URI.app.explore}>
             <Button variant="link" className="| flex h-fit items-center gap-2 py-0 text-xs">
-              <span>探索全部</span>
+              <span>{t("homepage.exploreAll")}</span>
               <ArrowRightIcon />
             </Button>
           </Link>

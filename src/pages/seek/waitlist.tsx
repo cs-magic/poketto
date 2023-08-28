@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { zodResolver } from "@hookform/resolvers/zod"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -71,4 +72,12 @@ export default function SeekPlatformWaitlistPage() {
       <FeedbackForm />
     </RootLayout>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  }
 }

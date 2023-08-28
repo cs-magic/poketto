@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { type GetServerSideProps } from "next"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import superjson from "superjson"
 
 import { prisma } from "@/server/db"
@@ -16,7 +17,6 @@ import { RootLayout } from "@/layouts/root.layout"
 import { AppDetailView } from "@/components/app/detail.view"
 
 import clsx from "@/lib/clsx"
-
 
 export default function ConversationPage({ appStr }: { appStr: string }) {
   const app = superjson.parse<AppForListView>(appStr)
@@ -34,8 +34,8 @@ export default function ConversationPage({ appStr }: { appStr: string }) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const appId = ctx.query.appId as string
+export const getServerSideProps: GetServerSideProps = async ({ locale, query }) => {
+  const appId = query!.appId as string
 
   const app = await prisma.app.findUniqueOrThrow({
     where: { id: appId },
@@ -53,6 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       appStr: superjson.stringify(app),
+      ...(await serverSideTranslations(locale ?? "zh-CN", ["common"])),
     },
   }
 }

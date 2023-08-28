@@ -5,27 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { useHotkeys } from "@mantine/hooks"
-import {
-  BellIcon,
-  GearIcon,
-  LapTimerIcon,
-  LightningBoltIcon,
-  MagnifyingGlassIcon,
-  MoonIcon,
-  QuestionMarkCircledIcon,
-  SunIcon,
-} from "@radix-ui/react-icons"
+import { GearIcon, LapTimerIcon, MagnifyingGlassIcon, MoonIcon, QuestionMarkCircledIcon, SunIcon } from "@radix-ui/react-icons"
 import groupBy from "lodash/groupBy"
+import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import React, { Fragment } from "react"
+import { TbLanguage } from "react-icons/tb"
 
 import { useAppStore } from "@/store"
 
-import { ICON_DIMENSION_SM, siteConfig } from "@/config"
+import { ICON_DIMENSION_SM } from "@/config"
 import { COMMANDS, menuGroups, menuItems } from "@/config-utils"
 
-import { ChargeContainer, IconContainer } from "@/components/containers"
+import { IconContainer } from "@/components/containers"
 import { Icons } from "@/components/icons"
 import { SidebarNavItem } from "@/components/link"
 import {
@@ -43,7 +37,6 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMount } from "@/hooks/use-mount"
-import { useUserId } from "@/hooks/use-user"
 
 export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
@@ -55,7 +48,7 @@ export function ThemeSwitcher() {
 
   const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length]!
   return (
-    <div onClick={() => setTheme(nextTheme)} className="p-2 hover:bg-accent">
+    <div onClick={() => setTheme(nextTheme)} className="hover:bg-accent">
       {theme === "light" && <SunIcon className={ICON_DIMENSION_SM} />}
       {theme === "dark" && <MoonIcon className={ICON_DIMENSION_SM} />}
       {theme === "system" && <LapTimerIcon className={ICON_DIMENSION_SM} />}
@@ -63,14 +56,34 @@ export function ThemeSwitcher() {
   )
 }
 
+export const LocaleSwitcher = () => {
+  const router = useRouter()
+  const { i18n } = useTranslation()
+  const languages = ["zh-CN", "en"]
+  const curLanguage = i18n.language
+  const nextLanguage = languages[(languages.findIndex((l) => l === curLanguage) + 1) % languages.length]
+  // console.log({ curLanguage, nextLanguage })
+
+  return (
+    <TbLanguage
+      onClick={() => {
+        void router.push(router.pathname, router.asPath, { locale: nextLanguage })
+        // i18n.changeLanguage(nextLanguage)
+      }}
+    />
+  )
+}
+
 /**
  * 晚点再开启公司模式，目前就一个业务，没有必要
  */
 export function LogoWithName({ withCompany }: { withCompany?: false }) {
+  const { t } = useTranslation()
+
   const productLogo = (
     <Link className="p-btn-horizontal w-fit shrink-0" href="/">
       <Icons.Product />
-      <span className="hidden md:flex whitespace-nowrap text-lg tracking-widest">{siteConfig.name}</span>
+      <span className="hidden md:flex whitespace-nowrap text-lg tracking-widest">{t(`product.name`)}</span>
     </Link>
   )
   return withCompany ? (
@@ -92,7 +105,6 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
 }
 
 export default function Navbar() {
-  const userId = useUserId()
   return (
     <div className="flex items-center border-b px-4 py-2">
       <LogoWithName />
@@ -101,13 +113,13 @@ export default function Navbar() {
       <CommandDemo />
 
       <div className="hidden items-center md:flex mx-2">
-        {/*<ChargeContainer>*/}
-        {/*  <IconContainer>*/}
-        {/*    <LightningBoltIcon />*/}
-        {/*  </IconContainer>*/}
-        {/*</ChargeContainer>*/}
+        <IconContainer>
+          <LocaleSwitcher />
+        </IconContainer>
 
-        <ThemeSwitcher />
+        <IconContainer>
+          <ThemeSwitcher />
+        </IconContainer>
 
         <Popover>
           <PopoverTrigger>
@@ -121,7 +133,7 @@ export default function Navbar() {
               {menuItems
                 .filter((k) => menuGroups.question!.includes(k.field))
                 .map((item) => (
-                  <SidebarNavItem {...item} />
+                  <SidebarNavItem key={item.field} {...item} />
                 ))}
             </section>
           </PopoverContent>

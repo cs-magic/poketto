@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
 
 import { RootLayout } from "@/layouts/root.layout"
@@ -14,7 +15,6 @@ import { ConversationList } from "@/components/conv/list"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
-
 
 export default function ConversationPage() {
   const router = useRouter()
@@ -45,4 +45,12 @@ export default function ConversationPage() {
       </div>
     </RootLayout>
   )
+}
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  }
 }

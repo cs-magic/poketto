@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import React from "react"
 
 import { useAppStore } from "@/store"
@@ -11,7 +12,6 @@ import { useAppStore } from "@/store"
 import { CardsLayoutType } from "@/ds"
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
 
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
@@ -31,4 +31,12 @@ export default function SettingsPage() {
       </SelectContent>
     </Select>
   )
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  }
 }

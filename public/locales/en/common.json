@@ -1,2 +1,65 @@
 {
+  "product": {
+    "name": "Poketto AI"
+  },
+  "menus": {
+    "homepage": "Home",
+    "explore": "Explore",
+    "mySpace": "My Space",
+    "myGallery": "My Gallery",
+    "charge": "Charge",
+    "feedback": "Feedback",
+    "whatsPoketto": "What's Poketto AI？",
+    "whatsDora": "What's Dora？",
+    "learningCenter": "Docs / Tutorial"
+  },
+  "general": {
+    "seeAll": "See All",
+    "appsList": "App List",
+    "fullscreenMode": "Full Screen",
+    "detail": "See Detail",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "share": "Share",
+    "open": "Open",
+    "category": "Category",
+    "model": "Model",
+    "language": "Language",
+    "platform": "Platform",
+    "reviews": "Reviews",
+    "information": "Information",
+    "owner": "Owner",
+    "openSource": "Open Source"
+  },
+  "homepage": {
+    "recentlyUsedApps": "Recently Used Apps",
+    "exploreTrendingApps": "Explore Trending Apps",
+    "exploreAll": "Explore All"
+  },
+  "states": {
+    "calls": {
+      "title": "Cals",
+      "desc": "该 App 被用户使用的总次数"
+    },
+    "forks": {
+      "title": "Forks",
+      "desc": "该 App 被用户引用并修改的总次数（待上线）"
+    },
+    "shares": {
+      "title": "Shares",
+      "desc": "该 App 被用户分享的总次数"
+    },
+    "stars": {
+      "title": "Stars",
+      "desc": "该 App 被用户收藏的总次数"
+    },
+    "tips": {
+      "title": "Tips",
+      "desc": "该 App 被用户打赏的总额"
+    },
+    "views": {
+      "title": "Views",
+      "desc": "该 App 在广场内被用户看到的总次数"
+    }
+  }
 }
