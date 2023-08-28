@@ -54,8 +54,10 @@ export enum CardsLayoutType {
 // User Preference (which can be managed via either by store or api)
 // -----------------------------------------------------------------------------
 
-export type SortOrder = keyof typeof resources.common.sorts
-export const sortOrders = Object.keys(resources.common.sorts)
+export const sortOrders = ["mostViewed", "mostUsed", "newest"] as const
+// todo: more intelligent approach
+// export type SortOrder = keyof typeof resources.common.sorts
+export type SortOrder = (typeof sortOrders)[number]
 
 // -----------------------------------------------------------------------------
 // models

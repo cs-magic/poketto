@@ -87,7 +87,7 @@ export default function ExplorePage() {
                     <ResponsiveTooltip
                       content={t(`common:sorts.${order}`)}
                       onClick={() => {
-                        setSortOrder(order)
+                        setSortOrder(order as SortOrder)
                       }}
                     >
                       <Icon />
