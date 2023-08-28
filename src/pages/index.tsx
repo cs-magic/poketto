@@ -47,7 +47,10 @@ export function RecentConversations() {
         <div className="| flex shrink-0 items-end justify-between">
           <CardTitle>{t("homepage.recentlyUsedApps")}</CardTitle>
           {user && (
-            <Link href={getConversationsLink(user.id)} className="h-fit | flex items-center gap-2 py-0 text-xs text-primary">
+            <Link
+              href={getConversationsLink(user.id)}
+              className="h-fit | flex items-center gap-2 py-0 text-xs text-primary"
+            >
               <span>{t("general.seeAll")}</span>
               <ArrowRightIcon />
             </Link>
@@ -65,8 +68,13 @@ export function RecentConversations() {
         ) : (
           conversations.slice(0, 10).map((c) => (
             //   正常情况下，我们应该用 PopContent，然后进入，不过这里是已经安装好的app，因此直接link过去比较好
-            <Link className="w-48 shrink-0" key={c.appId} href="/c/[userId]/[appId]" as={getConversationLink(c.userId, c.appId)}>
-              <AppVerticalCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort="new" key={c.appId} />
+            <Link
+              className="w-48 shrink-0"
+              key={c.appId}
+              href="/c/[userId]/[appId]"
+              as={getConversationLink(c.userId, c.appId)}
+            >
+              <AppVerticalCardView app={c.app} cardsLayout={CardsLayoutType.grid} sort="newest" key={c.appId} />
             </Link>
           ))
         )}

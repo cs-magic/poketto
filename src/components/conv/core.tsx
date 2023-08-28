@@ -32,7 +32,7 @@ import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
 
 import { LogoWithName } from "@/layouts/navbar"
 
-import { AppDialogContainer } from "@/components/app/container"
+import { AppDetailContainer } from "@/components/app/container"
 import { AutoScrollContainer, ChargeContainer, IconContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"
@@ -115,19 +115,27 @@ export function ConversationCore({ cid }: { cid: string }) {
 
                 <Separator orientation="horizontal" className="hidden md:flex" />
 
-                <Link href="/c/[userId]" as={getConversationsLink(c.userId)} className="p-btn-horizontal justify-between lg:hidden">
+                <Link
+                  href="/c/[userId]"
+                  as={getConversationsLink(c.userId)}
+                  className="p-btn-horizontal justify-between lg:hidden"
+                >
                   <span>List</span> <HamburgerMenuIcon />
                 </Link>
 
-                <AppDialogContainer appId={c.appId}>
+                <AppDetailContainer appId={c.appId}>
                   <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
                     <span>Detail</span> <CodeSandboxLogoIcon />
                   </Button>
-                </AppDialogContainer>
+                </AppDetailContainer>
 
                 <Separator orientation="horizontal" className="xl:hidden" />
 
-                <Button className="justify-between" variant="ghost" onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}>
+                <Button
+                  className="justify-between"
+                  variant="ghost"
+                  onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}
+                >
                   {c.pinned ? (
                     <>
                       <span>Unpin</span>
@@ -359,7 +367,10 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
               <CardDescription>AI 的回答将基于此人设进行</CardDescription>
             </CardHeader>
             <CardContent>
-              <ReactMarkdown className={clsx("p-prose py-0", contentStyleBasedOnRole[msg.role])} remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown
+                className={clsx("p-prose py-0", contentStyleBasedOnRole[msg.role])}
+                remarkPlugins={[remarkGfm]}
+              >
                 {m(msg.content)}
               </ReactMarkdown>
             </CardContent>
@@ -369,7 +380,10 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
           <div
             id={msg.id}
             key={msg.id}
-            className={clsx("group chat text-sm tracking-normal", msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end")}
+            className={clsx(
+              "group chat text-sm tracking-normal",
+              msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end"
+            )}
           >
             <div className="avatar chat-image">
               <Avatar>
@@ -377,7 +391,10 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
               </Avatar>
             </div>
 
-            <ReactMarkdown className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])} remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown
+              className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])}
+              remarkPlugins={[remarkGfm]}
+            >
               {m(msg.content)}
             </ReactMarkdown>
           </div>
@@ -409,7 +426,9 @@ export function AddAppAlertDialog({ app }: { app: AppForListView }) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>App 添加提示</AlertDialogTitle>
-          <AlertDialogDescription>在您没有添加 {app.name} 之前，您无法使用它，请确认是否要继续 ！</AlertDialogDescription>
+          <AlertDialogDescription>
+            在您没有添加 {app.name} 之前，您无法使用它，请确认是否要继续 ！
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>取消</AlertDialogCancel>

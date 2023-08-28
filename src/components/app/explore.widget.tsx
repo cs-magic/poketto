@@ -13,7 +13,7 @@ import Link from "next/link"
 import { URI } from "@/config"
 
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
-import { AppDialogContainer } from "@/components/app/container"
+import { AppDetailContainer } from "@/components/app/container"
 import { Loading } from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -59,9 +59,9 @@ export function ExploreAppsWidget() {
           ) : (
             apps.length >= limit &&
             sampleSize(range(limit), 3).map((i) => (
-              <AppDialogContainer appId={apps[i]!.id} key={i}>
+              <AppDetailContainer appId={apps[i]!.id} key={i}>
                 <AppHorizontalCardView app={apps[i]} key={i} />
-              </AppDialogContainer>
+              </AppDetailContainer>
             ))
           )}
         </div>

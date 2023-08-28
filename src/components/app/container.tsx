@@ -9,7 +9,7 @@ import React, { type PropsWithChildren, useState } from "react"
 import { AppDetailView } from "@/components/app/detail.view"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
-export function AppDialogContainer({ appId, children }: { appId: string } & PropsWithChildren) {
+export function AppDetailContainer({ appId, children }: { appId: string } & PropsWithChildren) {
   const [open, setOpen] = useState(false)
   return (
     <Dialog open={open} onOpenChange={setOpen}>

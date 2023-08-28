@@ -14,7 +14,6 @@ import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
 import type { SortOrder } from "@/ds"
 import { selectAppForDetailView, selectAppForListView, sortOrders } from "@/ds"
 
-
 import AppOrderByWithRelationInput = Prisma.AppOrderByWithRelationInput
 
 const orderByMap: { [key in SortOrder]: AppOrderByWithRelationInput } = {
@@ -22,7 +21,7 @@ const orderByMap: { [key in SortOrder]: AppOrderByWithRelationInput } = {
   mostUsed: { state: { calls: "desc" } },
   // mostSaved: { state: { stars: "desc" } },
   // mostShared: { state: { shares: "desc" } },
-  new: { state: { createdAt: "desc" } },
+  newest: { state: { createdAt: "desc" } },
   // top: { state: { calls: "desc" } },
   // trending: { state: { shares: "desc" } },
   // recommend
@@ -44,40 +43,50 @@ export const pokettoAppRouter = createTRPCRouter({
         categorySub: z.number().optional(),
         tags: z.string().optional(), // use | to space
         searchKey: z.string().optional(),
+        // todo: array augment
         sortOrder: z.enum(sortOrders).default("mostUsed"),
       })
     )
-    .query(async ({ ctx: { prisma }, input: { cursor, language, searchKey, limit, sortOrder, categoryMain, categorySub, tags } }) => {
-      const items = await prisma.app.findMany({
-        cursor: cursor ? { id: cursor } : undefined,
-        take: limit + 1,
+    .query(
+      async ({
+        ctx: { prisma },
+        input: { cursor, language, searchKey, limit, sortOrder, categoryMain, categorySub, tags },
+      }) => {
+        const items = await prisma.app.findMany({
+          cursor: cursor ? { id: cursor } : undefined,
+          take: limit + 1,
 
-        select: selectAppForListView,
-        where: {
-          language,
-          categoryMain,
-          categorySub,
-          tags: {
-            every: {
-              id: {
-                in: tags?.split(TAG_SEPARATOR),
+          select: selectAppForListView,
+          where: {
+            language,
+            categoryMain,
+            categorySub,
+            tags: {
+              every: {
+                id: {
+                  in: tags?.split(TAG_SEPARATOR),
+                },
               },
             },
+            OR: [
+              { name: { contains: searchKey } },
+              { desc: { contains: searchKey } },
+              { creator: { name: { contains: searchKey } } },
+            ],
           },
-          OR: [{ name: { contains: searchKey } }, { desc: { contains: searchKey } }, { creator: { name: { contains: searchKey } } }],
-        },
-        orderBy: orderByMap[sortOrder],
-      })
-      let nextCursor: typeof cursor | undefined
-      if (items.length > limit) {
-        const nextItem = items.pop()
-        nextCursor = nextItem!.id
+          orderBy: orderByMap[sortOrder],
+        })
+        let nextCursor: typeof cursor | undefined
+        if (items.length > limit) {
+          const nextItem = items.pop()
+          nextCursor = nextItem!.id
+        }
+        return {
+          items,
+          nextCursor,
+        }
       }
-      return {
-        items,
-        nextCursor,
-      }
-    }),
+    ),
 
   get: publicProcedure
     .input(

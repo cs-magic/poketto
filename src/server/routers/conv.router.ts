@@ -58,6 +58,7 @@ export const convRouter = createTRPCRouter({
             messages: {
               create: [
                 {
+                  role: "system",
                   content: getWelcomeSystemNotification(user.name ?? "bro"), // do not know app name here, lol
                   format: ChatMessageFormatType.systemNotification,
                 },

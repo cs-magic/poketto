@@ -22,7 +22,7 @@ import { CardsLayoutType, sortOrders } from "@/ds"
 import { RootLayout } from "@/layouts/root.layout"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
-import { AppDialogContainer } from "@/components/app/container"
+import { AppDetailContainer } from "@/components/app/container"
 import { GridContainer, IconContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
 import { Order2icon } from "@/components/icons"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
@@ -102,9 +102,9 @@ export default function ExplorePage() {
         <div className="w-full grow overflow-auto | flex flex-col gap-2 ">
           <Container>
             {apps.map((app) => (
-              <AppDialogContainer key={app.id} appId={app.id}>
+              <AppDetailContainer key={app.id} appId={app.id}>
                 <AppVerticalCardView app={app} cardsLayout={cardsLayout} sort={sortOrder} />
-              </AppDialogContainer>
+              </AppDetailContainer>
             ))}
           </Container>
 
@@ -158,7 +158,10 @@ function ScrollTrigger({ trigger }: { trigger: any }) {
   return (
     <p
       ref={ref}
-      className={clsx("flex-center m-auto shrink-0 rounded-2xl px-16 py-8", " animate-pulse bg-card font-bold text-primary-foreground")}
+      className={clsx(
+        "flex-center m-auto shrink-0 rounded-2xl px-16 py-8",
+        " animate-pulse bg-card font-bold text-primary-foreground"
+      )}
     >
       {entry?.isIntersecting && "Loading More Data ..."}
     </p>

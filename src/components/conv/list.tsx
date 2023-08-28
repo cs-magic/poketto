@@ -13,7 +13,7 @@ import { type PropsWithChildren, useState } from "react"
 
 import { type ConvForListView } from "@/ds"
 
-import { AppDialogContainer } from "@/components/app/container"
+import { AppDetailContainer } from "@/components/app/container"
 import { SearchResultView } from "@/components/app/search-result.view"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -56,7 +56,11 @@ export function ConversationList() {
           }}
         />
         {searchKey && (
-          <Button className="absolute bottom-2 right-4 text-muted-foreground" variant="ghost" onClick={() => setSearchKey("")}>
+          <Button
+            className="absolute bottom-2 right-4 text-muted-foreground"
+            variant="ghost"
+            onClick={() => setSearchKey("")}
+          >
             <XIcon className=" wh-5" />
           </Button>
         )}
@@ -69,9 +73,9 @@ export function ConversationList() {
             <>
               <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
               {searchedApps.slice(0, 10).map((app) => (
-                <AppDialogContainer appId={app.id} key={app.id}>
+                <AppDetailContainer appId={app.id} key={app.id}>
                   <SearchResultView app={app} />
-                </AppDialogContainer>
+                </AppDetailContainer>
               ))}
             </>
           ) : (

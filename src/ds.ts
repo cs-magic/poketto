@@ -55,7 +55,7 @@ export enum CardsLayoutType {
 // -----------------------------------------------------------------------------
 
 export type SortOrder = keyof typeof resources.common.sorts
-export const sortOrders = Object.keys(resources.common.sorts) as SortOrder[]
+export const sortOrders = Object.keys(resources.common.sorts)
 
 // -----------------------------------------------------------------------------
 // models

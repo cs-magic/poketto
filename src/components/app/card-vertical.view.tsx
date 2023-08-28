@@ -11,6 +11,8 @@ import Image from "next/image"
 
 import { type AppForListView, CardsLayoutType, type SortOrder } from "@/ds"
 
+import { AppDetailContainer } from "@/components/app/container"
+import { AppDetailView } from "@/components/app/detail.view"
 import { UsesField, ViewsField } from "@/components/field"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
@@ -20,14 +22,29 @@ import { Button } from "@/components/ui/button"
 import clsx from "@/lib/clsx"
 import { getFlowgptUserLink, getLocalFlowgptImageUri } from "@/lib/string"
 
-export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForListView; cardsLayout: CardsLayoutType; sort: SortOrder }) {
+export function AppVerticalCardView({
+  app,
+  cardsLayout,
+  sort,
+}: {
+  app: AppForListView
+  cardsLayout: CardsLayoutType
+  sort: SortOrder
+}) {
   // console.log("app avatar: ", app.avatar)
   const appAvatar = getLocalFlowgptImageUri(app.avatar, "md")
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (
         <AspectRatio ratio={3 / 4} className="overflow-hidden rounded-2xl">
-          <Image src={appAvatar} priority fill className="object-fill transition-all group-hover:scale-125" alt={app.name} sizes="300px" />
+          <Image
+            src={appAvatar}
+            priority
+            fill
+            className="object-fill transition-all group-hover:scale-125"
+            alt={app.name}
+            sizes="300px"
+          />
         </AspectRatio>
       ) : (
         <Image
@@ -49,7 +66,9 @@ export function AppVerticalCardView({ app, cardsLayout, sort }: { app: AppForLis
         <div className="flex items-center gap-2">
           {app.tags.length && <Badge variant="destructive">{startCase(capitalize(app.tags[0]?.name))}</Badge>}
         </div>
-        <DotsVerticalIcon className="hidden group-hover:flex" />
+        {/*<AppDetailContainer appId={app.id}>*/}
+        {/*  <DotsVerticalIcon className="hidden group-hover:flex" />*/}
+        {/*</AppDetailContainer>*/}
       </div>
 
       {/* footer desc */}

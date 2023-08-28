@@ -30,7 +30,7 @@ export function UserProfile({ user }: { user: UserForProfile }) {
 
   return (
     <div className="| mx-auto flex h-fit max-w-[375px] flex-col justify-around gap-4 rounded-2xl p-4">
-      <Avatar className="mx-auto wh-[256px]">
+      <Avatar className="mx-auto wh-[128px]">
         <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? user.id, "md")} className="" />
         <AvatarFallback>
           <AvatarIcon />
@@ -39,7 +39,11 @@ export function UserProfile({ user }: { user: UserForProfile }) {
 
       {/* avatar info */}
       <div className="flex flex-col  overflow-hidden">
-        <Link className="text-2xl flex items-center gap-2" href={getFlowgptUserLink(user.platformArgs?.uri)} target="_blank">
+        <Link
+          className="text-2xl flex items-center gap-2"
+          href={getFlowgptUserLink(user.platformArgs?.uri)}
+          target="_blank"
+        >
           <span>{user?.name ?? user?.email ?? user.platformArgs?.uri ?? DEFAULT_USER_NAME}</span>
           <Badge className="text-xs" variant="secondary">
             {user.platformType}

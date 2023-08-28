@@ -26,7 +26,7 @@ export default function SettingsPage() {
   // todo: in settings
   return (
     <RootLayout>
-      <div className={"w-full max-w-[512px] m-auto p-2 overflow-auto | flex flex-wrap gap-2"}>
+      <div className={"w-full max-w-[512px] m-auto overflow-auto | flex flex-wrap p-4 gap-4"}>
         <Card className={"w-full"}>
           <CardHeader>
             <CardTitle>全局</CardTitle>

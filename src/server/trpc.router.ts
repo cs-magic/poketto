@@ -7,11 +7,11 @@
 import { convRouter } from "./routers/conv.router"
 
 import { pokettoAppRouter } from "@/server/routers/app.router"
+import { billRouter } from "@/server/routers/bill.router"
 import { invitationRouter } from "@/server/routers/invitation.router"
 import { msgRouter } from "@/server/routers/msg.router"
 import { userRouter } from "@/server/routers/user.router"
 import { createTRPCRouter } from "@/server/trpc.helpers"
-
 
 /**
  * This is the primary router for your server.
@@ -24,6 +24,7 @@ export const rootRouter = createTRPCRouter({
   conv: convRouter,
   message: msgRouter,
   invitation: invitationRouter,
+  bill: billRouter,
 })
 
 // export type definition of API
