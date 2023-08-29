@@ -58,31 +58,31 @@ export function ConversationList() {
       </div>
 
       <div className="flex w-full grow flex-col overflow-y-auto overflow-x-hidden">
-        {/* 列表 */}
-        {searchKey ? ( // 搜索时
-          searchedApps ? (
-            <>
-              <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>
-              {searchedApps.slice(0, 10).map((app) => (
-                <AppDetailContainer appId={app.id} key={app.id}>
-                  <SearchResultView app={app} />
-                </AppDetailContainer>
-              ))}
-            </>
-          ) : (
-            <>
-              <SectionTitle>Global search results</SectionTitle>
-              <Skeleton className="h-8" />
-            </>
-          ) // 	没有搜索时显示最近聊天列表
-        ) : (
-          <>
-            <SectionTitle>Poketto Apps</SectionTitle>
-            {orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
-              <ConversationListView key={c.appId} c={c} />
-            ))}
-          </>
-        )}
+        {/* todo: 搜索聊天记录 */}
+        {/*{searchKey ? ( // 搜索时*/}
+        {/*//   searchedApps ? (*/}
+        {/*//     <>*/}
+        {/*//       <SectionTitle>Global search results {searchedApps.length ? "" : " (0)"}</SectionTitle>*/}
+        {/*//       {searchedApps.slice(0, 10).map((app) => (*/}
+        {/*//         <AppDetailContainer appId={app.id} key={app.id}>*/}
+        {/*//           <SearchResultView app={app} />*/}
+        {/*//         </AppDetailContainer>*/}
+        {/*//       ))}*/}
+        {/*//     </>*/}
+        {/*//   ) : (*/}
+        {/*//     <>*/}
+        {/*//       <SectionTitle>Global search results</SectionTitle>*/}
+        {/*//       <Skeleton className="h-8" />*/}
+        {/*//     </>*/}
+        {/*//   ) // 	没有搜索时显示最近聊天列表*/}
+        {/*// ) : (*/}
+        {/*//   <>*/}
+        {/*//     <SectionTitle>Poketto Apps</SectionTitle>*/}
+        {/*//     {orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (*/}
+        {/*//       <ConversationListView key={c.appId} c={c} />*/}
+        {/*//     ))}*/}
+        {/*//   </>*/}
+        {/*// )}*/}
       </div>
     </div>
   )
