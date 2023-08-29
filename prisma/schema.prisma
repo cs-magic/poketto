@@ -183,6 +183,9 @@ model ChatMessage {
   // 每条 message 付费
   cost Float? @default(0)
 
+  modelType String? @default("gpt-3.5-turbo")
+  isUsingFree Boolean? @default(false)
+
   @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
 }
 
@@ -338,6 +341,10 @@ model User {
   stripePayments        StripePayment[]
   stripeSubscriptionEnd DateTime?
   stripeCustomerId      String?         @unique
+
+  // 每日需要更新
+  /// [ModelQuota]
+  quota Json?
 
   // maybe we only need one id
   @@unique([platformType, platformId], name: "platform")

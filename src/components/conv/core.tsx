@@ -31,7 +31,7 @@ import { useAppStore } from "@/store"
 
 import { contentStyleBasedOnRole } from "@/config-utils"
 
-import { type AppForListView, ModelType, type SelectChatMessageForListView, modelTypes } from "@/ds"
+import { AllMessage, type AppForListView, ModelQuota, defaultModelQuota, modelTypes } from "@/ds"
 
 import { LogoWithName } from "@/layouts/navbar"
 
@@ -61,19 +61,13 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
 import { useUniversalFullscreen } from "@/hooks/use-universal-fullscreen"
-import { useSessionUser, useUserId } from "@/hooks/use-user"
+import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
+import { packMessageWithDate } from "@/lib/message"
 import { getConversationsLink } from "@/lib/string"
-
-type AllMessage =
-  | SelectChatMessageForListView
-  | {
-      systemType: "notification" | "date"
-      content: string
-    }
 
 export function ConversationCore({ cid }: { cid: string }) {
   const { t } = useTranslation()
@@ -171,7 +165,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const { modelType, setModelType } = useAppStore()
   const { t } = useTranslation()
   const userId = useUserId()
-  const user = useSessionUser()
+  const { data: user } = api.user.getProfile.useQuery({ id: userId })
   const { data: balanceOk } = api.user.validateBalance.useQuery({ id: userId })
   const { data: conv } = api.conv.get.useQuery({ id: conversationId })
   const { data: hasApp } = api.conv.has.useQuery({ appId: conv?.appId ?? "" }, { enabled: !!conv })
@@ -198,6 +192,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
     },
     onFinish: async (msg) => {
       void utils.conv.list.invalidate()
+      void utils.user.getProfile.invalidate()
 
       console.log("onFinish:", { msg })
       // 不能用以下的办法更新id，会与数据库不同步，性能也不好
@@ -220,36 +215,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
     }
   }, [initialMessages])
 
-  if (!conv) {
-    return null
-  }
-
-  const messagesWithDate: AllMessage[] = []
-  let curDate = d(new Date(0, 0, 0))
-  for (const m of messages) {
-    const newDate = d(m.createdAt).startOf("date")
-    if (newDate > curDate) {
-      curDate = newDate
-      messagesWithDate.push({ systemType: "date", content: curDate.format("MMMM DD") })
-    }
-    messagesWithDate.push({
-      ...m,
-      user:
-        m?.role === PromptRoleType.user
-          ? {
-              id: user!.id,
-              image: user!.image!,
-              name: user!.name!,
-            }
-          : {
-              id: conv.app.id,
-              image: conv.app.avatar,
-              name: conv.app.name!,
-            },
-      format: "format" in m ? (m.format as ChatMessageFormatType) : ChatMessageFormatType.text,
-      createdAt: m?.createdAt ?? new Date(),
-    })
-  }
+  if (!conv || !user) return null
 
   const modelWeight = (
     Math.floor((modelTypes.findIndex((m) => m === modelType)! / modelTypes.length) * 128) + 128
@@ -257,17 +223,17 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const color = `#${modelWeight}${modelWeight}00`
   console.log({ color })
 
+  const quota: ModelQuota = user?.quota ?? defaultModelQuota
+
   return (
     <div className={clsx("relative  h-full w-full", "flex  flex-col", "overflow-hidden")}>
       <Dialog>
         <AlertDialog open={alertVisible} onOpenChange={setAlertVisible}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>账号提醒</AlertDialogTitle>
+              <AlertDialogTitle>小 P 提醒</AlertDialogTitle>
               <AlertDialogDescription>
-                哎呀，您的账户余额不足啦！
-                <br />
-                请确认充值才能继续使用哦:)
+                哎呀，您今天的试用次数已经用完啦，继续需要充值才能继续使用哦:)
               </AlertDialogDescription>
             </AlertDialogHeader>
 
@@ -284,25 +250,18 @@ export function ConversationInput({ conversationId }: { conversationId: string }
         </DialogContent>
       </Dialog>
 
-      {addDialogVisible && conv && <AddAppAlertDialog app={conv.app} />}
-
       <ScrollContainer>
-        <div
-          className={clsx(
-            "w-full p-2 "
-            // "bg-cyan-600 dark:bg-cyan-950 "
-          )}
-        >
+        <div className={clsx("w-full p-2 ")}>
           {/* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序 */}
-          {conv && <ConversationMessages messages={messagesWithDate.reverse()} />}
+          {conv && <ConversationMessages messages={packMessageWithDate(messages, user, conv.app).reverse()} />}
         </div>
       </ScrollContainer>
 
       <div className={"w-full px-4 flex items-center"}>
         <Popover>
           <PopoverTrigger>
-            <IconContainer>
-              <CodeSandboxLogoIcon style={{ color }} />
+            <IconContainer className={"rounded-sm"}>
+              <CodeSandboxLogoIcon style={{ color }} />({quota[modelType]})
             </IconContainer>
           </PopoverTrigger>
           <PopoverContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
@@ -328,10 +287,8 @@ export function ConversationInput({ conversationId }: { conversationId: string }
         onSubmit={(event) => {
           event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
           console.log({ hasApp, balanceOk })
-          if (!hasApp) {
-            return setAddDialogVisible(true)
-          }
-          if (!balanceOk) {
+
+          if (!balanceOk && quota[modelType] <= 0) {
             return setAlertVisible(true)
           }
           handleSubmit(event)
@@ -358,9 +315,6 @@ export function ConversationInput({ conversationId }: { conversationId: string }
             ],
           ])}
         />
-        <input className="hidden" name="conversationUserId" value={userId} />
-        <input className="hidden" name="conversationAppId" value={conversationId} />
-
         <Button className="lg:hidden flex items-center justify-center" variant="ghost" type="submit">
           <SendIcon />
         </Button>
@@ -447,6 +401,12 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
   )
 }
 
+/**
+ * 目前不需要它，因为现在一定是先添加app，才能开始会话
+ *
+ * @param app
+ * @constructor
+ */
 export function AddAppAlertDialog({ app }: { app: AppForListView }) {
   const utils = api.useContext()
   const [addOpen, setAddOpen] = useState(false)

@@ -195,5 +195,7 @@ export const STRIPE_PAYMENT_PRODUCT_10_ID = "prod_OVgbKpNEmJJXIy"
 export const STRIPE_SUBSCRIBE_PRODUCT_10_ID = "prod_OVgYAVpLO6oLje"
 export const STRIPE_SUBSCRIBE_PRODUCT_30_ID = "prod_OVgZnKD7Fc2bsQ"
 
-export const FREE_GPT3_DAILY = 1000
-export const FREE_GPT4_DAILY = 100
+export const FREE_GPT3_DAILY_TOTAL = 1000
+export const FREE_GPT4_DAILY_TOTAL = 100
+export const FREE_GPT3_DAILY_USER = 10
+export const FREE_GPT4_DAILY_USER = 3

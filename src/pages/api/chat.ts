@@ -21,6 +21,8 @@ import { baseEnv } from "@/env.mjs"
 
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 
+import { defaultModelQuota } from "@/ds"
+
 import { nanoid } from "@/lib/id"
 
 import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
@@ -43,8 +45,8 @@ export default async function handler(req: Request, res: Response) {
   /**
    * validate balance
    */
-  const balanceOk = await proxy.user.validateBalance.query({ id: userId })
-  if (!balanceOk)
+  const user = await proxy.user.getProfile.query({ id: userId })
+  if (user.balance <= 0 && (user.quota ?? defaultModelQuota)[modelType] <= 0)
     return new Response(ERR_MSG_BALANCE_NOT_ENOUGH, {
       status: 406,
     })
@@ -60,6 +62,8 @@ export default async function handler(req: Request, res: Response) {
       content,
       conversationId,
       shortId: id,
+      modelType,
+      isUsingFree: user.balance <= 0
     }
     console.log("pushing: ", newMessage)
     await proxy.message.push.mutate(newMessage)

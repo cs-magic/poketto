@@ -11,6 +11,8 @@ import type { Session } from "next-auth"
 import type { AppProps } from "next/app"
 import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 
+import { FREE_GPT3_DAILY_USER, FREE_GPT4_DAILY_USER } from "@/config"
+
 import resources from "@/@types/resources"
 
 import AppGetPayload = Prisma.AppGetPayload
@@ -66,6 +68,12 @@ export interface ICommandItem {
 
 export const modelTypes = ["gpt-3.5-turbo", "gpt-4", "openchat"] as const
 export type ModelType = (typeof modelTypes)[number]
+export type ModelQuota = Record<ModelType, number>
+export const defaultModelQuota: ModelQuota = {
+  "gpt-3.5-turbo": FREE_GPT3_DAILY_USER,
+  "gpt-4": FREE_GPT4_DAILY_USER,
+  openchat: 100,
+}
 
 // -----------------------------------------------------------------------------
 // UI
@@ -108,6 +116,7 @@ export const selectUserProfile = validator<UserSelect>()({
   platformType: true,
   platformId: true,
   platformArgs: true,
+  quota: true,
 })
 export type UserForProfile = UserGetPayload<{ select: typeof selectUserProfile }>
 
@@ -202,3 +211,10 @@ export const selectChatMessageForDetailView = validator<ChatMessageSelect>()({
   },
 })
 export type SelectChatMessageForDetailView = ChatMessageGetPayload<{ select: typeof selectChatMessageForDetailView }>
+
+export type AllMessage =
+  | SelectChatMessageForListView
+  | {
+      systemType: "notification" | "date"
+      content: string
+    }

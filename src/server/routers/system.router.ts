@@ -6,17 +6,17 @@
  */
 import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
 
-import { FREE_GPT3_DAILY, FREE_GPT4_DAILY } from "@/config"
+import { FREE_GPT3_DAILY_TOTAL, FREE_GPT4_DAILY_TOTAL } from "@/config"
 
 const status = {
   gpt3: {
     free: {
-      surplus: FREE_GPT3_DAILY,
+      surplus: FREE_GPT3_DAILY_TOTAL,
     },
   },
   gpt4: {
     free: {
-      surplus: FREE_GPT4_DAILY,
+      surplus: FREE_GPT4_DAILY_TOTAL,
     },
   },
   users: 0,

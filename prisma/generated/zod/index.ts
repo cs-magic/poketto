@@ -64,7 +64,7 @@ export const AppStateScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt
 
 export const AppTagScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','creatorId','name']);
 
-export const ChatMessageScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','role','content','format','conversationId','shortId','namespace','cost']);
+export const ChatMessageScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','role','content','format','conversationId','shortId','namespace','cost','modelType','isUsingFree']);
 
 export const ChatMessageActionScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','messageId','action']);
 
@@ -82,7 +82,7 @@ export const StripeProductScalarFieldEnumSchema = z.enum(['id','price','currency
 
 export const StripePaymentScalarFieldEnumSchema = z.enum(['id','count','redeemCode','productId','userId']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','platformType','platformId','platformArgs','name','email','emailVerified','image','description','followedByCount','followingCount','balance','stripeSubscriptionEnd','stripeCustomerId']);
+export const UserScalarFieldEnumSchema = z.enum(['id','platformType','platformId','platformArgs','name','email','emailVerified','image','description','followedByCount','followingCount','balance','stripeSubscriptionEnd','stripeCustomerId','quota']);
 
 export const VerificationTokenScalarFieldEnumSchema = z.enum(['identifier','token','expires']);
 
@@ -279,6 +279,8 @@ export const ChatMessageSchema = z.object({
   shortId: z.string(),
   namespace: z.string().nullable(),
   cost: z.number().nullable(),
+  modelType: z.string().nullable(),
+  isUsingFree: z.boolean().nullable(),
 })
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>
@@ -426,6 +428,10 @@ export const UserSchema = z.object({
   balance: z.number().int(),
   stripeSubscriptionEnd: z.coerce.date().nullable(),
   stripeCustomerId: z.string().nullable(),
+  /**
+   * [ModelQuota]
+   */
+  quota: NullableJsonValue.optional(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -709,6 +715,8 @@ export const ChatMessageSelectSchema: z.ZodType<Prisma.ChatMessageSelect> = z.ob
   shortId: z.boolean().optional(),
   namespace: z.boolean().optional(),
   cost: z.boolean().optional(),
+  modelType: z.boolean().optional(),
+  isUsingFree: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   userActionOnMessage: z.union([z.boolean(),z.lazy(() => ChatMessageActionFindManyArgsSchema)]).optional(),
   conversation: z.union([z.boolean(),z.lazy(() => ConversationArgsSchema)]).optional(),
@@ -986,6 +994,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   balance: z.boolean().optional(),
   stripeSubscriptionEnd: z.boolean().optional(),
   stripeCustomerId: z.boolean().optional(),
+  quota: z.boolean().optional(),
   accounts: z.union([z.boolean(),z.lazy(() => AccountFindManyArgsSchema)]).optional(),
   sessions: z.union([z.boolean(),z.lazy(() => SessionFindManyArgsSchema)]).optional(),
   invitedFrom: z.union([z.boolean(),z.lazy(() => InvitationRelationFindManyArgsSchema)]).optional(),
@@ -1644,6 +1653,8 @@ export const ChatMessageWhereInputSchema: z.ZodType<Prisma.ChatMessageWhereInput
   shortId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   cost: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  modelType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  isUsingFree: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionListRelationFilterSchema).optional(),
   conversation: z.union([ z.lazy(() => ConversationRelationFilterSchema),z.lazy(() => ConversationWhereInputSchema) ]).optional(),
@@ -1661,6 +1672,8 @@ export const ChatMessageOrderByWithRelationInputSchema: z.ZodType<Prisma.ChatMes
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   cost: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  modelType: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  isUsingFree: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionOrderByRelationAggregateInputSchema).optional(),
   conversation: z.lazy(() => ConversationOrderByWithRelationInputSchema).optional()
@@ -1694,6 +1707,8 @@ export const ChatMessageWhereUniqueInputSchema: z.ZodType<Prisma.ChatMessageWher
   shortId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   cost: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  modelType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  isUsingFree: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionListRelationFilterSchema).optional(),
   conversation: z.union([ z.lazy(() => ConversationRelationFilterSchema),z.lazy(() => ConversationWhereInputSchema) ]).optional(),
@@ -1711,6 +1726,8 @@ export const ChatMessageOrderByWithAggregationInputSchema: z.ZodType<Prisma.Chat
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   cost: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  modelType: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  isUsingFree: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => ChatMessageCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => ChatMessageAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => ChatMessageMaxOrderByAggregateInputSchema).optional(),
@@ -1733,6 +1750,8 @@ export const ChatMessageScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.C
   shortId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   cost: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  modelType: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  isUsingFree: z.union([ z.lazy(() => BoolNullableWithAggregatesFilterSchema),z.boolean() ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageActionWhereInputSchema: z.ZodType<Prisma.ChatMessageActionWhereInput> = z.object({
@@ -2295,6 +2314,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   balance: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   stripeSubscriptionEnd: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   stripeCustomerId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  quota: z.lazy(() => JsonNullableFilterSchema).optional(),
   accounts: z.lazy(() => AccountListRelationFilterSchema).optional(),
   sessions: z.lazy(() => SessionListRelationFilterSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationListRelationFilterSchema).optional(),
@@ -2327,6 +2347,7 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   balance: z.lazy(() => SortOrderSchema).optional(),
   stripeSubscriptionEnd: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   stripeCustomerId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  quota: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   accounts: z.lazy(() => AccountOrderByRelationAggregateInputSchema).optional(),
   sessions: z.lazy(() => SessionOrderByRelationAggregateInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationOrderByRelationAggregateInputSchema).optional(),
@@ -2427,6 +2448,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   followingCount: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   balance: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   stripeSubscriptionEnd: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  quota: z.lazy(() => JsonNullableFilterSchema).optional(),
   accounts: z.lazy(() => AccountListRelationFilterSchema).optional(),
   sessions: z.lazy(() => SessionListRelationFilterSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationListRelationFilterSchema).optional(),
@@ -2459,6 +2481,7 @@ export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderBy
   balance: z.lazy(() => SortOrderSchema).optional(),
   stripeSubscriptionEnd: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   stripeCustomerId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  quota: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => UserCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => UserAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => UserMaxOrderByAggregateInputSchema).optional(),
@@ -2484,6 +2507,7 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   balance: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   stripeSubscriptionEnd: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   stripeCustomerId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  quota: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional()
 }).strict();
 
 export const VerificationTokenWhereInputSchema: z.ZodType<Prisma.VerificationTokenWhereInput> = z.object({
@@ -3152,6 +3176,8 @@ export const ChatMessageCreateInputSchema: z.ZodType<Prisma.ChatMessageCreateInp
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutChatMessagesInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionCreateNestedManyWithoutMessageInputSchema).optional(),
   conversation: z.lazy(() => ConversationCreateNestedOneWithoutMessagesInputSchema)
@@ -3169,6 +3195,8 @@ export const ChatMessageUncheckedCreateInputSchema: z.ZodType<Prisma.ChatMessage
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
 
@@ -3182,6 +3210,8 @@ export const ChatMessageUpdateInputSchema: z.ZodType<Prisma.ChatMessageUpdateInp
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneWithoutChatMessagesNestedInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUpdateManyWithoutMessageNestedInputSchema).optional(),
   conversation: z.lazy(() => ConversationUpdateOneRequiredWithoutMessagesNestedInputSchema).optional()
@@ -3199,6 +3229,8 @@ export const ChatMessageUncheckedUpdateInputSchema: z.ZodType<Prisma.ChatMessage
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
 
@@ -3213,7 +3245,9 @@ export const ChatMessageCreateManyInputSchema: z.ZodType<Prisma.ChatMessageCreat
   conversationId: z.string(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
-  cost: z.number().optional().nullable()
+  cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable()
 }).strict();
 
 export const ChatMessageUpdateManyMutationInputSchema: z.ZodType<Prisma.ChatMessageUpdateManyMutationInput> = z.object({
@@ -3226,6 +3260,8 @@ export const ChatMessageUpdateManyMutationInputSchema: z.ZodType<Prisma.ChatMess
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ChatMessageUncheckedUpdateManyInput> = z.object({
@@ -3240,6 +3276,8 @@ export const ChatMessageUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ChatMes
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageActionCreateInputSchema: z.ZodType<Prisma.ChatMessageActionCreateInput> = z.object({
@@ -3735,6 +3773,7 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -3767,6 +3806,7 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -3799,6 +3839,7 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -3831,6 +3872,7 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -3862,7 +3904,8 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
   followingCount: z.number().int().optional(),
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
-  stripeCustomerId: z.string().optional().nullable()
+  stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
 }).strict();
 
 export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyMutationInput> = z.object({
@@ -3880,6 +3923,7 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
 }).strict();
 
 export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyInput> = z.object({
@@ -3897,6 +3941,7 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
 }).strict();
 
 export const VerificationTokenCreateInputSchema: z.ZodType<Prisma.VerificationTokenCreateInput> = z.object({
@@ -4636,6 +4681,11 @@ export const FloatNullableFilterSchema: z.ZodType<Prisma.FloatNullableFilter> = 
   not: z.union([ z.number(),z.lazy(() => NestedFloatNullableFilterSchema) ]).optional().nullable(),
 }).strict();
 
+export const BoolNullableFilterSchema: z.ZodType<Prisma.BoolNullableFilter> = z.object({
+  equals: z.boolean().optional().nullable(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
 export const ChatMessageActionListRelationFilterSchema: z.ZodType<Prisma.ChatMessageActionListRelationFilter> = z.object({
   every: z.lazy(() => ChatMessageActionWhereInputSchema).optional(),
   some: z.lazy(() => ChatMessageActionWhereInputSchema).optional(),
@@ -4667,7 +4717,9 @@ export const ChatMessageCountOrderByAggregateInputSchema: z.ZodType<Prisma.ChatM
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.lazy(() => SortOrderSchema).optional(),
-  cost: z.lazy(() => SortOrderSchema).optional()
+  cost: z.lazy(() => SortOrderSchema).optional(),
+  modelType: z.lazy(() => SortOrderSchema).optional(),
+  isUsingFree: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ChatMessageAvgOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageAvgOrderByAggregateInput> = z.object({
@@ -4685,7 +4737,9 @@ export const ChatMessageMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMes
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.lazy(() => SortOrderSchema).optional(),
-  cost: z.lazy(() => SortOrderSchema).optional()
+  cost: z.lazy(() => SortOrderSchema).optional(),
+  modelType: z.lazy(() => SortOrderSchema).optional(),
+  isUsingFree: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ChatMessageMinOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageMinOrderByAggregateInput> = z.object({
@@ -4699,7 +4753,9 @@ export const ChatMessageMinOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMes
   conversationId: z.lazy(() => SortOrderSchema).optional(),
   shortId: z.lazy(() => SortOrderSchema).optional(),
   namespace: z.lazy(() => SortOrderSchema).optional(),
-  cost: z.lazy(() => SortOrderSchema).optional()
+  cost: z.lazy(() => SortOrderSchema).optional(),
+  modelType: z.lazy(() => SortOrderSchema).optional(),
+  isUsingFree: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ChatMessageSumOrderByAggregateInputSchema: z.ZodType<Prisma.ChatMessageSumOrderByAggregateInput> = z.object({
@@ -4740,6 +4796,14 @@ export const FloatNullableWithAggregatesFilterSchema: z.ZodType<Prisma.FloatNull
   _sum: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
   _min: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
   _max: z.lazy(() => NestedFloatNullableFilterSchema).optional()
+}).strict();
+
+export const BoolNullableWithAggregatesFilterSchema: z.ZodType<Prisma.BoolNullableWithAggregatesFilter> = z.object({
+  equals: z.boolean().optional().nullable(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedBoolNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedBoolNullableFilterSchema).optional()
 }).strict();
 
 export const ChatMessageRelationFilterSchema: z.ZodType<Prisma.ChatMessageRelationFilter> = z.object({
@@ -5112,7 +5176,8 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
   followingCount: z.lazy(() => SortOrderSchema).optional(),
   balance: z.lazy(() => SortOrderSchema).optional(),
   stripeSubscriptionEnd: z.lazy(() => SortOrderSchema).optional(),
-  stripeCustomerId: z.lazy(() => SortOrderSchema).optional()
+  stripeCustomerId: z.lazy(() => SortOrderSchema).optional(),
+  quota: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserAvgOrderByAggregateInputSchema: z.ZodType<Prisma.UserAvgOrderByAggregateInput> = z.object({
@@ -5718,6 +5783,10 @@ export const NullableFloatFieldUpdateOperationsInputSchema: z.ZodType<Prisma.Nul
   decrement: z.number().optional(),
   multiply: z.number().optional(),
   divide: z.number().optional()
+}).strict();
+
+export const NullableBoolFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableBoolFieldUpdateOperationsInput> = z.object({
+  set: z.boolean().optional().nullable()
 }).strict();
 
 export const UserUpdateOneWithoutChatMessagesNestedInputSchema: z.ZodType<Prisma.UserUpdateOneWithoutChatMessagesNestedInput> = z.object({
@@ -6942,6 +7011,11 @@ export const NestedEnumChatMessageFormatTypeFilterSchema: z.ZodType<Prisma.Neste
   not: z.union([ z.lazy(() => ChatMessageFormatTypeSchema),z.lazy(() => NestedEnumChatMessageFormatTypeFilterSchema) ]).optional(),
 }).strict();
 
+export const NestedBoolNullableFilterSchema: z.ZodType<Prisma.NestedBoolNullableFilter> = z.object({
+  equals: z.boolean().optional().nullable(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
 export const NestedEnumPromptRoleTypeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumPromptRoleTypeWithAggregatesFilter> = z.object({
   equals: z.lazy(() => PromptRoleTypeSchema).optional(),
   in: z.lazy(() => PromptRoleTypeSchema).array().optional(),
@@ -6976,6 +7050,14 @@ export const NestedFloatNullableWithAggregatesFilterSchema: z.ZodType<Prisma.Nes
   _sum: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
   _min: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
   _max: z.lazy(() => NestedFloatNullableFilterSchema).optional()
+}).strict();
+
+export const NestedBoolNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedBoolNullableWithAggregatesFilter> = z.object({
+  equals: z.boolean().optional().nullable(),
+  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedBoolNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedBoolNullableFilterSchema).optional()
 }).strict();
 
 export const NestedEnumInvitationStatusFilterSchema: z.ZodType<Prisma.NestedEnumInvitationStatusFilter> = z.object({
@@ -7044,6 +7126,7 @@ export const UserCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateWi
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
@@ -7075,6 +7158,7 @@ export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
@@ -7122,6 +7206,7 @@ export const UserUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUpdateWi
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
@@ -7153,6 +7238,7 @@ export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
@@ -7184,6 +7270,7 @@ export const UserCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreat
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7215,6 +7302,7 @@ export const UserUncheckedCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7443,6 +7531,7 @@ export const UserUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUpdat
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7474,6 +7563,7 @@ export const UserUncheckedUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7707,6 +7797,7 @@ export const UserCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserCreate
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7738,6 +7829,7 @@ export const UserUncheckedCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -7837,6 +7929,7 @@ export const UserUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUpdate
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -7868,6 +7961,7 @@ export const UserUncheckedUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8051,6 +8145,7 @@ export const UserCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserCreat
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8082,6 +8177,7 @@ export const UserUncheckedCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8181,6 +8277,7 @@ export const UserUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUpdat
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8212,6 +8309,7 @@ export const UserUncheckedUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8411,6 +8509,7 @@ export const UserCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserCreateWithou
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8442,6 +8541,7 @@ export const UserUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8541,6 +8641,7 @@ export const UserUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUpdateWithou
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8572,6 +8673,7 @@ export const UserUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8619,6 +8721,7 @@ export const UserCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserCrea
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8650,6 +8753,7 @@ export const UserUncheckedCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8748,6 +8852,7 @@ export const UserUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUpda
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8779,6 +8884,7 @@ export const UserUncheckedUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -8869,6 +8975,7 @@ export const UserCreateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8900,6 +9007,7 @@ export const UserUncheckedCreateWithoutChatMessageActionsInputSchema: z.ZodType<
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -8931,6 +9039,8 @@ export const ChatMessageCreateWithoutUserActionOnMessageInputSchema: z.ZodType<P
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutChatMessagesInputSchema).optional(),
   conversation: z.lazy(() => ConversationCreateNestedOneWithoutMessagesInputSchema)
 }).strict();
@@ -8946,7 +9056,9 @@ export const ChatMessageUncheckedCreateWithoutUserActionOnMessageInputSchema: z.
   conversationId: z.string(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
-  cost: z.number().optional().nullable()
+  cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable()
 }).strict();
 
 export const ChatMessageCreateOrConnectWithoutUserActionOnMessageInputSchema: z.ZodType<Prisma.ChatMessageCreateOrConnectWithoutUserActionOnMessageInput> = z.object({
@@ -8980,6 +9092,7 @@ export const UserUpdateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9011,6 +9124,7 @@ export const UserUncheckedUpdateWithoutChatMessageActionsInputSchema: z.ZodType<
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9048,6 +9162,8 @@ export const ChatMessageUpdateWithoutUserActionOnMessageInputSchema: z.ZodType<P
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneWithoutChatMessagesNestedInputSchema).optional(),
   conversation: z.lazy(() => ConversationUpdateOneRequiredWithoutMessagesNestedInputSchema).optional()
 }).strict();
@@ -9064,6 +9180,8 @@ export const ChatMessageUncheckedUpdateWithoutUserActionOnMessageInputSchema: z.
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageCreateWithoutConversationInputSchema: z.ZodType<Prisma.ChatMessageCreateWithoutConversationInput> = z.object({
@@ -9076,6 +9194,8 @@ export const ChatMessageCreateWithoutConversationInputSchema: z.ZodType<Prisma.C
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutChatMessagesInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
@@ -9091,6 +9211,8 @@ export const ChatMessageUncheckedCreateWithoutConversationInputSchema: z.ZodType
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
 
@@ -9119,6 +9241,7 @@ export const UserCreateWithoutConversationsInputSchema: z.ZodType<Prisma.UserCre
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9150,6 +9273,7 @@ export const UserUncheckedCreateWithoutConversationsInputSchema: z.ZodType<Prism
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9254,6 +9378,8 @@ export const ChatMessageScalarWhereInputSchema: z.ZodType<Prisma.ChatMessageScal
   shortId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   namespace: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   cost: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  modelType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  isUsingFree: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
 }).strict();
 
 export const UserUpsertWithoutConversationsInputSchema: z.ZodType<Prisma.UserUpsertWithoutConversationsInput> = z.object({
@@ -9282,6 +9408,7 @@ export const UserUpdateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUpd
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9313,6 +9440,7 @@ export const UserUncheckedUpdateWithoutConversationsInputSchema: z.ZodType<Prism
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9402,6 +9530,7 @@ export const UserCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreate
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9433,6 +9562,7 @@ export const UserUncheckedCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9469,6 +9599,7 @@ export const UserCreateWithoutFollowingInputSchema: z.ZodType<Prisma.UserCreateW
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9500,6 +9631,7 @@ export const UserUncheckedCreateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9547,6 +9679,7 @@ export const UserUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUpdate
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9578,6 +9711,7 @@ export const UserUncheckedUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9620,6 +9754,7 @@ export const UserUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUpdateW
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9651,6 +9786,7 @@ export const UserUncheckedUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9682,6 +9818,7 @@ export const UserCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreat
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
@@ -9713,6 +9850,7 @@ export const UserUncheckedCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
@@ -9749,6 +9887,7 @@ export const UserCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserCreateW
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9780,6 +9919,7 @@ export const UserUncheckedCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -9827,6 +9967,7 @@ export const UserUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUpdat
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
@@ -9858,6 +9999,7 @@ export const UserUncheckedUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
@@ -9900,6 +10042,7 @@ export const UserUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUpdateW
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9931,6 +10074,7 @@ export const UserUncheckedUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -9962,6 +10106,7 @@ export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWi
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
@@ -9993,6 +10138,7 @@ export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
@@ -10040,6 +10186,7 @@ export const UserUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUpdateWi
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
@@ -10071,6 +10218,7 @@ export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
   invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
@@ -10154,6 +10302,7 @@ export const UserCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserCreat
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -10185,6 +10334,7 @@ export const UserUncheckedCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -10290,6 +10440,7 @@ export const UserUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUpdat
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10321,6 +10472,7 @@ export const UserUncheckedUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10426,6 +10578,7 @@ export const UserCreateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserCr
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
@@ -10457,6 +10610,7 @@ export const UserUncheckedCreateWithoutStripePaymentsInputSchema: z.ZodType<Pris
   balance: z.number().int().optional(),
   stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
@@ -10533,6 +10687,7 @@ export const UserUpdateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUp
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10564,6 +10719,7 @@ export const UserUncheckedUpdateWithoutStripePaymentsInputSchema: z.ZodType<Pris
   balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
   accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
@@ -10752,6 +10908,8 @@ export const ChatMessageCreateWithoutUserInputSchema: z.ZodType<Prisma.ChatMessa
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionCreateNestedManyWithoutMessageInputSchema).optional(),
   conversation: z.lazy(() => ConversationCreateNestedOneWithoutMessagesInputSchema)
 }).strict();
@@ -10767,6 +10925,8 @@ export const ChatMessageUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
   cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutMessageInputSchema).optional()
 }).strict();
 
@@ -11671,7 +11831,9 @@ export const ChatMessageCreateManyConversationInputSchema: z.ZodType<Prisma.Chat
   format: z.lazy(() => ChatMessageFormatTypeSchema).optional(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
-  cost: z.number().optional().nullable()
+  cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable()
 }).strict();
 
 export const ChatMessageUpdateWithoutConversationInputSchema: z.ZodType<Prisma.ChatMessageUpdateWithoutConversationInput> = z.object({
@@ -11684,6 +11846,8 @@ export const ChatMessageUpdateWithoutConversationInputSchema: z.ZodType<Prisma.C
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneWithoutChatMessagesNestedInputSchema).optional(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
@@ -11699,6 +11863,8 @@ export const ChatMessageUncheckedUpdateWithoutConversationInputSchema: z.ZodType
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
 
@@ -11713,6 +11879,8 @@ export const ChatMessageUncheckedUpdateManyWithoutConversationInputSchema: z.Zod
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const StripePaymentCreateManyProductInputSchema: z.ZodType<Prisma.StripePaymentCreateManyProductInput> = z.object({
@@ -11804,7 +11972,9 @@ export const ChatMessageCreateManyUserInputSchema: z.ZodType<Prisma.ChatMessageC
   conversationId: z.string(),
   shortId: z.string().optional(),
   namespace: z.string().optional().nullable(),
-  cost: z.number().optional().nullable()
+  cost: z.number().optional().nullable(),
+  modelType: z.string().optional().nullable(),
+  isUsingFree: z.boolean().optional().nullable()
 }).strict();
 
 export const ChatMessageActionCreateManyUserInputSchema: z.ZodType<Prisma.ChatMessageActionCreateManyUserInput> = z.object({
@@ -12045,6 +12215,8 @@ export const ChatMessageUpdateWithoutUserInputSchema: z.ZodType<Prisma.ChatMessa
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUpdateManyWithoutMessageNestedInputSchema).optional(),
   conversation: z.lazy(() => ConversationUpdateOneRequiredWithoutMessagesNestedInputSchema).optional()
 }).strict();
@@ -12060,6 +12232,8 @@ export const ChatMessageUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userActionOnMessage: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutMessageNestedInputSchema).optional()
 }).strict();
 
@@ -12074,6 +12248,8 @@ export const ChatMessageUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Pri
   shortId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   namespace: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   cost: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  modelType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isUsingFree: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ChatMessageActionUpdateWithoutUserInputSchema: z.ZodType<Prisma.ChatMessageActionUpdateWithoutUserInput> = z.object({

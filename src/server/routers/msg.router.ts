@@ -18,19 +18,33 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 
 import { DEFAULT_LATEST_COUNT } from "@/config"
 
-import { selectChatMessageForDetailView } from "@/ds"
+import { ModelQuota, ModelType, defaultModelQuota, selectChatMessageForDetailView } from "@/ds"
+
+import UserUpdateArgs = Prisma.UserUpdateArgs
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {
-    const { userId } = await prisma.conversation.findUniqueOrThrow({ where: { id: input.id } })
+    const { user } = await prisma.conversation.findUniqueOrThrow({
+      where: { id: input.conversationId },
+      select: {
+        user: true,
+      },
+    })
+
+    // todo: token calculation
     const ourToken = input.content.length / 1000
-    await prisma.user.update({
-      where: { id: userId },
+    const { isUsingFree, role } = input
+    const modelType = input.modelType as ModelType
+    let { balance } = user
+    const quota = user.quota ?? defaultModelQuota
+    if (isUsingFree && role === "assistant") --quota[modelType]
+    else --balance
+    await prisma.user.update<UserUpdateArgs>({
+      where: { id: user.id },
       data: {
-        balance: {
-          decrement: ourToken,
-        },
+        quota,
+        balance,
       },
     })
 

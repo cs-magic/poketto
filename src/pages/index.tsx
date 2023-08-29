@@ -11,7 +11,7 @@ import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
 
-import { FREE_GPT3_DAILY, FREE_GPT4_DAILY } from "@/config"
+import { FREE_GPT3_DAILY_TOTAL, FREE_GPT4_DAILY_TOTAL } from "@/config"
 
 import { CardsLayoutType } from "@/ds"
 
@@ -54,13 +54,13 @@ export const SystemStatus = () => {
       <CardContent className={"w-full p-4 grid grid-cols-3"}>
         <StatusItem
           a={"GPT-3"}
-          b={s ? `${s.gpt3.free.surplus}/${FREE_GPT3_DAILY}` : <Skeleton className={"wh-5"} />}
+          b={s ? `${s.gpt3.free.surplus}/${FREE_GPT3_DAILY_TOTAL}` : <Skeleton className={"wh-5"} />}
           c={t("homepage:todayFree")}
         />
 
         <StatusItem
           a={"GPT-4"}
-          b={s ? `${s.gpt4.free.surplus}/${FREE_GPT4_DAILY}` : <Skeleton className={"wh-5"} />}
+          b={s ? `${s.gpt4.free.surplus}/${FREE_GPT4_DAILY_TOTAL}` : <Skeleton className={"wh-5"} />}
           c={t("homepage:todayFree")}
         />
 

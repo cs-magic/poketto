@@ -34,6 +34,7 @@ import {
 } from "@/config"
 
 import { getWelcomeSystemNotification } from "@/lib/string"
+import { resetUsersQuota } from "@/lib/system"
 
 import StripeMode = $Enums.StripeMode
 
@@ -52,7 +53,9 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     create: {
       platformId: POKETTO_CREATOR_ID,
       platformType: PlatformType.Poketto,
-      platformArgs: {},
+      platformArgs: {
+        uri: "",
+      },
       email: POKETTO_CREATOR_EMAIL,
       description: POKETTO_CREATOR_DESC,
       name: POKETTO_CREATOR_NAME,
@@ -101,6 +104,10 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       },
     },
   })
+
+  // 每个人都更新quota值
+  await resetUsersQuota(prisma)
+
   await prisma.stripeProduct.upsert({
     where: { id: STRIPE_PAYMENT_PRODUCT_10_ID },
     update: {},
@@ -164,6 +171,8 @@ export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterU
     },
     data: {
       ...user,
+      platformId: user.email ?? user.name,
+      platformType: PlatformType.Poketto,
       conversations: {
         create: [
           {
