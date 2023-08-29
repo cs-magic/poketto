@@ -11,7 +11,7 @@ import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { ComponentProps, FC, Fragment, useEffect, useRef, useState } from "react"
+import React, { ComponentProps, FC, Fragment, SyntheticEvent, useEffect, useRef, useState } from "react"
 import { TbLanguage } from "react-icons/tb"
 import { toast } from "sonner"
 
@@ -228,6 +228,12 @@ function CommandSearch() {
               placeholder={t("common:command.inputPlaceholder")}
               value={search}
               onValueChange={setSearch}
+              onKeyDown={(event) => {
+                // 兼容拼音
+                if (event.nativeEvent.isComposing) {
+                  event.preventDefault()
+                }
+              }}
             />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>

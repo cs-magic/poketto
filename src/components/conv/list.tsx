@@ -40,7 +40,7 @@ export function ConversationList() {
       <div className="relative w-full">
         <Input
           value={searchKey}
-          placeholder="搜索: 标题 / 描述 / Prompt"
+          placeholder="(todo) 搜索 App / 消息"
           className="mx-auto my-2 w-[95%] rounded-2xl bg-accent"
           onChange={(event) => {
             setSearchKey(event.currentTarget.value)
@@ -74,14 +74,14 @@ export function ConversationList() {
         {/*//       <SectionTitle>Global search results</SectionTitle>*/}
         {/*//       <Skeleton className="h-8" />*/}
         {/*//     </>*/}
-        {/*//   ) // 	没有搜索时显示最近聊天列表*/}
+        {/* 	没有搜索时显示最近聊天列表*/}
         {/*// ) : (*/}
-        {/*//   <>*/}
-        {/*//     <SectionTitle>Poketto Apps</SectionTitle>*/}
-        {/*//     {orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (*/}
-        {/*//       <ConversationListView key={c.appId} c={c} />*/}
-        {/*//     ))}*/}
-        {/*//   </>*/}
+        <>
+          <SectionTitle>Poketto Apps</SectionTitle>
+          {orderBy(convs, ["pinned", "updatedAt"], ["desc", "desc"]).map((c) => (
+            <ConversationListView key={c.appId} c={c} />
+          ))}
+        </>
         {/*// )}*/}
       </div>
     </div>
