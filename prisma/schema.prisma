@@ -84,6 +84,7 @@ model App {
 
   modelName    String
   isOpenSource Boolean @default(true)
+
   /// [ModelPlatformArgs]
   modelArgs    Json?
 
@@ -343,6 +344,7 @@ model User {
   stripeCustomerId      String?         @unique
 
   // 每日需要更新
+
   /// [ModelQuota]
   quota Json?
 

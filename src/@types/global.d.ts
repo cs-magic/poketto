@@ -4,12 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ModelType } from "@/ds"
 
 declare global {
+  import { type Message } from "ai/react"
+
+  import { ModelType } from "@/ds"
+
   namespace PrismaJson {
     // 要放在里面
-    import { type Message } from "ai/react"
 
     // you can use typical basic types
     type ModelPlatformArgs = {
@@ -17,12 +19,14 @@ declare global {
     }
 
     type UserPlatformArgs = {
-      uri: string
+      uri?: string
     }
 
-    type ModelQuota = Record<ModelType, number>
+    export type ModelQuota = Record<ModelType, number>
   }
+}
 
+declare global {
   /**
    * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
    * object and keep type safety.

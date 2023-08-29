@@ -28,72 +28,8 @@ import UserSelect = Prisma.UserSelect
 import validator = Prisma.validator
 
 // -----------------------------------------------------------------------------
-// next-auth, ref: https://stackoverflow.com/a/69968164/9422455
+// models
 // -----------------------------------------------------------------------------
-
-export type NextPageWithAuth<P = {}, IP = P> = NextPage<P, IP> & {
-  auth?: boolean
-}
-
-export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> & Partial<NextPageWithAuth>
-
-export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
-  Component: NextComponentWithAuth
-}
-
-// -----------------------------------------------------------------------------
-// general
-// -----------------------------------------------------------------------------
-
-export type MenuKey = keyof typeof resources.common.menus
-
-export interface IMenuItem {
-  field: MenuKey
-  link: string
-  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
-}
-
-export enum CommandType {
-  suggestion = "suggestion",
-  settings = "settings",
-}
-
-export interface ICommandItem {
-  id: string
-  Icon: (props: any) => ReactNode
-  title?: string
-  category: CommandType
-  kbd?: string
-}
-
-export const modelTypes = ["gpt-3.5-turbo", "gpt-4", "openchat"] as const
-export type ModelType = (typeof modelTypes)[number]
-export type ModelQuota = Record<ModelType, number>
-export const defaultModelQuota: ModelQuota = {
-  "gpt-3.5-turbo": FREE_GPT3_DAILY_USER,
-  "gpt-4": FREE_GPT4_DAILY_USER,
-  openchat: 100,
-}
-
-// -----------------------------------------------------------------------------
-// UI
-// -----------------------------------------------------------------------------
-
-export type IMAGE_SIZE = "xs" | "md" | "raw" | "full"
-
-export enum CardsLayoutType {
-  masonry = "masonry",
-  grid = "grid",
-}
-
-// -----------------------------------------------------------------------------
-// User Preference (which can be managed via either by store or api)
-// -----------------------------------------------------------------------------
-
-export const sortOrders = ["mostViewed", "mostUsed", "newest"] as const
-// todo: more intelligent approach
-// export type SortOrder = keyof typeof resources.common.sorts
-export type SortOrder = (typeof sortOrders)[number]
 
 // -----------------------------------------------------------------------------
 // models
@@ -211,6 +147,73 @@ export const selectChatMessageForDetailView = validator<ChatMessageSelect>()({
   },
 })
 export type SelectChatMessageForDetailView = ChatMessageGetPayload<{ select: typeof selectChatMessageForDetailView }>
+
+// -----------------------------------------------------------------------------
+// next-auth, ref: https://stackoverflow.com/a/69968164/9422455
+// -----------------------------------------------------------------------------
+
+export type NextPageWithAuth<P = {}, IP = P> = NextPage<P, IP> & {
+  auth?: boolean
+}
+
+export type NextComponentWithAuth = NextComponentType<NextPageContext, any, {}> & Partial<NextPageWithAuth>
+
+export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
+  Component: NextComponentWithAuth
+}
+
+// -----------------------------------------------------------------------------
+// general
+// -----------------------------------------------------------------------------
+
+export type MenuKey = keyof typeof resources.common.menus
+
+export interface IMenuItem {
+  field: MenuKey
+  link: string
+  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
+}
+
+export enum CommandType {
+  suggestion = "suggestion",
+  settings = "settings",
+}
+
+export interface ICommandItem {
+  id: string
+  Icon: (props: any) => ReactNode
+  title?: string
+  category: CommandType
+  kbd?: string
+}
+
+export const modelTypes = ["gpt-3.5-turbo", "gpt-4", "openchat"] as const
+export type ModelType = (typeof modelTypes)[number]
+export const defaultModelQuota: Record<ModelType, number> = {
+  "gpt-3.5-turbo": FREE_GPT3_DAILY_USER,
+  "gpt-4": FREE_GPT4_DAILY_USER,
+  openchat: 100,
+}
+
+// -----------------------------------------------------------------------------
+// UI
+// -----------------------------------------------------------------------------
+
+export type IMAGE_SIZE = "xs" | "md" | "raw" | "full"
+
+export enum CardsLayoutType {
+  masonry = "masonry",
+  grid = "grid",
+}
+
+// -----------------------------------------------------------------------------
+// User Preference (which can be managed via either by store or api)
+// -----------------------------------------------------------------------------
+
+export const sortOrders = ["mostViewed", "mostUsed", "newest"] as const
+// todo: more intelligent approach
+// export type SortOrder = keyof typeof resources.common.sorts
+export type SortOrder = (typeof sortOrders)[number]
 
 export type AllMessage =
   | SelectChatMessageForListView

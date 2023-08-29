@@ -39,10 +39,12 @@ export default function ConversationPage() {
         </section>
 
         <section className={clsx("relative w-full lg:grow", " overflow-hidden")}>
-          {curConv && <ConversationCore cid={curConv.id} />}
+          {curConv && <ConversationCore conversationId={curConv.id} />}
         </section>
 
-        <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>{curConv && <AppDetailView appId={curConv.appId} />}</section>
+        <section className={clsx("hidden shrink-[.1] xl:flex xl:w-[375px]")}>
+          {curConv && <AppDetailView appId={curConv.appId} />}
+        </section>
       </div>
     </RootLayout>
   )

@@ -243,7 +243,7 @@ export function InstallButton({
 }) {
   const router = useRouter()
   const utils = api.useContext()
-  const { data: hasApp } = api.conv.has.useQuery({ appId })
+  const { data: hasApp } = api.conv.has.useQuery({ conversation: { userId, appId } })
   const go = () => {
     void router.push(getConversationLink(userId, appId)) // app.id 进数据库后会生成新的
     setOpen && setOpen(false)

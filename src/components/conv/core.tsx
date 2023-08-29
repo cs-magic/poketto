@@ -31,7 +31,7 @@ import { useAppStore } from "@/store"
 
 import { contentStyleBasedOnRole } from "@/config-utils"
 
-import { AllMessage, type AppForListView, ModelQuota, defaultModelQuota, modelTypes } from "@/ds"
+import { AllMessage, type AppForListView, defaultModelQuota, modelTypes } from "@/ds"
 
 import { LogoWithName } from "@/layouts/navbar"
 
@@ -65,13 +65,12 @@ import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
-import d from "@/lib/datetime"
 import { packMessageWithDate } from "@/lib/message"
 import { getConversationsLink } from "@/lib/string"
 
-export function ConversationCore({ cid }: { cid: string }) {
+export function ConversationCore({ conversationId }: { conversationId: string }) {
   const { t } = useTranslation()
-  const { data: c } = api.conv.get.useQuery({ id: cid })
+  const { data: c } = api.conv.get.useQuery({ id: conversationId })
 
   const utils = api.useContext()
   const { mutate: pinConv } = api.conv.pin.useMutation({
@@ -168,7 +167,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const { data: user } = api.user.getProfile.useQuery({ id: userId })
   const { data: balanceOk } = api.user.validateBalance.useQuery({ id: userId })
   const { data: conv } = api.conv.get.useQuery({ id: conversationId })
-  const { data: hasApp } = api.conv.has.useQuery({ appId: conv?.appId ?? "" }, { enabled: !!conv })
+  const { data: hasApp } = api.conv.has.useQuery({ id: conversationId }, { enabled: !!conv })
   const { data: initialMessages } = api.message.list.useQuery({ conversationId: conversationId }, { enabled: !!userId })
   const refForm = useRef<HTMLFormElement>(null)
   const utils = api.useContext()
@@ -223,7 +222,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const color = `#${modelWeight}${modelWeight}00`
   console.log({ color })
 
-  const quota: ModelQuota = user?.quota ?? defaultModelQuota
+  const quota = user?.quota ?? defaultModelQuota
 
   return (
     <div className={clsx("relative  h-full w-full", "flex  flex-col", "overflow-hidden")}>

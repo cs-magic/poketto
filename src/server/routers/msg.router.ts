@@ -11,14 +11,13 @@ import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
 import sortedUniqBy from "lodash/sortedUniqBy"
 import { ChatMessageUncheckedCreateInputSchema, ChatMessageWhereInputSchema } from "prisma/generated/zod"
-import { use } from "sswr"
 import { z } from "zod"
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
 
 import { DEFAULT_LATEST_COUNT } from "@/config"
 
-import { ModelQuota, ModelType, defaultModelQuota, selectChatMessageForDetailView } from "@/ds"
+import { ModelType, defaultModelQuota, selectChatMessageForDetailView } from "@/ds"
 
 import UserUpdateArgs = Prisma.UserUpdateArgs
 
@@ -40,7 +39,7 @@ export const msgRouter = createTRPCRouter({
     const quota = user.quota ?? defaultModelQuota
     if (isUsingFree && role === "assistant") --quota[modelType]
     else --balance
-    await prisma.user.update<UserUpdateArgs>({
+    await prisma.user.update({
       where: { id: user.id },
       data: {
         quota,

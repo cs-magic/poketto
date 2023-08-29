@@ -9,7 +9,7 @@ import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
 
 import { DEFAULT_APP_VERSION } from "@/config"
 
-import { type AppForListView } from "@/ds"
+import { type AppForListView, defaultModelQuota } from "@/ds"
 
 export type IFlowgptPromptBasic = typeof sampleBasicPrompt
 export type IFlowgptUserBasic = typeof sampleBasicPrompt.User
@@ -39,6 +39,7 @@ export const transFlowgptUserBasic = (u: IFlowgptUserBasic): User => ({
   followingCount: 0,
   stripeCustomerId: null,
   stripeSubscriptionEnd: null,
+  quota: defaultModelQuota
 })
 export const transFlowgptPrompt2Model = (p: IFlowgptPromptBasic) => ({
   id: p.id,
