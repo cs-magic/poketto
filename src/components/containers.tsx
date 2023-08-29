@@ -18,13 +18,7 @@ import { DEVICES, type DEVICE_TYPE } from "@/lib/device"
 
 export function GridContainer({ children }: PropsWithChildren) {
   return (
-    <div
-      className={clsx(
-        "w-full gap-2",
-        // 'flex flex-wrap justify-between items-center',
-        "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-      )}
-    >
+    <div className={clsx("w-full gap-2 | grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5")}>
       {children}
     </div>
   )

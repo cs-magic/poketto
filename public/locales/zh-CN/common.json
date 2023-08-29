@@ -1,6 +1,6 @@
 {
   "product": {
-    "name": "口袋 A I"
+    "name": "Poketto.AI"
   },
   "menus": {
     "homepage": "首页",
@@ -16,8 +16,9 @@
   },
   "general": {
     "seeAll": "查看全部",
-    "appsList": "App 列表",
+    "appList": "App 列表",
     "fullscreenMode": "全屏模式",
+    "windowMode": "窗口模式",
     "detail": "查看详情",
     "pin": "置顶",
     "unpin": "取消置顶",
@@ -31,12 +32,7 @@
     "information": "信息",
     "owner": "所有者",
     "openSource": "开源",
-
-  },
-  "homepage": {
-    "recentlyUsedApps": "最近使用的 Apps",
-    "exploreTrendingApps": "探索当下最流行的 Apps",
-    "exploreAll": "探索全部"
+    "config": "配置"
   },
   "sorts": {
     "mostViewed": "最多浏览",
@@ -71,6 +67,10 @@
   },
   "command": {
     "inputPlaceholder": "你想搜点什么呢？"
-
+  },
+  "model": {
+    "gpt-3.5-turbo": "一般问题足够，较便宜",
+    "gpt-4": "专业问题效果更好，较贵，且限量哦",
+    "openchat": "清华开源的大语言模型，一度排名第一"
   }
 }

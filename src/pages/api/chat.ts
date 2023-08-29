@@ -17,7 +17,7 @@ import superjson from "superjson"
 
 import { type RootRouter } from "@/server/trpc.router"
 
-import { authEnv, baseEnv } from "@/env.mjs"
+import { baseEnv } from "@/env.mjs"
 
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 
@@ -31,7 +31,7 @@ export const runtime = "edge" // IMPORTANT! Set the runtime to edge
 
 export default async function handler(req: Request, res: Response) {
   const data = await req.json()
-  const { messages, conversationId, userId } = data
+  const { messages, conversationId, userId, modelType } = data
 
   const proxy = createTRPCProxyClient<RootRouter>({
     links: [
@@ -99,7 +99,7 @@ export default async function handler(req: Request, res: Response) {
   const context = await proxy.message.getContext.query({ conversationId, content })
   console.log({ conversationId, content, contextIds: context.map((c) => c.id) })
 
-  const model = new ChatOpenAI({
+  const chatModel = new ChatOpenAI({
     // stream / callback, ref: https://js.langchain.com/docs/modules/model_io/models/chat/how_to/streaming
     callbacks: [
       {
@@ -115,7 +115,7 @@ export default async function handler(req: Request, res: Response) {
     ],
     // openAIApiKey: env.OPENAI_API_KEY, // 不要用 nodejs 变量，而且其实已经内含了
     temperature: DEFAULT_TEMPERATURE,
-    modelName: "gpt-3.5-turbo",
+    modelName: modelType,
   })
 
   // todo: customize our template? or using traditional conversation approach?
@@ -131,7 +131,7 @@ Current conversation:
 Human: {input}
 AI:`)
   const outputParser = new BytesOutputParser()
-  const chain = prompt.pipe(model).pipe(outputParser)
+  const chain = prompt.pipe(chatModel).pipe(outputParser)
 
   // if (response.status !== 200) {
   //   const { error } = await response.json()

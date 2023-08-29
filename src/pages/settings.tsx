@@ -29,11 +29,11 @@ export default function SettingsPage() {
   return (
     <RootLayout>
       <div className={"w-full max-w-[512px] m-auto overflow-auto | flex flex-wrap p-4 gap-4"}>
+        {/* general config */}
         <Card className={"w-full"}>
           <CardHeader>
             <CardTitle>{t("settings:general")}</CardTitle>
           </CardHeader>
-
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>
             <div className={"w-full | flex justify-between items-center gap-4"}>
               <Label className={"whitespace-nowrap"}>{t("settings:language")}</Label>
@@ -48,15 +48,7 @@ export default function SettingsPage() {
                 <ThemeSwitcher />
               </IconContainer>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card className={"w-full"}>
-          <CardHeader>
-            <CardTitle>{t("settings:UI")}</CardTitle>
-          </CardHeader>
-
-          <CardContent className={"w-full flex flex-col p-4 gap-2"}>
             <div className={"w-full | flex justify-between items-center gap-4"}>
               <Label className={"whitespace-nowrap"}>{t("settings:cardsLayout")}</Label>
               <Select value={cardsLayout} onValueChange={setCardsLayout} defaultValue={cardsLayout}>
@@ -75,6 +67,32 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        {/* Poketto Config */}
+        {/*<Card className={"w-full"}>*/}
+        {/*  <CardHeader>*/}
+        {/*    <CardTitle>Poketto {t("common:general.config")}</CardTitle>*/}
+        {/*  </CardHeader>*/}
+
+        {/*  <CardContent className={"w-full flex flex-col p-4 gap-2"}>*/}
+        {/*    <div className={"w-full | flex justify-between items-center gap-4"}>*/}
+        {/*      <Label className={"whitespace-nowrap"}>{t("common:general.model")}</Label>*/}
+        {/*      <Select value={cardsLayout} onValueChange={setCardsLayout} defaultValue={cardsLayout}>*/}
+        {/*        <SelectTrigger className="w-28">*/}
+        {/*          <SelectValue />*/}
+        {/*        </SelectTrigger>*/}
+        {/*        <SelectContent>*/}
+        {/*          {Object.values(CardsLayoutType).map((cl) => (*/}
+        {/*            <SelectItem value={cl} key={cl}>*/}
+        {/*              {t(`settings:${cl}`)}*/}
+        {/*            </SelectItem>*/}
+        {/*          ))}*/}
+        {/*        </SelectContent>*/}
+        {/*      </Select>*/}
+        {/*    </div>*/}
+        {/*  </CardContent>*/}
+        {/*</Card>*/}
+
+        {/* account config */}
         <Card className={"w-full"}>
           <CardHeader>
             <CardTitle>{t("settings:account")}</CardTitle>
@@ -83,7 +101,7 @@ export default function SettingsPage() {
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>
             <div className={"w-full | flex justify-between items-center gap-4"}>
               <Label className={"whitespace-nowrap"}>OpenAI API Key</Label>
-              <Input value={""} />
+              <Input placeholder={"todo"} disabled />
             </div>
           </CardContent>
         </Card>

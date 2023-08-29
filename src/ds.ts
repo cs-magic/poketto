@@ -40,6 +40,34 @@ export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
 }
 
 // -----------------------------------------------------------------------------
+// general
+// -----------------------------------------------------------------------------
+
+export type MenuKey = keyof typeof resources.common.menus
+
+export interface IMenuItem {
+  field: MenuKey
+  link: string
+  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
+}
+
+export enum CommandType {
+  suggestion = "suggestion",
+  settings = "settings",
+}
+
+export interface ICommandItem {
+  id: string
+  Icon: (props: any) => ReactNode
+  title?: string
+  category: CommandType
+  kbd?: string
+}
+
+export const modelTypes = ["gpt-3.5-turbo", "gpt-4", "openchat"] as const
+export type ModelType = (typeof modelTypes)[number]
+
+// -----------------------------------------------------------------------------
 // UI
 // -----------------------------------------------------------------------------
 
@@ -174,28 +202,3 @@ export const selectChatMessageForDetailView = validator<ChatMessageSelect>()({
   },
 })
 export type SelectChatMessageForDetailView = ChatMessageGetPayload<{ select: typeof selectChatMessageForDetailView }>
-
-// -----------------------------------------------------------------------------
-// general
-// -----------------------------------------------------------------------------
-
-export type MenuKey = keyof typeof resources.common.menus
-
-export interface IMenuItem {
-  field: MenuKey
-  link: string
-  Icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>
-}
-
-export enum CommandType {
-  suggestion = "suggestion",
-  settings = "settings",
-}
-
-export interface ICommandItem {
-  id: string
-  Icon: (props: any) => ReactNode
-  title?: string
-  category: CommandType
-  kbd?: string
-}

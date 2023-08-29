@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import numeral from "numeral"
@@ -48,6 +49,7 @@ export function AppDetailView({
 }: { appId: string; setOpen?: (v: boolean) => void } & HTMLProps<HTMLDivElement>) {
   const userId = useUserId()
   const { data: app, error: appError } = api.app.get.useQuery({ id: appId })
+  const { t } = useTranslation()
 
   if (app === undefined) return <Loading />
 
@@ -80,11 +82,11 @@ export function AppDetailView({
       <Separator orientation="horizontal" />
 
       <section id="status" className={clsx("w-full", "flex items-center justify-between gap-1 overflow-auto")}>
-        <StatusItem a="category" b={`${app.category.main}-${app.category.sub}`} />
-        <StatusItem a="model" b={app.modelName} />
+        <StatusItem a={t("common:general.category")} b={`${app.category.main}-${app.category.sub}`} />
+        <StatusItem a={t("common:general.model")} b={app.modelName} />
         {POKETTO_DETAIL_RATINGS_ENABLED && <StatusItem a="ratings" b={numeral(app.state?.stars).format("0.0")} />}
-        <StatusItem a="language" b={app.language} />
-        <StatusItem a="platform" b={app.platformType} />
+        <StatusItem a={t("common:general.language")} b={app.language} />
+        <StatusItem a={t("common:general.platform")} b={app.platformType} />
       </section>
 
       {/* <section id={'user-cases'} className={'w-full shrink-0 overflow-auto | flex gap-4'}> */}
@@ -115,7 +117,7 @@ export function AppDetailView({
       <section id="ratings-reviews" className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           {/* todo: Ratings & */}
-          <h2>Reviews</h2>
+          <h2>{t("common:general.reviews")}</h2>
           {app.comments.length > 2 && (
             <Dialog>
               <DialogTrigger asChild>
@@ -149,10 +151,10 @@ export function AppDetailView({
       </section>
 
       <section id="information" className="flex w-full flex-col gap-4">
-        <h2>Information</h2>
+        <h2>{t("common:general.information")}</h2>
         <div className="grid grid-cols-2 gap-4">
           <InfoItem
-            a="platform"
+            a={t("common:general.platform")}
             b={
               <Link className="underline" href={platformMap[app.platformType]!.homepage} target="_blank">
                 {app.platformType}
@@ -160,17 +162,17 @@ export function AppDetailView({
             }
           />
           <InfoItem
-            a="owner"
+            a={t("common:general.owner")}
             b={
               <Link className="underline" href={getUserLink(app.creator.id)} target="_blank">
                 {app.creator.id}
               </Link>
             }
           />
-          <InfoItem a="model" b={app.modelName} />
-          <InfoItem a="Open Source" b={app.isOpenSource.toString()} />
-          <InfoItem a="category" b={`${app.category.main}-${app.category.sub}`} />
-          <InfoItem a="language" b={app.language} />
+          <InfoItem a={t("common:general.model")} b={app.modelName} />
+          <InfoItem a={t("common:general.openSource")} b={app.isOpenSource.toString()} />
+          <InfoItem a={t("common:general.category")} b={`${app.category.main}-${app.category.sub}`} />
+          <InfoItem a={t("common:general.language")} b={app.language} />
         </div>
 
         <Separator orientation="horizontal" />
@@ -179,7 +181,7 @@ export function AppDetailView({
             .filter(vIsNumber)
             .sort((a, b) => (a[0] < b[0] ? -1 : 1))
             .map(([key, val]) => (
-              <InfoItem key={key} a={key} b={val} />
+              <InfoItem key={key} a={t(`common:states.${key}.title`)} b={val} />
             ))}
         </div>
       </section>
@@ -237,6 +239,7 @@ export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c?: ReactNode
 }
 
 export function InfoItem({ a, b }: { a: string; b: ReactNode }) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col items-center gap-1">
       <div className="font-bold capitalize text-muted-foreground">{a}</div>

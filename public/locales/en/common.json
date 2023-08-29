@@ -5,8 +5,8 @@
   "menus": {
     "homepage": "Home",
     "explore": "Explore",
-    "account": "My Account",
-    "myGallery": "My Gallery",
+    "account": "Account",
+    "myGallery": "Gallery",
     "charge": "Charge",
     "feedback": "Feedback",
     "whatsPoketto": "What's Poketto AI？",
@@ -16,8 +16,9 @@
   },
   "general": {
     "seeAll": "See All",
-    "appsList": "App List",
+    "appList": "App List",
     "fullscreenMode": "Full Screen",
+    "windowMode": "Window Mode",
     "detail": "See Detail",
     "pin": "Pin",
     "unpin": "Unpin",
@@ -30,12 +31,8 @@
     "reviews": "Reviews",
     "information": "Information",
     "owner": "Owner",
-    "openSource": "Open Source"
-  },
-  "homepage": {
-    "recentlyUsedApps": "Recently Used Apps",
-    "exploreTrendingApps": "Explore Trending Apps",
-    "exploreAll": "Explore All"
+    "openSource": "Open Source",
+    "config": "Config"
   },
   "sorts": {
     "mostViewed": "Most Viewed",
@@ -70,5 +67,9 @@
   },
   "command": {
     "inputPlaceholder": "Type a command or search..."
+  },
+  "model": {
+    "gpt-3.5-turbo": "一般问题足够，较便宜",
+    "gpt-4": "专业问题效果更好，较贵，且限量哦"
   }
 }

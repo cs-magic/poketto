@@ -19,6 +19,7 @@ import {
 } from "@radix-ui/react-icons"
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
+import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import React, { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
@@ -26,9 +27,11 @@ import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 
+import { useAppStore } from "@/store"
+
 import { contentStyleBasedOnRole } from "@/config-utils"
 
-import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
+import { type AppForListView, ModelType, type SelectChatMessageForListView, modelTypes } from "@/ds"
 
 import { LogoWithName } from "@/layouts/navbar"
 
@@ -73,6 +76,7 @@ type AllMessage =
     }
 
 export function ConversationCore({ cid }: { cid: string }) {
+  const { t } = useTranslation()
   const { data: c } = api.conv.get.useQuery({ id: cid })
 
   const utils = api.useContext()
@@ -107,7 +111,7 @@ export function ConversationCore({ cid }: { cid: string }) {
               </PopoverTrigger>
               <PopoverContent className="flex flex-col gap-2">
                 <Button variant="ghost" onClick={toggle} className="flex w-full justify-between">
-                  <span>{fullscreen ? "窗口模式" : "全屏模式"}</span>
+                  <span>{fullscreen ? t("common:general.windowMode") : t("common:general.fullscreenMode")}</span>
                   {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
                 </Button>
 
@@ -118,12 +122,12 @@ export function ConversationCore({ cid }: { cid: string }) {
                   as={getConversationsLink(c.userId)}
                   className="p-btn-horizontal justify-between lg:hidden"
                 >
-                  <span>List</span> <HamburgerMenuIcon />
+                  <span>{t("common:general.appList")}</span> <HamburgerMenuIcon />
                 </Link>
 
                 <AppDetailContainer appId={c.appId}>
                   <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
-                    <span>Detail</span> <CodeSandboxLogoIcon />
+                    <span>{t("common:general.detail")}</span> <CodeSandboxLogoIcon />
                   </Button>
                 </AppDetailContainer>
 
@@ -136,19 +140,19 @@ export function ConversationCore({ cid }: { cid: string }) {
                 >
                   {c.pinned ? (
                     <>
-                      <span>Unpin</span>
+                      <span>{t("common:general.unpin")}</span>
                       <DrawingPinIcon />
                     </>
                   ) : (
                     <>
-                      <span>Pin</span>
+                      <span>{t("common:general.pin")}</span>
                       <DrawingPinFilledIcon />
                     </>
                   )}
                 </Button>
 
                 <Button className="justify-between" variant="ghost">
-                  <span>Share (todo)</span> <Link2Icon />
+                  <span>{t("common:general.share")}</span> <Link2Icon />
                 </Button>
               </PopoverContent>
             </Popover>
@@ -156,20 +160,22 @@ export function ConversationCore({ cid }: { cid: string }) {
         </div>
 
         <div className={clsx("w-full grow ", "overflow-auto")}>
-          <ConversationInput cid={c.id} />
+          <ConversationInput conversationId={c.id} />
         </div>
       </div>
     </div>
   )
 }
 
-export function ConversationInput({ cid }: { cid: string }) {
+export function ConversationInput({ conversationId }: { conversationId: string }) {
+  const { modelType, setModelType } = useAppStore()
+  const { t } = useTranslation()
   const userId = useUserId()
   const user = useSessionUser()
   const { data: balanceOk } = api.user.validateBalance.useQuery({ id: userId })
-  const { data: conv } = api.conv.get.useQuery({ id: cid })
+  const { data: conv } = api.conv.get.useQuery({ id: conversationId })
   const { data: hasApp } = api.conv.has.useQuery({ appId: conv?.appId ?? "" }, { enabled: !!conv })
-  const { data: initialMessages } = api.message.list.useQuery({ conversationId: cid }, { enabled: !!userId })
+  const { data: initialMessages } = api.message.list.useQuery({ conversationId: conversationId }, { enabled: !!userId })
   const refForm = useRef<HTMLFormElement>(null)
   const utils = api.useContext()
   const [addDialogVisible, setAddDialogVisible] = useState(false)
@@ -181,7 +187,7 @@ export function ConversationInput({ cid }: { cid: string }) {
   const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
-    body: { userId, conversationId: cid },
+    body: { userId, conversationId, modelType },
     onError: (err) => {
       console.warn(err)
       toast.error(err.message, { duration: Infinity })
@@ -201,12 +207,12 @@ export function ConversationInput({ cid }: { cid: string }) {
       // const n = messages.length
       // setMessages([...messages.slice(0, n - 1), { ...messages[n - 1]!, id: refMessage.current }])
     },
-    id: cid,
+    id: conversationId,
   })
 
   useEffect(() => {
     stop() // 防止串台
-  }, [cid])
+  }, [conversationId])
 
   useEffect(() => {
     if (initialMessages) {
@@ -245,6 +251,12 @@ export function ConversationInput({ cid }: { cid: string }) {
     })
   }
 
+  const modelWeight = (
+    Math.floor((modelTypes.findIndex((m) => m === modelType)! / modelTypes.length) * 128) + 128
+  ).toString(16)
+  const color = `#${modelWeight}${modelWeight}00`
+  console.log({ color })
+
   return (
     <div className={clsx("relative  h-full w-full", "flex  flex-col", "overflow-hidden")}>
       <Dialog>
@@ -252,12 +264,16 @@ export function ConversationInput({ cid }: { cid: string }) {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>账号提醒</AlertDialogTitle>
-              <AlertDialogDescription>哎呀，您的账户余额不足啦，请确认充值才能继续使用哦！</AlertDialogDescription>
+              <AlertDialogDescription>
+                哎呀，您的账户余额不足啦！
+                <br />
+                请确认充值才能继续使用哦:)
+              </AlertDialogDescription>
             </AlertDialogHeader>
 
             <AlertDialogFooter>
               <AlertDialogCancel>取消</AlertDialogCancel>
-              <DialogTrigger>
+              <DialogTrigger asChild>
                 <AlertDialogAction>确认</AlertDialogAction>
               </DialogTrigger>
             </AlertDialogFooter>
@@ -282,9 +298,33 @@ export function ConversationInput({ cid }: { cid: string }) {
         </div>
       </ScrollContainer>
 
+      <div className={"w-full px-4 flex items-center"}>
+        <Popover>
+          <PopoverTrigger>
+            <IconContainer>
+              <CodeSandboxLogoIcon style={{ color }} />
+            </IconContainer>
+          </PopoverTrigger>
+          <PopoverContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
+            {modelTypes.map((k) => (
+              <div
+                key={k}
+                onClick={() => {
+                  setModelType(k)
+                }}
+                className={clsx("p-2 rounded-sm", modelType === k && "bg-accent")}
+              >
+                {k}
+                <span className={"text-xs text-muted-foreground ml-2"}>({t(`common:model.${k}`)})</span>
+              </div>
+            ))}
+          </PopoverContent>
+        </Popover>
+      </div>
+
       <form
         ref={refForm}
-        className={clsx("w-full gap-2 p-4", "flex items-center justify-center")}
+        className={clsx("w-full gap-2 px-4 py-2 | flex items-center justify-center")}
         onSubmit={(event) => {
           event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
           console.log({ hasApp, balanceOk })
@@ -319,7 +359,7 @@ export function ConversationInput({ cid }: { cid: string }) {
           ])}
         />
         <input className="hidden" name="conversationUserId" value={userId} />
-        <input className="hidden" name="conversationAppId" value={cid} />
+        <input className="hidden" name="conversationAppId" value={conversationId} />
 
         <Button className="lg:hidden flex items-center justify-center" variant="ghost" type="submit">
           <SendIcon />

@@ -44,7 +44,7 @@ export function RecentConversations() {
     <Card id="recent-apps" variant="ghost" className="w-full">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>{t("common:homepage.recentlyUsedApps")}</CardTitle>
+          <CardTitle>{t("homepage:recentlyUsedApps")}</CardTitle>
           {user && (
             <Link
               href={getConversationsLink(user.id)}
@@ -84,7 +84,7 @@ export function RecentConversations() {
 }
 
 export async function getStaticProps({ locale }) {
-  const localeContent = await serverSideTranslations(locale, ["common"])
+  const localeContent = await serverSideTranslations(locale, ["common", "homepage"])
   console.log({ locale }, localeContent._nextI18Next)
 
   return {
