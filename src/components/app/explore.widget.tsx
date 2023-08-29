@@ -14,20 +14,21 @@ import { URI } from "@/config"
 
 import { AppHorizontalCardView } from "@/components/app/card-horizontal.view"
 import { AppDetailContainer } from "@/components/app/container"
-import { Loading } from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { api } from "@/lib/api"
 
-const limit = 5
+const k = 3
+const n = 5
 
 export function ExploreAppsWidget() {
   const { i18n, t } = useTranslation()
 
   const query = api.app.list.useInfiniteQuery(
     {
-      limit,
+      limit: n,
       language: i18n.language === "zh-CN" ? "zh" : "en",
     },
     {
@@ -54,16 +55,27 @@ export function ExploreAppsWidget() {
 
       <CardContent className="w-full grow | flex justify-between">
         <div className="w-full h-full | flex flex-col divide-y">
-          {!apps ? (
-            <Loading />
-          ) : (
-            apps.length >= limit &&
-            sampleSize(range(limit), 3).map((i) => (
-              <AppDetailContainer appId={apps[i]!.id} key={i}>
-                <AppHorizontalCardView app={apps[i]} key={i} />
-              </AppDetailContainer>
-            ))
-          )}
+          {!apps
+            ? range(k).map((i) => (
+                <div key={i} className={"w-full h-20 flex items-center gap-4 pb-3 pt-6 "}>
+                  <Skeleton className={"wh-20"} />
+                  <div className={"grow flex flex-col gap-2"}>
+                    <Skeleton className={"w-full h-4"} />
+                    <Skeleton className={"w-full h-4"} />
+                    <Skeleton className={"w-full h-4"} />
+                  </div>
+                  <div className={"w-8 flex flex-col gap-2"}>
+                    <Skeleton className={"w-full h-4"} />
+                    <Skeleton className={"w-full h-4"} />
+                  </div>
+                </div>
+              ))
+            : apps.length >= n &&
+              sampleSize(range(n), k).map((i) => (
+                <AppDetailContainer appId={apps[i]!.id} key={i}>
+                  <AppHorizontalCardView app={apps[i]} key={i} />
+                </AppDetailContainer>
+              ))}
         </div>
       </CardContent>
     </Card>

@@ -5,8 +5,28 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export const FontWeightGlowSansSC = ["Thin", "ExtraLight", "Light", "Regular", "Book", "Medium", "Bold", "ExtraBold", "Heavy"] as const
-export const FontWeightTailwind = ["thin", "extralight", "light", "normal", "medium", "semibold", "bold", "extrabold", "black"] as const
+export const FontWeightGlowSansSC = [
+  "Thin",
+  "ExtraLight",
+  "Light",
+  "Regular",
+  "Book",
+  "Medium",
+  "Bold",
+  "ExtraBold",
+  "Heavy",
+] as const
+export const FontWeightTailwind = [
+  "thin",
+  "extralight",
+  "light",
+  "normal",
+  "medium",
+  "semibold",
+  "bold",
+  "extrabold",
+  "black",
+] as const
 
 export const MAX_MOBILE_WIDTH = 640 as const
 
@@ -110,7 +130,8 @@ export const POKETTO_CREATOR_EMAIL = "pr@cs-magic.com" as const
 export const POKETTO_APP_ID = "Your-Sole-Poketto" as const
 export const POKETTO_APP_AVATAR = "/images/logo/poketto/Your-Sole-Poketto.png" as const
 export const POKETTO_APP_NAME = "Your Sole Poketto" as const
-export const POKETTO_APP_DESC = "The sole **Poketto** you need, at your service, anytime, anywhere, developed by Poketto Official." as const
+export const POKETTO_APP_DESC =
+  "The sole **Poketto** you need, at your service, anytime, anywhere, developed by Poketto Official." as const
 export const POKETTO_APP_VERSION = "1.0.0" as const
 export const POKETTO_APP_CREATED_AT = new Date(2023, 8, 13)
 export const POKETTO_APP_UPDATED_AT = new Date(2023, 8, 13)
@@ -173,3 +194,6 @@ export const AMOUNT_STEP = 5.0
 export const STRIPE_PAYMENT_PRODUCT_10_ID = "prod_OVgbKpNEmJJXIy"
 export const STRIPE_SUBSCRIBE_PRODUCT_10_ID = "prod_OVgYAVpLO6oLje"
 export const STRIPE_SUBSCRIBE_PRODUCT_30_ID = "prod_OVgZnKD7Fc2bsQ"
+
+export const FREE_GPT3_DAILY = 1000
+export const FREE_GPT4_DAILY = 100

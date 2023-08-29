@@ -5,10 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ArrowRightIcon } from "@radix-ui/react-icons"
+import range from "lodash/range"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
+
+import { FREE_GPT3_DAILY, FREE_GPT4_DAILY } from "@/config"
 
 import { CardsLayoutType } from "@/ds"
 
@@ -16,8 +19,10 @@ import { RootLayout } from "@/layouts/root.layout"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { ExploreAppsWidget } from "@/components/app/explore.widget"
+import { StatusItem } from "@/components/status"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { useSessionUser } from "@/hooks/use-user"
 
@@ -30,8 +35,42 @@ export default function HomePage() {
       <div className="h-full w-full overflow-auto | flex flex-col">
         <RecentConversations />
         <ExploreAppsWidget />
+        <SystemStatus />
       </div>
     </RootLayout>
+  )
+}
+
+export const SystemStatus = () => {
+  const { t } = useTranslation()
+  const { data: s } = api.system.status.useQuery()
+
+  return (
+    <Card variant={"ghost"}>
+      <CardHeader>
+        <CardTitle>Poketto Today</CardTitle>
+      </CardHeader>
+
+      <CardContent className={"w-full p-4 grid grid-cols-3"}>
+        <StatusItem
+          a={"GPT-3"}
+          b={s ? `${s.gpt3.free.surplus}/${FREE_GPT3_DAILY}` : <Skeleton className={"wh-5"} />}
+          c={t("homepage:todayFree")}
+        />
+
+        <StatusItem
+          a={"GPT-4"}
+          b={s ? `${s.gpt4.free.surplus}/${FREE_GPT4_DAILY}` : <Skeleton className={"wh-5"} />}
+          c={t("homepage:todayFree")}
+        />
+
+        <StatusItem
+          a={"Calls"}
+          b={s ? `${s.users}:${s.calls}` : <Skeleton className={"wh-5"} />}
+          c={t("homepage:todayTotal")}
+        />
+      </CardContent>
+    </Card>
   )
 }
 
@@ -40,6 +79,7 @@ export function RecentConversations() {
   const user = useSessionUser()
   const { data: conversations } = api.conv.list.useQuery(undefined, { enabled: !!user })
 
+  const n = 10
   return (
     <Card id="recent-apps" variant="ghost" className="w-full">
       <CardHeader>
@@ -58,15 +98,21 @@ export function RecentConversations() {
       </CardHeader>
 
       <CardContent className="flex w-full gap-2 p-2 overflow-auto">
-        {!conversations ? (
+        {!user ? (
           <div>
             <Button variant="link" onClick={() => void signIn()}>
               登录
             </Button>
             后才能查看最近使用的 App 哦！
           </div>
+        ) : !conversations ? (
+          <>
+            {range(n).map((i) => (
+              <Skeleton key={i} className={"w-48 h-72 shrink-0"} />
+            ))}
+          </>
         ) : (
-          conversations.slice(0, 10).map((c) => (
+          conversations.slice(0, n).map((c) => (
             //   正常情况下，我们应该用 PopContent，然后进入，不过这里是已经安装好的app，因此直接link过去比较好
             <Link
               className="w-48 shrink-0"

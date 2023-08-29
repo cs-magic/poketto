@@ -8,15 +8,16 @@ import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import numeral from "numeral"
-import { HTMLProps, type ReactNode, useCallback, useState } from "react"
+import { HTMLProps, useCallback, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
 
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { platformMap } from "@/config-utils"
 
-import { MarqueeContainer, MasonryContainer } from "@/components/containers"
+import { MasonryContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
+import { InfoItem, StatusItem } from "@/components/status"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -224,26 +225,6 @@ export function CollapsablePara({ content }: { content: string }) {
           {shownMore ? "Less" : "More"}
         </Button>
       )}
-    </div>
-  )
-}
-
-export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c?: ReactNode }) {
-  return (
-    <div className="w-24 shrink-0 overflow-hidden | flex flex-col items-center justify-between gap-1 | whitespace-nowrap py-2">
-      <div className="font-bold uppercase text-muted-foreground">{a}</div>
-      <MarqueeContainer className="text-lg">{b}</MarqueeContainer>
-      {c && <div className="flex items-center justify-center text-primary-foreground/50">{c}</div>}
-    </div>
-  )
-}
-
-export function InfoItem({ a, b }: { a: string; b: ReactNode }) {
-  const { t } = useTranslation()
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="font-bold capitalize text-muted-foreground">{a}</div>
-      <div className="text-primary-foreground/75">{b}</div>
     </div>
   )
 }
