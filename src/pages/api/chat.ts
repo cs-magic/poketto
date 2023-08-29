@@ -17,7 +17,7 @@ import superjson from "superjson"
 
 import { type RootRouter } from "@/server/trpc.router"
 
-import { env } from "@/env.mjs"
+import { authEnv, baseEnv } from "@/env.mjs"
 
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 
@@ -71,7 +71,7 @@ export default async function handler(req: Request, res: Response) {
   /**
    * 2. 检查频率等相关
    */
-  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+  if (baseEnv.KV_REST_API_URL && baseEnv.KV_REST_API_TOKEN) {
     const ip = req.headers.get("x-forwarded-for")
     const ratelimit = new Ratelimit({
       redis: kv,

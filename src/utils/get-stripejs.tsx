@@ -6,13 +6,12 @@
  */
 import { type Stripe, loadStripe } from "@stripe/stripe-js"
 
-import { env } from "@/env.mjs"
-
+import { paymentEnv } from "@/env.mjs"
 
 let stripePromise: Promise<Stripe | null>
 const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+    stripePromise = loadStripe(paymentEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   }
   return stripePromise
 }

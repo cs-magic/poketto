@@ -9,7 +9,7 @@ import type Stripe from "stripe"
 
 import { prisma } from "@/server/db"
 
-import { env } from "@/env.mjs"
+import { paymentEnv } from "@/env.mjs"
 
 import { STRIPE_SUBSCRIBE_PRODUCT_10_ID } from "@/config"
 
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET)
+    event = stripe.webhooks.constructEvent(body, signature, paymentEnv.STRIPE_WEBHOOK_SECRET)
   } catch (error) {
     console.log({ error })
     const { message } = error as { message: string }

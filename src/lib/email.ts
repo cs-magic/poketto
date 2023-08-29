@@ -12,22 +12,21 @@ import { Client } from "postmark"
 
 import { prisma } from "@/server/db"
 
-import { env } from "@/env.mjs"
+import { authEnv } from "@/env.mjs"
 
 import { AWS_REGION, emailProvider, siteConfig } from "@/config"
 
 import d from "@/lib/datetime"
 
-
 // @ts-ignore
 const isAws = emailProvider === "aws"
 
-const postmarkClient = new Client(env.POSTMARK_API_TOKEN)
+const postmarkClient = new Client(authEnv.POSTMARK_API_TOKEN)
 const sesClient = new SESClient({
   region: AWS_REGION,
   credentials: {
-    accessKeyId: env.AWS_AK,
-    secretAccessKey: env.AWS_SK,
+    accessKeyId: authEnv.AWS_AK,
+    secretAccessKey: authEnv.AWS_SK,
   },
 })
 
@@ -107,7 +106,7 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
       })
     )
   } else {
-    const templateId = user?.emailVerified ? env.POSTMARK_SIGN_IN_TEMPLATE : env.POSTMARK_ACTIVATION_TEMPLATE
+    const templateId = user?.emailVerified ? authEnv.POSTMARK_SIGN_IN_TEMPLATE : authEnv.POSTMARK_ACTIVATION_TEMPLATE
     if (!templateId) {
       throw new Error("Missing template id")
     }

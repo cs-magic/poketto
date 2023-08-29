@@ -7,10 +7,9 @@
 import "server-only"
 import Stripe from "stripe"
 
-import { env } from "@/env.mjs"
+import { paymentEnv } from "@/env.mjs"
 
-
-const key = env.STRIPE_API_KEY
+const key = paymentEnv.STRIPE_API_KEY
 console.log({ key })
 
 export const stripe = new Stripe(key, {

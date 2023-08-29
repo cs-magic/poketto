@@ -11,13 +11,12 @@ import DiscordProvider from "next-auth/providers/discord"
 import EmailProvider from "next-auth/providers/email"
 import GithubProvider from "next-auth/providers/github"
 
-import { env } from "@/env.mjs"
+import { authEnv } from "@/env.mjs"
 
 import { URI, allowDangerousEmailAccountLinking } from "@/config"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
 import { emailFrom, sendVerificationRequest } from "@/lib/email"
-
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -87,8 +86,8 @@ export const authOptions: NextAuthOptions = {
       sendVerificationRequest,
     }),
     GithubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
+      clientId: authEnv.GITHUB_CLIENT_ID,
+      clientSecret: authEnv.GITHUB_CLIENT_SECRET,
       allowDangerousEmailAccountLinking,
       profile(profile): NextAuthUser {
         return {
@@ -104,8 +103,8 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+      clientId: authEnv.DISCORD_CLIENT_ID,
+      clientSecret: authEnv.DISCORD_CLIENT_SECRET,
       allowDangerousEmailAccountLinking,
     }), // ref: https://next-auth.js.org/providers/google
     // GoogleProvider({
@@ -136,5 +135,7 @@ export const authOptions: NextAuthOptions = {
  *
  * @see https://next-auth.js.org/configuration/nextjs
  */
-export const getServerAuthSession = (ctx: { req: GetServerSidePropsContext["req"]; res: GetServerSidePropsContext["res"] }) =>
-  getServerSession(ctx.req, ctx.res, authOptions)
+export const getServerAuthSession = (ctx: {
+  req: GetServerSidePropsContext["req"]
+  res: GetServerSidePropsContext["res"]
+}) => getServerSession(ctx.req, ctx.res, authOptions)

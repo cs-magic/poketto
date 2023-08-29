@@ -7,7 +7,7 @@
 import Head from "next/head"
 import React from "react"
 
-import { env } from "@/env.mjs"
+import { paymentEnv } from "@/env.mjs"
 
 import { useSessionUser } from "@/hooks/use-user"
 
@@ -39,8 +39,8 @@ function StripePricingTable() {
       </Head>
 
       <stripe-pricing-table
-        pricing-table-id={env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
-        publishable-key={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        pricing-table-id={paymentEnv.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
+        publishable-key={paymentEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
         client-reference-id={user.id}
         customer-email={user.email}
       />
