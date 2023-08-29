@@ -50,12 +50,13 @@ export function RecentConversations() {
               href={getConversationsLink(user.id)}
               className="h-fit | flex items-center gap-2 py-0 text-xs text-primary"
             >
-              <span>{t("general.seeAll")}</span>
+              <span>{t("common:general.seeAll")}</span>
               <ArrowRightIcon />
             </Link>
           )}
         </div>
       </CardHeader>
+
       <CardContent className="flex w-full gap-2 p-2 overflow-auto">
         {!conversations ? (
           <div>
@@ -83,9 +84,12 @@ export function RecentConversations() {
 }
 
 export async function getStaticProps({ locale }) {
+  const localeContent = await serverSideTranslations(locale, ["common"])
+  console.log({ locale }, localeContent._nextI18Next)
+
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...localeContent,
     },
   }
 }

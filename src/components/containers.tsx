@@ -22,7 +22,7 @@ export function GridContainer({ children }: PropsWithChildren) {
       className={clsx(
         "w-full gap-2",
         // 'flex flex-wrap justify-between items-center',
-        "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
       )}
     >
       {children}
@@ -53,7 +53,11 @@ export function MarqueeContainer({ children, className, ...props }: PropsWithChi
   }, [])
 
   return (
-    <div ref={ref} className={clsx("relative flex w-full overflow-hidden", !isOverflow && "justify-center", className)} {...props}>
+    <div
+      ref={ref}
+      className={clsx("relative flex w-full overflow-hidden", !isOverflow && "justify-center", className)}
+      {...props}
+    >
       <div className={clsx("whitespace-nowrap ", isOverflow && "animate-marquee ")}>{children}</div>
       {isOverflow && <div className="absolute top-0 animate-marquee2">{children}</div>}
     </div>
@@ -152,7 +156,10 @@ export function ResponsiveTooltip({ content, children, ...props }: TooltipTrigge
 
 export function IconContainer({ children, className, ...props }: PropsWithChildren & HTMLProps<HTMLDivElement>) {
   return (
-    <div className={clsx("p-2 hover:bg-accent rounded-0 inline-flex items-center gap-1 cursor-pointer", className)} {...props}>
+    <div
+      className={clsx("p-2 hover:bg-accent rounded-0 inline-flex items-center gap-1 cursor-pointer", className)}
+      {...props}
+    >
       {children}
     </div>
   )

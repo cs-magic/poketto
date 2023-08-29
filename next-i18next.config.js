@@ -1,12 +1,12 @@
 /** @type {import("next-i18next").UserConfig} */
 module.exports = {
-  debug: false, // process.env.NODE_ENV === 'development',
+  debug: true, // process.env.NODE_ENV === 'development',
 
   i18n: {
     defaultLocale: "zh-CN",
     locales: ["zh-CN", "en"],
     // todo: compatible with next.config.mjs
-    localeDetection: true,
+    // localeDetection: true,
   },
 
   defaultNS: "common",

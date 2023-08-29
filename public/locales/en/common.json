@@ -69,7 +69,6 @@
     }
   },
   "command": {
-    "inputPlaceholder": "Type a command or search...",
-
+    "inputPlaceholder": "Type a command or search..."
   }
 }

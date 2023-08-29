@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import React from "react"
 
@@ -22,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
+  const { t } = useTranslation()
 
   // todo: in settings
   return (
@@ -29,19 +31,19 @@ export default function SettingsPage() {
       <div className={"w-full max-w-[512px] m-auto overflow-auto | flex flex-wrap p-4 gap-4"}>
         <Card className={"w-full"}>
           <CardHeader>
-            <CardTitle>全局</CardTitle>
+            <CardTitle>{t("settings:general")}</CardTitle>
           </CardHeader>
 
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>
             <div className={"w-full | flex justify-between items-center gap-4"}>
-              <Label className={"whitespace-nowrap"}>语言</Label>
+              <Label className={"whitespace-nowrap"}>{t("settings:language")}</Label>
               <IconContainer>
                 <LocaleSwitcher />
               </IconContainer>
             </div>
 
             <div className={"w-full | flex justify-between items-center gap-4"}>
-              <Label className={"whitespace-nowrap"}>主题</Label>
+              <Label className={"whitespace-nowrap"}>{t("settings:theme")}</Label>
               <IconContainer>
                 <ThemeSwitcher />
               </IconContainer>
@@ -51,12 +53,12 @@ export default function SettingsPage() {
 
         <Card className={"w-full"}>
           <CardHeader>
-            <CardTitle>视觉</CardTitle>
+            <CardTitle>{t("settings:UI")}</CardTitle>
           </CardHeader>
 
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>
             <div className={"w-full | flex justify-between items-center gap-4"}>
-              <Label className={"whitespace-nowrap"}>卡片布局</Label>
+              <Label className={"whitespace-nowrap"}>{t("settings:cardsLayout")}</Label>
               <Select value={cardsLayout} onValueChange={setCardsLayout} defaultValue={cardsLayout}>
                 <SelectTrigger className="w-28">
                   <SelectValue />
@@ -64,7 +66,7 @@ export default function SettingsPage() {
                 <SelectContent>
                   {Object.values(CardsLayoutType).map((cl) => (
                     <SelectItem value={cl} key={cl}>
-                      {cl}
+                      {t(`settings:${cl}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -75,7 +77,7 @@ export default function SettingsPage() {
 
         <Card className={"w-full"}>
           <CardHeader>
-            <CardTitle>账号</CardTitle>
+            <CardTitle>{t("settings:account")}</CardTitle>
           </CardHeader>
 
           <CardContent className={"w-full flex flex-col p-4 gap-2"}>
@@ -93,7 +95,7 @@ export default function SettingsPage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...(await serverSideTranslations(locale, ["common", "settings"])),
     },
   }
 }

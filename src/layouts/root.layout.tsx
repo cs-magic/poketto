@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 import Navbar from "./navbar"
-import { useHotkeys } from "@mantine/hooks"
 import React, { type PropsWithChildren, useEffect } from "react"
 
 import { useAppStore } from "@/store"

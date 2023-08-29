@@ -112,7 +112,7 @@ export default function Navbar() {
       <div className="grow" />
       <CommandSearch />
 
-      <div className="hidden items-center md:flex mx-2">
+      <div className="hidden md:flex items-center mx-2">
         <IconContainer>
           <LocaleSwitcher />
         </IconContainer>
