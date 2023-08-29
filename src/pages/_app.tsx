@@ -15,7 +15,6 @@ import { siteConfig } from "@/config"
 import { type ExtendedAppProps } from "@/ds"
 
 import ErrorBoundary from "@/components/error-boundary"
-import { I18nProvider } from "@/components/i18n"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
@@ -51,21 +50,19 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
 
       <ThemeProvider>
         <SessionProvider session={session}>
-          <I18nProvider>
-            <ErrorBoundary>
-              <TooltipProvider>
-                <main
-                  className={clsx(
-                    "min-w-[375px] max-w-screen w-auto | bg-background text-foreground text-sm font-light" // 'bg-zinc-900',
-                    // fontChinese.className
-                  )}
-                >
-                  <Component {...pageProps} />
-                </main>
-              </TooltipProvider>
-            </ErrorBoundary>
-            <Toaster richColors closeButton position="top-right" />
-          </I18nProvider>
+          <ErrorBoundary>
+            <TooltipProvider>
+              <main
+                className={clsx(
+                  "min-w-[375px] max-w-screen w-auto | bg-background text-foreground text-sm font-light" // 'bg-zinc-900',
+                  // fontChinese.className
+                )}
+              >
+                <Component {...pageProps} />
+              </main>
+            </TooltipProvider>
+          </ErrorBoundary>
+          <Toaster richColors closeButton position="top-right" />
         </SessionProvider>
       </ThemeProvider>
     </>

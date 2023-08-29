@@ -33,7 +33,7 @@ import { type AppForListView, type SelectChatMessageForListView } from "@/ds"
 import { LogoWithName } from "@/layouts/navbar"
 
 import { AppDetailContainer } from "@/components/app/container"
-import { AutoScrollContainer, ChargeContainer, IconContainer } from "@/components/containers"
+import { AutoScrollContainer, IconContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"
 import {
@@ -64,8 +64,6 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
 import { getConversationsLink } from "@/lib/string"
-
-import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
 
 type AllMessage =
   | SelectChatMessageForListView

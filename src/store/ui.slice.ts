@@ -8,13 +8,15 @@ import { type StoreSlice } from "@/store/index"
 
 import { CardsLayoutType } from "@/ds"
 
-
 export interface UIState {
   cardsLayout: CardsLayoutType
   setCardsLayout: (v: CardsLayoutType) => void
 
   fullscreen: boolean
   switchFullscreen: () => void
+
+  searchOpen: boolean
+  setSearchOpen: (v: boolean) => void
 }
 
 export const createUISlice: StoreSlice<UIState> = (setState, getState, store) => ({
@@ -27,5 +29,11 @@ export const createUISlice: StoreSlice<UIState> = (setState, getState, store) =>
   switchFullscreen: () =>
     setState((state) => {
       state.fullscreen = !state.fullscreen
+    }),
+
+  searchOpen: false,
+  setSearchOpen: (v) =>
+    setState((state) => {
+      state.searchOpen = v
     }),
 })

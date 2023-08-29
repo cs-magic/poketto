@@ -6,6 +6,13 @@
  */
 import { useRouter } from "next/router"
 
+import { POKETTO_APP_ID } from "@/config"
+
+import { useUserId } from "@/hooks/use-user"
+
+import { api } from "@/lib/api"
+import { getConversationLink } from "@/lib/string"
+
 export const useUrl = () => {
   const router = useRouter()
   const origin = window?.location.origin ? window.location.origin : ""
@@ -13,4 +20,14 @@ export const useUrl = () => {
   // console.log({ router })
   const baseUrl = `${origin}${router.asPath}`
   return { origin, baseUrl }
+}
+
+export const usePokettoConversationUrl = () => {
+  const userId = useUserId()
+  const { data: app } = api.app.get.useQuery(
+    { platform: { platformId: POKETTO_APP_ID, platformType: "Poketto" } },
+    { enabled: !!userId }
+  )
+  if (!userId || !app) return null
+  return getConversationLink(userId, app.id)
 }

@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import Navbar from "./navbar"
+import { useHotkeys } from "@mantine/hooks"
 import React, { type PropsWithChildren, useEffect } from "react"
 
 import { useAppStore } from "@/store"
@@ -34,7 +35,9 @@ export function MobileLayout(props: PropsWithChildren) {
     <div className="md:hidden | h-full w-full | flex flex-col">
       {!fullscreen && <Navbar />}
 
-      <div className="w-full grow overflow-hidden | flex flex-col items-center justify-center gap-2">{props.children}</div>
+      <div className="w-full grow overflow-hidden | flex flex-col items-center justify-center gap-2">
+        {props.children}
+      </div>
 
       {!fullscreen && <Footer />}
     </div>
@@ -42,12 +45,39 @@ export function MobileLayout(props: PropsWithChildren) {
 }
 
 export function DesktopLayout(props: PropsWithChildren) {
+  const { setSearchOpen } = useAppStore()
+
+  /**
+   * 快速搜索（全局）， from gpt4
+   * 不能用 mantine 的 useHotkey，因为它不是全局的
+   */
+  React.useEffect(() => {
+    function handleKeyDownCapture(event: KeyboardEvent) {
+      // console.log("in layout: ", event)
+      if (event.metaKey && event.key === "k") {
+        setSearchOpen(true)
+        // 要两个结合
+        event.stopPropagation()
+        event.preventDefault()
+      }
+    }
+
+    // The third parameter 'true' means we're using the capturing phase
+    window.addEventListener("keydown", handleKeyDownCapture, true)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDownCapture, true)
+    }
+  }, [])
+
   return (
     <div className="hidden h-full w-full flex-col md:flex overflow-hidden">
       <Navbar />
       <div className="flex grow divide-x overflow-hidden">
         <Sidebar />
-        <div className="flex h-full grow flex-col items-center justify-center gap-2 overflow-hidden">{props.children}</div>
+        <div className="flex h-full grow flex-col items-center justify-center gap-2 overflow-hidden">
+          {props.children}
+        </div>
       </div>
     </div>
   )

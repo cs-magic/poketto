@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ArrowRightIcon } from "@radix-ui/react-icons"
-import { GetServerSideProps } from "next"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
@@ -45,7 +44,7 @@ export function RecentConversations() {
     <Card id="recent-apps" variant="ghost" className="w-full">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>{t("homepage.recentlyUsedApps")}</CardTitle>
+          <CardTitle>{t("common:homepage.recentlyUsedApps")}</CardTitle>
           {user && (
             <Link
               href={getConversationsLink(user.id)}

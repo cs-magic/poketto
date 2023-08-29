@@ -4,19 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma } from ".prisma/client"
-import { CheckCircledIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import numeral from "numeral"
-import { type ReactNode, useCallback, useState } from "react"
+import { HTMLProps, type ReactNode, useCallback, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
 
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
 import { platformMap } from "@/config-utils"
-
-import { ConvForDetailView } from "@/ds"
 
 import { MarqueeContainer, MasonryContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
@@ -44,9 +40,14 @@ import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
 import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
 
-export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v: boolean) => void }) {
+export function AppDetailView({
+  appId,
+  setOpen,
+  className,
+  ...props
+}: { appId: string; setOpen?: (v: boolean) => void } & HTMLProps<HTMLDivElement>) {
   const userId = useUserId()
-  const { data: app, error: appError } = api.app.get.useQuery({ appId })
+  const { data: app, error: appError } = api.app.get.useQuery({ id: appId })
 
   if (app === undefined) return <Loading />
 
@@ -54,7 +55,7 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
   if (appError) return null
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 overflow-auto p-2">
+    <div className={clsx("flex h-full w-full flex-col gap-2 overflow-auto p-2", className)} {...props}>
       <section id="basic" className="| flex w-full items-center gap-2">
         <Avatar className="shrink-0 p-4  wh-28">
           <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className="rounded-2xl" />
@@ -122,7 +123,9 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
               </DialogTrigger>
               <DialogContent className="h-[80vh]  max-w-[80vw] overflow-auto">
                 <h2>All the comments</h2>
-                <MasonryContainer>{/* {comments.map((item) => (<PokettoComment comment={item} key={item.id}/>))} */}</MasonryContainer>
+                <MasonryContainer>
+                  {/* {comments.map((item) => (<PokettoComment comment={item} key={item.id}/>))} */}
+                </MasonryContainer>
               </DialogContent>
             </Dialog>
           )}
@@ -140,7 +143,9 @@ export function AppDetailView({ appId, setOpen }: { appId: string; setOpen?: (v:
         {/*	</div> */}
         {/*	<Image src={RatingChart} alt={'rating-chart'} width={320} height={40}/> */}
         {/* </div> */}
-        <div className="grid gap-2">{/* {comments.slice(0, 2).map((item) => (<PokettoComment comment={item} key={item.id}/>))} */}</div>
+        <div className="grid gap-2">
+          {/* {comments.slice(0, 2).map((item) => (<PokettoComment comment={item} key={item.id}/>))} */}
+        </div>
       </section>
 
       <section id="information" className="flex w-full flex-col gap-4">
@@ -243,7 +248,15 @@ export function InfoItem({ a, b }: { a: string; b: ReactNode }) {
 /**
  * 新加app后应该立即进入
  */
-export function InstallButton({ userId, appId, setOpen }: { userId: string; appId: string; setOpen?: (v: boolean) => void }) {
+export function InstallButton({
+  userId,
+  appId,
+  setOpen,
+}: {
+  userId: string
+  appId: string
+  setOpen?: (v: boolean) => void
+}) {
   const router = useRouter()
   const utils = api.useContext()
   const { data: hasApp } = api.conv.has.useQuery({ appId })
@@ -264,7 +277,10 @@ export function InstallButton({ userId, appId, setOpen }: { userId: string; appI
   })
 
   return (
-    <Badge className={clsx(" h-6 rounded-3xl px-4 transition-all cursor-pointer")} onClick={hasApp ? go : () => addApp({ appId })}>
+    <Badge
+      className={clsx(" h-6 rounded-3xl px-4 transition-all cursor-pointer")}
+      onClick={hasApp ? go : () => addApp({ appId })}
+    >
       {hasApp ? "Open" : "Get"}
     </Badge>
   )
@@ -273,7 +289,15 @@ export function InstallButton({ userId, appId, setOpen }: { userId: string; appI
 /**
  * 删除app后应该留在原地, todo: maybe can go into the list page, if so
  */
-export function UninstallButton({ userId, appId, setOpen }: { userId: string; appId: string; setOpen?: (v: boolean) => void }) {
+export function UninstallButton({
+  userId,
+  appId,
+  setOpen,
+}: {
+  userId: string
+  appId: string
+  setOpen?: (v: boolean) => void
+}) {
   const router = useRouter()
   const { data: conv } = api.conv.get.useQuery({ conversation: { userId, appId } })
 
@@ -295,7 +319,10 @@ export function UninstallButton({ userId, appId, setOpen }: { userId: string; ap
     <section id="collections" className="my-4 flex w-full flex-col gap-4">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive" disabled={conv.app.platformId === POKETTO_APP_ID && conv.app.platformType === "Poketto"}>
+          <Button
+            variant="destructive"
+            disabled={conv.app.platformId === POKETTO_APP_ID && conv.app.platformType === "Poketto"}
+          >
             Clear
           </Button>
         </AlertDialogTrigger>

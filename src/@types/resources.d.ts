@@ -68,10 +68,13 @@ interface Resources {
         "title": "浏览",
         "desc": "该 App 在广场内被用户看到的总次数"
       }
+    },
+    "command": {
+      "inputPlaceholder": "你想搜点什么呢？"
     }
   },
   "explore": {
-    "appPlayground": "应用广场"
+    "appMarket": "应用市场"
   }
 }
 

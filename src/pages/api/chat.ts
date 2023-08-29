@@ -21,7 +21,6 @@ import { authEnv, baseEnv } from "@/env.mjs"
 
 import { CHAT_MESSAGE_CID_LEN, DEFAULT_TEMPERATURE } from "@/config"
 
-// allow lodash run in edge, ref: https://github.com/lodash/lodash/issues/5525#issuecomment-1426535044
 import { nanoid } from "@/lib/id"
 
 import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"

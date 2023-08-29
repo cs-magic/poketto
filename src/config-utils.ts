@@ -6,7 +6,16 @@
  */
 import { Icons } from "./components/icons"
 import type { PlatformType, PromptRoleType } from ".prisma/client"
-import { BellIcon, DashboardIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
+import {
+  BellIcon,
+  DashboardIcon,
+  GearIcon,
+  HandIcon,
+  HomeIcon,
+  MixIcon,
+  RocketIcon,
+  TargetIcon,
+} from "@radix-ui/react-icons"
 
 import { POKETTO_HOMEPAGE, URI } from "@/config"
 
@@ -19,19 +28,7 @@ export const COMMANDS: ICommandItem[] = [
     id: "Ask Poketto",
     Icon: Icons.Product,
     category: CommandType.suggestion,
-    kbd: "⌘ D",
-  },
-  {
-    id: "Dashboard",
-    Icon: DashboardIcon,
-    category: CommandType.settings,
-    kbd: "⌘ D",
-  },
-  {
-    id: "Explore",
-    Icon: GearIcon,
-    category: CommandType.settings,
-    kbd: "⌘ E",
+    kbd: "⌘ P",
   },
 ]
 export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {

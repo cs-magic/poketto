@@ -67,5 +67,9 @@
       "title": "Views",
       "desc": "该 App 在广场内被用户看到的总次数"
     }
+  },
+  "command": {
+    "inputPlaceholder": "Type a command or search...",
+
   }
 }

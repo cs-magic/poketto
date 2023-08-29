@@ -32,16 +32,7 @@ export function ConversationList() {
   const { data: convs } = api.conv.list.useQuery()
 
   const [searchKey, setSearchKey] = useState("")
-  const [toSearch] = useDebouncedValue(searchKey, 200)
-  // todo: avoid empty call of trpc
-  const queryApps = api.app.list.useInfiniteQuery(
-    { searchKey: toSearch },
-    {
-      enabled: toSearch !== "",
-      getNextPageParam: (lastPage, allPages) => lastPage.nextCursor,
-    }
-  )
-  const searchedApps = queryApps.data?.pages.flatMap((item) => item.items) ?? []
+  // todo: search chat history
 
   return (
     <div className="flex h-full w-full shrink-[.1] flex-col overflow-hidden">

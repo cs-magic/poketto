@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Prisma } from ".prisma/client"
+import { AppWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
 
 import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
@@ -88,17 +89,10 @@ export const pokettoAppRouter = createTRPCRouter({
       }
     ),
 
-  get: publicProcedure
-    .input(
-      z.object({
-        appId: z.string(),
-      })
-    )
-    .query(async ({ ctx: { prisma }, input: { appId } }) => {
-      console.log("finding app: ", { appId })
-      return prisma.app.findUniqueOrThrow({
-        select: selectAppForDetailView,
-        where: { id: appId },
-      })
-    }),
+  get: publicProcedure.input(AppWhereUniqueInputSchema).query(async ({ ctx: { prisma }, input }) => {
+    return prisma.app.findUniqueOrThrow({
+      select: selectAppForDetailView,
+      where: input,
+    })
+  }),
 })

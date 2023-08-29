@@ -4,39 +4,38 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { useHotkeys } from "@mantine/hooks"
-import { GearIcon, LapTimerIcon, MagnifyingGlassIcon, MoonIcon, QuestionMarkCircledIcon, SunIcon } from "@radix-ui/react-icons"
-import groupBy from "lodash/groupBy"
+import { useDebouncedValue, useHotkeys } from "@mantine/hooks"
+import { LapTimerIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons"
+import { CommandLoading } from "cmdk"
 import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { Fragment } from "react"
+import React, { ComponentProps, FC, Fragment, useEffect, useRef, useState } from "react"
 import { TbLanguage } from "react-icons/tb"
+import { toast } from "sonner"
 
 import { useAppStore } from "@/store"
 
-import { ICON_DIMENSION_SM, URI } from "@/config"
-import { COMMANDS, menuGroups, menuItems } from "@/config-utils"
+import { ICON_DIMENSION_SM, POKETTO_APP_ID } from "@/config"
 
+import { AppDetailContainer } from "@/components/app/container"
+import { AppDetailView } from "@/components/app/detail.view"
 import { IconContainer } from "@/components/containers"
 import { Icons } from "@/components/icons"
-import { SidebarNavItem } from "@/components/link"
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMount } from "@/hooks/use-mount"
+import { usePokettoConversationUrl } from "@/hooks/use-url"
+
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
+import { getLocalFlowgptImageUri } from "@/lib/string"
 
 export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
@@ -111,7 +110,7 @@ export default function Navbar() {
       <LogoWithName />
 
       <div className="grow" />
-      <CommandDemo />
+      <CommandSearch />
 
       <div className="hidden items-center md:flex mx-2">
         <IconContainer>
@@ -150,64 +149,146 @@ export default function Navbar() {
   )
 }
 
-function CommandDemo() {
-  const [open, setOpen] = React.useState(false)
-  const { searchHistory: history, pushSearch: push } = useAppStore()
+const Item: FC<ComponentProps<typeof CommandItem>> = ({ className, ...props }) => {
+  return <CommandItem className={clsx("w-full flex items-center gap-2", className)} {...props} />
+}
 
-  const KEY = "K"
-  useHotkeys([[`mod+${KEY}`, () => setOpen(!open)]])
+function CommandSearch() {
+  const { t } = useTranslation()
+
+  const [search, setSearch] = React.useState("")
+  const [toSearch] = useDebouncedValue(search, 200)
+  const { data: queried } = api.app.list.useInfiniteQuery({ searchKey: toSearch, limit: 5 }, {})
+
+  const { searchHistory, pushSearch, searchOpen: open, setSearchOpen: setOpen } = useAppStore()
+  const pokettoConversationUrl = usePokettoConversationUrl()
+
+  const router = useRouter()
+
+  const [appId, setAppId] = useState<string | null>(null)
+  const refInput = useRef<HTMLInputElement>(null)
+
+  /**
+   *  close dialog if url changed
+   */
+  useEffect(() => {
+    console.log({ path: router.asPath })
+    setOpen(false)
+  }, [router.asPath])
+
+  /**
+   * refocus so that arrow navigation works again
+   */
+  useEffect(() => {
+    if (!appId) {
+      // console.log("re-focusing input", refInput.current)
+      refInput.current?.focus()
+    }
+  }, [appId])
+
+  // console.log({ cmdValue })
 
   return (
     <>
-      <div className="| | relative flex w-[256px] items-center text-sm text-muted-foreground">
+      {appId && (
+        <AppDetailContainer
+          appId={appId}
+          open={!!appId}
+          onOpenChange={(v) => {
+            // close dialog
+            if (!v) {
+              setAppId(null)
+            }
+          }}
+        />
+      )}
+
+      <div className="relative flex w-[256px] items-center text-sm text-muted-foreground">
         <MagnifyingGlassIcon className="absolute left-2 wh-5" />
         <Input className="grow" onFocus={() => setOpen(!open)} />
         <kbd className="pointer-events-none absolute right-2 hidden h-6  shrink-0  select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground md:inline-flex">
-          ⌘ {KEY}
+          ⌘ K
         </kbd>
       </div>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
-        <CommandList className="max-h-[600px]">
-          <CommandEmpty>No results found.</CommandEmpty>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className=" p-0 shadow-lg h-[360px] overflow-auto">
+          <Command
+            className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
+            filter={(value, search) => {
+              // note: value 都是小写， ref: https://github.com/pacocoursey/cmdk#command-cmdk-root
+              return 1
+              // if (value.includes("poketto")) return 1
+              // if (value.includes(search)) return 1
+              // return 0
+            }}
+          >
+            <CommandInput
+              ref={refInput}
+              placeholder={t("common:command.inputPlaceholder")}
+              value={search}
+              onValueChange={setSearch}
+            />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
 
-          <CommandGroup heading="History">
-            <div className="flex flex-wrap gap-2">
-              {history
-                .map((id) => COMMANDS.find((command) => command.id === id)!)
-                .map((Item) => (
-                  <CommandItem key={Item.id} className="flex items-center gap-2">
-                    <Item.Icon />
-                    <span>{Item.title ?? Item.id}</span>
-                  </CommandItem>
-                ))}
-            </div>
-          </CommandGroup>
+              {/* 历史的UI呈现不知道怎么搞比较好 */}
+              {/*<CommandGroup heading="历史">*/}
+              {/*  <div className="flex flex-wrap gap-2">*/}
+              {/*    {searchHistory.map((key) => (*/}
+              {/*      <Item key={key} className="w-fit" value={key} onSelect={() => pushSearch(key)}>*/}
+              {/*        <span>{key}</span>*/}
+              {/*      </Item>*/}
+              {/*    ))}*/}
+              {/*  </div>*/}
+              {/*</CommandGroup>*/}
 
-          {Object.entries(groupBy(COMMANDS, "category")).map(([cat, items]) => (
-            <Fragment key={cat}>
-              <CommandSeparator />
-              <CommandGroup heading={cat} key={cat}>
-                {items.map((Item) => (
-                  <CommandItem
-                    key={Item.id}
-                    className="flex items-center gap-2"
-                    onSelect={() => {
-                      // ref: https://github.com/pacocoursey/cmdk#nested-items
-                      console.log("selected ", Item)
-                      push(Item.id)
-                    }}
-                  >
-                    <Item.Icon />
-                    <span>{Item.title ?? Item.id}</span>
-                  </CommandItem>
-                ))}
+              <CommandGroup heading="系统">
+                <Item
+                  value={POKETTO_APP_ID}
+                  onSelect={() => {
+                    pushSearch(toSearch)
+                    if (pokettoConversationUrl) {
+                      void router.push(pokettoConversationUrl)
+                    } else {
+                      toast.error("您需要登录才可以启用 Poketto！")
+                    }
+                  }}
+                >
+                  <Icons.Product />
+                  <span>召唤 Poketto</span>
+                </Item>
               </CommandGroup>
-            </Fragment>
-          ))}
-        </CommandList>
-      </CommandDialog>
+
+              <CommandGroup heading="Apps">
+                <CommandEmpty>No results found.</CommandEmpty>
+                {!queried ? (
+                  <CommandLoading>Hang on…</CommandLoading>
+                ) : (
+                  queried.pages
+                    .flatMap((item) => item.items)
+                    .map((app) => (
+                      <Item
+                        key={app.id}
+                        value={app.id}
+                        onSelect={(value) => {
+                          console.log("selected: ", { value, appId: app.id })
+                          pushSearch(app.name)
+                          setAppId(app.id)
+                        }}
+                      >
+                        <Avatar className={"wh-5"}>
+                          <AvatarImage src={getLocalFlowgptImageUri(app.avatar)} />
+                        </Avatar>
+                        <span>{app.name ?? app.id}</span>
+                      </Item>
+                    ))
+                )}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

@@ -15,7 +15,11 @@ import { ResponsiveTooltip } from "@/components/containers"
 export function SidebarNavItem({ field, Icon, link }: IMenuItem) {
   const { t } = useTranslation()
 
-  const inner = <ResponsiveTooltip content={t(`menus.${field}`)}>{Icon && <Icon className="wh-12 p-btn-horizontal" />}</ResponsiveTooltip>
+  const inner = (
+    <ResponsiveTooltip content={t(`common:menus.${field}`)}>
+      {Icon && <Icon className="wh-12 p-btn-horizontal" />}
+    </ResponsiveTooltip>
+  )
   return link ? <Link href={link}>{inner}</Link> : inner
 }
 
