@@ -56,6 +56,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -257,27 +258,31 @@ export function ConversationInput({ conversationId }: { conversationId: string }
       </ScrollContainer>
 
       <div className={"w-full px-4 flex items-center"}>
-        <Popover>
-          <PopoverTrigger>
+        <Select onValueChange={setModelType} value={modelType}>
+          <SelectTrigger variant={"simple"}>
             <IconContainer className={"rounded-sm"}>
               <CodeSandboxLogoIcon style={{ color }} />({quota[modelType]})
             </IconContainer>
-          </PopoverTrigger>
-          <PopoverContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
-            {modelTypes.map((k) => (
-              <div
-                key={k}
-                onClick={() => {
-                  setModelType(k)
-                }}
-                className={clsx("p-2 rounded-sm", modelType === k && "bg-accent")}
-              >
-                {k}
-                <span className={"text-xs text-muted-foreground ml-2"}>({t(`common:model.${k}`)})</span>
-              </div>
-            ))}
-          </PopoverContent>
-        </Popover>
+          </SelectTrigger>
+          <SelectContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
+            <SelectGroup>
+              {modelTypes.map((k) => (
+                <SelectItem
+                  key={k}
+                  value={k}
+                  onClick={() => {
+                    setModelType(k)
+                  }}
+                  className={clsx("p-2 rounded-sm", modelType === k && "bg-accent")}
+                  disabled={k === "openchat"}
+                >
+                  {k}
+                  <span className={"text-xs text-muted-foreground ml-2"}>({t(`common:model.${k}`)})</span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
 
       <form
