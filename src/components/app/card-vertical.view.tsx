@@ -9,7 +9,7 @@ import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
 import Image from "next/image"
 
-import { type AppForListView, CardsLayoutType, type SortOrder } from "@/ds"
+import { type AppForListView, CardsLayoutType, IMAGE_SIZE, type SortOrder } from "@/ds"
 
 import { AppDetailContainer } from "@/components/app/container"
 import { AppDetailView } from "@/components/app/detail.view"
@@ -26,13 +26,15 @@ export function AppVerticalCardView({
   app,
   cardsLayout,
   sort,
+  size = "md",
 }: {
   app: AppForListView
   cardsLayout: CardsLayoutType
   sort: SortOrder
+  size?: IMAGE_SIZE
 }) {
   // console.log("app avatar: ", app.avatar)
-  const appAvatar = getLocalFlowgptImageUri(app.avatar, "md")
+  const appAvatar = getLocalFlowgptImageUri(app.avatar, size)
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (

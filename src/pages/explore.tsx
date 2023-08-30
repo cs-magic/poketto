@@ -103,7 +103,13 @@ export default function ExplorePage() {
           <Container>
             {apps.map((app) => (
               <AppDetailContainer key={app.id} appId={app.id}>
-                <AppVerticalCardView app={app} cardsLayout={cardsLayout} sort={sortOrder} />
+                <AppVerticalCardView
+                  app={app}
+                  cardsLayout={cardsLayout}
+                  sort={sortOrder}
+                  // explore 页需要大屏的图
+                  size={"raw"}
+                />
               </AppDetailContainer>
             ))}
           </Container>
