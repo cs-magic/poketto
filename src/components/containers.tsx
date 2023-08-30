@@ -5,10 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 import type { TooltipTriggerProps } from "@radix-ui/react-tooltip"
+import { useTranslation } from "next-i18next"
 import React, { type HTMLProps, type PropsWithChildren, type ReactNode, useCallback, useState } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ScrollToBottom from "react-scroll-to-bottom"
 
+import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -156,5 +158,16 @@ export function IconContainer({ children, className, ...props }: PropsWithChildr
     >
       {children}
     </div>
+  )
+}
+
+export const AsyncListContainer = <T extends any>({ items, style }: { items?: T[]; style: (ele: T) => ReactNode }) => {
+  const { t } = useTranslation()
+  return !items ? (
+    <Loading />
+  ) : !items.length ? (
+    <div className={"w-full flex flex-col items-center"}>{t("common:CurrentlyNoResult")}</div>
+  ) : (
+    <>{items.map((p, index) => style(p))}</>
   )
 }

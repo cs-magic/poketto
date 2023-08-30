@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { signOut } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import React from "react"
@@ -16,14 +17,18 @@ import { LocaleSwitcher, ThemeSwitcher } from "@/layouts/navbar"
 import { RootLayout } from "@/layouts/root.layout"
 
 import { IconContainer } from "@/components/containers"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+import { useSessionUser } from "@/hooks/use-user"
+
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
+  const user = useSessionUser()
 
   // todo: in settings
   return (
@@ -103,6 +108,12 @@ export default function SettingsPage() {
               <Label className={"whitespace-nowrap"}>OpenAI API Key</Label>
               <Input placeholder={"todo"} disabled />
             </div>
+
+            {user && (
+              <Button variant="destructive" onClick={() => void signOut()} className={"w-full"}>
+                {t("common:LogOut")}
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>

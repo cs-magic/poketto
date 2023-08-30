@@ -1,6 +1,16 @@
 {
   "Login": "登录",
   "LoadingMoreData": "正在加载更多数据……",
+  "CurrentlyNoResult": "暂无结果！",
+  "CurrentlyNoComments":"暂无评价！",
+  "Following": "关注",
+  "Followers": "粉丝",
+  "Impact": "影响力",
+  "Dora": "Dora",
+  "EditProfile": "编辑简介",
+  "Charge": "充值",
+  "LogOut": "退出登录",
+  "StartLogIn": "立即登录",
   "product": {
     "name": "Poketto.AI"
   },

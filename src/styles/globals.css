@@ -47,7 +47,7 @@ colors:
         --popover-foreground: 222.2 84% 4.9%;
 
         /*--primary: 222.2 47.4% 11.2%;*/
-        --primary: 211.542, 100%, 50%;
+        --primary: 211.542 100% 50%;
         --primary-foreground: 210 40% 0%;
 
         --secondary: 210 40% 96.1%;
@@ -65,7 +65,7 @@ colors:
         --border: 214.3 31.8% 91.4%;
         --input: 214.3 31.8% 91.4%;
         --ring: 222.2 84% 4.9%;
-        --link: 213, 68%, 55%;
+        --link: 213 68% 55%;
 
         --radius: 0.5rem;
     }

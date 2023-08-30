@@ -133,7 +133,7 @@ export function AppDetailView({
             </Dialog>
           )}
         </div>
-        {app.comments.length === 0 && "No Comments Yet !"}
+        {app.comments.length === 0 && t("common:CurrentlyNoComments")}
 
         {/* todo: rate level */}
         {/* <div className={'grid grid-col-1 md:grid-cols-2 gap-4'}> */}
@@ -261,12 +261,12 @@ export function InstallButton({
   })
 
   return (
-    <Badge
-      className={clsx(" h-6 rounded-3xl px-4 transition-all cursor-pointer")}
+    <Button
+      className={clsx(" h-6 rounded-3xl px-4 transition-all cursor-pointer text-white")}
       onClick={hasApp ? go : () => addApp({ appId })}
     >
       {hasApp ? "Open" : "Get"}
-    </Badge>
+    </Button>
   )
 }
 

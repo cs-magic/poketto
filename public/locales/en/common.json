@@ -1,6 +1,16 @@
 {
   "Login": "Login",
   "LoadingMoreData": "Loading More Data …",
+  "CurrentlyNoResult": "Currently no result …",
+  "CurrentlyNoComments":"Currently no comments …",
+  "Following": "Following",
+  "Followers": "Followers",
+  "Impact": "Impact",
+  "Dora": "Dora",
+  "EditProfile": "Edit Profile",
+  "Charge": "Charge",
+  "LogOut": "Log Out",
+  "StartLogIn": "Start Log In",
   "product": {
     "name": "Poketto AI"
   },
