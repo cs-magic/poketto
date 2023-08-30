@@ -33,9 +33,9 @@ export default function HomePage() {
   return (
     <RootLayout>
       <div className="h-full w-full overflow-auto | flex flex-col">
+        <SystemStatus />
         <RecentConversations />
         <ExploreAppsWidget />
-        <SystemStatus />
       </div>
     </RootLayout>
   )
@@ -52,23 +52,11 @@ export const SystemStatus = () => {
       </CardHeader>
 
       <CardContent className={"w-full p-4 grid grid-cols-3"}>
-        <StatusItem
-          a={"GPT-3"}
-          b={s ? `${s.gpt3.free.surplus}/${FREE_GPT3_DAILY_TOTAL}` : <Skeleton className={"wh-5"} />}
-          c={t("homepage:todayFree")}
-        />
+        <StatusItem a={"Apps"} b={s ? s.apps : <Skeleton className={"w-12 h-4"} />} c={"Total"} />
 
-        <StatusItem
-          a={"GPT-4"}
-          b={s ? `${s.gpt4.free.surplus}/${FREE_GPT4_DAILY_TOTAL}` : <Skeleton className={"wh-5"} />}
-          c={t("homepage:todayFree")}
-        />
+        <StatusItem a={"Users"} b={s ? s.users : <Skeleton className={"w-12 h-4"} />} c={"Total"} />
 
-        <StatusItem
-          a={"Calls"}
-          b={s ? `${s.users}:${s.calls}` : <Skeleton className={"wh-5"} />}
-          c={t("homepage:todayTotal")}
-        />
+        <StatusItem a={"Calls"} b={s ? s.calls : <Skeleton className={"w-12 h-4"} />} c={"Total"} />
       </CardContent>
     </Card>
   )
@@ -131,7 +119,7 @@ export function RecentConversations() {
 
 export async function getStaticProps({ locale }) {
   const localeContent = await serverSideTranslations(locale, ["common", "homepage"])
-  console.log({ locale }, localeContent._nextI18Next)
+  // console.log({ locale }, localeContent._nextI18Next)
 
   return {
     props: {

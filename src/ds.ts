@@ -195,20 +195,12 @@ export const defaultModelQuota: Record<ModelType, number> = {
   openchat: 100,
 }
 
-// -----------------------------------------------------------------------------
-// UI
-// -----------------------------------------------------------------------------
-
 export type IMAGE_SIZE = "xs" | "md" | "raw" | "full"
 
 export enum CardsLayoutType {
   masonry = "masonry",
   grid = "grid",
 }
-
-// -----------------------------------------------------------------------------
-// User Preference (which can be managed via either by store or api)
-// -----------------------------------------------------------------------------
 
 export const sortOrders = ["mostViewed", "mostUsed", "newest"] as const
 // todo: more intelligent approach
@@ -221,3 +213,15 @@ export type AllMessage =
       systemType: "notification" | "date"
       content: string
     }
+
+export const issueTypes = [
+  "puzzle-in-use",
+  "feature-request",
+  "bug-report",
+  "leak-report",
+  "business-collaboration",
+] as const
+export type IssueType = (typeof issueTypes)[number]
+
+export const appPlatforms = ["web", "desktop", "mobile", "mini-program"] as const
+export type AppPlatform = (typeof appPlatforms)[number]

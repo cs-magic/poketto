@@ -1,6 +1,6 @@
 /** @type {import("next-i18next").UserConfig} */
 module.exports = {
-  debug: true, // process.env.NODE_ENV === 'development',
+  debug: false, // process.env.NODE_ENV === 'development',
 
   i18n: {
     defaultLocale: "zh-CN",

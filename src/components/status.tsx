@@ -5,7 +5,7 @@ import { MarqueeContainer } from "@/components/containers"
 
 export function StatusItem({ a, b, c }: { a: string; b: ReactNode; c?: ReactNode }) {
   return (
-    <div className="w-24 shrink-0 overflow-hidden | flex flex-col items-center justify-between gap-1 | whitespace-nowrap py-2">
+    <div className="w-24 mx-auto shrink-0 overflow-hidden | flex flex-col items-center justify-between gap-1 | whitespace-nowrap py-2">
       <div className="font-bold uppercase text-muted-foreground">{a}</div>
       <MarqueeContainer className="text-lg">{b}</MarqueeContainer>
       {c && <div className="flex items-center justify-center text-primary-foreground/50">{c}</div>}

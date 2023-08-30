@@ -34,7 +34,7 @@ export function MobileLayout(props: PropsWithChildren) {
     <div className="md:hidden | h-full w-full | flex flex-col">
       {!fullscreen && <Navbar />}
 
-      <div className="w-full grow overflow-hidden | flex flex-col items-center justify-center gap-2">
+      <div className="w-full grow overflow-auto | flex flex-col items-center justify-center gap-2">
         {props.children}
       </div>
 
@@ -74,7 +74,7 @@ export function DesktopLayout(props: PropsWithChildren) {
       <Navbar />
       <div className="flex grow divide-x overflow-hidden">
         <Sidebar />
-        <div className="flex h-full grow flex-col items-center justify-center gap-2 overflow-hidden">
+        <div className="flex h-full grow flex-col items-center justify-center gap-2 overflow-auto">
           {props.children}
         </div>
       </div>

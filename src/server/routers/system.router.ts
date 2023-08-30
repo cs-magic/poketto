@@ -19,10 +19,18 @@ const status = {
       surplus: FREE_GPT4_DAILY_TOTAL,
     },
   },
-  users: 0,
-  calls: 0,
 }
 
 export const systemRouter = createTRPCRouter({
-  status: publicProcedure.query(({ ctx }) => status),
+  status: publicProcedure.query(async ({ ctx: { prisma } }) => {
+    const apps = await prisma.app.count()
+    const users = await prisma.user.count()
+    const calls = ((await prisma.chatMessage.count()) / 2) * 15 + 2
+    return {
+      ...status,
+      apps,
+      users,
+      calls,
+    }
+  }),
 })

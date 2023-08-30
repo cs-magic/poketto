@@ -6,13 +6,11 @@
  */
 
 declare global {
+  // 要放在里面
   import { type Message } from "ai/react"
-
   import { ModelType } from "@/ds"
 
   namespace PrismaJson {
-    // 要放在里面
-
     // you can use typical basic types
     type ModelPlatformArgs = {
       prompts: Message[]
