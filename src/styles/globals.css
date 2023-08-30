@@ -164,7 +164,11 @@ main {
     }
 
     /* 让子元素的外框尺寸都一样 */
-    .flex-equal {
+    .p-flex-equal {
         @apply child:grow child:basis-0 child:whitespace-nowrap;
+    }
+
+    .p-interactive {
+        @apply bg-transparent text-muted-foreground hover:text-accent-foreground hover:bg-accent;
     }
 }

@@ -228,6 +228,7 @@ model Feedback {
   title     String
   detail    String
   contact   String
+  anonymous Boolean @default(false)
 
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId String? @db.VarChar(5)

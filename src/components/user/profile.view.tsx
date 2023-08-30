@@ -86,7 +86,7 @@ export function UserProfile({ user }: { user: UserForProfile }) {
 
       {/*	collections */}
       {isSelf && (
-        <div className="flex flex-equal gap-4">
+        <div className="flex p-flex-equal gap-4">
           {user ? (
             <>
               <Button variant="outline" disabled={!user} onClick={todo}>

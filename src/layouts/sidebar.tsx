@@ -13,7 +13,7 @@ import Link from "next/link"
 import React from "react"
 import ReactMarkdown from "react-markdown"
 
-import { ICON_DIMENSION_MD, URI, siteConfig } from "@/config"
+import { ICON_DIMENSION_MD, ICON_DIMENSION_SM, URI, siteConfig } from "@/config"
 import { menuItems, sidebarSections } from "@/config-utils"
 
 import { ChargeContainer, IconContainer } from "@/components/containers"
@@ -39,7 +39,7 @@ export function InviteCard() {
         <Badge className="w-fit" variant="secondary">
           Tips
         </Badge>
-        <Cross1Icon className="text-muted-foreground wh-4" />
+        <Cross1Icon className={clsx("text-muted-foreground", ICON_DIMENSION_SM)} />
       </div>
       <article className="p-prose">
         <ReactMarkdown>

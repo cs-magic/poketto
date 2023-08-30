@@ -116,6 +116,7 @@ module.exports = {
       addVariant("child", "& > *");
 
       addVariant("hocus", ["&:hover", "&:focus"]);
+      // todo: group-hocus
 
       matchUtilities(
         {

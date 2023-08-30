@@ -57,7 +57,7 @@ export function ExploreAppsWidget() {
         <div className="w-full h-full | flex flex-col divide-y">
           {!apps
             ? range(k).map((i) => (
-                <div key={i} className={"w-full h-20 flex items-center gap-4 pb-3 pt-6 "}>
+                <div key={i} className={"w-full h-20 flex items-center gap-4 py-6 "}>
                   <Skeleton className={"wh-20"} />
                   <div className={"grow flex flex-col gap-2"}>
                     <Skeleton className={"w-full h-4"} />

@@ -70,7 +70,7 @@ export const ChatMessageActionScalarFieldEnumSchema = z.enum(['id','createdAt','
 
 export const ConversationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','isActive','userId','appId','pinned']);
 
-export const FeedbackScalarFieldEnumSchema = z.enum(['id','issueType','title','detail','contact','userId']);
+export const FeedbackScalarFieldEnumSchema = z.enum(['id','issueType','title','detail','contact','anonymous','userId']);
 
 export const FollowRelationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','fromId','toId']);
 
@@ -332,6 +332,7 @@ export const FeedbackSchema = z.object({
   title: z.string(),
   detail: z.string(),
   contact: z.string(),
+  anonymous: z.boolean(),
   userId: z.string().nullable(),
 })
 
@@ -823,6 +824,7 @@ export const FeedbackSelectSchema: z.ZodType<Prisma.FeedbackSelect> = z.object({
   title: z.boolean().optional(),
   detail: z.boolean().optional(),
   contact: z.boolean().optional(),
+  anonymous: z.boolean().optional(),
   userId: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
@@ -1959,6 +1961,7 @@ export const FeedbackWhereInputSchema: z.ZodType<Prisma.FeedbackWhereInput> = z.
   title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   detail: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   contact: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  anonymous: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   userId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
 }).strict();
@@ -1969,6 +1972,7 @@ export const FeedbackOrderByWithRelationInputSchema: z.ZodType<Prisma.FeedbackOr
   title: z.lazy(() => SortOrderSchema).optional(),
   detail: z.lazy(() => SortOrderSchema).optional(),
   contact: z.lazy(() => SortOrderSchema).optional(),
+  anonymous: z.lazy(() => SortOrderSchema).optional(),
   userId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional()
 }).strict();
@@ -1985,6 +1989,7 @@ export const FeedbackWhereUniqueInputSchema: z.ZodType<Prisma.FeedbackWhereUniqu
   title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   detail: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   contact: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  anonymous: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   userId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
 }).strict());
@@ -1995,6 +2000,7 @@ export const FeedbackOrderByWithAggregationInputSchema: z.ZodType<Prisma.Feedbac
   title: z.lazy(() => SortOrderSchema).optional(),
   detail: z.lazy(() => SortOrderSchema).optional(),
   contact: z.lazy(() => SortOrderSchema).optional(),
+  anonymous: z.lazy(() => SortOrderSchema).optional(),
   userId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => FeedbackCountOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => FeedbackMaxOrderByAggregateInputSchema).optional(),
@@ -2010,6 +2016,7 @@ export const FeedbackScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Feed
   title: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   detail: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   contact: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  anonymous: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
   userId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
@@ -3531,6 +3538,7 @@ export const FeedbackCreateInputSchema: z.ZodType<Prisma.FeedbackCreateInput> = 
   title: z.string(),
   detail: z.string(),
   contact: z.string(),
+  anonymous: z.boolean().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutFeedbackInputSchema).optional()
 }).strict();
 
@@ -3540,6 +3548,7 @@ export const FeedbackUncheckedCreateInputSchema: z.ZodType<Prisma.FeedbackUnchec
   title: z.string(),
   detail: z.string(),
   contact: z.string(),
+  anonymous: z.boolean().optional(),
   userId: z.string().optional().nullable()
 }).strict();
 
@@ -3549,6 +3558,7 @@ export const FeedbackUpdateInputSchema: z.ZodType<Prisma.FeedbackUpdateInput> = 
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   user: z.lazy(() => UserUpdateOneWithoutFeedbackNestedInputSchema).optional()
 }).strict();
 
@@ -3558,6 +3568,7 @@ export const FeedbackUncheckedUpdateInputSchema: z.ZodType<Prisma.FeedbackUnchec
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
@@ -3567,6 +3578,7 @@ export const FeedbackCreateManyInputSchema: z.ZodType<Prisma.FeedbackCreateManyI
   title: z.string(),
   detail: z.string(),
   contact: z.string(),
+  anonymous: z.boolean().optional(),
   userId: z.string().optional().nullable()
 }).strict();
 
@@ -3576,6 +3588,7 @@ export const FeedbackUpdateManyMutationInputSchema: z.ZodType<Prisma.FeedbackUpd
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const FeedbackUncheckedUpdateManyInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateManyInput> = z.object({
@@ -3584,6 +3597,7 @@ export const FeedbackUncheckedUpdateManyInputSchema: z.ZodType<Prisma.FeedbackUn
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
@@ -5074,6 +5088,7 @@ export const FeedbackCountOrderByAggregateInputSchema: z.ZodType<Prisma.Feedback
   title: z.lazy(() => SortOrderSchema).optional(),
   detail: z.lazy(() => SortOrderSchema).optional(),
   contact: z.lazy(() => SortOrderSchema).optional(),
+  anonymous: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -5083,6 +5098,7 @@ export const FeedbackMaxOrderByAggregateInputSchema: z.ZodType<Prisma.FeedbackMa
   title: z.lazy(() => SortOrderSchema).optional(),
   detail: z.lazy(() => SortOrderSchema).optional(),
   contact: z.lazy(() => SortOrderSchema).optional(),
+  anonymous: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -5092,6 +5108,7 @@ export const FeedbackMinOrderByAggregateInputSchema: z.ZodType<Prisma.FeedbackMi
   title: z.lazy(() => SortOrderSchema).optional(),
   detail: z.lazy(() => SortOrderSchema).optional(),
   contact: z.lazy(() => SortOrderSchema).optional(),
+  anonymous: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -11709,7 +11726,8 @@ export const FeedbackCreateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackCrea
   issueType: z.lazy(() => IssueTypeSchema),
   title: z.string(),
   detail: z.string(),
-  contact: z.string()
+  contact: z.string(),
+  anonymous: z.boolean().optional()
 }).strict();
 
 export const FeedbackUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedCreateWithoutUserInput> = z.object({
@@ -11717,7 +11735,8 @@ export const FeedbackUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.Fee
   issueType: z.lazy(() => IssueTypeSchema),
   title: z.string(),
   detail: z.string(),
-  contact: z.string()
+  contact: z.string(),
+  anonymous: z.boolean().optional()
 }).strict();
 
 export const FeedbackCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.FeedbackCreateOrConnectWithoutUserInput> = z.object({
@@ -12047,6 +12066,7 @@ export const FeedbackScalarWhereInputSchema: z.ZodType<Prisma.FeedbackScalarWher
   title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   detail: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   contact: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  anonymous: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   userId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
@@ -12630,7 +12650,8 @@ export const FeedbackCreateManyUserInputSchema: z.ZodType<Prisma.FeedbackCreateM
   issueType: z.lazy(() => IssueTypeSchema),
   title: z.string(),
   detail: z.string(),
-  contact: z.string()
+  contact: z.string(),
+  anonymous: z.boolean().optional()
 }).strict();
 
 export const AccountUpdateWithoutUserInputSchema: z.ZodType<Prisma.AccountUpdateWithoutUserInput> = z.object({
@@ -13079,6 +13100,7 @@ export const FeedbackUpdateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUpda
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const FeedbackUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateWithoutUserInput> = z.object({
@@ -13087,6 +13109,7 @@ export const FeedbackUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Fee
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const FeedbackUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateManyWithoutUserInput> = z.object({
@@ -13095,6 +13118,7 @@ export const FeedbackUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 /////////////////////////////////////////

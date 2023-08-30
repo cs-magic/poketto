@@ -42,7 +42,7 @@ export const menuItems: IMenuItem[] = [
   { field: "explore", link: URI.app.explore, Icon: RocketIcon },
   { field: "account", link: URI.user.mySpace, Icon: MixIcon },
   { field: "myGallery", link: URI.user.myGallery, Icon: TargetIcon },
-  { field: "feedback", link: URI.user.seek.feedback, Icon: HandIcon },
+  { field: "feedback", link: URI.user.feedback, Icon: HandIcon },
   { field: "whatsPoketto", link: URI.app.docs.intro },
   { field: "whatsDora", link: URI.app.docs.currency },
   { field: "learningCenter", link: URI.app.docs.learn },

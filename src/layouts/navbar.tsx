@@ -5,19 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks"
-import { LapTimerIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons"
+import { HandIcon, LapTimerIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons"
 import { CommandLoading } from "cmdk"
 import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { ComponentProps, FC, Fragment, SyntheticEvent, useEffect, useRef, useState } from "react"
+import React, { ComponentProps, FC, Fragment, HTMLProps, SyntheticEvent, useEffect, useRef, useState } from "react"
 import { TbLanguage } from "react-icons/tb"
 import { toast } from "sonner"
 
 import { useAppStore } from "@/store"
 
-import { ICON_DIMENSION_SM, POKETTO_APP_ID } from "@/config"
+import { ICON_DIMENSION_SM, POKETTO_APP_ID, URI } from "@/config"
 
 import { AppDetailContainer } from "@/components/app/container"
 import { AppDetailView } from "@/components/app/detail.view"
@@ -65,7 +65,7 @@ export const LocaleSwitcher = () => {
 
   return (
     <TbLanguage
-      className={"wh-5"}
+      className={ICON_DIMENSION_SM}
       onClick={() => {
         void router.push(router.pathname, router.asPath, { locale: nextLanguage })
         // i18n.changeLanguage(nextLanguage)
@@ -106,45 +106,49 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
 
 export default function Navbar() {
   return (
-    <div className="flex items-center border-b px-4 py-2">
+    <div className="flex items-center border-b px-4 py-2 gap-0">
       <LogoWithName />
 
       <div className="grow" />
-      <CommandSearch />
+      <CommandSearch className={"mx-2"} />
 
-      <div className="hidden md:flex items-center mx-2">
+      <IconContainer className={"hidden md:flex"}>
+        <LocaleSwitcher />
+      </IconContainer>
+
+      <IconContainer className={"hidden md:flex"}>
+        <ThemeSwitcher />
+      </IconContainer>
+
+      {/*<Popover>*/}
+      {/*  <PopoverTrigger>*/}
+      {/*    <IconContainer>*/}
+      {/*      <QuestionMarkCircledIcon />*/}
+      {/*    </IconContainer>*/}
+      {/*  </PopoverTrigger>*/}
+
+      {/*  <PopoverContent>*/}
+      {/*    <section className="flex flex-col gap-2">*/}
+      {/*      {menuItems*/}
+      {/*        .filter((k) => menuGroups.question!.includes(k.field))*/}
+      {/*        .map((item) => (*/}
+      {/*          <SidebarNavItem key={item.field} {...item} />*/}
+      {/*        ))}*/}
+      {/*    </section>*/}
+      {/*  </PopoverContent>*/}
+      {/*</Popover>*/}
+
+      {/*<Link href={URI.user.settings}>*/}
+      {/*  <IconContainer>*/}
+      {/*    <GearIcon />*/}
+      {/*  </IconContainer>*/}
+      {/*</Link>*/}
+
+      <Link href={URI.user.feedback}>
         <IconContainer>
-          <LocaleSwitcher />
+          <HandIcon />
         </IconContainer>
-
-        <IconContainer>
-          <ThemeSwitcher />
-        </IconContainer>
-
-        {/*<Popover>*/}
-        {/*  <PopoverTrigger>*/}
-        {/*    <IconContainer>*/}
-        {/*      <QuestionMarkCircledIcon />*/}
-        {/*    </IconContainer>*/}
-        {/*  </PopoverTrigger>*/}
-
-        {/*  <PopoverContent>*/}
-        {/*    <section className="flex flex-col gap-2">*/}
-        {/*      {menuItems*/}
-        {/*        .filter((k) => menuGroups.question!.includes(k.field))*/}
-        {/*        .map((item) => (*/}
-        {/*          <SidebarNavItem key={item.field} {...item} />*/}
-        {/*        ))}*/}
-        {/*    </section>*/}
-        {/*  </PopoverContent>*/}
-        {/*</Popover>*/}
-
-        {/*<Link href={URI.user.settings}>*/}
-        {/*  <IconContainer>*/}
-        {/*    <GearIcon />*/}
-        {/*  </IconContainer>*/}
-        {/*</Link>*/}
-      </div>
+      </Link>
     </div>
   )
 }
@@ -153,7 +157,7 @@ const Item: FC<ComponentProps<typeof CommandItem>> = ({ className, ...props }) =
   return <CommandItem className={clsx("w-full flex items-center gap-2", className)} {...props} />
 }
 
-function CommandSearch() {
+function CommandSearch({ className, ...props }: HTMLProps<HTMLDivElement>) {
   const { t } = useTranslation()
 
   const [search, setSearch] = React.useState("")
@@ -189,7 +193,7 @@ function CommandSearch() {
   // console.log({ cmdValue })
 
   return (
-    <>
+    <div className={clsx("relative flex w-[256px] items-center text-sm text-muted-foreground", className)} {...props}>
       {appId && (
         <AppDetailContainer
           appId={appId}
@@ -202,15 +206,6 @@ function CommandSearch() {
           }}
         />
       )}
-
-      <div className="relative flex w-[256px] items-center text-sm text-muted-foreground">
-        <MagnifyingGlassIcon className="absolute left-2 wh-5" />
-        <Input className="grow" onFocus={() => setOpen(!open)} />
-        <kbd className="pointer-events-none absolute right-2 hidden h-6  shrink-0  select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground md:inline-flex">
-          ⌘ K
-        </kbd>
-      </div>
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className=" p-0 shadow-lg h-[360px] overflow-auto">
           <Command
@@ -295,6 +290,12 @@ function CommandSearch() {
           </Command>
         </DialogContent>
       </Dialog>
-    </>
+
+      <MagnifyingGlassIcon className="absolute left-2 wh-5" />
+      <Input className="grow" onFocus={() => setOpen(!open)} />
+      <kbd className="pointer-events-none absolute right-2 hidden h-6  shrink-0  select-none items-center gap-1 rounded border bg-muted p-2 font-mono font-medium text-muted-foreground md:inline-flex">
+        ⌘ K
+      </kbd>
+    </div>
   )
 }

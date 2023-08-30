@@ -63,17 +63,13 @@ export const URI = {
     mySpace: "/dashboard",
     myGallery: "/gallery",
     integrations: "/integrations",
+    feedback: "/feedback",
 
     auth: {
       signIn: "/login",
       // signin: "/api/auth/signin",
       login: "/login",
       register: "/register",
-    },
-
-    seek: {
-      feedback: "/feedback",
-      enterprise: "/seek/enterprise",
     },
   },
   images: {
