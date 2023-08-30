@@ -6,6 +6,8 @@
  */
 import { PrismaClient } from ".prisma/client"
 
+import { initSystem } from "@/server/init"
+
 function getExtendedClient() {
   const c = new PrismaClient({
     log:
@@ -42,6 +44,8 @@ function getExtendedClient() {
   // })
 
   globalForDB.prisma = c
+
+  void initSystem(c)
 
   return c
 }

@@ -34,21 +34,12 @@ import {
 } from "@/config"
 
 import { getWelcomeSystemNotification } from "@/lib/string"
-import { resetUsersQuota } from "@/lib/system"
 
 import StripeMode = $Enums.StripeMode
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
-  const result = await prisma.user.upsert({
+  const user = await prisma.user.upsert({
     where: { platform: { platformId: POKETTO_CREATOR_ID, platformType: PlatformType.Poketto } },
-    include: {
-      createdApps: {
-        include: {
-          category: true,
-          state: true,
-        },
-      },
-    },
     update: {},
     create: {
       platformId: POKETTO_CREATOR_ID,
@@ -60,53 +51,61 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       description: POKETTO_CREATOR_DESC,
       name: POKETTO_CREATOR_NAME,
       image: POKETTO_CREATOR_AVATAR,
-      createdApps: {
-        create: [
-          {
-            name: POKETTO_APP_NAME,
-            language: POKETTO_APP_LANGUAGE,
-            avatar: POKETTO_APP_AVATAR,
-            platformId: POKETTO_APP_ID,
-            platformType: PlatformType.Poketto,
-            desc: POKETTO_APP_DESC,
-            modelName: POKETTO_MODEL_NAME,
-            modelArgs: {
-              prompts: [
-                {
-                  role: PromptRoleType.system,
-                  content: POKETTO_SYSTEM_PROMPT,
-                },
-                {
-                  role: PromptRoleType.assistant,
-                  content: POKETTO_WELCOME_MESSAGE,
-                },
-              ],
-            },
-            category: {
-              connectOrCreate: {
-                where: { id: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB } },
-                create: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB },
-              },
-            },
-            isOpenSource: false,
-            state: {
-              create: {
-                calls: 0,
-                forks: 0,
-                shares: 0,
-                stars: 0,
-                tips: 0,
-                views: 0,
-              },
-            },
-          },
-        ],
-      },
     },
   })
 
-  // 每个人都更新quota值
-  await resetUsersQuota(prisma)
+  // 不要nest在user里写，否则app删除后，就脱钩了
+  await prisma.app.upsert({
+    where: { platform: { platformId: POKETTO_APP_ID, platformType: "Poketto" } },
+    update: {},
+    include: {
+      category: true,
+      state: true,
+    },
+    create: {
+      creator: {
+        connect: {
+          id: user.id,
+        },
+      },
+      name: POKETTO_APP_NAME,
+      language: POKETTO_APP_LANGUAGE,
+      avatar: POKETTO_APP_AVATAR,
+      platformId: POKETTO_APP_ID,
+      platformType: PlatformType.Poketto,
+      desc: POKETTO_APP_DESC,
+      modelName: POKETTO_MODEL_NAME,
+      modelArgs: {
+        prompts: [
+          {
+            role: PromptRoleType.system,
+            content: POKETTO_SYSTEM_PROMPT,
+          },
+          {
+            role: PromptRoleType.assistant,
+            content: POKETTO_WELCOME_MESSAGE,
+          },
+        ],
+      },
+      category: {
+        connectOrCreate: {
+          where: { id: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB } },
+          create: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB },
+        },
+      },
+      isOpenSource: false,
+      state: {
+        create: {
+          calls: 0,
+          forks: 0,
+          shares: 0,
+          stars: 0,
+          tips: 0,
+          views: 0,
+        },
+      },
+    },
+  })
 
   await prisma.stripeProduct.upsert({
     where: { id: STRIPE_PAYMENT_PRODUCT_10_ID },
@@ -143,8 +142,6 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     },
   })
   console.log("✅ Successfully initialized poketto system ~")
-
-  return result
 }
 
 /**
@@ -153,9 +150,6 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
  * @param {} user 注意是 next-auth 里 user
  */
 export const initUser = async (prisma: ExtendedPrismaClient, user: Omit<AdapterUser, "id">) => {
-  // note: 在创建用户之前先创建系统用户，因为是 upsert 的操作，所以可以保证不会出错
-  await initSystem(prisma)
-
   const pokettoRealApp = await prisma.app.findUniqueOrThrow({
     where: { platform: { platformId: POKETTO_APP_ID, platformType: PlatformType.Poketto } },
   })

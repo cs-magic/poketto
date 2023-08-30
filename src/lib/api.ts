@@ -54,7 +54,7 @@ export const api = createTRPCNext<RootRouter>({
             // ref: https://tanstack.com/query/v4/docs/react/reference/QueryClient
             // staleTime: Infinity,
             staleTime: 5 * 1000,
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true,
             refetchOnmount: false,
             refetchOnReconnect: false,
 

@@ -8,6 +8,7 @@ import { signOut } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import React from "react"
+import { toast } from "sonner"
 
 import { useAppStore } from "@/store"
 
@@ -25,10 +26,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { useSessionUser } from "@/hooks/use-user"
 
+import { api } from "@/lib/api"
+
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
   const user = useSessionUser()
+  const { mutateAsync: delUser } = api.user.del.useMutation({
+    onSuccess: () => {
+      void signOut()
+      toast.success("成功删除账号")
+    },
+  })
 
   // todo: in settings
   return (
@@ -112,6 +121,11 @@ export default function SettingsPage() {
             {user && (
               <Button variant="destructive" onClick={() => void signOut()} className={"w-full"}>
                 {t("common:LogOut")}
+              </Button>
+            )}
+            {user && (
+              <Button variant="destructive" onClick={() => delUser()} className={"w-full"}>
+                注销账号
               </Button>
             )}
           </CardContent>

@@ -4,85 +4,92 @@ import { type IFlowgptPromptBasic } from "./lib/flowgpt"
 import { MongoClient } from "mongodb"
 
 const init = async () => {
+  const client = new MongoClient(process.env.MONGO_URI!)
   console.log("initializing flowgpt apps")
   let k = 0
-  for await (const p of new MongoClient(process.env.MONGO_URI!)
+  for await (const p of client
     .db("flowgpt")
     .collection("basic")
     .find() as unknown as IFlowgptPromptBasic[]) {
+    const modelArgs = {
+      temperature: p.temperature,
+      prompts: [
+        {
+          role: PromptRoleType.system,
+          content: p.initPrompt
+        },
+        {
+          role: PromptRoleType.assistant,
+          content: p.welcomeMessage
+        }
+      ]
+    }
+    const d = {
+      platformId: p.id,
+      platformType: PlatformType.FlowGPT,
+      avatar: p.thumbnailURL,
+      desc: p.description,
+      language: p.language ?? "en",
+      name: p.title,
+      isOpenSource: p.visibility,
+      state: {
+        create: {
+          views: p.views,
+          calls: p.uses,
+          forks: 0,
+          tips: p.tip,
+          stars: p.saves,
+          shares: p.shares
+        }
+      },
+      modelName: p.model,
+      modelArgs,
+      category: {
+        connectOrCreate: {
+          where: { id: { main: p.categoryId, sub: p.subCategoryId } },
+          create: { main: p.categoryId, sub: p.subCategoryId }
+        }
+      },
+
+      creator: {
+        connectOrCreate: {
+          where: { platform: { platformId: p.User.id, platformType: PlatformType.FlowGPT } },
+          create: {
+            platformId: p.User.id,
+            platformType: PlatformType.FlowGPT,
+            platformArgs: {
+              url: p.User.uri
+            },
+            image: p.User.image
+          }
+        }
+      },
+      tags: {
+        connectOrCreate: p.Tag.map((t) => ({
+          where: { id: t.name },
+          create: { id: t.name, name: t.name }
+        }))
+      }
+    }
     await prisma.app.upsert({
       where: { platform: { platformId: p.id, platformType: PlatformType.FlowGPT } },
       include: {
         creator: true,
         category: true,
         state: true,
-        tags: true,
+        tags: true
       },
-      update: {},
-      create: {
-        platformId: p.id,
-        platformType: PlatformType.FlowGPT,
-        avatar: p.thumbnailURL,
-        desc: p.description,
-        language: p.language ?? "en",
-        name: p.title,
-        isOpenSource: p.visibility,
-        state: {
-          create: {
-            views: p.views,
-            calls: p.uses,
-            forks: 0,
-            tips: p.tip,
-            stars: p.saves,
-            shares: p.shares,
-          },
-        },
-        modelName: p.model,
-        modelArgs: {
-          temperature: p.temperature,
-          prompts: [
-            {
-              role: PromptRoleType.system,
-              content: p.initPrompt,
-            },
-            {
-              role: PromptRoleType.assistant,
-              content: p.welcomeMessage
-            }
-          ],
-        },
-        category: {
-          connectOrCreate: {
-            where: { id: { main: p.categoryId, sub: p.subCategoryId } },
-            create: { main: p.categoryId, sub: p.subCategoryId },
-          },
-        },
-
-        creator: {
-          connectOrCreate: {
-            where: { platform: { platformId: p.User.id, platformType: PlatformType.FlowGPT } },
-            create: {
-              platformId: p.User.id,
-              platformType: PlatformType.FlowGPT,
-              platformArgs: {
-                url: p.User.uri,
-              },
-              image: p.User.image,
-            },
-          },
-        },
-        tags: {
-          connectOrCreate: p.Tag.map((t) => ({
-            where: { id: t.name },
-            create: { id: t.name, name: t.name },
-          })),
-        },
+      update: {
+        modelArgs
       },
+      create: d
     })
     if (++k % 100 === 0) {
       console.log(`dumping ${k}`)
     }
   }
+
+  client.close()
   console.log("successfully initialized")
 }
 

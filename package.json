@@ -13,7 +13,8 @@
     "i18n": "yarn toc && yarn merge && yarn interface",
     "prebuild": "yarn i18n && prisma migrate dev && prisma db push",
     "build": "next build",
-    "update": "DIST=.next-tmp && git stash && git pull -f && yarn && DIST=$DIST yarn build && rm -rf .next && mv $DIST .next"
+    "update": "DIST=.next-tmp && git stash && git pull -f && yarn && DIST=$DIST yarn build && rm -rf .next && mv $DIST .next",
+    "run-reset-quota-daily": "pm2 start 'npx tsx scripts/reset-quota-daily.ts' --name 'reset-quota-daily' -c '0 4 * * *' --no-autorestart"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.395.0",

@@ -24,4 +24,15 @@ export const userRouter = createTRPCRouter({
     const { balance } = await prisma.user.findUniqueOrThrow({ where: input })
     return balance > 0
   }),
+
+  del: protectedProcedure.mutation(
+    async ({
+      ctx: {
+        prisma,
+        session: { user },
+      },
+    }) => {
+      return prisma.user.delete({ where: { id: user.id } })
+    }
+  ),
 })

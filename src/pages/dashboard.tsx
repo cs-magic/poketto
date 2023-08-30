@@ -34,11 +34,11 @@ import d from "@/lib/datetime"
 
 export const DashboardPage: NextPageWithAuth = () => {
   const { t } = useTranslation()
-  const userId = useUserId()!
-  // console.log("dashboard: ", { userId })
-  const { data: userProfile } = api.user.getProfile.useQuery({ id: userId })
+  const userId = useUserId()
+  console.log("dashboard: ", { userId })
+  const { data: userProfile } = api.user.getProfile.useQuery({ id: userId }, { enabled: !!userId })
   const { data: payments } = api.bill.listPayments.useQuery()
-  const { data: messages } = api.message.list.useQuery({ userId })
+  const { data: messages } = api.message.list.useQuery({ userId }, { enabled: !!userId })
 
   const paymentHistoryColumns: ColumnDef<StripePayment>[] = [
     {
