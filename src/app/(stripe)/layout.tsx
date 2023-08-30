@@ -12,9 +12,10 @@ import { type PropsWithChildren } from "react"
 
 import { siteConfig } from "@/config"
 
+import { getOrigin } from "@/hooks/use-url"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(getOrigin()),
   title: {
     default: "TypeScript Next.js Stripe Example",
     template: "%s | Next.js + TypeScript Example",

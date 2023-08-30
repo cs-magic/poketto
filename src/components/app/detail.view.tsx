@@ -13,7 +13,6 @@ import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
 
 import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
-import { platformMap } from "@/config-utils"
 
 import { MasonryContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
@@ -35,12 +34,15 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 
 import { useMustache } from "@/hooks/use-mustache"
+import { useUrl } from "@/hooks/use-url"
 import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
 import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+
+import { FLOWGPT_HOMEPAGE } from "@/const"
 
 export function AppDetailView({
   appId,
@@ -51,6 +53,7 @@ export function AppDetailView({
   const userId = useUserId()
   const { data: app, error: appError } = api.app.get.useQuery({ id: appId })
   const { t } = useTranslation()
+  const { origin } = useUrl()
 
   if (app === undefined) return <Loading />
 
@@ -157,7 +160,11 @@ export function AppDetailView({
           <InfoItem
             a={t("common:general.platform")}
             b={
-              <Link className="underline" href={platformMap[app.platformType]!.homepage} target="_blank">
+              <Link
+                className="underline"
+                href={app.platformType === "Poketto" ? origin : FLOWGPT_HOMEPAGE}
+                target="_blank"
+              >
                 {app.platformType}
               </Link>
             }

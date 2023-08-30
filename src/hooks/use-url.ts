@@ -15,13 +15,14 @@ import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import { getConversationLink } from "@/lib/string"
 
+export const getOrigin = () => (typeof window !== "undefined" ? window.location.origin : baseEnv.HOST)
+
 export const useUrl = () => {
   const router = useRouter()
-  const origin = typeof window !== "undefined" ? window.location.origin : baseEnv.HOST
 
   // console.log({ router })
   const baseUrl = `${origin}${router.asPath}`
-  return { origin, baseUrl }
+  return { origin: getOrigin(), baseUrl }
 }
 
 export const usePokettoConversationUrl = () => {

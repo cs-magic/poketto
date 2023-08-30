@@ -5,23 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Icons } from "./components/icons"
-import type { PlatformType, PromptRoleType } from ".prisma/client"
-import {
-  BellIcon,
-  DashboardIcon,
-  GearIcon,
-  HandIcon,
-  HomeIcon,
-  MixIcon,
-  RocketIcon,
-  TargetIcon,
-} from "@radix-ui/react-icons"
+import type { PromptRoleType } from ".prisma/client"
+import { BellIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 
-import { POKETTO_HOMEPAGE, URI } from "@/config"
+import { URI } from "@/config"
 
 import { CommandType, type ICommandItem, type IMenuItem, MenuKey } from "@/ds"
-
-import { FLOWGPT_HOMEPAGE } from "@/const"
 
 export const COMMANDS: ICommandItem[] = [
   {
@@ -60,17 +49,4 @@ export const sidebarSections: Record<string, MenuKey[]> = {
     // "myGallery" // todo: myGallery
     "settings",
   ],
-  // section3: [
-  //   // "charge",
-  //   "feedback",
-  // ],
-}
-
-export const platformMap: { [key in PlatformType]?: { homepage: string } } = {
-  Poketto: {
-    homepage: POKETTO_HOMEPAGE,
-  },
-  FlowGPT: {
-    homepage: FLOWGPT_HOMEPAGE,
-  },
 }

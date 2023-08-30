@@ -3,14 +3,17 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
+import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type * as z from "zod"
 
+import { POKETTO_INTERNATIONAL_HOME, POKETTO_MAINLAND_CHINA_HOME } from "@/config"
+
 import { Icons } from "@/components/icons"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -42,6 +45,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const searchParams = useSearchParams()
   const locale = useLocale()
   const { origin } = useUrl()
+  const isDomestic = origin.includes("cn")
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)
@@ -99,7 +103,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       </form>
 
       {/* 国内的OAuth会超过3.5秒 */}
-      {!origin.includes("cn") && (
+      {!isDomestic && (
         <>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -144,6 +148,29 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             Discord
           </button>
         </>
+      )}
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">{t("auth:OrYouCanAlso")}</span>
+        </div>
+      </div>
+
+      {isDomestic ? (
+        <Link href={`${POKETTO_INTERNATIONAL_HOME}/login`} className={"w-full"}>
+          <Button variant={"outline"} className={"w-full"}>
+            使用国际版
+          </Button>
+        </Link>
+      ) : (
+        <Link href={`${POKETTO_MAINLAND_CHINA_HOME}/login`} className={"w-full"}>
+          <Button variant={"outline"} className={"w-full"}>
+            Jump to Mainland China version
+          </Button>
+        </Link>
       )}
     </div>
   )

@@ -20,6 +20,8 @@ import { TailwindIndicator } from "@/components/tailwind-indicator"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
+import { getOrigin } from "@/hooks/use-url"
+
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { fontHeading, fontSans } from "@/lib/fonts"
@@ -31,7 +33,7 @@ export function reportWebVitals(metric) {
 }
 
 export const metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(getOrigin()),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
@@ -68,7 +70,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "zh_CN",
-    url: siteConfig.url,
+    url: getOrigin(),
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
@@ -85,7 +87,7 @@ export const metadata = {
     // shortcut: "/favicon-16x16.png",
     // apple: "/apple-touch-icon.png",
   },
-  manifest: `${siteConfig.url}/site.webmanifest`,
+  manifest: `${getOrigin()}/site.webmanifest`,
 }
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppProps) {

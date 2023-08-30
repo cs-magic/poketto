@@ -92,7 +92,8 @@ export const CAROUSELS = [
 // -----------------------------------------------------------------------------
 // product
 // -----------------------------------------------------------------------------
-export const POKETTO_HOMEPAGE = "https://poketto.ai"
+export const POKETTO_INTERNATIONAL_HOME = "https://poketto.ai"
+export const POKETTO_MAINLAND_CHINA_HOME = "https://poketto.cs-magic.cn"
 export const siteConfig = {
   name: "Poketto.AI", // name: 'Poketto.AI',
   companyName: "CS Magic, Inc",
@@ -101,10 +102,7 @@ export const siteConfig = {
   supportEmailAddress: "Poketto.AI Support <support@cs-magic.com>",
   currency: "Dora", // currency: 'Dora',
   description: "每一个人的哆啦A梦", // '每个人都是魔法师',
-  url: POKETTO_HOMEPAGE,
-  loginUrl: `${POKETTO_HOMEPAGE}/login`,
   icon: URI.images.favicon,
-  ogImage: `${POKETTO_HOMEPAGE}/images/logo/poketto/Your-Sole-Poketto_256.ico`,
   links: {
     twitter: "https://twitter.com/cs-magic",
     github: "https://github.com/cs-magic/poketto",
