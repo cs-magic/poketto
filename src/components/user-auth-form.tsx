@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 
 import { useLocale } from "@/hooks/use-i18n"
 import { useMustache } from "@/hooks/use-mustache"
+import { useUrl } from "@/hooks/use-url"
 
 import { cn } from "@/lib/utils"
 import { userAuthSchema } from "@/lib/validations/auth"
@@ -40,7 +41,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isDiscordLoading, setIsDiscordLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
   const locale = useLocale()
-  // console.log("UserAuthForm: ", { locale })
+  const { origin } = useUrl()
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)
@@ -55,7 +56,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           redirect: false,
           callbackUrl: searchParams?.get("from") || "/dashboard",
         },
-        { locale }
+        { locale, origin }
       )
 
       setIsLoading(false)
@@ -96,48 +97,54 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           </button>
         </div>
       </form>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">{t("auth:OrContinueWith")}</span>
-        </div>
-      </div>
 
-      <button
-        type="button"
-        className={cn(buttonVariants({ variant: "outline" }))}
-        onClick={() => {
-          setIsGitHubLoading(true)
-          void signIn("github")
-        }}
-        disabled={isLoading || isGitHubLoading}
-      >
-        {isGitHubLoading ? (
-          <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.GitHub className="mr-2 h-4 w-4" />
-        )}{" "}
-        Github
-      </button>
+      {/* 国内的OAuth会超过3.5秒 */}
+      {!origin.includes("cn") && (
+        <>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">{t("auth:OrContinueWith")}</span>
+            </div>
+          </div>
 
-      <button
-        type="button"
-        className={cn(buttonVariants({ variant: "outline" }))}
-        onClick={() => {
-          setIsDiscordLoading(true)
-          void signIn("discord")
-        }}
-        disabled={isLoading || isGitHubLoading}
-      >
-        {isDiscordLoading ? (
-          <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.Discord className="mr-2 h-4 w-4" />
-        )}{" "}
-        Discord
-      </button>
+          <button
+            type="button"
+            className={cn(buttonVariants({ variant: "outline" }))}
+            onClick={() => {
+              setIsGitHubLoading(true)
+              void signIn("github")
+            }}
+            disabled={isLoading || isGitHubLoading}
+          >
+            {isGitHubLoading ? (
+              <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Icons.GitHub className="mr-2 h-4 w-4" />
+            )}{" "}
+            Github
+          </button>
+
+          <button
+            type="button"
+            className={cn(buttonVariants({ variant: "outline" }))}
+            onClick={() => {
+              setIsDiscordLoading(true)
+              void signIn("discord")
+            }}
+            disabled={isLoading || isGitHubLoading}
+          >
+            {isDiscordLoading ? (
+              <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Icons.Discord className="mr-2 h-4 w-4" />
+            )}{" "}
+            Discord
+          </button>
+        </>
+      )}
     </div>
   )
 }

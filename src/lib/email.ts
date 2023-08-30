@@ -41,8 +41,9 @@ export const emailFrom = siteConfig.welcomeEmailAddress
  * @param provider
  * @param token
  * @param locale
+ * @param origin 用户填的地址
  */
-export const sendVerificationRequest = async ({ identifier, url, provider, token, locale }) => {
+export const sendVerificationRequest = async ({ identifier, url, provider, token, locale, origin }) => {
   // console.log("sendVerificationRequest: ", { identifier, url, provider, token, locale })
 
   const user = await prisma.user.findUnique({
@@ -80,15 +81,16 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
             Html: {
               Charset: "UTF-8",
               Data: Mustache.render(t, {
-                CompanyName: "CS Magic, Inc.",
+                CompanyName: siteConfig.companyName,
                 ProductName: siteConfig.name,
                 username: identifier,
                 action_url: url,
-                login_url: siteConfig.loginUrl,
+                login_url: `${origin}/login`,
+                support_mail: siteConfig.links.customerSupportEmail,
+
                 trial_length: " 7 Days",
                 trial_start_date: d(new Date()).toDate().toLocaleDateString(),
                 trial_end_date: d(new Date()).add(7, "days").toDate().toLocaleDateString(),
-                support_mail: "support@cs-maigc.com",
               }),
             },
             Text: {

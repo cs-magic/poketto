@@ -15,6 +15,8 @@ import { Icons } from "@/components/icons"
 import { buttonVariants } from "@/components/ui/button"
 import { UserAuthForm } from "@/components/user-auth-form"
 
+import { useUrl } from "@/hooks/use-url"
+
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
@@ -24,6 +26,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   const { t } = useTranslation()
+
   return (
     <RootLayout>
       <div className="container relative flex h-full w-full overflow-auto flex-col items-center justify-center">
