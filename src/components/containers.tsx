@@ -142,11 +142,12 @@ export function ResponsiveTooltip({
   content,
   children,
   disableHoverableContent,
+  className,
   ...props
 }: TooltipTriggerProps & { content?: ReactNode; disableHoverableContent?: boolean }) {
   return (
     <Tooltip delayDuration={100} disableHoverableContent={disableHoverableContent}>
-      <TooltipTrigger className="flex items-center gap-2 p-interactive px-2 w-full" {...props}>
+      <TooltipTrigger className={clsx("flex items-center gap-2 p-interactive px-2 w-full", className)} {...props}>
         {children}
         <span className="hidden lg:flex mr-2">{content}</span>
       </TooltipTrigger>

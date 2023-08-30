@@ -73,7 +73,7 @@ export function Sidebar() {
           {/*<ChevronRightIcon className="hidden lg:flex shrink-0" />*/}
         </Link>
       ) : (
-        <div className={"w-full p-2"}>
+        <div className={"w-full p-2 flex justify-center"}>
           <Button variant="destructive" className="w-full hidden lg:block" onClick={() => void signIn()}>
             {t("common:Login")}
           </Button>
