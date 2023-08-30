@@ -1447,7 +1447,7 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@babel/runtime@^7.22.5":
+"@babel/runtime@^7.22.10", "@babel/runtime@^7.22.5":
   version "7.22.11"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.11.tgz#7a9ba3bbe406ad6f9e8dd4da2ece453eb23a77a4"
   integrity sha512-ee7jVNlWN09+KftVOu9n7S8gQzD/Z6hN/I8VBRXW4P1+Xe7kJGXMwu8vds4aGIMHZnNbdpSWCfZZtinytpcAvA==
@@ -6101,6 +6101,13 @@ i18next-fs-backend@^2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/i18next-fs-backend/-/i18next-fs-backend-2.1.5.tgz#03347eacde6a35b599da1889a048ae63bcf0c687"
   integrity sha512-7fgSH8nVhXSBYPHR/W3tEXXhcnwHwNiND4Dfx9knzPzdsWTUTL/TdDVV+DY0dL0asHKLbdoJaXS4LdVW6R8MVQ==
+
+i18next-resources-for-ts@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/i18next-resources-for-ts/-/i18next-resources-for-ts-1.3.0.tgz#5f7d49bb7d239bcc2833b6e1aaf836a54970953e"
+  integrity sha512-tOjKisBF0j1XnjX5V/55eagHl996S7rYahtMlbdkuhkKJuYySmb/+sf7QZkiG/gTLZ7KqqCtGGj6jNejxXIKfg==
+  dependencies:
+    "@babel/runtime" "^7.22.10"
 
 i18next@^23.4.6:
   version "23.4.6"
