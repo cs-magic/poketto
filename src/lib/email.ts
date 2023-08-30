@@ -42,7 +42,8 @@ export const emailFrom = siteConfig.welcomeEmailAddress
  * @param token
  */
 export const sendVerificationRequest = async ({ identifier, url, provider, token }) => {
-  console.log({ identifier, url, provider, token })
+  const { locale } = token
+  console.log({ identifier, url, provider, token, locale })
 
   const user = await prisma.user.findUnique({
     where: {
@@ -56,7 +57,9 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
   let result
 
   if (isAws) {
-    const t = await fs.readFile(path.resolve("./public", "email.templates/welcome.html"), { encoding: "utf-8" })
+    const t = await fs.readFile(path.resolve("./public", `email.templates/welcome_${locale}.html`), {
+      encoding: "utf-8",
+    })
     result = await sesClient.send(
       new SendEmailCommand({
         Destination: {

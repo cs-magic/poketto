@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
+import { useTranslation } from "next-i18next"
 import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
@@ -32,6 +33,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false)
   const [isDiscordLoading, setIsDiscordLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
+  const { i18n } = useTranslation()
+  console.log({ i18n })
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)
@@ -42,6 +45,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         email: data.email.toLowerCase(),
         redirect: false,
         callbackUrl: searchParams?.get("from") || "/dashboard",
+
+        // add locale
+        locale: i18n.language,
       })
 
       setIsLoading(false)
@@ -108,7 +114,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         }}
         disabled={isLoading || isGitHubLoading}
       >
-        {isGitHubLoading ? <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.GitHub className="mr-2 h-4 w-4" />} Github
+        {isGitHubLoading ? (
+          <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Icons.GitHub className="mr-2 h-4 w-4" />
+        )}{" "}
+        Github
       </button>
 
       <button
@@ -120,7 +131,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         }}
         disabled={isLoading || isGitHubLoading}
       >
-        {isDiscordLoading ? <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" /> : <Icons.Discord className="mr-2 h-4 w-4" />} Discord
+        {isDiscordLoading ? (
+          <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Icons.Discord className="mr-2 h-4 w-4" />
+        )}{" "}
+        Discord
       </button>
     </div>
   )

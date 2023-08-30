@@ -44,25 +44,27 @@ export const authOptions: NextAuthOptions = {
 
     // async jwt({ token, user }) {
     //   console.log("jwt: ", { token, user })
-    //   const dbUser = await prisma.user.findUnique({
-    //     where: {
-    //       id: token.id as string,
-    //     },
-    //   })
     //
-    //   if (!dbUser) {
-    //     if (user) {
-    //       token.id = user?.id
-    //     }
-    //     return token
-    //   }
-    //
-    //   return {
-    //     id: dbUser.id,
-    //     name: dbUser.name,
-    //     email: dbUser.email,
-    //     picture: dbUser.image,
-    //   }
+    //   return user
+    //   // const dbUser = await prisma.user.findUnique({
+    //   //   where: {
+    //   //     id: token.id as string,
+    //   //   },
+    //   // })
+    //   //
+    //   // if (!dbUser) {
+    //   //   if (user) {
+    //   //     token.id = user?.id
+    //   //   }
+    //   //   return token
+    //   // }
+    //   //
+    //   // return {
+    //   //   id: dbUser.id,
+    //   //   name: dbUser.name,
+    //   //   email: dbUser.email,
+    //   //   picture: dbUser.image,
+    //   // }
     // },
 
     async session({ token, session }) {

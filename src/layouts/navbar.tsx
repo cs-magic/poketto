@@ -7,6 +7,7 @@
 import { useDebouncedValue, useHotkeys } from "@mantine/hooks"
 import { HandIcon, LapTimerIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons"
 import { CommandLoading } from "cmdk"
+import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
 import Link from "next/link"
@@ -24,6 +25,7 @@ import { AppDetailView } from "@/components/app/detail.view"
 import { IconContainer } from "@/components/containers"
 import { Icons } from "@/components/icons"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -32,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMount } from "@/hooks/use-mount"
 import { usePokettoConversationUrl } from "@/hooks/use-url"
+import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
@@ -105,6 +108,7 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
 }
 
 export default function Navbar() {
+  const userId = useUserId()
   return (
     <div className="flex items-center border-b px-4 py-2 gap-0">
       <LogoWithName />
@@ -112,11 +116,11 @@ export default function Navbar() {
       <div className="grow" />
       <CommandSearch className={"mx-2"} />
 
-      <IconContainer className={"hidden md:flex"}>
+      <IconContainer>
         <LocaleSwitcher />
       </IconContainer>
 
-      <IconContainer className={"hidden md:flex"}>
+      <IconContainer>
         <ThemeSwitcher />
       </IconContainer>
 
@@ -144,11 +148,17 @@ export default function Navbar() {
       {/*  </IconContainer>*/}
       {/*</Link>*/}
 
-      <Link href={URI.user.feedback}>
-        <IconContainer>
-          <HandIcon />
-        </IconContainer>
-      </Link>
+      {userId ? (
+        <Link href={URI.user.feedback}>
+          <IconContainer>
+            <HandIcon />
+          </IconContainer>
+        </Link>
+      ) : (
+        <Button size={"xs"} variant={"outline"} onClick={() => void signIn()} className={"whitespace-nowrap"}>
+          登录
+        </Button>
+      )}
     </div>
   )
 }

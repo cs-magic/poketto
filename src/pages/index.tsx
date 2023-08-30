@@ -105,7 +105,7 @@ export function RecentConversations() {
 
       <CardContent className="flex w-full gap-2 p-2 overflow-auto">
         {!user ? (
-          <div>
+          <div className={"mx-4"}>
             <Button variant="link" onClick={() => void signIn()}>
               登录
             </Button>

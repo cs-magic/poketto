@@ -14,17 +14,78 @@ import { siteConfig } from "@/config"
 
 import { type ExtendedAppProps } from "@/ds"
 
+import { Analytics } from "@/components/analytics"
 import ErrorBoundary from "@/components/error-boundary"
+import { TailwindIndicator } from "@/components/tailwind-indicator"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
+import { fontHeading, fontSans } from "@/lib/fonts"
 
 import "@/styles/globals.css"
 
 export function reportWebVitals(metric) {
   console.log(metric)
+}
+
+export const metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: [
+    "Poketto AI",
+    "MarkShawn",
+    "南川",
+
+    "AIGC",
+    "OpenAI",
+    "ChatGPT",
+    "prompt",
+    "FlowGPT",
+
+    "Next.js",
+    "React",
+    "Tailwind CSS",
+    "Server Components",
+    "Radix UI",
+  ],
+  authors: [
+    {
+      name: "MarkShawn",
+      url: "https://github.com/markshawn2020",
+    },
+  ],
+  creator: "MarkShawn",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+  openGraph: {
+    type: "website",
+    locale: "zh_CN",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  // twitter: {
+  //   card: "summary_large_image",
+  //   title: siteConfig.name,
+  //   description: siteConfig.description,
+  //   images: [`${siteConfig.url}/og.jpg`],
+  //   creator: "@MarkShawn",
+  // },
+  icons: {
+    icon: "/favicon.ico",
+    // shortcut: "/favicon-16x16.png",
+    // apple: "/apple-touch-icon.png",
+  },
+  manifest: `${siteConfig.url}/site.webmanifest`,
 }
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppProps) {
@@ -54,15 +115,21 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
             <TooltipProvider>
               <main
                 className={clsx(
-                  "min-w-[375px] max-w-screen w-auto | bg-background text-foreground text-sm font-light" // 'bg-zinc-900',
+                  "min-w-[375px] max-w-screen w-auto | bg-background text-foreground text-sm font-light",
+                  // 'bg-zinc-900',
                   // fontChinese.className
+                  "font-sans antialiased",
+                  fontSans.variable,
+                  fontHeading.variable
                 )}
               >
                 <Component {...pageProps} />
               </main>
             </TooltipProvider>
+            <Toaster richColors closeButton position="top-right" />
+            <TailwindIndicator />
+            <Analytics />
           </ErrorBoundary>
-          <Toaster richColors closeButton position="top-right" />
         </SessionProvider>
       </ThemeProvider>
     </>
