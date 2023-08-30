@@ -43,10 +43,10 @@ export function ExploreAppsWidget() {
     <Card id="explore" variant="ghost" className="w-full grow | flex flex-col">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>{t("homepage:exploreTrendingApps")}</CardTitle>
+          <CardTitle>{t("homepage:ExploreTrendingApps")}</CardTitle>
           <Link href={URI.app.explore}>
             <Button variant="link" className="| flex h-fit items-center gap-2 py-0 text-xs">
-              <span>{t("homepage:exploreAll")}</span>
+              <span>{t("homepage:ExploreAll")}</span>
               <ArrowRightIcon />
             </Button>
           </Link>

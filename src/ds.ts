@@ -224,5 +224,5 @@ export const feedbackFormSchema = z.object({
   issueType: z.nativeEnum(IssueType).default("Debunk"),
   title: z.string().min(1),
   detail: z.string().min(1),
-  anonymous: z.boolean().default(true),
+  anonymous: z.boolean().default(false),
 })

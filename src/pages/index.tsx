@@ -48,15 +48,33 @@ export const SystemStatus = () => {
   return (
     <Card variant={"ghost"}>
       <CardHeader>
-        <CardTitle>Poketto Today</CardTitle>
+        <CardTitle>{t("homepage:PokettoToday")}</CardTitle>
       </CardHeader>
 
-      <CardContent className={"w-full p-4 grid grid-cols-3"}>
-        <StatusItem a={"Apps"} b={s ? s.apps : <Skeleton className={"w-12 h-4"} />} c={"Total"} />
+      <CardContent className={"w-full px-2 py-4 grid grid-cols-4 overflow-auto"}>
+        <StatusItem
+          a={t("homepage:Apps")}
+          b={s ? s.apps : <Skeleton className={"w-12 h-4"} />}
+          c={t("homepage:Total")}
+        />
 
-        <StatusItem a={"Users"} b={s ? s.users : <Skeleton className={"w-12 h-4"} />} c={"Total"} />
+        <StatusItem
+          a={t("homepage:Users")}
+          b={s ? s.users : <Skeleton className={"w-12 h-4"} />}
+          c={t("homepage:Total")}
+        />
 
-        <StatusItem a={"Calls"} b={s ? s.calls : <Skeleton className={"w-12 h-4"} />} c={"Total"} />
+        <StatusItem
+          a={t("homepage:Calls")}
+          b={s ? s.calls : <Skeleton className={"w-12 h-4"} />}
+          c={t("homepage:Total")}
+        />
+
+        <StatusItem
+          a={t("homepage:Feedbacks")}
+          b={s ? s.feedbacks : <Skeleton className={"w-12 h-4"} />}
+          c={t("homepage:Total")}
+        />
       </CardContent>
     </Card>
   )
@@ -72,7 +90,7 @@ export function RecentConversations() {
     <Card id="recent-apps" variant="ghost" className="w-full">
       <CardHeader>
         <div className="| flex shrink-0 items-end justify-between">
-          <CardTitle>{t("homepage:recentlyUsedApps")}</CardTitle>
+          <CardTitle>{t("homepage:RecentlyUsedApps")}</CardTitle>
           {user && (
             <Link
               href={getConversationsLink(user.id)}

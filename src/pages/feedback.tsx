@@ -31,7 +31,7 @@ import { getZodDefaults } from "@/lib/zod"
 const FeedbackForm = () => {
   const { t } = useTranslation()
   const router = useRouter()
-  const { mutateAsync: postFeedback } = api.feedback.post.useMutation()
+  const { mutateAsync: postFeedback, isLoading } = api.feedback.post.useMutation()
 
   const form = useForm<z.infer<typeof feedbackFormSchema>>({
     resolver: zodResolver(feedbackFormSchema),
@@ -39,11 +39,9 @@ const FeedbackForm = () => {
   })
 
   async function onSubmit(values: z.infer<typeof feedbackFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
-    await postFeedback(values)
+    console.log("submitted feedback: ", values)
     toast.success("感谢！提交成功！")
+    await postFeedback(values)
     void router.push("/")
   }
 
@@ -141,7 +139,9 @@ const FeedbackForm = () => {
           )}
         />
 
-        <Button type="submit">提交</Button>
+        <Button type="submit" disabled={isLoading}>
+          提交
+        </Button>
       </form>
     </Form>
   )
