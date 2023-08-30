@@ -13,7 +13,7 @@ import sortedUniqBy from "lodash/sortedUniqBy"
 import { ChatMessageUncheckedCreateInputSchema, ChatMessageWhereInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc-helpers"
 
 import { DEFAULT_LATEST_COUNT } from "@/config"
 

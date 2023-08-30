@@ -8,9 +8,13 @@ import { IssueType } from ".prisma/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
+import { useRouter } from "next/router"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
+
+import { feedbackFormSchema } from "@/ds"
 
 import { RootLayout } from "@/layouts/root.layout"
 
@@ -21,30 +25,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 
-const formSchema = z.object({
-  // appPlatform: z.enum(appPlatforms).default("web"),
-  contact: z.string().min(1),
-  issueType: z.nativeEnum(IssueType),
-  title: z.string().min(1),
-  detail: z.string().min(1),
-  anonymous: z.boolean(),
-})
+import { api } from "@/lib/api"
+import { getZodDefaults } from "@/lib/zod"
 
 const FeedbackForm = () => {
   const { t } = useTranslation()
+  const router = useRouter()
+  const { mutateAsync: postFeedback } = api.feedback.post.useMutation()
 
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof feedbackFormSchema>>({
+    resolver: zodResolver(feedbackFormSchema),
+    defaultValues: getZodDefaults(feedbackFormSchema),
   })
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof feedbackFormSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
+    await postFeedback(values)
+    toast.success("感谢！提交成功！")
+    void router.push("/")
   }
-  const [issueType, setIssueType] = useState<IssueType>("PuzzleInUse")
 
   return (
     <Form {...form}>
@@ -67,27 +68,31 @@ const FeedbackForm = () => {
         <FormField
           control={form.control}
           name="issueType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>类型</FormLabel>
-              <FormControl>
-                <Select value={issueType} onValueChange={(v) => setIssueType(v as IssueType)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(IssueType).map((cl: IssueType) => (
-                      <SelectItem value={cl} key={cl}>
-                        {t(`feedback:${cl}.title`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormDescription>{t(`feedback:${issueType}.desc`)}</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            console.log({ issueType: field })
+
+            return (
+              <FormItem>
+                <FormLabel>类型</FormLabel>
+                <FormControl>
+                  <Select {...field} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(IssueType).map((cl: IssueType) => (
+                        <SelectItem value={cl} key={cl}>
+                          {t(`feedback:${cl}.title`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormDescription>{t(`feedback:${field.value}.desc`)}</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
 
         <FormField
@@ -145,7 +150,6 @@ const FeedbackForm = () => {
 export default function SeekPlatformWaitlistPage() {
   return (
     <RootLayout>
-      {/*From Poketto Official: 很快就会上线，请再耐心等等吧！*/}
       <FeedbackForm />
     </RootLayout>
   )

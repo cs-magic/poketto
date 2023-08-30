@@ -8,7 +8,7 @@ import { Prisma } from ".prisma/client"
 import { AppWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
 
-import { createTRPCRouter, publicProcedure } from "@/server/trpc.helpers"
+import { createTRPCRouter, publicProcedure } from "@/server/trpc-helpers"
 
 import { DEFAULT_BATCH_CARDS, TAG_SEPARATOR } from "@/config"
 

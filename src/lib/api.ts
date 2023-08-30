@@ -10,10 +10,9 @@ import { type TRPCError, type inferRouterInputs, type inferRouterOutputs } from 
 import { toast } from "sonner"
 import superjson from "superjson"
 
-import { type RootRouter } from "@/server/trpc.router"
+import { type RootRouter } from "@/server/routers/_root.router"
 
 import { URI } from "@/config"
-
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") {
@@ -99,7 +98,8 @@ export const api = createTRPCNext<RootRouter>({
        */
       links: [
         loggerLink({
-          enabled: (opts) => process.env.NODE_ENV === "development" || (opts.direction === "down" && opts.result instanceof Error),
+          enabled: (opts) =>
+            process.env.NODE_ENV === "development" || (opts.direction === "down" && opts.result instanceof Error),
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,

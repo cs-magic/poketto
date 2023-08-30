@@ -396,6 +396,7 @@ enum InvitationStatus {
 }
 
 enum IssueType {
+  Debunk
   PuzzleInUse
   FeatureRequest
   BugReport

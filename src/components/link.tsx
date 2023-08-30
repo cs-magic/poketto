@@ -26,7 +26,7 @@ export function SidebarNavItem({ field, Icon, link }: IMenuItem) {
 export function FooterNavItem({ field, link, Icon }: IMenuItem) {
   const { t } = useTranslation()
   const content = t(`common:menus.${field}`)
-  console.log({ field, content })
+  // console.log({ field, content })
 
   const inner = (
     <>

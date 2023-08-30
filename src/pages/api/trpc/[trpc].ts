@@ -6,9 +6,9 @@
  */
 import { createNextApiHandler } from "@trpc/server/adapters/next"
 
-import { createTRPCContext } from "@/server/trpc.helpers"
 // export API handler
-import { rootRouter } from "@/server/trpc.router"
+import { rootRouter } from "@/server/routers/_root.router"
+import { createTRPCContext } from "@/server/trpc-helpers"
 
 import { authEnv, baseEnv } from "@/env.mjs"
 

@@ -7,7 +7,7 @@
 import { UserWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc.helpers"
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc-helpers"
 
 import { type UserForProfile, selectUserProfile } from "@/ds"
 

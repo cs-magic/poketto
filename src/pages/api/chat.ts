@@ -15,7 +15,7 @@ import { type LLMResult } from "langchain/schema"
 import { BytesOutputParser } from "langchain/schema/output_parser"
 import superjson from "superjson"
 
-import { type RootRouter } from "@/server/trpc.router"
+import { type RootRouter } from "@/server/routers/_root.router"
 
 import { baseEnv } from "@/env.mjs"
 
@@ -63,7 +63,7 @@ export default async function handler(req: Request, res: Response) {
       conversationId,
       shortId: id,
       modelType,
-      isUsingFree: user.balance <= 0
+      isUsingFree: user.balance <= 0,
     }
     console.log("pushing: ", newMessage)
     await proxy.message.push.mutate(newMessage)

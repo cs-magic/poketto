@@ -106,7 +106,7 @@ export const InvitationStatusSchema = z.enum(['Idle','Pending','Accepted','Expir
 
 export type InvitationStatusType = `${z.infer<typeof InvitationStatusSchema>}`
 
-export const IssueTypeSchema = z.enum(['PuzzleInUse','FeatureRequest','BugReport','LeakReport','BusinessCollaboration']);
+export const IssueTypeSchema = z.enum(['Debunk','PuzzleInUse','FeatureRequest','BugReport','LeakReport','BusinessCollaboration']);
 
 export type IssueTypeType = `${z.infer<typeof IssueTypeSchema>}`
 

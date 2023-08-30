@@ -172,7 +172,7 @@ function CommandSearch() {
    *  close dialog if url changed
    */
   useEffect(() => {
-    console.log({ path: router.asPath })
+    // console.log({ path: router.asPath })
     setOpen(false)
   }, [router.asPath])
 

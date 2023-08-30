@@ -4,12 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma } from ".prisma/client"
+import { IssueType, Prisma } from ".prisma/client"
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
 import type { NextComponentType, NextPage, NextPageContext } from "next"
 import type { Session } from "next-auth"
 import type { AppProps } from "next/app"
 import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
+import { z } from "zod"
 
 import { FREE_GPT3_DAILY_USER, FREE_GPT4_DAILY_USER } from "@/config"
 
@@ -216,3 +217,12 @@ export type AllMessage =
 
 export const appPlatforms = ["web", "desktop", "mobile", "mini-program"] as const
 export type AppPlatform = (typeof appPlatforms)[number]
+
+export const feedbackFormSchema = z.object({
+  // appPlatform: z.enum(appPlatforms).default("web"),
+  contact: z.string().min(1),
+  issueType: z.nativeEnum(IssueType).default("Debunk"),
+  title: z.string().min(1),
+  detail: z.string().min(1),
+  anonymous: z.boolean().default(true),
+})

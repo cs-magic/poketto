@@ -9,7 +9,7 @@ import { ChatMessageFormatType } from "@prisma/client"
 import { ConversationWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
 
-import { createTRPCRouter, protectedProcedure } from "@/server/trpc.helpers"
+import { createTRPCRouter, protectedProcedure } from "@/server/trpc-helpers"
 
 import { includeConvForDetailView, selectAppForDetailView, selectConvForListView } from "@/ds"
 
