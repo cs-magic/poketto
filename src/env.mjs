@@ -15,6 +15,8 @@ export const baseEnv = createEnv({
     OPENAI_API_KEY: z.string(),
     KV_REST_API_URL: z.string(),
     KV_REST_API_TOKEN: z.string(),
+
+    HOST: z.string().min(1),
   },
   client: {
 
@@ -26,6 +28,8 @@ export const baseEnv = createEnv({
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
+
+    HOST: process.env.HOST,
   }
 })
 

@@ -6,6 +6,8 @@
  */
 import { useRouter } from "next/router"
 
+import { baseEnv } from "@/env.mjs"
+
 import { POKETTO_APP_ID } from "@/config"
 
 import { useUserId } from "@/hooks/use-user"
@@ -15,7 +17,7 @@ import { getConversationLink } from "@/lib/string"
 
 export const useUrl = () => {
   const router = useRouter()
-  const origin = window?.location.origin ? window.location.origin : ""
+  const origin = typeof window !== "undefined" ? window.location.origin : baseEnv.HOST
 
   // console.log({ router })
   const baseUrl = `${origin}${router.asPath}`
