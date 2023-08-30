@@ -21,6 +21,7 @@ import { useLocale } from "@/hooks/use-i18n"
 import { useMustache } from "@/hooks/use-mustache"
 import { useUrl } from "@/hooks/use-url"
 
+import { getOrigin } from "@/lib/string"
 import { cn } from "@/lib/utils"
 import { userAuthSchema } from "@/lib/validations/auth"
 
@@ -44,8 +45,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isDiscordLoading, setIsDiscordLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
   const locale = useLocale()
-  const { origin } = useUrl()
-  const isDomestic = origin.includes("cn")
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)
@@ -103,7 +102,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       </form>
 
       {/* 国内的OAuth会超过3.5秒 */}
-      {!isDomestic && (
+      {!getOrigin().includes("cn") && (
         <>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -159,7 +158,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         </div>
       </div>
 
-      {isDomestic ? (
+      {getOrigin().includes("cn") ? (
         <Link href={`${POKETTO_INTERNATIONAL_HOME}/login`} className={"w-full"}>
           <Button variant={"outline"} className={"w-full"}>
             使用国际版
