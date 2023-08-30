@@ -1,11 +1,8 @@
-import fs from "fs";
-import type { NextApiRequest, NextApiResponse } from "next";
-import path from "path";
+import fs from "fs"
+import type { NextApiRequest, NextApiResponse } from "next"
+import path from "path"
 
-
-
-import type { IMAGE_SIZE } from "@/ds";
-
+import type { IMAGE_SIZE } from "@/ds"
 
 // ref: https://github.com/vercel/next.js/discussions/40270#discussioncomment-3571223
 export const config = {
@@ -27,7 +24,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   // Set the path for images - adjust this as needed
-  const imagesDir = path.join(process.cwd(), "../scrapy_flowgpt/__data__/images")
+  const imagesDir = path.join(process.cwd(), "../scrapy-flowgpt/__data__/images")
   const imagePath = path.join(imagesDir, filesize, `${filename}.jpg`)
 
   // console.log({ imagePath })
