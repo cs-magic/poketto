@@ -29,18 +29,19 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
 export function Sidebar() {
+  const { t } = useTranslation()
   const user = useSessionUser()
 
   return (
     <div
       className={clsx(
-        "hidden md:flex | max-w-[240px] shrink-0 h-full overflow-auto px-4 pt-8 | flex-col gap-6 | whitespace-nowrap bg-sidebar text-sm text-primary-foreground"
+        "shrink-0 h-full overflow-auto pt-8 gap-6 | hidden md:flex flex-col items-center | whitespace-nowrap bg-sidebar text-sm text-primary-foreground"
       )}
     >
       {Object.entries(sidebarSections).map(([key, keys]) => (
         <>
           <Separator className={"first:hidden"} />
-          <section className="flex flex-col">
+          <section className="w-full flex flex-col">
             {keys.map((key) => (
               <SidebarNavItem key={key} {...menuItems.find((i) => i.field === key)!} />
             ))}
@@ -72,9 +73,16 @@ export function Sidebar() {
           {/*<ChevronRightIcon className="hidden lg:flex shrink-0" />*/}
         </Link>
       ) : (
-        <Button variant="destructive" className="my-2" onClick={() => void signIn()}>
-          登录
-        </Button>
+        <div className={"w-full p-2"}>
+          <Button variant="destructive" className="w-full hidden lg:block" onClick={() => void signIn()}>
+            {t("common:Login")}
+          </Button>
+          <Avatar className={"block lg:hidden"} onClick={() => void signIn()}>
+            <AvatarFallback>
+              <UserIcon />
+            </AvatarFallback>
+          </Avatar>
+        </div>
       )}
     </div>
   )

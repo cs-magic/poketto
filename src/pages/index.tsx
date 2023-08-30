@@ -106,10 +106,10 @@ export function RecentConversations() {
       <CardContent className="flex w-full gap-2 p-2 overflow-auto">
         {!user ? (
           <div className={"mx-4"}>
+            {t("homepage:LoginToSeeApp")}
             <Button variant="link" onClick={() => void signIn()}>
-              登录
+              {t("common:Login")}
             </Button>
-            后才能查看最近使用的 App 哦！
           </div>
         ) : !conversations ? (
           <>
@@ -136,12 +136,9 @@ export function RecentConversations() {
 }
 
 export async function getStaticProps({ locale }) {
-  const localeContent = await serverSideTranslations(locale, ["common", "homepage"])
-  // console.log({ locale }, localeContent._nextI18Next)
-
   return {
     props: {
-      ...localeContent,
+      ...(await serverSideTranslations(locale, ["common", "homepage"])),
     },
   }
 }

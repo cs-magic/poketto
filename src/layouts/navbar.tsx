@@ -108,7 +108,10 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
 }
 
 export default function Navbar() {
+  const { t } = useTranslation()
+
   const userId = useUserId()
+
   return (
     <div className="flex items-center border-b px-4 py-2 gap-0">
       <LogoWithName />
@@ -156,7 +159,7 @@ export default function Navbar() {
         </Link>
       ) : (
         <Button size={"xs"} variant={"outline"} onClick={() => void signIn()} className={"whitespace-nowrap"}>
-          登录
+          {t("common:Login")}
         </Button>
       )}
     </div>
@@ -168,7 +171,7 @@ const Item: FC<ComponentProps<typeof CommandItem>> = ({ className, ...props }) =
 }
 
 function CommandSearch({ className, ...props }: HTMLProps<HTMLDivElement>) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const [search, setSearch] = React.useState("")
   const [toSearch] = useDebouncedValue(search, 200)

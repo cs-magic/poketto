@@ -138,9 +138,9 @@ export function ChargeContainer({ children }: PropsWithChildren) {
 export function ResponsiveTooltip({ content, children, ...props }: TooltipTriggerProps & { content?: ReactNode }) {
   return (
     <Tooltip delayDuration={100}>
-      <TooltipTrigger className="flex justify-between items-center gap-2" {...props}>
+      <TooltipTrigger className="flex items-center gap-2 p-interactive px-2 w-full" {...props}>
         {children}
-        <span className="hidden lg:flex">{content}</span>
+        <span className="hidden lg:flex mr-2">{content}</span>
       </TooltipTrigger>
 
       <TooltipContent className="lg:hidden">{content}</TooltipContent>

@@ -145,12 +145,16 @@ main {
         background-image: linear-gradient(to right, transparent 0%, hsl(var(--background)) 20%);
     }
 
+    .p-interactive {
+        @apply bg-transparent text-muted-foreground hover:text-accent-foreground hover:bg-accent transition-colors;
+    }
+
     .p-btn-horizontal {
-        @apply inline-flex w-full  items-center justify-start gap-2 rounded-md pl-4 text-sm  hover:bg-accent font-medium ring-offset-background transition-colors hover:text-accent-foreground focus-visible:outline-none h-10 px-4 py-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+        @apply p-interactive inline-flex w-full  items-center justify-start gap-2 rounded-md pl-4 text-sm font-medium ring-offset-background focus-visible:outline-none h-10 px-4 py-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
     }
 
     .p-btn-vertical {
-        @apply p-2 flex flex-col gap-1 w-full  items-center justify-between rounded-md text-sm  hover:bg-accent font-medium ring-offset-background transition-colors hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+        @apply p-interactive p-2 flex flex-col gap-1 w-full  items-center justify-between rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
     }
 
     /* 全局 typography */
@@ -168,7 +172,4 @@ main {
         @apply child:grow child:basis-0 child:whitespace-nowrap;
     }
 
-    .p-interactive {
-        @apply bg-transparent text-muted-foreground hover:text-accent-foreground hover:bg-accent;
-    }
 }

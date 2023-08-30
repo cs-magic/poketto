@@ -14,7 +14,7 @@ export default withAuth(
     const isAuth = !!token
     const isAuthPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/register")
 
-    console.log({ token, isAuth, isAuthPage })
+    // console.log({ token, isAuth, isAuthPage })
 
     if (isAuthPage) {
       if (isAuth) {
