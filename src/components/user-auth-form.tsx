@@ -40,7 +40,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isDiscordLoading, setIsDiscordLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
   const locale = useLocale()
-  console.log("UserAuthForm: ", { locale })
+  // console.log("UserAuthForm: ", { locale })
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)

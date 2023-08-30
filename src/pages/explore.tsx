@@ -146,6 +146,7 @@ function HomeCarousel() {
 }
 
 function ScrollTrigger({ trigger }: { trigger: any }) {
+  const { t } = useTranslation()
   const { ref, entry } = useIntersection({ rootMargin: "400px" })
 
   useEffect(() => {
@@ -163,7 +164,7 @@ function ScrollTrigger({ trigger }: { trigger: any }) {
         " animate-pulse bg-card font-bold text-primary-foreground"
       )}
     >
-      {entry?.isIntersecting && "Loading More Data ..."}
+      {entry?.isIntersecting && t("common:LoadingMoreData")}
     </p>
   )
 }

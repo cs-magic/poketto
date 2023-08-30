@@ -43,7 +43,7 @@ export const createAuthOptions = ({ locale }: { locale: string }): NextAuthOptio
     },
 
     async session(params) {
-      console.log("session: ", params)
+      // console.log("session: ", params)
       const { token, session } = params
       if (token) {
         session.user.id = token.sub! // 不要 token.id 了，妈的

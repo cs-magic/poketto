@@ -35,7 +35,7 @@ export const AsyncListContainer = <T extends any>({ items, style }: { items?: T[
 
 export const DashboardPage: NextPageWithAuth = () => {
   const userId = useUserId()!
-  console.log("dashboard: ", { userId })
+  // console.log("dashboard: ", { userId })
   const { data: userProfile } = api.user.getProfile.useQuery({ id: userId })
   const { data: payments } = api.bill.listPayments.useQuery()
   const { data: messages } = api.message.list.useQuery({ userId })

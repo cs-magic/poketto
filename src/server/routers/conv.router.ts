@@ -46,7 +46,7 @@ export const convRouter = createTRPCRouter({
         input: { appId },
       }) => {
         const userId = user.id
-        console.log("adding app: ", { userId, appId })
+        // console.log("adding app: ", { userId, appId })
         const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, select: selectAppForDetailView })
         const addedConv = await prisma.conversation.create({
           include: {

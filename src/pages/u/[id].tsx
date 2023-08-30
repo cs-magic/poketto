@@ -20,7 +20,7 @@ import { api } from "@/lib/api"
 export const DashboardPage: NextPageWithAuth = () => {
   const router = useRouter()
   const userId = router.query.id as string
-  console.log("dashboard: ", { userId })
+  // console.log("dashboard: ", { userId })
   const { data: userProfile } = api.user.getProfile.useQuery({ id: userId }, { enabled: !!userId })
 
   return (

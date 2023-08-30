@@ -12,7 +12,7 @@ import { createAuthOptions } from "@/server/auth"
 import { DEFAULT_LOCALE } from "@/config"
 
 const authHandler: NextApiHandler = async (req, res) => {
-  console.log("auth: [query] ", req.query)
+  // console.log("auth: [query] ", req.query)
   const locale = (req.query.locale as string | undefined) ?? DEFAULT_LOCALE
 
   return await NextAuth(req, res, createAuthOptions({ locale }))

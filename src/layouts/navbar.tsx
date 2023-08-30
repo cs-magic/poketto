@@ -286,7 +286,7 @@ function CommandSearch({ className, ...props }: HTMLProps<HTMLDivElement>) {
                         key={app.id}
                         value={app.id}
                         onSelect={(value) => {
-                          console.log("selected: ", { value, appId: app.id })
+                          // console.log("selected: ", { value, appId: app.id })
                           pushSearch(app.name)
                           setAppId(app.id)
                         }}
