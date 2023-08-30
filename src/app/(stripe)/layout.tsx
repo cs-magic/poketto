@@ -12,7 +12,7 @@ import { type PropsWithChildren } from "react"
 
 import { siteConfig } from "@/config"
 
-import { getOrigin } from "@/hooks/use-url"
+import { getOrigin } from "@/lib/string"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getOrigin()),

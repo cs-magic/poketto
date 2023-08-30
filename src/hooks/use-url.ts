@@ -6,16 +6,12 @@
  */
 import { useRouter } from "next/router"
 
-import { baseEnv } from "@/env.mjs"
-
 import { POKETTO_APP_ID } from "@/config"
 
 import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
-import { getConversationLink } from "@/lib/string"
-
-export const getOrigin = () => (typeof window !== "undefined" ? window.location.origin : baseEnv.HOST)
+import { getConversationLink, getOrigin } from "@/lib/string"
 
 export const useUrl = () => {
   const router = useRouter()

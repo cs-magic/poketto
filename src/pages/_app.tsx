@@ -20,11 +20,10 @@ import { TailwindIndicator } from "@/components/tailwind-indicator"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
-import { getOrigin } from "@/hooks/use-url"
-
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { fontHeading, fontSans } from "@/lib/fonts"
+import { getOrigin } from "@/lib/string"
 
 import "@/styles/globals.css"
 

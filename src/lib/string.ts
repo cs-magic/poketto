@@ -7,10 +7,11 @@
 import hash from "js-sha1"
 import capitalize from "lodash/capitalize"
 
+import { baseEnv } from "@/env.mjs"
+
 import { type IMAGE_SIZE } from "@/ds"
 
 import { FLOWGPT_HOMEPAGE } from "@/const"
-
 
 export const getShortName = (s: string, len: number = 2) =>
   s
@@ -58,3 +59,5 @@ export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs"): s
   // console.log({ uri, size, result })
   return result
 }
+
+export const getOrigin = () => (typeof window !== "undefined" ? window.location.origin : baseEnv.HOST)
