@@ -214,14 +214,5 @@ export type AllMessage =
       content: string
     }
 
-export const issueTypes = [
-  "puzzle-in-use",
-  "feature-request",
-  "bug-report",
-  "leak-report",
-  "business-collaboration",
-] as const
-export type IssueType = (typeof issueTypes)[number]
-
 export const appPlatforms = ["web", "desktop", "mobile", "mini-program"] as const
 export type AppPlatform = (typeof appPlatforms)[number]

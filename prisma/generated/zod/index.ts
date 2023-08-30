@@ -70,6 +70,8 @@ export const ChatMessageActionScalarFieldEnumSchema = z.enum(['id','createdAt','
 
 export const ConversationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','isActive','userId','appId','pinned']);
 
+export const FeedbackScalarFieldEnumSchema = z.enum(['id','issueType','title','detail','contact','userId']);
+
 export const FollowRelationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','fromId','toId']);
 
 export const InvitationRelationScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','status','fromId','toId']);
@@ -103,6 +105,10 @@ export type ChatMessageFormatTypeType = `${z.infer<typeof ChatMessageFormatTypeS
 export const InvitationStatusSchema = z.enum(['Idle','Pending','Accepted','Expired']);
 
 export type InvitationStatusType = `${z.infer<typeof InvitationStatusSchema>}`
+
+export const IssueTypeSchema = z.enum(['PuzzleInUse','FeatureRequest','BugReport','LeakReport','BusinessCollaboration']);
+
+export type IssueTypeType = `${z.infer<typeof IssueTypeSchema>}`
 
 export const PlatformTypeSchema = z.enum(['Poketto','FlowGPT','OpenAI','MidJourney','StableDiffusion','OpenChat','email','github','discord','google']);
 
@@ -315,6 +321,21 @@ export const ConversationSchema = z.object({
 })
 
 export type Conversation = z.infer<typeof ConversationSchema>
+
+/////////////////////////////////////////
+// FEEDBACK SCHEMA
+/////////////////////////////////////////
+
+export const FeedbackSchema = z.object({
+  issueType: IssueTypeSchema,
+  id: z.string().cuid(),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string(),
+  userId: z.string().nullable(),
+})
+
+export type Feedback = z.infer<typeof FeedbackSchema>
 
 /////////////////////////////////////////
 // FOLLOW RELATION SCHEMA
@@ -784,6 +805,28 @@ export const ConversationSelectSchema: z.ZodType<Prisma.ConversationSelect> = z.
   _count: z.union([z.boolean(),z.lazy(() => ConversationCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
+// FEEDBACK
+//------------------------------------------------------
+
+export const FeedbackIncludeSchema: z.ZodType<Prisma.FeedbackInclude> = z.object({
+  user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
+}).strict()
+
+export const FeedbackArgsSchema: z.ZodType<Prisma.FeedbackDefaultArgs> = z.object({
+  select: z.lazy(() => FeedbackSelectSchema).optional(),
+  include: z.lazy(() => FeedbackIncludeSchema).optional(),
+}).strict();
+
+export const FeedbackSelectSchema: z.ZodType<Prisma.FeedbackSelect> = z.object({
+  id: z.boolean().optional(),
+  issueType: z.boolean().optional(),
+  title: z.boolean().optional(),
+  detail: z.boolean().optional(),
+  contact: z.boolean().optional(),
+  userId: z.boolean().optional(),
+  user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
+}).strict()
+
 // FOLLOW RELATION
 //------------------------------------------------------
 
@@ -949,6 +992,7 @@ export const UserIncludeSchema: z.ZodType<Prisma.UserInclude> = z.object({
   createdApps: z.union([z.boolean(),z.lazy(() => AppFindManyArgsSchema)]).optional(),
   conversations: z.union([z.boolean(),z.lazy(() => ConversationFindManyArgsSchema)]).optional(),
   stripePayments: z.union([z.boolean(),z.lazy(() => StripePaymentFindManyArgsSchema)]).optional(),
+  Feedback: z.union([z.boolean(),z.lazy(() => FeedbackFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -977,6 +1021,7 @@ export const UserCountOutputTypeSelectSchema: z.ZodType<Prisma.UserCountOutputTy
   createdApps: z.boolean().optional(),
   conversations: z.boolean().optional(),
   stripePayments: z.boolean().optional(),
+  Feedback: z.boolean().optional(),
 }).strict();
 
 export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
@@ -1010,6 +1055,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   createdApps: z.union([z.boolean(),z.lazy(() => AppFindManyArgsSchema)]).optional(),
   conversations: z.union([z.boolean(),z.lazy(() => ConversationFindManyArgsSchema)]).optional(),
   stripePayments: z.union([z.boolean(),z.lazy(() => StripePaymentFindManyArgsSchema)]).optional(),
+  Feedback: z.union([z.boolean(),z.lazy(() => FeedbackFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -1904,6 +1950,69 @@ export const ConversationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.
   pinned: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
 }).strict();
 
+export const FeedbackWhereInputSchema: z.ZodType<Prisma.FeedbackWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => FeedbackWhereInputSchema),z.lazy(() => FeedbackWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => FeedbackWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => FeedbackWhereInputSchema),z.lazy(() => FeedbackWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  issueType: z.union([ z.lazy(() => EnumIssueTypeFilterSchema),z.lazy(() => IssueTypeSchema) ]).optional(),
+  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  detail: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  contact: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  userId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const FeedbackOrderByWithRelationInputSchema: z.ZodType<Prisma.FeedbackOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  issueType: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  detail: z.lazy(() => SortOrderSchema).optional(),
+  contact: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  user: z.lazy(() => UserOrderByWithRelationInputSchema).optional()
+}).strict();
+
+export const FeedbackWhereUniqueInputSchema: z.ZodType<Prisma.FeedbackWhereUniqueInput> = z.object({
+  id: z.string().cuid()
+})
+.and(z.object({
+  id: z.string().cuid().optional(),
+  AND: z.union([ z.lazy(() => FeedbackWhereInputSchema),z.lazy(() => FeedbackWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => FeedbackWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => FeedbackWhereInputSchema),z.lazy(() => FeedbackWhereInputSchema).array() ]).optional(),
+  issueType: z.union([ z.lazy(() => EnumIssueTypeFilterSchema),z.lazy(() => IssueTypeSchema) ]).optional(),
+  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  detail: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  contact: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  userId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  user: z.union([ z.lazy(() => UserNullableRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional().nullable(),
+}).strict());
+
+export const FeedbackOrderByWithAggregationInputSchema: z.ZodType<Prisma.FeedbackOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  issueType: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  detail: z.lazy(() => SortOrderSchema).optional(),
+  contact: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  _count: z.lazy(() => FeedbackCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => FeedbackMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => FeedbackMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const FeedbackScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.FeedbackScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => FeedbackScalarWhereWithAggregatesInputSchema),z.lazy(() => FeedbackScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => FeedbackScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => FeedbackScalarWhereWithAggregatesInputSchema),z.lazy(() => FeedbackScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  issueType: z.union([ z.lazy(() => EnumIssueTypeWithAggregatesFilterSchema),z.lazy(() => IssueTypeSchema) ]).optional(),
+  title: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  detail: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  contact: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  userId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+}).strict();
+
 export const FollowRelationWhereInputSchema: z.ZodType<Prisma.FollowRelationWhereInput> = z.object({
   AND: z.union([ z.lazy(() => FollowRelationWhereInputSchema),z.lazy(() => FollowRelationWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => FollowRelationWhereInputSchema).array().optional(),
@@ -2329,7 +2438,8 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   StarringApp: z.lazy(() => StarringAppListRelationFilterSchema).optional(),
   createdApps: z.lazy(() => AppListRelationFilterSchema).optional(),
   conversations: z.lazy(() => ConversationListRelationFilterSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentListRelationFilterSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentListRelationFilterSchema).optional(),
+  Feedback: z.lazy(() => FeedbackListRelationFilterSchema).optional()
 }).strict();
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
@@ -2362,7 +2472,8 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   StarringApp: z.lazy(() => StarringAppOrderByRelationAggregateInputSchema).optional(),
   createdApps: z.lazy(() => AppOrderByRelationAggregateInputSchema).optional(),
   conversations: z.lazy(() => ConversationOrderByRelationAggregateInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentOrderByRelationAggregateInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentOrderByRelationAggregateInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -2463,7 +2574,8 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   StarringApp: z.lazy(() => StarringAppListRelationFilterSchema).optional(),
   createdApps: z.lazy(() => AppListRelationFilterSchema).optional(),
   conversations: z.lazy(() => ConversationListRelationFilterSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentListRelationFilterSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentListRelationFilterSchema).optional(),
+  Feedback: z.lazy(() => FeedbackListRelationFilterSchema).optional()
 }).strict());
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
@@ -3413,6 +3525,68 @@ export const ConversationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Conver
   pinned: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
+export const FeedbackCreateInputSchema: z.ZodType<Prisma.FeedbackCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  issueType: z.lazy(() => IssueTypeSchema),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string(),
+  user: z.lazy(() => UserCreateNestedOneWithoutFeedbackInputSchema).optional()
+}).strict();
+
+export const FeedbackUncheckedCreateInputSchema: z.ZodType<Prisma.FeedbackUncheckedCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  issueType: z.lazy(() => IssueTypeSchema),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string(),
+  userId: z.string().optional().nullable()
+}).strict();
+
+export const FeedbackUpdateInputSchema: z.ZodType<Prisma.FeedbackUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user: z.lazy(() => UserUpdateOneWithoutFeedbackNestedInputSchema).optional()
+}).strict();
+
+export const FeedbackUncheckedUpdateInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const FeedbackCreateManyInputSchema: z.ZodType<Prisma.FeedbackCreateManyInput> = z.object({
+  id: z.string().cuid().optional(),
+  issueType: z.lazy(() => IssueTypeSchema),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string(),
+  userId: z.string().optional().nullable()
+}).strict();
+
+export const FeedbackUpdateManyMutationInputSchema: z.ZodType<Prisma.FeedbackUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const FeedbackUncheckedUpdateManyInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
 export const FollowRelationCreateInputSchema: z.ZodType<Prisma.FollowRelationCreateInput> = z.object({
   id: z.string().cuid().optional(),
   createdAt: z.coerce.date().optional(),
@@ -3788,7 +3962,8 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
@@ -3821,7 +3996,8 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
@@ -3854,7 +4030,8 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
@@ -3887,7 +4064,8 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
@@ -4883,6 +5061,50 @@ export const ConversationMinOrderByAggregateInputSchema: z.ZodType<Prisma.Conver
   pinned: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
+export const EnumIssueTypeFilterSchema: z.ZodType<Prisma.EnumIssueTypeFilter> = z.object({
+  equals: z.lazy(() => IssueTypeSchema).optional(),
+  in: z.lazy(() => IssueTypeSchema).array().optional(),
+  notIn: z.lazy(() => IssueTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => NestedEnumIssueTypeFilterSchema) ]).optional(),
+}).strict();
+
+export const FeedbackCountOrderByAggregateInputSchema: z.ZodType<Prisma.FeedbackCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  issueType: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  detail: z.lazy(() => SortOrderSchema).optional(),
+  contact: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const FeedbackMaxOrderByAggregateInputSchema: z.ZodType<Prisma.FeedbackMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  issueType: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  detail: z.lazy(() => SortOrderSchema).optional(),
+  contact: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const FeedbackMinOrderByAggregateInputSchema: z.ZodType<Prisma.FeedbackMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  issueType: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  detail: z.lazy(() => SortOrderSchema).optional(),
+  contact: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const EnumIssueTypeWithAggregatesFilterSchema: z.ZodType<Prisma.EnumIssueTypeWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => IssueTypeSchema).optional(),
+  in: z.lazy(() => IssueTypeSchema).array().optional(),
+  notIn: z.lazy(() => IssueTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => NestedEnumIssueTypeWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumIssueTypeFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumIssueTypeFilterSchema).optional()
+}).strict();
+
 export const FollowRelationCountOrderByAggregateInputSchema: z.ZodType<Prisma.FollowRelationCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
@@ -5141,6 +5363,12 @@ export const FollowRelationListRelationFilterSchema: z.ZodType<Prisma.FollowRela
   none: z.lazy(() => FollowRelationWhereInputSchema).optional()
 }).strict();
 
+export const FeedbackListRelationFilterSchema: z.ZodType<Prisma.FeedbackListRelationFilter> = z.object({
+  every: z.lazy(() => FeedbackWhereInputSchema).optional(),
+  some: z.lazy(() => FeedbackWhereInputSchema).optional(),
+  none: z.lazy(() => FeedbackWhereInputSchema).optional()
+}).strict();
+
 export const AccountOrderByRelationAggregateInputSchema: z.ZodType<Prisma.AccountOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -5154,6 +5382,10 @@ export const InvitationRelationOrderByRelationAggregateInputSchema: z.ZodType<Pr
 }).strict();
 
 export const FollowRelationOrderByRelationAggregateInputSchema: z.ZodType<Prisma.FollowRelationOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const FeedbackOrderByRelationAggregateInputSchema: z.ZodType<Prisma.FeedbackOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -5933,6 +6165,26 @@ export const ChatMessageUncheckedUpdateManyWithoutConversationNestedInputSchema:
   deleteMany: z.union([ z.lazy(() => ChatMessageScalarWhereInputSchema),z.lazy(() => ChatMessageScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
+export const UserCreateNestedOneWithoutFeedbackInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutFeedbackInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedCreateWithoutFeedbackInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutFeedbackInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
+}).strict();
+
+export const EnumIssueTypeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumIssueTypeFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => IssueTypeSchema).optional()
+}).strict();
+
+export const UserUpdateOneWithoutFeedbackNestedInputSchema: z.ZodType<Prisma.UserUpdateOneWithoutFeedbackNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedCreateWithoutFeedbackInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutFeedbackInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutFeedbackInputSchema).optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => UserWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => UserWhereInputSchema) ]).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutFeedbackInputSchema),z.lazy(() => UserUpdateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedUpdateWithoutFeedbackInputSchema) ]).optional(),
+}).strict();
+
 export const UserCreateNestedOneWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutFollowedByInput> = z.object({
   create: z.union([ z.lazy(() => UserCreateWithoutFollowedByInputSchema),z.lazy(() => UserUncheckedCreateWithoutFollowedByInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutFollowedByInputSchema).optional(),
@@ -6222,6 +6474,13 @@ export const StripePaymentCreateNestedManyWithoutUserInputSchema: z.ZodType<Pris
   connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
+export const FeedbackCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.FeedbackCreateNestedManyWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => FeedbackCreateWithoutUserInputSchema),z.lazy(() => FeedbackCreateWithoutUserInputSchema).array(),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema),z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => FeedbackCreateManyUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const AccountUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.AccountUncheckedCreateNestedManyWithoutUserInput> = z.object({
   create: z.union([ z.lazy(() => AccountCreateWithoutUserInputSchema),z.lazy(() => AccountCreateWithoutUserInputSchema).array(),z.lazy(() => AccountUncheckedCreateWithoutUserInputSchema),z.lazy(() => AccountUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => AccountCreateOrConnectWithoutUserInputSchema),z.lazy(() => AccountCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
@@ -6325,6 +6584,13 @@ export const StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema: z.Zod
   connectOrCreate: z.union([ z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema),z.lazy(() => StripePaymentCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
   createMany: z.lazy(() => StripePaymentCreateManyUserInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => StripePaymentWhereUniqueInputSchema),z.lazy(() => StripePaymentWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const FeedbackUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => FeedbackCreateWithoutUserInputSchema),z.lazy(() => FeedbackCreateWithoutUserInputSchema).array(),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema),z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => FeedbackCreateManyUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const AccountUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.AccountUpdateManyWithoutUserNestedInput> = z.object({
@@ -6537,6 +6803,20 @@ export const StripePaymentUpdateManyWithoutUserNestedInputSchema: z.ZodType<Pris
   deleteMany: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
+export const FeedbackUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.FeedbackUpdateManyWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => FeedbackCreateWithoutUserInputSchema),z.lazy(() => FeedbackCreateWithoutUserInputSchema).array(),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema),z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => FeedbackUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => FeedbackUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => FeedbackCreateManyUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => FeedbackUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => FeedbackUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => FeedbackUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => FeedbackUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => FeedbackScalarWhereInputSchema),z.lazy(() => FeedbackScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
 export const AccountUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput> = z.object({
   create: z.union([ z.lazy(() => AccountCreateWithoutUserInputSchema),z.lazy(() => AccountCreateWithoutUserInputSchema).array(),z.lazy(() => AccountUncheckedCreateWithoutUserInputSchema),z.lazy(() => AccountUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => AccountCreateOrConnectWithoutUserInputSchema),z.lazy(() => AccountCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
@@ -6745,6 +7025,20 @@ export const StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema: z.Zod
   update: z.union([ z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => StripePaymentUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => StripePaymentUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => StripePaymentScalarWhereInputSchema),z.lazy(() => StripePaymentScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => FeedbackCreateWithoutUserInputSchema),z.lazy(() => FeedbackCreateWithoutUserInputSchema).array(),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema),z.lazy(() => FeedbackCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => FeedbackUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => FeedbackUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => FeedbackCreateManyUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => FeedbackWhereUniqueInputSchema),z.lazy(() => FeedbackWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => FeedbackUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => FeedbackUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => FeedbackUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => FeedbackUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => FeedbackScalarWhereInputSchema),z.lazy(() => FeedbackScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -7060,6 +7354,23 @@ export const NestedBoolNullableWithAggregatesFilterSchema: z.ZodType<Prisma.Nest
   _max: z.lazy(() => NestedBoolNullableFilterSchema).optional()
 }).strict();
 
+export const NestedEnumIssueTypeFilterSchema: z.ZodType<Prisma.NestedEnumIssueTypeFilter> = z.object({
+  equals: z.lazy(() => IssueTypeSchema).optional(),
+  in: z.lazy(() => IssueTypeSchema).array().optional(),
+  notIn: z.lazy(() => IssueTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => NestedEnumIssueTypeFilterSchema) ]).optional(),
+}).strict();
+
+export const NestedEnumIssueTypeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumIssueTypeWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => IssueTypeSchema).optional(),
+  in: z.lazy(() => IssueTypeSchema).array().optional(),
+  notIn: z.lazy(() => IssueTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => NestedEnumIssueTypeWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumIssueTypeFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumIssueTypeFilterSchema).optional()
+}).strict();
+
 export const NestedEnumInvitationStatusFilterSchema: z.ZodType<Prisma.NestedEnumInvitationStatusFilter> = z.object({
   equals: z.lazy(() => InvitationStatusSchema).optional(),
   in: z.lazy(() => InvitationStatusSchema).array().optional(),
@@ -7140,7 +7451,8 @@ export const UserCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateWi
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAccountsInput> = z.object({
@@ -7172,7 +7484,8 @@ export const UserUncheckedCreateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAccountsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAccountsInput> = z.object({
@@ -7220,7 +7533,8 @@ export const UserUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUpdateWi
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAccountsInput> = z.object({
@@ -7252,7 +7566,8 @@ export const UserUncheckedUpdateWithoutAccountsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreateWithoutCreatedAppsInput> = z.object({
@@ -7284,7 +7599,8 @@ export const UserCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreat
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutCreatedAppsInput> = z.object({
@@ -7316,7 +7632,8 @@ export const UserUncheckedCreateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutCreatedAppsInput> = z.object({
@@ -7545,7 +7862,8 @@ export const UserUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUpdat
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutCreatedAppsInput> = z.object({
@@ -7577,7 +7895,8 @@ export const UserUncheckedUpdateWithoutCreatedAppsInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppTagUpsertWithWhereUniqueWithoutAppsInputSchema: z.ZodType<Prisma.AppTagUpsertWithWhereUniqueWithoutAppsInput> = z.object({
@@ -7811,7 +8130,8 @@ export const UserCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserCreate
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAppActionsInput> = z.object({
@@ -7843,7 +8163,8 @@ export const UserUncheckedCreateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAppActionsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAppActionsInput> = z.object({
@@ -7943,7 +8264,8 @@ export const UserUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUpdate
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAppActionsInput> = z.object({
@@ -7975,7 +8297,8 @@ export const UserUncheckedUpdateWithoutAppActionsInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithoutActionsInputSchema: z.ZodType<Prisma.AppUpsertWithoutActionsInput> = z.object({
@@ -8159,7 +8482,8 @@ export const UserCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserCreat
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAppCommentsInput> = z.object({
@@ -8191,7 +8515,8 @@ export const UserUncheckedCreateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAppCommentsInput> = z.object({
@@ -8291,7 +8616,8 @@ export const UserUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUpdat
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAppCommentsInput> = z.object({
@@ -8323,7 +8649,8 @@ export const UserUncheckedUpdateWithoutAppCommentsInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithoutCommentsInputSchema: z.ZodType<Prisma.AppUpsertWithoutCommentsInput> = z.object({
@@ -8523,7 +8850,8 @@ export const UserCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserCreateWithou
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTagsInput> = z.object({
@@ -8555,7 +8883,8 @@ export const UserUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutTagsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTagsInput> = z.object({
@@ -8655,7 +8984,8 @@ export const UserUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUpdateWithou
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTagsInput> = z.object({
@@ -8687,7 +9017,8 @@ export const UserUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.UserUnc
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithWhereUniqueWithoutTagsInputSchema: z.ZodType<Prisma.AppUpsertWithWhereUniqueWithoutTagsInput> = z.object({
@@ -8735,7 +9066,8 @@ export const UserCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserCrea
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutChatMessagesInput> = z.object({
@@ -8767,7 +9099,8 @@ export const UserUncheckedCreateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutChatMessagesInput> = z.object({
@@ -8866,7 +9199,8 @@ export const UserUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUpda
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutChatMessagesInput> = z.object({
@@ -8898,7 +9232,8 @@ export const UserUncheckedUpdateWithoutChatMessagesInputSchema: z.ZodType<Prisma
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const ChatMessageActionUpsertWithWhereUniqueWithoutMessageInputSchema: z.ZodType<Prisma.ChatMessageActionUpsertWithWhereUniqueWithoutMessageInput> = z.object({
@@ -8989,7 +9324,8 @@ export const UserCreateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutChatMessageActionsInput> = z.object({
@@ -9021,7 +9357,8 @@ export const UserUncheckedCreateWithoutChatMessageActionsInputSchema: z.ZodType<
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutChatMessageActionsInput> = z.object({
@@ -9106,7 +9443,8 @@ export const UserUpdateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutChatMessageActionsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutChatMessageActionsInput> = z.object({
@@ -9138,7 +9476,8 @@ export const UserUncheckedUpdateWithoutChatMessageActionsInputSchema: z.ZodType<
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const ChatMessageUpsertWithoutUserActionOnMessageInputSchema: z.ZodType<Prisma.ChatMessageUpsertWithoutUserActionOnMessageInput> = z.object({
@@ -9255,7 +9594,8 @@ export const UserCreateWithoutConversationsInputSchema: z.ZodType<Prisma.UserCre
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutConversationsInput> = z.object({
@@ -9287,7 +9627,8 @@ export const UserUncheckedCreateWithoutConversationsInputSchema: z.ZodType<Prism
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutConversationsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutConversationsInput> = z.object({
@@ -9422,7 +9763,8 @@ export const UserUpdateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUpd
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutConversationsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutConversationsInput> = z.object({
@@ -9454,7 +9796,8 @@ export const UserUncheckedUpdateWithoutConversationsInputSchema: z.ZodType<Prism
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppUpsertWithoutUsingInputSchema: z.ZodType<Prisma.AppUpsertWithoutUsingInput> = z.object({
@@ -9515,6 +9858,154 @@ export const AppUncheckedUpdateWithoutUsingInputSchema: z.ZodType<Prisma.AppUnch
   state: z.lazy(() => AppStateUncheckedUpdateOneWithoutAppNestedInputSchema).optional()
 }).strict();
 
+export const UserCreateWithoutFeedbackInputSchema: z.ZodType<Prisma.UserCreateWithoutFeedbackInput> = z.object({
+  id: z.string().optional(),
+  platformType: z.lazy(() => PlatformTypeSchema).optional(),
+  platformId: z.string(),
+  platformArgs: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  name: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  emailVerified: z.coerce.date().optional().nullable(),
+  image: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  followedByCount: z.number().int().optional(),
+  followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
+  stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  accounts: z.lazy(() => AccountCreateNestedManyWithoutUserInputSchema).optional(),
+  sessions: z.lazy(() => SessionCreateNestedManyWithoutUserInputSchema).optional(),
+  invitedFrom: z.lazy(() => InvitationRelationCreateNestedManyWithoutFromInputSchema).optional(),
+  invitedTo: z.lazy(() => InvitationRelationCreateNestedManyWithoutToInputSchema).optional(),
+  followedBy: z.lazy(() => FollowRelationCreateNestedManyWithoutFromInputSchema).optional(),
+  following: z.lazy(() => FollowRelationCreateNestedManyWithoutToInputSchema).optional(),
+  chatMessages: z.lazy(() => ChatMessageCreateNestedManyWithoutUserInputSchema).optional(),
+  chatMessageActions: z.lazy(() => ChatMessageActionCreateNestedManyWithoutUserInputSchema).optional(),
+  tags: z.lazy(() => AppTagCreateNestedManyWithoutCreatorInputSchema).optional(),
+  appComments: z.lazy(() => AppCommentCreateNestedManyWithoutUserInputSchema).optional(),
+  appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
+  StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
+  createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
+  conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+}).strict();
+
+export const UserUncheckedCreateWithoutFeedbackInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutFeedbackInput> = z.object({
+  id: z.string().optional(),
+  platformType: z.lazy(() => PlatformTypeSchema).optional(),
+  platformId: z.string(),
+  platformArgs: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  name: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  emailVerified: z.coerce.date().optional().nullable(),
+  image: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  followedByCount: z.number().int().optional(),
+  followingCount: z.number().int().optional(),
+  balance: z.number().int().optional(),
+  stripeSubscriptionEnd: z.coerce.date().optional().nullable(),
+  stripeCustomerId: z.string().optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  accounts: z.lazy(() => AccountUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  sessions: z.lazy(() => SessionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invitedFrom: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  invitedTo: z.lazy(() => InvitationRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  followedBy: z.lazy(() => FollowRelationUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  following: z.lazy(() => FollowRelationUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  chatMessages: z.lazy(() => ChatMessageUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  chatMessageActions: z.lazy(() => ChatMessageActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  tags: z.lazy(() => AppTagUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
+  appComments: z.lazy(() => AppCommentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
+  conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+}).strict();
+
+export const UserCreateOrConnectWithoutFeedbackInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutFeedbackInput> = z.object({
+  where: z.lazy(() => UserWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => UserCreateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedCreateWithoutFeedbackInputSchema) ]),
+}).strict();
+
+export const UserUpsertWithoutFeedbackInputSchema: z.ZodType<Prisma.UserUpsertWithoutFeedbackInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedUpdateWithoutFeedbackInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedCreateWithoutFeedbackInputSchema) ]),
+  where: z.lazy(() => UserWhereInputSchema).optional()
+}).strict();
+
+export const UserUpdateToOneWithWhereWithoutFeedbackInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutFeedbackInput> = z.object({
+  where: z.lazy(() => UserWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => UserUpdateWithoutFeedbackInputSchema),z.lazy(() => UserUncheckedUpdateWithoutFeedbackInputSchema) ]),
+}).strict();
+
+export const UserUpdateWithoutFeedbackInputSchema: z.ZodType<Prisma.UserUpdateWithoutFeedbackInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  platformType: z.union([ z.lazy(() => PlatformTypeSchema),z.lazy(() => EnumPlatformTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  platformId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  platformArgs: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  accounts: z.lazy(() => AccountUpdateManyWithoutUserNestedInputSchema).optional(),
+  sessions: z.lazy(() => SessionUpdateManyWithoutUserNestedInputSchema).optional(),
+  invitedFrom: z.lazy(() => InvitationRelationUpdateManyWithoutFromNestedInputSchema).optional(),
+  invitedTo: z.lazy(() => InvitationRelationUpdateManyWithoutToNestedInputSchema).optional(),
+  followedBy: z.lazy(() => FollowRelationUpdateManyWithoutFromNestedInputSchema).optional(),
+  following: z.lazy(() => FollowRelationUpdateManyWithoutToNestedInputSchema).optional(),
+  chatMessages: z.lazy(() => ChatMessageUpdateManyWithoutUserNestedInputSchema).optional(),
+  chatMessageActions: z.lazy(() => ChatMessageActionUpdateManyWithoutUserNestedInputSchema).optional(),
+  tags: z.lazy(() => AppTagUpdateManyWithoutCreatorNestedInputSchema).optional(),
+  appComments: z.lazy(() => AppCommentUpdateManyWithoutUserNestedInputSchema).optional(),
+  appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
+  StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
+  createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
+  conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+}).strict();
+
+export const UserUncheckedUpdateWithoutFeedbackInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutFeedbackInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  platformType: z.union([ z.lazy(() => PlatformTypeSchema),z.lazy(() => EnumPlatformTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  platformId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  platformArgs: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  emailVerified: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  image: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  followedByCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  followingCount: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  balance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeSubscriptionEnd: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  quota: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  accounts: z.lazy(() => AccountUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  sessions: z.lazy(() => SessionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invitedFrom: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  invitedTo: z.lazy(() => InvitationRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  followedBy: z.lazy(() => FollowRelationUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  following: z.lazy(() => FollowRelationUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  chatMessages: z.lazy(() => ChatMessageUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  chatMessageActions: z.lazy(() => ChatMessageActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  tags: z.lazy(() => AppTagUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
+  appComments: z.lazy(() => AppCommentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
+  conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+}).strict();
+
 export const UserCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreateWithoutFollowedByInput> = z.object({
   id: z.string().optional(),
   platformType: z.lazy(() => PlatformTypeSchema).optional(),
@@ -9544,7 +10035,8 @@ export const UserCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreate
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutFollowedByInput> = z.object({
@@ -9576,7 +10068,8 @@ export const UserUncheckedCreateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutFollowedByInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutFollowedByInput> = z.object({
@@ -9613,7 +10106,8 @@ export const UserCreateWithoutFollowingInputSchema: z.ZodType<Prisma.UserCreateW
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutFollowingInput> = z.object({
@@ -9645,7 +10139,8 @@ export const UserUncheckedCreateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutFollowingInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutFollowingInput> = z.object({
@@ -9693,7 +10188,8 @@ export const UserUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUpdate
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutFollowedByInput> = z.object({
@@ -9725,7 +10221,8 @@ export const UserUncheckedUpdateWithoutFollowedByInputSchema: z.ZodType<Prisma.U
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutFollowingInputSchema: z.ZodType<Prisma.UserUpsertWithoutFollowingInput> = z.object({
@@ -9768,7 +10265,8 @@ export const UserUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUpdateW
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutFollowingInput> = z.object({
@@ -9800,7 +10298,8 @@ export const UserUncheckedUpdateWithoutFollowingInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreateWithoutInvitedFromInput> = z.object({
@@ -9832,7 +10331,8 @@ export const UserCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreat
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutInvitedFromInput> = z.object({
@@ -9864,7 +10364,8 @@ export const UserUncheckedCreateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutInvitedFromInput> = z.object({
@@ -9901,7 +10402,8 @@ export const UserCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserCreateW
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutInvitedToInput> = z.object({
@@ -9933,7 +10435,8 @@ export const UserUncheckedCreateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutInvitedToInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutInvitedToInput> = z.object({
@@ -9981,7 +10484,8 @@ export const UserUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUpdat
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutInvitedFromInput> = z.object({
@@ -10013,7 +10517,8 @@ export const UserUncheckedUpdateWithoutInvitedFromInputSchema: z.ZodType<Prisma.
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUpsertWithoutInvitedToInput> = z.object({
@@ -10056,7 +10561,8 @@ export const UserUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUpdateW
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutInvitedToInput> = z.object({
@@ -10088,7 +10594,8 @@ export const UserUncheckedUpdateWithoutInvitedToInputSchema: z.ZodType<Prisma.Us
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWithoutSessionsInput> = z.object({
@@ -10120,7 +10627,8 @@ export const UserCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateWi
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSessionsInput> = z.object({
@@ -10152,7 +10660,8 @@ export const UserUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutSessionsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSessionsInput> = z.object({
@@ -10200,7 +10709,8 @@ export const UserUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUpdateWi
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSessionsInput> = z.object({
@@ -10232,7 +10742,8 @@ export const UserUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Use
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AppCreateWithoutStarringInputSchema: z.ZodType<Prisma.AppCreateWithoutStarringInput> = z.object({
@@ -10316,7 +10827,8 @@ export const UserCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserCreat
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutStarringAppInput> = z.object({
@@ -10348,7 +10860,8 @@ export const UserUncheckedCreateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutStarringAppInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutStarringAppInput> = z.object({
@@ -10454,7 +10967,8 @@ export const UserUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUpdat
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutStarringAppInput> = z.object({
@@ -10486,7 +11000,8 @@ export const UserUncheckedUpdateWithoutStarringAppInputSchema: z.ZodType<Prisma.
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
   conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  stripePayments: z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const StripePaymentCreateWithoutProductInputSchema: z.ZodType<Prisma.StripePaymentCreateWithoutProductInput> = z.object({
@@ -10592,7 +11107,8 @@ export const UserCreateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserCr
   appActions: z.lazy(() => AppActionCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppCreateNestedManyWithoutCreatorInputSchema).optional(),
-  conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional()
+  conversations: z.lazy(() => ConversationCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutStripePaymentsInput> = z.object({
@@ -10624,7 +11140,8 @@ export const UserUncheckedCreateWithoutStripePaymentsInputSchema: z.ZodType<Pris
   appActions: z.lazy(() => AppActionUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedCreateNestedManyWithoutCreatorInputSchema).optional(),
-  conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  conversations: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutStripePaymentsInput> = z.object({
@@ -10701,7 +11218,8 @@ export const UserUpdateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUp
   appActions: z.lazy(() => AppActionUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUpdateManyWithoutCreatorNestedInputSchema).optional(),
-  conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional()
+  conversations: z.lazy(() => ConversationUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutStripePaymentsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutStripePaymentsInput> = z.object({
@@ -10733,7 +11251,8 @@ export const UserUncheckedUpdateWithoutStripePaymentsInputSchema: z.ZodType<Pris
   appActions: z.lazy(() => AppActionUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   StarringApp: z.lazy(() => StarringAppUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdApps: z.lazy(() => AppUncheckedUpdateManyWithoutCreatorNestedInputSchema).optional(),
-  conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  conversations: z.lazy(() => ConversationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  Feedback: z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const AccountCreateWithoutUserInputSchema: z.ZodType<Prisma.AccountCreateWithoutUserInput> = z.object({
@@ -11185,6 +11704,32 @@ export const StripePaymentCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.St
   skipDuplicates: z.boolean().optional()
 }).strict();
 
+export const FeedbackCreateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackCreateWithoutUserInput> = z.object({
+  id: z.string().cuid().optional(),
+  issueType: z.lazy(() => IssueTypeSchema),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string()
+}).strict();
+
+export const FeedbackUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedCreateWithoutUserInput> = z.object({
+  id: z.string().cuid().optional(),
+  issueType: z.lazy(() => IssueTypeSchema),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string()
+}).strict();
+
+export const FeedbackCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.FeedbackCreateOrConnectWithoutUserInput> = z.object({
+  where: z.lazy(() => FeedbackWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => FeedbackCreateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema) ]),
+}).strict();
+
+export const FeedbackCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.FeedbackCreateManyUserInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => FeedbackCreateManyUserInputSchema),z.lazy(() => FeedbackCreateManyUserInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const AccountUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.AccountUpsertWithWhereUniqueWithoutUserInput> = z.object({
   where: z.lazy(() => AccountWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => AccountUpdateWithoutUserInputSchema),z.lazy(() => AccountUncheckedUpdateWithoutUserInputSchema) ]),
@@ -11475,6 +12020,34 @@ export const StripePaymentUpdateWithWhereUniqueWithoutUserInputSchema: z.ZodType
 export const StripePaymentUpdateManyWithWhereWithoutUserInputSchema: z.ZodType<Prisma.StripePaymentUpdateManyWithWhereWithoutUserInput> = z.object({
   where: z.lazy(() => StripePaymentScalarWhereInputSchema),
   data: z.union([ z.lazy(() => StripePaymentUpdateManyMutationInputSchema),z.lazy(() => StripePaymentUncheckedUpdateManyWithoutUserInputSchema) ]),
+}).strict();
+
+export const FeedbackUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUpsertWithWhereUniqueWithoutUserInput> = z.object({
+  where: z.lazy(() => FeedbackWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => FeedbackUpdateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedUpdateWithoutUserInputSchema) ]),
+  create: z.union([ z.lazy(() => FeedbackCreateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedCreateWithoutUserInputSchema) ]),
+}).strict();
+
+export const FeedbackUpdateWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUpdateWithWhereUniqueWithoutUserInput> = z.object({
+  where: z.lazy(() => FeedbackWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => FeedbackUpdateWithoutUserInputSchema),z.lazy(() => FeedbackUncheckedUpdateWithoutUserInputSchema) ]),
+}).strict();
+
+export const FeedbackUpdateManyWithWhereWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUpdateManyWithWhereWithoutUserInput> = z.object({
+  where: z.lazy(() => FeedbackScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => FeedbackUpdateManyMutationInputSchema),z.lazy(() => FeedbackUncheckedUpdateManyWithoutUserInputSchema) ]),
+}).strict();
+
+export const FeedbackScalarWhereInputSchema: z.ZodType<Prisma.FeedbackScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => FeedbackScalarWhereInputSchema),z.lazy(() => FeedbackScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => FeedbackScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => FeedbackScalarWhereInputSchema),z.lazy(() => FeedbackScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  issueType: z.union([ z.lazy(() => EnumIssueTypeFilterSchema),z.lazy(() => IssueTypeSchema) ]).optional(),
+  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  detail: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  contact: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  userId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
 export const AppActionCreateManyAppInputSchema: z.ZodType<Prisma.AppActionCreateManyAppInput> = z.object({
@@ -12052,6 +12625,14 @@ export const StripePaymentCreateManyUserInputSchema: z.ZodType<Prisma.StripePaym
   productId: z.string()
 }).strict();
 
+export const FeedbackCreateManyUserInputSchema: z.ZodType<Prisma.FeedbackCreateManyUserInput> = z.object({
+  id: z.string().cuid().optional(),
+  issueType: z.lazy(() => IssueTypeSchema),
+  title: z.string(),
+  detail: z.string(),
+  contact: z.string()
+}).strict();
+
 export const AccountUpdateWithoutUserInputSchema: z.ZodType<Prisma.AccountUpdateWithoutUserInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   type: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -12490,6 +13071,30 @@ export const StripePaymentUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<P
   count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   redeemCode: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   productId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const FeedbackUpdateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const FeedbackUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const FeedbackUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.FeedbackUncheckedUpdateManyWithoutUserInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  issueType: z.union([ z.lazy(() => IssueTypeSchema),z.lazy(() => EnumIssueTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  detail: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  contact: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 /////////////////////////////////////////
@@ -13114,6 +13719,68 @@ export const ConversationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Conversat
   select: ConversationSelectSchema.optional(),
   include: ConversationIncludeSchema.optional(),
   where: ConversationWhereUniqueInputSchema,
+}).strict()
+
+export const FeedbackFindFirstArgsSchema: z.ZodType<Prisma.FeedbackFindFirstArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereInputSchema.optional(),
+  orderBy: z.union([ FeedbackOrderByWithRelationInputSchema.array(),FeedbackOrderByWithRelationInputSchema ]).optional(),
+  cursor: FeedbackWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ FeedbackScalarFieldEnumSchema,FeedbackScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const FeedbackFindFirstOrThrowArgsSchema: z.ZodType<Prisma.FeedbackFindFirstOrThrowArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereInputSchema.optional(),
+  orderBy: z.union([ FeedbackOrderByWithRelationInputSchema.array(),FeedbackOrderByWithRelationInputSchema ]).optional(),
+  cursor: FeedbackWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ FeedbackScalarFieldEnumSchema,FeedbackScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const FeedbackFindManyArgsSchema: z.ZodType<Prisma.FeedbackFindManyArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereInputSchema.optional(),
+  orderBy: z.union([ FeedbackOrderByWithRelationInputSchema.array(),FeedbackOrderByWithRelationInputSchema ]).optional(),
+  cursor: FeedbackWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ FeedbackScalarFieldEnumSchema,FeedbackScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const FeedbackAggregateArgsSchema: z.ZodType<Prisma.FeedbackAggregateArgs> = z.object({
+  where: FeedbackWhereInputSchema.optional(),
+  orderBy: z.union([ FeedbackOrderByWithRelationInputSchema.array(),FeedbackOrderByWithRelationInputSchema ]).optional(),
+  cursor: FeedbackWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const FeedbackGroupByArgsSchema: z.ZodType<Prisma.FeedbackGroupByArgs> = z.object({
+  where: FeedbackWhereInputSchema.optional(),
+  orderBy: z.union([ FeedbackOrderByWithAggregationInputSchema.array(),FeedbackOrderByWithAggregationInputSchema ]).optional(),
+  by: FeedbackScalarFieldEnumSchema.array(),
+  having: FeedbackScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const FeedbackFindUniqueArgsSchema: z.ZodType<Prisma.FeedbackFindUniqueArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereUniqueInputSchema,
+}).strict()
+
+export const FeedbackFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.FeedbackFindUniqueOrThrowArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereUniqueInputSchema,
 }).strict()
 
 export const FollowRelationFindFirstArgsSchema: z.ZodType<Prisma.FollowRelationFindFirstArgs> = z.object({
@@ -14015,6 +14682,47 @@ export const ConversationUpdateManyArgsSchema: z.ZodType<Prisma.ConversationUpda
 
 export const ConversationDeleteManyArgsSchema: z.ZodType<Prisma.ConversationDeleteManyArgs> = z.object({
   where: ConversationWhereInputSchema.optional(),
+}).strict()
+
+export const FeedbackCreateArgsSchema: z.ZodType<Prisma.FeedbackCreateArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  data: z.union([ FeedbackCreateInputSchema,FeedbackUncheckedCreateInputSchema ]),
+}).strict()
+
+export const FeedbackUpsertArgsSchema: z.ZodType<Prisma.FeedbackUpsertArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereUniqueInputSchema,
+  create: z.union([ FeedbackCreateInputSchema,FeedbackUncheckedCreateInputSchema ]),
+  update: z.union([ FeedbackUpdateInputSchema,FeedbackUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const FeedbackCreateManyArgsSchema: z.ZodType<Prisma.FeedbackCreateManyArgs> = z.object({
+  data: z.union([ FeedbackCreateManyInputSchema,FeedbackCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const FeedbackDeleteArgsSchema: z.ZodType<Prisma.FeedbackDeleteArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  where: FeedbackWhereUniqueInputSchema,
+}).strict()
+
+export const FeedbackUpdateArgsSchema: z.ZodType<Prisma.FeedbackUpdateArgs> = z.object({
+  select: FeedbackSelectSchema.optional(),
+  include: FeedbackIncludeSchema.optional(),
+  data: z.union([ FeedbackUpdateInputSchema,FeedbackUncheckedUpdateInputSchema ]),
+  where: FeedbackWhereUniqueInputSchema,
+}).strict()
+
+export const FeedbackUpdateManyArgsSchema: z.ZodType<Prisma.FeedbackUpdateManyArgs> = z.object({
+  data: z.union([ FeedbackUpdateManyMutationInputSchema,FeedbackUncheckedUpdateManyInputSchema ]),
+  where: FeedbackWhereInputSchema.optional(),
+}).strict()
+
+export const FeedbackDeleteManyArgsSchema: z.ZodType<Prisma.FeedbackDeleteManyArgs> = z.object({
+  where: FeedbackWhereInputSchema.optional(),
 }).strict()
 
 export const FollowRelationCreateArgsSchema: z.ZodType<Prisma.FollowRelationCreateArgs> = z.object({

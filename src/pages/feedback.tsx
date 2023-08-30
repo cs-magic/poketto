@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { IssueType } from ".prisma/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
@@ -11,22 +12,22 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { IssueType, issueTypes } from "@/ds"
-
 import { RootLayout } from "@/layouts/root.layout"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
-  contact: z.string().min(1).optional(),
-  issueType: z.enum(issueTypes).default("bug-report"),
   // appPlatform: z.enum(appPlatforms).default("web"),
+  contact: z.string().min(1),
+  issueType: z.nativeEnum(IssueType),
   title: z.string().min(1),
   detail: z.string().min(1),
+  anonymous: z.boolean(),
 })
 
 const FeedbackForm = () => {
@@ -43,7 +44,7 @@ const FeedbackForm = () => {
     // ✅ This will be type-safe and validated.
     console.log(values)
   }
-  const [issueType, setIssueType] = useState<IssueType>("puzzle-in-use")
+  const [issueType, setIssueType] = useState<IssueType>("PuzzleInUse")
 
   return (
     <Form {...form}>
@@ -75,7 +76,7 @@ const FeedbackForm = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {issueTypes.map((cl) => (
+                    {Object.values(IssueType).map((cl: IssueType) => (
                       <SelectItem value={cl} key={cl}>
                         {t(`feedback:${cl}.title`)}
                       </SelectItem>
@@ -115,6 +116,22 @@ const FeedbackForm = () => {
               </FormControl>
               <FormDescription>一份具体的说明往往会有意想不到的效果哦</FormDescription>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="anonymous"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>是否匿名</FormLabel>
+                <FormDescription>匿名的话您的头像等信息将不会被显示</FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
             </FormItem>
           )}
         />

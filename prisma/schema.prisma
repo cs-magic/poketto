@@ -48,7 +48,7 @@ model Account {
   scope                    String?
   id_token                 String? // @db.Text
   session_state            String?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   refresh_token_expires_in Int? // github necessary
 
   @@unique([provider, providerAccountId])
@@ -63,7 +63,7 @@ model App {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  creator      User        @relation(fields: [creatorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  creator      User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   creatorId    String
   name         String
   avatar       String
@@ -71,7 +71,7 @@ model App {
   language     String      @default("en")
   version      String      @default("1.0.0")
   tags         AppTag[]
-  category     AppCategory @relation(fields: [categoryMain, categorySub], references: [main, sub], onDelete: Cascade, onUpdate: Cascade)
+  category     AppCategory @relation(fields: [categoryMain, categorySub], references: [main, sub], onDelete: Cascade)
   categoryMain Int
   categorySub  Int
 
@@ -86,7 +86,7 @@ model App {
   isOpenSource Boolean @default(true)
 
   /// [ModelPlatformArgs]
-  modelArgs    Json?
+  modelArgs Json?
 
   @@unique([platformType, platformId], name: "platform")
 }
@@ -96,9 +96,9 @@ model AppAction {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  user   User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
-  app    App     @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  app    App     @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
 
   action String
@@ -120,9 +120,9 @@ model AppComment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
-  aApp   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  aApp   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
 
   title   String?
@@ -142,7 +142,7 @@ model AppState {
   calls  Int   @default(0)
   shares Int   @default(0)
 
-  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId String @unique
 }
 
@@ -152,7 +152,7 @@ model AppTag {
   /// 这几个主要是 flowgpt 没有
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
-  creator   User?     @relation(fields: [creatorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  creator   User?     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   creatorId String?
 
   name String
@@ -164,7 +164,7 @@ model ChatMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String? // system notification
 
   role                PromptRoleType        @default(user)
@@ -172,7 +172,7 @@ model ChatMessage {
   format              ChatMessageFormatType @default(text)
   userActionOnMessage ChatMessageAction[]
 
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId String
 
   shortId String @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
@@ -184,7 +184,7 @@ model ChatMessage {
   // 每条 message 付费
   cost Float? @default(0)
 
-  modelType String? @default("gpt-3.5-turbo")
+  modelType   String?  @default("gpt-3.5-turbo")
   isUsingFree Boolean? @default(false)
 
   @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
@@ -195,9 +195,9 @@ model ChatMessageAction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User        @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   messageId String
 
   action String
@@ -214,12 +214,23 @@ model Conversation {
   userId String
   appId  String
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade)
 
   pinned Boolean @default(false)
 
   @@unique([userId, appId], name: "conversation", map: "conversation")
+}
+
+model Feedback {
+  id        String    @id @default(cuid())
+  issueType IssueType
+  title     String
+  detail    String
+  contact   String
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String? @db.VarChar(5)
 }
 
 model FollowRelation {
@@ -227,8 +238,8 @@ model FollowRelation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
+  to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
   fromId String
   toId   String
 }
@@ -240,10 +251,10 @@ model InvitationRelation {
   status    InvitationStatus @default(Idle)
   // code if necessary
 
-  from   User?  @relation("from", fields: [fromId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  from   User?  @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
   fromId String
 
-  to   User?   @relation("to", fields: [toId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  to   User?   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
   toId String? @unique
 }
 
@@ -252,7 +263,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StarringApp {
@@ -260,12 +271,12 @@ model StarringApp {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId String
 
   isActive Boolean @default(true)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 }
 
@@ -286,7 +297,7 @@ model StripePayment {
   id         String        @id
   // 记录要保留
   product    StripeProduct @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   count      Int           @default(1)
   // 优惠码
   redeemCode String?
@@ -336,7 +347,7 @@ model User {
 
   conversations Conversation[]
 
-  balance               Int             @default(0)
+  balance Int @default(0)
 
   // 应该要有个多模态，获取账单历史数据……
   stripePayments        StripePayment[]
@@ -346,7 +357,8 @@ model User {
   // 每日需要更新
 
   /// [ModelQuota]
-  quota Json?
+  quota    Json?
+  Feedback Feedback[]
 
   // maybe we only need one id
   @@unique([platformType, platformId], name: "platform")
@@ -381,6 +393,14 @@ enum InvitationStatus {
   Pending
   Accepted
   Expired
+}
+
+enum IssueType {
+  PuzzleInUse
+  FeatureRequest
+  BugReport
+  LeakReport
+  BusinessCollaboration
 }
 
 enum PlatformType {
