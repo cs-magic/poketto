@@ -96,6 +96,7 @@ export const POKETTO_HOMEPAGE = "https://poketto.ai"
 export const siteConfig = {
   name: "Poketto.AI", // name: 'Poketto.AI',
   companyName: "CS Magic, Inc",
+  companyUrl: "https://cs-magic.com",
   welcomeEmailAddress: "Poketto.AI Team <team@cs-magic.com>",
   supportEmailAddress: "Poketto.AI Support <support@cs-magic.com>",
   currency: "Dora", // currency: 'Dora',

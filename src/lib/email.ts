@@ -82,6 +82,7 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
               Charset: "UTF-8",
               Data: Mustache.render(t, {
                 CompanyName: siteConfig.companyName,
+                companyUrl: siteConfig.companyUrl,
                 ProductName: siteConfig.name,
                 username: identifier,
                 action_url: url,
