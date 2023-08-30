@@ -60,10 +60,10 @@ export const sidebarSections: Record<string, MenuKey[]> = {
     // "myGallery" // todo: myGallery
     "settings",
   ],
-  section3: [
-    // "charge",
-    "feedback",
-  ],
+  // section3: [
+  //   // "charge",
+  //   "feedback",
+  // ],
 }
 
 export const platformMap: { [key in PlatformType]?: { homepage: string } } = {

@@ -28,29 +28,6 @@ import { useSessionUser } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
-export function InviteCard() {
-  const { data = [] } = api.invitation.list.useQuery()
-  // todo: include ? on enum type
-  const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
-
-  return (
-    <div className="hidden lg:flex flex-col gap-2 whitespace-normal rounded-xl border p-4 text-sm">
-      <div className="flex items-center justify-between">
-        <Badge className="w-fit" variant="secondary">
-          Tips
-        </Badge>
-        <Cross1Icon className={clsx("text-muted-foreground", ICON_DIMENSION_SM)} />
-      </div>
-      <article className="p-prose">
-        <ReactMarkdown>
-          {`每位 ${siteConfig.name} 用户都拥有 **5** 张邀请码，分享给您的好友注册成功后将有优惠券赠送哦！当前剩余：[${surplus}](/dashboard)`}
-        </ReactMarkdown>
-      </article>
-      <Button className="bg-blue-500/75 hover:bg-blue-500">立即邀请</Button>
-    </div>
-  )
-}
-
 export function Sidebar() {
   const user = useSessionUser()
 
@@ -99,6 +76,29 @@ export function Sidebar() {
           登录
         </Button>
       )}
+    </div>
+  )
+}
+
+export function InviteCard() {
+  const { data = [] } = api.invitation.list.useQuery()
+  // todo: include ? on enum type
+  const surplus = data.filter((item) => item.status === InvitationStatus.Idle).length
+
+  return (
+    <div className="hidden lg:flex flex-col gap-2 whitespace-normal rounded-xl border p-4 text-sm">
+      <div className="flex items-center justify-between">
+        <Badge className="w-fit" variant="secondary">
+          Tips
+        </Badge>
+        <Cross1Icon className={clsx("text-muted-foreground", ICON_DIMENSION_SM)} />
+      </div>
+      <article className="p-prose">
+        <ReactMarkdown>
+          {`每位 ${siteConfig.name} 用户都拥有 **5** 张邀请码，分享给您的好友注册成功后将有优惠券赠送哦！当前剩余：[${surplus}](/dashboard)`}
+        </ReactMarkdown>
+      </article>
+      <Button className="bg-blue-500/75 hover:bg-blue-500">立即邀请</Button>
     </div>
   )
 }
