@@ -40,10 +40,10 @@ export const emailFrom = siteConfig.welcomeEmailAddress
  * @param url 回调地址
  * @param provider
  * @param token
+ * @param locale
  */
-export const sendVerificationRequest = async ({ identifier, url, provider, token }) => {
-  const { locale } = token
-  console.log({ identifier, url, provider, token, locale })
+export const sendVerificationRequest = async ({ identifier, url, provider, token, locale }) => {
+  console.log("sendVerificationRequest: ", { identifier, url, provider, token, locale })
 
   const user = await prisma.user.findUnique({
     where: {
@@ -98,7 +98,7 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
           },
           Subject: {
             Charset: "UTF-8",
-            Data: `Welcome to ${siteConfig.name} !`,
+            Data: (locale === "en" ? `Welcome to` : `欢迎来到`) + ` ${siteConfig.name} !`,
           },
         },
         Source: siteConfig.welcomeEmailAddress /* required */,

@@ -13,7 +13,7 @@ import GithubProvider from "next-auth/providers/github"
 
 import { authEnv } from "@/env.mjs"
 
-import { URI, allowDangerousEmailAccountLinking } from "@/config"
+import { DEFAULT_LOCALE, URI, allowDangerousEmailAccountLinking } from "@/config"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
 import { emailFrom, sendVerificationRequest } from "@/lib/email"
@@ -23,7 +23,7 @@ import { emailFrom, sendVerificationRequest } from "@/lib/email"
  *
  * @see https://next-auth.js.org/configuration/options
  */
-export const authOptions: NextAuthOptions = {
+export const createAuthOptions = ({ locale }: { locale: string }): NextAuthOptions => ({
   pages: {
     signIn: URI.user.auth.signIn,
   },
@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     signIn: async (signInParams) => {
       const { user, email, profile, account, credentials } = signInParams
-      console.log("signIn: ", { user, email, profile, account, credentials }) // 这个文件里，不要用 pino 之类的异步 log 函数，否则会导致 debug 困难
+      console.log("signIn: ", signInParams) // 这个文件里，不要用 pino 之类的异步 log 函数，否则会导致 debug 困难
       user.platformId = user.id
       user.platformType = account?.provider ?? PlatformType.Poketto
       if (profile) {
@@ -42,33 +42,9 @@ export const authOptions: NextAuthOptions = {
       return true
     },
 
-    // async jwt({ token, user }) {
-    //   console.log("jwt: ", { token, user })
-    //
-    //   return user
-    //   // const dbUser = await prisma.user.findUnique({
-    //   //   where: {
-    //   //     id: token.id as string,
-    //   //   },
-    //   // })
-    //   //
-    //   // if (!dbUser) {
-    //   //   if (user) {
-    //   //     token.id = user?.id
-    //   //   }
-    //   //   return token
-    //   // }
-    //   //
-    //   // return {
-    //   //   id: dbUser.id,
-    //   //   name: dbUser.name,
-    //   //   email: dbUser.email,
-    //   //   picture: dbUser.image,
-    //   // }
-    // },
-
-    async session({ token, session }) {
-      // console.log("session: ", { token, session })
+    async session(params) {
+      console.log("session: ", params)
+      const { token, session } = params
       if (token) {
         session.user.id = token.sub! // 不要 token.id 了，妈的
         session.user.name = token.name
@@ -85,7 +61,8 @@ export const authOptions: NextAuthOptions = {
       from: emailFrom,
       // 它之所以没有配置 server，是因为直接在 sendVerificationRequest 中完成邮箱的所有验证等操作了
       // 而我在本地初始化 aws 客户端，之所以不需要输入 credentials 信息，是因为我本地有 ~/.aws 配置文件
-      sendVerificationRequest,
+      sendVerificationRequest: ({ identifier, url, provider, token }) =>
+        sendVerificationRequest({ identifier, url, provider, token, locale }),
     }),
     GithubProvider({
       clientId: authEnv.GITHUB_CLIENT_ID,
@@ -130,7 +107,7 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-}
+})
 
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
@@ -140,4 +117,4 @@ export const authOptions: NextAuthOptions = {
 export const getServerAuthSession = (ctx: {
   req: GetServerSidePropsContext["req"]
   res: GetServerSidePropsContext["res"]
-}) => getServerSession(ctx.req, ctx.res, authOptions)
+}) => getServerSession(ctx.req, ctx.res, createAuthOptions({ locale: DEFAULT_LOCALE }))

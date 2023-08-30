@@ -195,3 +195,5 @@ export const FREE_GPT3_DAILY_TOTAL = 1000
 export const FREE_GPT4_DAILY_TOTAL = 100
 export const FREE_GPT3_DAILY_USER = 10
 export const FREE_GPT4_DAILY_USER = 3
+
+export const DEFAULT_LOCALE = "zh-CN"

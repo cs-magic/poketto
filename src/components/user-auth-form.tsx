@@ -2,17 +2,18 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
-import { useTranslation } from "next-i18next"
 import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import type * as z from "zod"
 
 import { Icons } from "@/components/icons"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
+
+import { useLocale } from "@/hooks/use-i18n"
 
 import { cn } from "@/lib/utils"
 import { userAuthSchema } from "@/lib/validations/auth"
@@ -33,38 +34,31 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false)
   const [isDiscordLoading, setIsDiscordLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
-  const { i18n } = useTranslation()
-  console.log({ i18n })
+  const locale = useLocale()
+  console.log("UserAuthForm: ", { locale })
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)
 
+    const email = data.email.toLowerCase()
     try {
       // const signInResult = false
-      const signInResult = await signIn("email", {
-        email: data.email.toLowerCase(),
-        redirect: false,
-        callbackUrl: searchParams?.get("from") || "/dashboard",
-
-        // add locale
-        locale: i18n.language,
-      })
+      const signInResult = await signIn(
+        "email",
+        {
+          email,
+          redirect: false,
+          callbackUrl: searchParams?.get("from") || "/dashboard",
+        },
+        { locale }
+      )
 
       setIsLoading(false)
 
       console.log("signInResult: ", { signInResult })
-      if (!signInResult?.ok || signInResult.error !== null) {
-        return toast({
-          title: "Something went wrong.",
-          description: "Your sign in request failed. Please try again.",
-          variant: "destructive",
-        })
-      }
+      if (!signInResult?.ok || signInResult.error !== null) return toast.error("登录失败，请再试一遍或者反馈")
 
-      return toast({
-        title: "Check your email",
-        description: "We sent you a login link. Be sure to check your spam too.",
-      })
+      return toast.success(`邮件已发送至${email}，请注意查收！`)
     } catch (error) {
       console.log({ error })
     }
@@ -87,6 +81,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               autoCorrect="off"
               disabled={isLoading || isGitHubLoading}
               {...register("email")}
+              // defaultValue={baseEnv.NODE_ENV === "development" ? "mark@cs-magic.com" : undefined}
             />
             {errors?.email && <p className="px-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
