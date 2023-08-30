@@ -16,7 +16,7 @@ export function SidebarNavItem({ field, Icon, link }: IMenuItem) {
   const { t } = useTranslation()
 
   const inner = (
-    <ResponsiveTooltip content={t(`common:menus.${field}`)}>
+    <ResponsiveTooltip content={t(`common:menus.${field}`)} disableHoverableContent>
       {Icon && <Icon className="wh-12 p-btn-horizontal" />}
     </ResponsiveTooltip>
   )

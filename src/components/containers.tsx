@@ -135,11 +135,17 @@ export function ChargeContainer({ children }: PropsWithChildren) {
  * @param content 是 lg 下的 label，否则是悬浮内容
  * @param children
  * @param props
+ * @param disableHoverableContent, ref: https://www.radix-ui.com/primitives/docs/components/tooltip#api-reference
  * @constructor
  */
-export function ResponsiveTooltip({ content, children, ...props }: TooltipTriggerProps & { content?: ReactNode }) {
+export function ResponsiveTooltip({
+  content,
+  children,
+  disableHoverableContent,
+  ...props
+}: TooltipTriggerProps & { content?: ReactNode; disableHoverableContent?: boolean }) {
   return (
-    <Tooltip delayDuration={100}>
+    <Tooltip delayDuration={100} disableHoverableContent={disableHoverableContent}>
       <TooltipTrigger className="flex items-center gap-2 p-interactive px-2 w-full" {...props}>
         {children}
         <span className="hidden lg:flex mr-2">{content}</span>
