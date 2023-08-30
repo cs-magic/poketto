@@ -1,6 +1,7 @@
 public/images/flowgpt
 **/.archive
 
+.vscode
 .idea*
 .env.production
 .env.development
