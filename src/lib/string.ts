@@ -54,3 +54,4 @@ export const getImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
 }
 
 export const getOrigin = () => (typeof window !== "undefined" ? window.location.origin : baseEnv.HOST)
+export const isDomestic = () => getOrigin().includes(".cn")

@@ -28,7 +28,7 @@ import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
-export const runtime = "edge" // IMPORTANT! Set the runtime to edge
+// export const runtime = "edge" // IMPORTANT! Set the runtime to edge
 
 /**
  * ref:
@@ -38,7 +38,7 @@ export const runtime = "edge" // IMPORTANT! Set the runtime to edge
  * @constructor
  */
 export async function POST(req: Request) {
-  console.log("calling chat in [EDGE ENVIRONMENT]")
+  console.log("calling chat in [NODE ENVIRONMENT]")
   const data = await req.json()
   const { messages: receivedMessages, conversationId, userId, modelType } = data
   const memoryMode = data.memoryMode as MemoryMode

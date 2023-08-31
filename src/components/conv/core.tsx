@@ -69,12 +69,13 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
 import { useUniversalFullscreen } from "@/hooks/use-universal-fullscreen"
+import { useUrl } from "@/hooks/use-url"
 import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { packMessageWithDate } from "@/lib/message"
-import { getConversationsLink } from "@/lib/string"
+import { getConversationsLink, isDomestic } from "@/lib/string"
 
 export function ConversationCore({ conversationId }: { conversationId: string }) {
   const { t } = useTranslation()
@@ -178,13 +179,13 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const { data: initialMessages } = api.message.list.useQuery({ conversationId: conversationId }, { enabled: !!userId })
   const refForm = useRef<HTMLFormElement>(null)
   const utils = api.useContext()
-  const [addDialogVisible, setAddDialogVisible] = useState(false)
   const refMessage = useRef<string>("")
   // console.log({ userId, appId, conversationId })
   const ScrollContainer = AutoScrollContainer
   const [alertVisible, setAlertVisible] = useState(false)
 
   const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
+    api: isDomestic() ? "/api/chat-node" : "/api/chat",
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
     body: { userId, conversationId, modelType, memoryMode },
