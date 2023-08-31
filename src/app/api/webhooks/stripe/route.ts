@@ -11,7 +11,7 @@ import { prisma } from "@/server/db"
 
 import { paymentEnv } from "@/env.mjs"
 
-import { STRIPE_SUBSCRIBE_PRODUCT_10_ID } from "@/config"
+import { subscriptionLevel2Unit } from "@/config-utils"
 
 import d from "@/lib/datetime"
 import { stripe } from "@/lib/stripe"
@@ -41,6 +41,7 @@ export async function POST(req: Request) {
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
     for (const item of lineItems.data) {
       const productId = item.price?.product as string // get the product ID
+      const productInfo = await prisma.stripeProduct.findUniqueOrThrow({ where: { id: productId } })
       const { quantity } = item // get the quantity
       const count = quantity ?? 1
 
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
           },
           data: {
             balance: {
-              increment: count * 1000, // 10 刀 --> 1000 dora
+              increment: subscriptionLevel2Unit[productInfo.level ?? "basic"] * count * 100,
             },
             stripeCustomerId,
             stripePayments: {
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
           },
           data: {
             balance: {
-              increment: (productId === STRIPE_SUBSCRIBE_PRODUCT_10_ID ? 1 : 3) * count * 1000,
+              increment: subscriptionLevel2Unit[productInfo.level ?? "basic"] * count * 100,
             },
             stripeSubscriptionEnd: d(new Date()).add(30, "days").toDate(),
             stripeCustomerId,

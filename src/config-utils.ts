@@ -6,11 +6,15 @@
  */
 import { Icons } from "./components/icons"
 import type { PromptRoleType } from ".prisma/client"
+import { Prisma } from ".prisma/client"
+import { StripeSubscriptionLevel } from "@prisma/client"
 import { BellIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 
 import { URI } from "@/config"
 
 import { CommandType, type ICommandItem, type IMenuItem, MenuKey } from "@/ds"
+
+import StripeProductUncheckedCreateInput = Prisma.StripeProductUncheckedCreateInput
 
 export const COMMANDS: ICommandItem[] = [
   {
@@ -45,4 +49,21 @@ export const menuGroups: Record<string, MenuKey[]> = {
 export const sidebarSections: Record<string, MenuKey[]> = {
   section1: ["homepage", "explore"],
   section2: ["account", "settings"],
+}
+
+// products list, ref: https://dashboard.stripe.com/products?active=true
+export const paymentProducts: StripeProductUncheckedCreateInput[] = [
+  { id: "prod_OVgbKpNEmJJXIy", price: 10, currency: "USD", mode: "payment" },
+  { id: "prod_OVgYAVpLO6oLje", price: 9.99, currency: "USD", mode: "subscription", level: "premium", expire: 30 },
+  { id: "prod_OVgZnKD7Fc2bsQ", price: 29.99, currency: "USD", mode: "subscription", level: "extreme", expire: 30 },
+
+  { id: "prod_OOeVuH6LpHINCO", price: 9.99, currency: "CNY", mode: "payment" },
+  { id: "prod_OOeF8lXiDVIMlS", price: 9.99, currency: "CNY", mode: "subscription", level: "basic", expire: 30 },
+  { id: "prod_OOeH04oe1Sm67z", price: 29.99, currency: "CNY", mode: "subscription", level: "premium", expire: 30 },
+  { id: "prod_OOeIvw7nucInBz", price: 49.99, currency: "CNY", mode: "subscription", level: "extreme", expire: 30 },
+]
+export const subscriptionLevel2Unit: Record<StripeSubscriptionLevel, number> = {
+  basic: 1,
+  premium: 2,
+  extreme: 3,
 }

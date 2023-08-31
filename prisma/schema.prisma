@@ -289,7 +289,7 @@ model StripeProduct {
   mode     StripeMode
   // 订阅的期限
   expire   Int?
-  level    StripeSubscriptionLevel?
+  level    StripeSubscriptionLevel? @default(basic)
 
   payments StripePayment[]
 }
@@ -439,6 +439,7 @@ enum StripeMode {
 }
 
 enum StripeSubscriptionLevel {
+  basic
   premium
   extreme
 }

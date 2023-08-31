@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { $Enums, ChatMessageFormatType } from ".prisma/client"
+import { ChatMessageFormatType } from ".prisma/client"
 import { PlatformType, PromptRoleType } from "@prisma/client"
 import range from "lodash/range"
 import { type AdapterUser } from "next-auth/adapters"
@@ -27,15 +27,11 @@ import {
   POKETTO_MODEL_NAME,
   POKETTO_SYSTEM_PROMPT,
   POKETTO_WELCOME_MESSAGE,
-  STRIPE_PAYMENT_PRODUCT_10_ID,
-  STRIPE_SUBSCRIBE_PRODUCT_10_ID,
-  STRIPE_SUBSCRIBE_PRODUCT_30_ID,
   USER_INVITATIONS_COUNT,
 } from "@/config"
+import { paymentProducts } from "@/config-utils"
 
 import { getWelcomeSystemNotification } from "@/lib/string"
-
-import StripeMode = $Enums.StripeMode
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
   const user = await prisma.user.upsert({
@@ -107,40 +103,14 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
     },
   })
 
-  await prisma.stripeProduct.upsert({
-    where: { id: STRIPE_PAYMENT_PRODUCT_10_ID },
-    update: {},
-    create: {
-      id: STRIPE_PAYMENT_PRODUCT_10_ID,
-      price: 10,
-      currency: "USD",
-      mode: StripeMode.payment,
-    },
-  })
-  await prisma.stripeProduct.upsert({
-    where: { id: STRIPE_SUBSCRIBE_PRODUCT_10_ID },
-    update: {},
-    create: {
-      id: STRIPE_SUBSCRIBE_PRODUCT_10_ID,
-      price: 9.99,
-      currency: "USD",
-      mode: StripeMode.subscription,
-      expire: 30,
-      level: "premium",
-    },
-  })
-  await prisma.stripeProduct.upsert({
-    where: { id: STRIPE_SUBSCRIBE_PRODUCT_30_ID },
-    update: {},
-    create: {
-      id: STRIPE_SUBSCRIBE_PRODUCT_30_ID,
-      price: 29.99,
-      currency: "USD",
-      mode: StripeMode.subscription,
-      expire: 30,
-      level: "extreme",
-    },
-  })
+  for (const product of paymentProducts) {
+    await prisma.stripeProduct.upsert({
+      where: { id: product.id },
+      update: {},
+      create: product,
+    })
+  }
+
   console.log("✅ Successfully initialized poketto system ~")
 }
 

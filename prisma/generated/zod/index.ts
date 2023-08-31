@@ -126,7 +126,7 @@ export const StripeModeSchema = z.enum(['payment','subscription']);
 
 export type StripeModeType = `${z.infer<typeof StripeModeSchema>}`
 
-export const StripeSubscriptionLevelSchema = z.enum(['premium','extreme']);
+export const StripeSubscriptionLevelSchema = z.enum(['basic','premium','extreme']);
 
 export type StripeSubscriptionLevelType = `${z.infer<typeof StripeSubscriptionLevelSchema>}`
 
