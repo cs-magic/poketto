@@ -10,6 +10,7 @@ import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
 import { Ratelimit } from "@upstash/ratelimit"
 import { kv } from "@vercel/kv"
 import { type Message, OpenAIStream, StreamingTextResponse } from "ai"
+import { HttpsProxyAgent } from "https-proxy-agent"
 import { NextResponse } from "next/server"
 import OpenAI, { APIError as OpenAIAPIError } from "openai"
 import superjson from "superjson"
@@ -137,7 +138,11 @@ export async function POST(req: Request) {
         messages,
         temperature: 0.7,
       },
-      { timeout: 3000 }
+      {
+        timeout: 3000,
+        // todo: validate ali-domestic
+        httpAgent: new HttpsProxyAgent("http://localhost:7890"),
+      }
     )
 
     const stream = OpenAIStream(response, {
