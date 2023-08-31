@@ -4,17 +4,17 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { IssueType, Prisma } from ".prisma/client"
+import { IssueType, Prisma } from "@prisma/client"
+import { Crosshair2Icon, CubeIcon, EyeOpenIcon } from "@radix-ui/react-icons"
 import { type IconProps } from "@radix-ui/react-icons/dist/types"
+import { CreateMessage } from "ai"
 import type { NextComponentType, NextPage, NextPageContext } from "next"
 import type { Session } from "next-auth"
 import type { AppProps } from "next/app"
-import { type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
+import { ElementType, type ForwardRefExoticComponent, type ReactNode, type RefAttributes } from "react"
 import { z } from "zod"
 
-import { FREE_GPT3_DAILY_USER, FREE_GPT4_DAILY_USER } from "@/config"
-
-import resources from "@/@types/resources"
+import { FREE_GPT3_DAILY_USER, FREE_GPT4_DAILY_USER, MenuKey } from "@/config"
 
 import AppGetPayload = Prisma.AppGetPayload
 import AppSelect = Prisma.AppSelect
@@ -27,10 +27,6 @@ import ConversationSelect = Prisma.ConversationSelect
 import UserGetPayload = Prisma.UserGetPayload
 import UserSelect = Prisma.UserSelect
 import validator = Prisma.validator
-
-// -----------------------------------------------------------------------------
-// models
-// -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
 // models
@@ -71,8 +67,6 @@ export const selectAppForListView = validator<AppSelect>()({
   modelName: true,
   language: true,
   isOpenSource: true,
-  createdAt: true,
-  updatedAt: true,
   category: true,
   creator: {
     select: {
@@ -89,7 +83,13 @@ export type AppForListView = AppGetPayload<{ select: typeof selectAppForListView
 export const selectAppForDetailView = validator<AppSelect>()({
   ...selectAppForListView,
   comments: true,
-  modelArgs: true,
+  prompts: {
+    select: {
+      content: true,
+      role: true,
+    },
+  },
+  temperature: true,
 })
 export type AppForDetailView = AppGetPayload<{ select: typeof selectAppForDetailView }>
 
@@ -98,10 +98,10 @@ export const selectConvForListView = validator<ConversationSelect>()({
   // @ts-ignore
   // latestMessage: true, // 这会覆盖我的 messages 数据结构，因为 latestMessages need messages
   messages: {
-    orderBy: { updatedAt: "desc" },
+    orderBy: { id: "desc" },
     take: 1,
     select: {
-      updatedAt: true,
+      id: true,
       content: true,
     },
   },
@@ -129,7 +129,6 @@ export type ConvForDetailView = ConversationGetPayload<{
 
 export const selectChatMessageForListView = validator<ChatMessageSelect>()({
   id: true,
-  createdAt: true,
   // updatedAt: true, // todo: support message modification
   content: true,
   role: true,
@@ -166,8 +165,6 @@ export type ExtendedAppProps<P = { session: Session }> = AppProps<P> & {
 // -----------------------------------------------------------------------------
 // general
 // -----------------------------------------------------------------------------
-
-export type MenuKey = keyof typeof resources.common.menus
 
 export interface IMenuItem {
   field: MenuKey
@@ -208,6 +205,21 @@ export const sortOrders = ["mostViewed", "mostUsed", "newest"] as const
 // export type SortOrder = keyof typeof resources.common.sorts
 export type SortOrder = (typeof sortOrders)[number]
 
+export const Order2icon: { [key in SortOrder]: ElementType } = {
+  mostViewed: EyeOpenIcon,
+  mostUsed: CubeIcon,
+  // mostSaved: IconDownload,
+  // mostShared: IconTrendingUp,
+  newest: Crosshair2Icon,
+
+  // recommend: IconStackPush,
+  // top: IconThumbUp,
+  // mostViewed: IconEye,
+  // "most-saved": IconDownload,
+  // trending: IconTrendingUp,
+  // follow: IconTelescope,
+}
+
 export type AllMessage =
   | SelectChatMessageForListView
   | {
@@ -229,3 +241,5 @@ export const feedbackFormSchema = z.object({
 
 export const memoryModes = ["one-time", "recent", "with-memory"] as const
 export type MemoryMode = (typeof memoryModes)[number]
+
+export type OpenAIMessage = CreateMessage

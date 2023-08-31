@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { useDebouncedValue, useHotkeys } from "@mantine/hooks"
+import { useDebouncedValue } from "@mantine/hooks"
 import { HandIcon, LapTimerIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons"
 import { CommandLoading } from "cmdk"
 import { signIn } from "next-auth/react"
@@ -12,7 +12,7 @@ import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { ComponentProps, FC, Fragment, HTMLProps, SyntheticEvent, useEffect, useRef, useState } from "react"
+import React, { ComponentProps, FC, HTMLProps, useEffect, useRef, useState } from "react"
 import { TbLanguage } from "react-icons/tb"
 import { toast } from "sonner"
 
@@ -21,9 +21,8 @@ import { useAppStore } from "@/store"
 import { ICON_DIMENSION_SM, POKETTO_APP_ID, URI } from "@/config"
 
 import { AppDetailContainer } from "@/components/app/container"
-import { AppDetailView } from "@/components/app/detail.view"
 import { IconContainer } from "@/components/containers"
-import { Icons } from "@/components/icons"
+import { CompanyIcon, ProductIcon } from "@/components/icons"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -34,7 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMount } from "@/hooks/use-mount"
 import { usePokettoConversationUrl } from "@/hooks/use-url"
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
@@ -85,7 +84,7 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
 
   const productLogo = (
     <Link className="p-btn-horizontal w-fit shrink-0" href="/">
-      <Icons.Product />
+      <ProductIcon />
       <span className="hidden md:flex whitespace-nowrap text-lg tracking-widest">{t(`product.name`)}</span>
     </Link>
   )
@@ -94,7 +93,7 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
     <div className="flex items-center gap-2 h-8">
       <Link href="https://cs-magic.com" className="hidden md:flex">
         <IconContainer>
-          <Icons.Company className="wh-8" />
+          <CompanyIcon className="wh-8" />
         </IconContainer>
       </Link>
 
@@ -110,7 +109,7 @@ export function LogoWithName({ withCompany }: { withCompany?: false }) {
 export default function Navbar() {
   const { t } = useTranslation()
 
-  const userId = useUserId()
+  const { userId } = useUser()
 
   return (
     <div className="flex items-center border-b px-4 py-2 gap-0">
@@ -269,7 +268,7 @@ function CommandSearch({ className, ...props }: HTMLProps<HTMLDivElement>) {
                     }
                   }}
                 >
-                  <Icons.Product />
+                  <ProductIcon />
                   <span>召唤 Poketto</span>
                 </Item>
               </CommandGroup>

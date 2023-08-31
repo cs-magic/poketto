@@ -6,11 +6,10 @@
  */
 import Mustache from "mustache"
 
-import { useSessionUser } from "@/hooks/use-user"
-
+import { useUser } from "@/hooks/use-user"
 
 export const useMustache = () => {
-  const user = useSessionUser()
+  const user = useUser()
   return (s: string, dict?: { [key: string]: string | number | boolean }) => {
     const d = { ...{ userName: user?.name }, ...(dict ?? {}) }
     try {

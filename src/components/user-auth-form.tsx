@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { DiscordLogoIcon } from "@radix-ui/react-icons"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
@@ -12,16 +13,15 @@ import type * as z from "zod"
 
 import { POKETTO_INTERNATIONAL_HOME, POKETTO_MAINLAND_CHINA_HOME } from "@/config"
 
-import { Icons } from "@/components/icons"
+import { GithubIcon, SpinnerIcon } from "@/components/icons"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { useLocale } from "@/hooks/use-i18n"
 import { useMustache } from "@/hooks/use-mustache"
-import { useUrl } from "@/hooks/use-url"
 
-import { getOrigin } from "@/lib/string"
+import { getOrigin } from "@/lib/edge"
 import { cn } from "@/lib/utils"
 import { userAuthSchema } from "@/lib/validations/auth"
 
@@ -95,7 +95,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             {errors?.email && <p className="px-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
           <button type="submit" className={cn(buttonVariants())} disabled={isLoading}>
-            {isLoading && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading && <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />}
             {t("auth:SignInWithEmail")}
           </button>
         </div>
@@ -123,9 +123,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             disabled={isLoading || isGitHubLoading}
           >
             {isGitHubLoading ? (
-              <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
+              <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Icons.GitHub className="mr-2 h-4 w-4" />
+              <GithubIcon className="mr-2 h-4 w-4" />
             )}{" "}
             Github
           </button>
@@ -140,9 +140,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             disabled={isLoading || isGitHubLoading}
           >
             {isDiscordLoading ? (
-              <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
+              <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Icons.Discord className="mr-2 h-4 w-4" />
+              <DiscordLogoIcon className="mr-2 h-4 w-4" />
             )}{" "}
             Discord
           </button>

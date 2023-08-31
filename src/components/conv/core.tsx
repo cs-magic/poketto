@@ -4,8 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { PromptRoleType } from ".prisma/client"
 import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
+import { PromptRoleType } from "@prisma/client"
 import {
   ChevronDownIcon,
   CodeSandboxLogoIcon,
@@ -34,7 +34,7 @@ import Typewriter from "typewriter-effect"
 
 import { useAppStore } from "@/store"
 
-import { contentStyleBasedOnRole } from "@/config-utils"
+import { contentStyleBasedOnRole } from "@/config"
 
 import { AllMessage, type AppForListView, defaultModelQuota, memoryModes, modelTypes } from "@/ds"
 
@@ -67,12 +67,12 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
 import { useUniversalFullscreen } from "@/hooks/use-universal-fullscreen"
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { packMessageWithDate } from "@/lib/message"
-import { getConversationsLink, isDomestic } from "@/lib/string"
+import { getConversationsLink } from "@/lib/string"
 
 export function ConversationCore({ conversationId }: { conversationId: string }) {
   const { t } = useTranslation()
@@ -169,7 +169,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
 export function ConversationInput({ conversationId }: { conversationId: string }) {
   const { modelType, setModelType, memoryMode, setMemoryMode } = useAppStore()
   const { t } = useTranslation()
-  const userId = useUserId()
+  const { userId } = useUser()
   const { data: user } = api.user.getProfile.useQuery({ id: userId })
   const { data: conv } = api.conv.get.useQuery({ id: conversationId })
   const { data: hasApp } = api.conv.has.useQuery({ id: conversationId }, { enabled: !!conv })
@@ -182,7 +182,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const [alertVisible, setAlertVisible] = useState(false)
 
   const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
-    api: isDomestic() ? "/api/chat-node" : "/api/chat",
+    api: "/api/chat", // explicit default
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
     body: { userId, conversationId, modelType, memoryMode },
@@ -407,7 +407,7 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
             {m(msg.content)}
           </div>
         ) : msg.role === "system" ? (
-          <Card>
+          <Card key={msg.id} className={"my-4"}>
             <CardHeader>
               <CardTitle>AI 人设</CardTitle>
               <CardDescription>AI 的回答将基于此人设进行</CardDescription>

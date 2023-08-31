@@ -4,33 +4,23 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { IssueType } from ".prisma/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TRPCClientError } from "@trpc/client"
 import { useTranslation } from "next-i18next"
-import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
 import * as React from "react"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { feedbackFormSchema } from "@/ds"
-
 import { ChargeContainer } from "@/components/containers"
-import { RootLayout } from "@/components/layouts/root.layout"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
 
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
-import { getZodDefaults } from "@/lib/zod"
 
 const fastChargeSchema = z.object({
   coupon: z.string().optional(),
@@ -38,9 +28,8 @@ const fastChargeSchema = z.object({
 
 const FastChargeForm = () => {
   const { t } = useTranslation()
-  const router = useRouter()
   const { mutateAsync: addCoupon, isLoading } = api.bill.addCoupon.useMutation()
-  const userId = useUserId()
+  const { userId } = useUser()
   const { data: user } = api.user.getProfile.useQuery({ id: userId }, { enabled: !!userId })
 
   const util = api.useContext()

@@ -26,14 +26,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-import { useSessionUser } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
-  const user = useSessionUser()
+  const user = useUser()
 
   const router = useRouter()
   const logout = () => {

@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { AvatarIcon } from "@radix-ui/react-icons"
-import { signIn, signOut } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import React from "react"
@@ -20,14 +19,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
-import { todo } from "@/lib/helpers"
 import { getFlowgptUserLink, getImageUri } from "@/lib/string"
 
 export function UserProfile({ user }: { user: UserForProfile }) {
   const { t } = useTranslation()
-  const userId = useUserId()
+  const { userId } = useUser()
   const isSelf = userId === user.id
 
   return (
@@ -55,7 +53,7 @@ export function UserProfile({ user }: { user: UserForProfile }) {
             {user?.name ?? user?.email ?? user.platformArgs?.uri ?? DEFAULT_USER_NAME}
           </span>
         )}
-        <p className="truncate text-muted-foreground">@{user?.id ?? DEFAULT_USER_ID}</p>
+        <p className="truncate text-muted-foreground">@{userId}</p>
         {/* todo: description */}
         {/*{isSelf && (*/}
         {/*  <p className="lines-clamp-2 my-2 text-primary-foreground/75">*/}

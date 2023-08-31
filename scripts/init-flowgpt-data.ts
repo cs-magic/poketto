@@ -1,96 +1,111 @@
-import { prisma } from "@/server/db"
-import { PlatformType, PromptRoleType } from ".prisma/client"
-import { type IFlowgptPromptBasic } from "./lib/flowgpt"
+import { Prisma, PrismaClient } from "@prisma/client"
 import { MongoClient } from "mongodb"
 
-const init = async () => {
-  const client = new MongoClient(process.env.MONGO_URI!)
-  console.log("initializing flowgpt apps")
-  let k = 0
-  for await (const p of client
-    .db("flowgpt")
-    .collection("basic")
-    .find() as unknown as IFlowgptPromptBasic[]) {
-    const modelArgs = {
-      temperature: p.temperature,
-      prompts: [
-        {
-          role: PromptRoleType.system,
-          content: p.initPrompt
-        },
-        {
-          role: PromptRoleType.assistant,
-          content: p.welcomeMessage
-        }
-      ]
-    }
-    const d = {
-      platformId: p.id,
-      platformType: PlatformType.FlowGPT,
-      avatar: p.thumbnailURL,
-      desc: p.description,
-      language: p.language ?? "en",
-      name: p.title,
-      isOpenSource: p.visibility,
-      state: {
-        create: {
-          views: p.views,
-          calls: p.uses,
-          forks: 0,
-          tips: p.tip,
-          stars: p.saves,
-          shares: p.shares
-        }
-      },
-      modelName: p.model,
-      modelArgs,
-      category: {
-        connectOrCreate: {
-          where: { id: { main: p.categoryId, sub: p.subCategoryId } },
-          create: { main: p.categoryId, sub: p.subCategoryId }
-        }
-      },
+import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
 
-      creator: {
-        connectOrCreate: {
-          where: { platform: { platformId: p.User.id, platformType: PlatformType.FlowGPT } },
-          create: {
-            platformId: p.User.id,
-            platformType: PlatformType.FlowGPT,
-            platformArgs: {
-              url: p.User.uri
-            },
-            image: p.User.image
-          }
-        }
+import AppPromptsCreateManyAppInput = Prisma.AppPromptsCreateManyAppInput
+
+export type IFlowgptPromptBasic = typeof sampleBasicPrompt
+
+const init = async () => {
+  const mongoClient = new MongoClient("mongodb://localhost")
+  const prismaClient = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL!,
       },
-      tags: {
-        connectOrCreate: p.Tag.map((t) => ({
-          where: { id: t.name },
-          create: { id: t.name, name: t.name }
-        }))
+    },
+  })
+  let p
+  try {
+    console.log("initializing flowgpt apps")
+    let k = 0
+    for await (p of mongoClient.db("flowgpt").collection("basic").find() as unknown as IFlowgptPromptBasic[]) {
+      const appPrompts: AppPromptsCreateManyAppInput[] = []
+      if (p.systemMessage)
+        appPrompts.push({
+          role: "system",
+          content: p.systemMessage,
+        })
+      if (p.initPrompt)
+        appPrompts.push({
+          role: "user",
+          content: p.initPrompt,
+        })
+      if (p.welcomeMessage)
+        appPrompts.push({
+          role: "assistant",
+          content: p.welcomeMessage,
+        })
+      // console.log({ p })
+
+      // 不能直接用 new PrismaClient 应该
+
+      await prismaClient.app.upsert({
+        where: { platform: { platformId: p.id, platformType: "FlowGPT" } },
+        update: {},
+        create: {
+          platformId: p.id,
+          platformType: "FlowGPT",
+          avatar: p.thumbnailURL,
+          desc: p.description,
+          language: p.language ?? "en",
+          name: p.title,
+          isOpenSource: p.visibility,
+          state: {
+            create: {
+              views: p.views,
+              calls: p.uses,
+              forks: 0,
+              tips: p.tip,
+              stars: p.saves,
+              shares: p.shares,
+            },
+          },
+          modelName: p.model,
+          prompts: {
+            create: appPrompts,
+          },
+          temperature: p.temperature,
+          category: {
+            connectOrCreate: {
+              where: { category: { main: p.categoryId, sub: p.subCategoryId } },
+              create: { main: p.categoryId, sub: p.subCategoryId },
+            },
+          },
+
+          creator: {
+            connectOrCreate: {
+              where: { platform: { platformId: p.User.id, platformType: "FlowGPT" } },
+              create: {
+                platformId: p.User.id,
+                platformType: "FlowGPT",
+                platformArgs: {
+                  uri: p.User.uri,
+                },
+                image: p.User.image,
+              },
+            },
+          },
+          tags: {
+            connectOrCreate: p.Tag.map((t) => ({
+              where: { name: t.name },
+              create: { name: t.name },
+            })),
+          },
+        },
+      })
+      if (++k % 100 === 0) {
+        console.log(`dumping ${k}`)
       }
     }
-    await prisma.app.upsert({
-      where: { platform: { platformId: p.id, platformType: PlatformType.FlowGPT } },
-      include: {
-        creator: true,
-        category: true,
-        state: true,
-        tags: true
-      },
-      update: {
-        modelArgs
-      },
-      create: d
-    })
-    if (++k % 100 === 0) {
-      console.log(`dumping ${k}`)
-    }
-  }
 
-  client.close()
-  console.log("successfully initialized")
+    console.log("successfully initialized")
+  } catch (e) {
+    console.error({ e, p })
+  } finally {
+    await mongoClient.close()
+  }
 }
 
 void init()

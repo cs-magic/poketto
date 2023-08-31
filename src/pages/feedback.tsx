@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { IssueType } from ".prisma/client"
+import { IssueType } from "@prisma/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"

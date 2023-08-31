@@ -4,8 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma } from ".prisma/client"
-import { PromptRoleType } from "@prisma/client"
+import { Prisma, PromptRoleType } from "@prisma/client"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
 import { Ratelimit } from "@upstash/ratelimit"
 import { kv } from "@vercel/kv"
@@ -22,13 +21,14 @@ import { CHAT_MESSAGE_CID_LEN } from "@/config"
 
 import { MemoryMode, defaultModelQuota } from "@/ds"
 
+import { isDomestic } from "@/lib/edge"
 import { nanoid } from "@/lib/id"
 
 import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
-export const runtime = "edge" // IMPORTANT! Set the runtime to edge
+export const runtime = isDomestic() ? "node" : "edge" // IMPORTANT! Set the runtime to edge
 
 /**
  * ref:
@@ -64,12 +64,11 @@ export async function POST(req: Request) {
 
   // console.log("req: ", { data })
   const pushMessage = (msg: Message) => {
-    const { id, role, content } = msg
+    const { role, content } = msg
     const newMessage: ChatMessageUncheckedCreateInput = {
       role,
       content,
       conversationId,
-      shortId: id,
       modelType,
       isUsingFree: user.balance <= 0,
     }
@@ -132,9 +131,19 @@ export async function POST(req: Request) {
       apiKey: baseEnv.OPENAI_API_KEY,
       timeout: 3000,
       /**
+       *
+       * ref:
+       *  - https://github.com/openai/openai-node/tree/v4#configuring-an-https-agent-eg-for-proxies
+       *  - https://github.com/openai/openai-node/issues/85
+       *  - https://www.npmjs.com/package/https-proxy-agent
+       *
        * edge 环境中 不支持 http / https-proxy-agent 等库
        */
-      httpAgent: undefined,
+      httpAgent: isDomestic()
+        ? new (
+            await import("https-proxy-agent")
+          ).HttpsProxyAgent("http://localhost:7890")
+        : undefined,
     }).chat.completions.create(
       {
         model: modelType,

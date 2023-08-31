@@ -5,20 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 import hash from "js-sha1"
-import capitalize from "lodash/capitalize"
-
-import { baseEnv } from "@/env.mjs"
 
 import { type IMAGE_SIZE } from "@/ds"
 
 import { FLOWGPT_HOMEPAGE } from "@/const"
-
-export const getShortName = (s: string, len: number = 2) =>
-  s
-    .split(/\s+/)
-    .slice(0, len)
-    .map((i) => capitalize(i[0]))
-    .join("")
 
 /**
  * ref: https://robohash.org/
@@ -53,5 +43,14 @@ export const getImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
   return getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
 }
 
-export const getOrigin = () => (typeof window !== "undefined" ? window.location.origin : baseEnv.HOST)
-export const isDomestic = () => getOrigin().includes(".cn")
+export function getCuidTimestamp(cuidStr: string): Date {
+  const cuidParts = cuidStr.split("-")
+
+  const timestampPortion = cuidParts[0]!
+
+  const timestampHex = timestampPortion.substring(1) // Remove the 'c' prefix
+
+  const timestampMillis = parseInt(timestampHex, 36) // Convert from base36 to decimal
+
+  return new Date(timestampMillis)
+}

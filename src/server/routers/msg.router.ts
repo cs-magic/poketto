@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma } from ".prisma/client"
+import { Prisma } from "@prisma/client"
 import { type ChatMessage } from "@prisma/client"
 import { type CreateMessage } from "ai"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"

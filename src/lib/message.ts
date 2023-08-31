@@ -1,4 +1,4 @@
-import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { ChatMessageFormatType, PromptRoleType } from "@prisma/client"
 import { ChatMessage } from "@prisma/client"
 import { Message } from "ai"
 

@@ -4,14 +4,21 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 
-export const useSessionUser = () => {
-  const { data } = useSession()
-  return data?.user
-}
+import { api } from "@/lib/api"
 
-export const useUserId = () => {
-  const { data } = useSession()
-  return data?.user.id
+export const useUser = () => {
+  const { data: session } = useSession()
+  const userInSession = session?.user
+  const { data: userInDB, isLoading: isLoadingUser } = api.user.getProfile.useQuery(
+    { id: userInSession?.id },
+    { enabled: !!userInSession?.id }
+  )
+  if (userInSession && !isLoadingUser && !userInDB) {
+    // 数据库不匹配，重置浏览器端
+    void signOut()
+  }
+  const user = userInDB
+  return { user, userId: user?.id, isLoadingUser }
 }

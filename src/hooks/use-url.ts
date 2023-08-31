@@ -8,10 +8,11 @@ import { useRouter } from "next/router"
 
 import { POKETTO_APP_ID } from "@/config"
 
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
-import { getConversationLink, getOrigin } from "@/lib/string"
+import { getOrigin } from "@/lib/edge"
+import { getConversationLink } from "@/lib/string"
 
 export const useUrl = () => {
   const router = useRouter()
@@ -22,7 +23,7 @@ export const useUrl = () => {
 }
 
 export const usePokettoConversationUrl = () => {
-  const userId = useUserId()
+  const { userId } = useUser()
   const { data: app } = api.app.get.useQuery(
     { platform: { platformId: POKETTO_APP_ID, platformType: "Poketto" } },
     { enabled: !!userId }

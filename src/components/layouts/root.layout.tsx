@@ -9,8 +9,9 @@ import Navbar from "src/components/layouts/navbar"
 
 import { useAppStore } from "@/store"
 
-import { menuGroups, menuItems } from "@/config-utils"
+import { menuGroups } from "@/config"
 
+import { menuItems } from "@/components/icons"
 import { Sidebar } from "@/components/layouts/sidebar"
 import { FooterNavItem } from "@/components/link"
 

@@ -1,10 +1,12 @@
-///////////////////////////
+// -----------------------------------------------------------------------------
 // ref: https://pris.ly/d/prisma-schema
-///////////////////////////
+// -----------------------------------------------------------------------------
 
 generator client {
   provider = "prisma-client-js"
   // output   = "../node_modules/@prisma/client/generated" // support for webstorm autocompletion
+
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 generator json {
@@ -29,11 +31,13 @@ datasource db {
   // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
   // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
+
+  extensions = [vector]
 }
 
-///////////////////////////
+// -----------------------------------------------------------------------------
 // models
-///////////////////////////
+// -----------------------------------------------------------------------------
 
 model Account {
   id                       String  @id @default(cuid())
@@ -55,13 +59,12 @@ model Account {
 }
 
 model App {
-  id String @id @default(dbgenerated("nanoid()")) @db.VarChar(5)
+  id        String   @id @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   platformType PlatformType @default(Poketto)
   platformId   String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   creator      User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   creatorId    String
@@ -69,6 +72,7 @@ model App {
   avatar       String
   desc         String
   language     String      @default("en")
+  isOpenSource Boolean     @default(true)
   version      String      @default("1.0.0")
   tags         AppTag[]
   category     AppCategory @relation(fields: [categoryMain, categorySub], references: [main, sub], onDelete: Cascade)
@@ -79,22 +83,17 @@ model App {
   using    Conversation[]
   starring StarringApp[]
   comments AppComment[]
+  state    AppState?
 
-  state AppState?
-
-  modelName    String
-  isOpenSource Boolean @default(true)
-
-  /// [ModelPlatformArgs]
-  modelArgs Json?
+  modelName   String
+  prompts     AppPrompts[]
+  temperature Float
 
   @@unique([platformType, platformId], name: "platform")
 }
 
 model AppAction {
-  id        String    @id @default(cuid())
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  id String @id @default(cuid())
 
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
@@ -105,20 +104,20 @@ model AppAction {
 }
 
 model AppCategory {
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // category 是由我们自己创建，不交给用户
+  id String @id @default(cuid())
 
-  main Int
-  sub  Int
-  App  App[]
+  main   Int
+  sub    Int
+  App    App[]
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
 
-  @@id([main, sub], name: "id")
+  @@unique([main, sub], name: "category")
 }
 
 model AppComment {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id String @id @default(cuid())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
@@ -130,10 +129,17 @@ model AppComment {
   rate    Int?    @default(0)
 }
 
+model AppPrompts {
+  id    String @id @default(cuid())
+  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId String
+
+  role    PromptRoleType
+  content String
+}
+
 model AppState {
-  id        String    @id @default(cuid())
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  id String @id @default(cuid())
 
   views  Int   @default(0)
   stars  Int   @default(0)
@@ -149,13 +155,10 @@ model AppState {
 model AppTag {
   id String @id @default(cuid())
 
-  /// 这几个主要是 flowgpt 没有
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  creator   User?     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creator   User?   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   creatorId String?
 
-  name String
+  name String @unique
   apps App[]
 }
 
@@ -175,8 +178,6 @@ model ChatMessage {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId String
 
-  shortId String @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
-
   // ref: https://js.langchain.com/docs/modules/data_connection/vectorstores/integrations/prisma
   namespace String?                @default("default")
   vector    Unsupported("vector")?
@@ -186,14 +187,10 @@ model ChatMessage {
 
   modelType   String?  @default("gpt-3.5-turbo")
   isUsingFree Boolean? @default(false)
-
-  @@unique([conversationId, shortId], name: "id2", map: "id2") // for inner conversation to shorter url
 }
 
 model ChatMessageAction {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id String @id @default(cuid())
 
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
@@ -204,9 +201,7 @@ model ChatMessageAction {
 }
 
 model Conversation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id String @id @default(cuid())
 
   isActive Boolean       @default(true)
   messages ChatMessage[]
@@ -223,21 +218,20 @@ model Conversation {
 }
 
 model Feedback {
-  id        String    @id @default(cuid())
+  id String @id @default(cuid())
+
   issueType IssueType
   title     String
   detail    String
   contact   String
-  anonymous Boolean @default(false)
+  anonymous Boolean   @default(false)
 
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId String? @db.VarChar(5)
+  userId String?
 }
 
 model FollowRelation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id String @id @default(cuid())
 
   from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
   to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
@@ -246,10 +240,9 @@ model FollowRelation {
 }
 
 model InvitationRelation {
-  id        String           @id @default(cuid())
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  status    InvitationStatus @default(Idle)
+  id String @id @default(cuid())
+
+  status InvitationStatus @default(Idle)
   // code if necessary
 
   from   User?  @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
@@ -260,7 +253,8 @@ model InvitationRelation {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
+
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -268,9 +262,7 @@ model Session {
 }
 
 model StarringApp {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id String @id @default(cuid())
 
   app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId String
@@ -283,7 +275,9 @@ model StarringApp {
 
 // todo: stripe 自己的 api 是不是够用了
 model StripeProduct {
-  id       String                   @id
+  // id 从 stripe 拿
+  id String @id
+
   price    Float
   currency String
   mode     StripeMode
@@ -295,20 +289,24 @@ model StripeProduct {
 }
 
 model StripePayment {
-  id         String        @id
+  // id 从 stripe 拿
+  id String @id
+
   // 记录要保留
-  product    StripeProduct @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product    StripeProduct @relation(fields: [productId], references: [id], onDelete: NoAction)
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   count      Int           @default(1)
   // 优惠码
   redeemCode String?
 
   productId String
-  userId    String @db.VarChar(5)
+  userId    String
 }
 
 model User {
-  id String @id @default(dbgenerated("nanoid()")) @db.VarChar(5)
+  id        String   @id @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   platformType PlatformType @default(Poketto)
   platformId   String
@@ -358,8 +356,9 @@ model User {
   // 每日需要更新
 
   /// [ModelQuota]
-  quota    Json?
-  Feedback Feedback[]
+  quota       Json?
+  Feedback    Feedback[]
+  AppCategory AppCategory[]
 
   // maybe we only need one id
   @@unique([platformType, platformId], name: "platform")
@@ -373,9 +372,9 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-////////////////////////////
+// -----------------------------------------------------------------------------
 // enums
-///////////////////////////
+// -----------------------------------------------------------------------------
 
 enum ChatMessageFormatType {
   text

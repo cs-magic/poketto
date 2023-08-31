@@ -4,8 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { InvitationStatus } from ".prisma/client"
-import { BellIcon, ChevronRightIcon, Cross1Icon } from "@radix-ui/react-icons"
+import { InvitationStatus } from "@prisma/client"
+import { BellIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
@@ -13,24 +13,24 @@ import Link from "next/link"
 import React, { Fragment } from "react"
 import ReactMarkdown from "react-markdown"
 
-import { ICON_DIMENSION_MD, ICON_DIMENSION_SM, URI, siteConfig } from "@/config"
-import { menuItems, sidebarSections } from "@/config-utils"
+import { ICON_DIMENSION_MD, ICON_DIMENSION_SM, URI, sidebarSections, siteConfig } from "@/config"
 
-import { ChargeContainer, IconContainer } from "@/components/containers"
+import { IconContainer } from "@/components/containers"
+import { menuItems } from "@/components/icons"
 import { SidebarNavItem } from "@/components/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
-import { useSessionUser } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 
 export function Sidebar() {
   const { t } = useTranslation()
-  const user = useSessionUser()
+  const { user, userId } = useUser()
 
   return (
     <div
@@ -65,7 +65,7 @@ export function Sidebar() {
 
           <div className="hidden lg:flex grow flex-col gap-0 overflow-hidden">
             <span className="text-xs">{user.name}</span>
-            <span className="truncate text-xs text-muted-foreground italic">@{user.id}</span>
+            <span className="truncate text-xs text-muted-foreground italic">@{userId}</span>
           </div>
           <IconContainer className="hidden lg:flex shrink-0">
             <BellIcon />

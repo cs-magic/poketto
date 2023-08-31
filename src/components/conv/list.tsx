@@ -4,29 +4,26 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { useDebouncedValue } from "@mantine/hooks"
 import orderBy from "lodash/orderBy"
 import { XIcon } from "lucide-react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import { type PropsWithChildren, useState } from "react"
 
 import { type ConvForListView } from "@/ds"
 
-import { AppDetailContainer } from "@/components/app/container"
-import { SearchResultView } from "@/components/app/search-result.view"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMustache } from "@/hooks/use-mustache"
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
-import { getConversationLink, getImageUri } from "@/lib/string"
+import { getConversationLink, getCuidTimestamp, getImageUri } from "@/lib/string"
 
 export function ConversationList() {
   const { data: convs } = api.conv.list.useQuery()
@@ -94,15 +91,19 @@ export function SectionTitle({ children }: PropsWithChildren) {
 
 export function ConversationListView({ c }: { c: ConvForListView }) {
   const m = useMustache()
-  const userId = useUserId()!
+  const { userId, isLoadingUser } = useUser()
   const latestMessage = c.messages[0]!
   const {
     i18n: { language },
   } = useTranslation()
+
+  const router = useRouter()
+  if (!userId && !isLoadingUser) return router.push("/login")
+
   return (
     <Link
       href="/c/[userId]/[appId]"
-      as={getConversationLink(userId, c.appId)}
+      as={getConversationLink(userId!, c.appId)}
       className={clsx("h-fit w-full px-4 py-2 hover:bg-accent", c.pinned && "bg-indigo-100 dark:bg-slate-900")}
     >
       <div className="flex h-fit w-full items-center  gap-4">
@@ -114,7 +115,7 @@ export function ConversationListView({ c }: { c: ConvForListView }) {
           <div className="| flex w-full justify-between gap-2">
             <span className="truncate ">{c.app.name}</span>
             {/* todo: dayjs locale calendar */}
-            <span>{d(latestMessage.updatedAt).locale(language).calendar()}</span>
+            <span>{d(getCuidTimestamp(latestMessage.id)).locale(language).calendar()}</span>
           </div>
           <div className="flex gap-2">
             {/* 只有 group 才需要打开 */}

@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
-import { useSessionUser } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import { getConversationLink, getConversationsLink } from "@/lib/string"
@@ -81,7 +81,7 @@ export const SystemStatus = () => {
 
 export function RecentConversations() {
   const { t } = useTranslation()
-  const user = useSessionUser()
+  const { user } = useUser()
   const { data: conversations } = api.conv.list.useQuery(undefined, { enabled: !!user })
 
   const n = 10

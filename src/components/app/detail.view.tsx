@@ -35,7 +35,7 @@ import { Separator } from "@/components/ui/separator"
 
 import { useMustache } from "@/hooks/use-mustache"
 import { useUrl } from "@/hooks/use-url"
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
@@ -50,7 +50,7 @@ export function AppDetailView({
   className,
   ...props
 }: { appId: string; setOpen?: (v: boolean) => void } & HTMLProps<HTMLDivElement>) {
-  const userId = useUserId()
+  const { userId } = useUser()
   const { data: app, error: appError } = api.app.get.useQuery({ id: appId })
   const { t } = useTranslation()
   const { origin } = useUrl()
@@ -256,7 +256,7 @@ export function InstallButton({
     setOpen && setOpen(false)
   }
 
-  const { mutate: addApp } = api.conv.add.useMutation({
+  const { mutateAsync: addApp } = api.conv.add.useMutation({
     onSuccess: (data) => {
       toast.success(`Successfully added one app`)
       void utils.conv.list.invalidate()

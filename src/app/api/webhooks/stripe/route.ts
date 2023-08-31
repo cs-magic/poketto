@@ -11,7 +11,7 @@ import { prisma } from "@/server/db"
 
 import { paymentEnv } from "@/env.mjs"
 
-import { subscriptionLevel2Unit } from "@/config-utils"
+import { subscriptionLevel2Unit } from "@/config"
 
 import d from "@/lib/datetime"
 import { stripe } from "@/lib/stripe"

@@ -6,7 +6,7 @@
  */
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 
-import { Icons } from "@/components/icons"
+import { ErrorIcon } from "@/components/icons"
 import { RootLayout } from "@/components/layouts/root.layout"
 
 export default function Custom404() {
@@ -16,7 +16,7 @@ export default function Custom404() {
         <h1 className="mt-8 text-4xl">404</h1>
         <p>{"Poketto Note: You've come to the wilderness of knowledge."}</p>
 
-        <Icons.Error width={480} className="shrink-0 wh-[240px] md:wh-[480px]" />
+        <ErrorIcon width={480} className="shrink-0 wh-[240px] md:wh-[480px]" />
       </div>
     </RootLayout>
   )

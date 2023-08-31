@@ -4,17 +4,16 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { ChevronLeftIcon } from "@radix-ui/react-icons"
 import { type Metadata } from "next"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
 
-import { Icons } from "@/components/icons"
+import { ProductIcon } from "@/components/icons"
 import { RootLayout } from "@/components/layouts/root.layout"
 import { buttonVariants } from "@/components/ui/button"
 import { UserAuthForm } from "@/components/user-auth-form"
-
-import { useUrl } from "@/hooks/use-url"
 
 import { cn } from "@/lib/utils"
 
@@ -31,13 +30,13 @@ export default function LoginPage() {
       <div className="container relative flex h-full w-full overflow-auto flex-col items-center justify-center">
         <Link href="/" className={cn(buttonVariants({ variant: "ghost" }), "absolute left-4 top-4 md:left-8 md:top-8")}>
           <>
-            <Icons.ChevronLeft className="mr-2 h-4 w-4" />
+            <ChevronLeftIcon className="mr-2 h-4 w-4" />
             Back
           </>
         </Link>
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
-            <Icons.Product className="mx-auto h-6 w-6" />
+            <ProductIcon className="mx-auto h-6 w-6" />
             <h1 className="text-2xl font-semibold tracking-tight">{t("auth:WelcomeBack")}</h1>
             <p className="text-sm text-muted-foreground">{t("auth:LoginViaEmail")}</p>
           </div>

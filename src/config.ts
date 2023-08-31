@@ -4,6 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { Prisma, PromptRoleType, StripeSubscriptionLevel } from "@prisma/client"
+
+import resources from "@/@types/resources"
+
+import StripeProductUncheckedCreateInput = Prisma.StripeProductUncheckedCreateInput
 
 export const FontWeightGlowSansSC = [
   "Thin",
@@ -144,6 +149,7 @@ export const DEFAULT_APP_VERSION = "1.0.0" as const
 // -----------------------------------------------------------------------------
 
 export const POKETTO_MODEL_NAME = "poketto-1.0" as const
+export const POKETTO_MODEL_TEMPERATURE = 0.7 as const
 export const POKETTO_SYSTEM_PROMPT =
   `You are a loyal companion by the name of Poketto, developed by the official Poketto team led by MarkShawn, and my name is {{userName}}.
 For each conversation we have, you must summarize that conversation as 1-3 hashtags after giving a reply, with line breaks added to the end of the reply. Each hashtag should be as short as possible, prefixed with a "#" sign. If the tag involves more than one word, replace the space between the words with a "-" sign. Every two tags need to be separated by a space.` as const
@@ -196,3 +202,39 @@ export const FREE_GPT3_DAILY_USER = 10
 export const FREE_GPT4_DAILY_USER = 3
 
 export const DEFAULT_LOCALE = "zh-CN"
+
+// products list, ref: https://dashboard.stripe.com/products?active=true
+export const paymentProducts: StripeProductUncheckedCreateInput[] = [
+  { id: "prod_OVgbKpNEmJJXIy", price: 10, currency: "USD", mode: "payment" },
+  { id: "prod_OVgYAVpLO6oLje", price: 9.99, currency: "USD", mode: "subscription", level: "premium", expire: 30 },
+  { id: "prod_OVgZnKD7Fc2bsQ", price: 29.99, currency: "USD", mode: "subscription", level: "extreme", expire: 30 },
+
+  { id: "prod_OOeVuH6LpHINCO", price: 9.99, currency: "CNY", mode: "payment" },
+  { id: "prod_OOeF8lXiDVIMlS", price: 9.99, currency: "CNY", mode: "subscription", level: "basic", expire: 30 },
+  { id: "prod_OOeH04oe1Sm67z", price: 29.99, currency: "CNY", mode: "subscription", level: "premium", expire: 30 },
+  { id: "prod_OOeIvw7nucInBz", price: 49.99, currency: "CNY", mode: "subscription", level: "extreme", expire: 30 },
+]
+export const subscriptionLevel2Unit: Record<StripeSubscriptionLevel, number> = {
+  basic: 1,
+  premium: 2,
+  extreme: 3,
+}
+
+export const contentStyleBasedOnRole: { [key in PromptRoleType]: string } = {
+  system: "bg-transparent", // "bg-slate-700"
+  function: "bg-destructive",
+  user: "bg-green-600 text-black",
+  assistant: "bg-muted text-primary-foreground/75 dark:bg-sidebar",
+}
+
+export type MenuKey = keyof typeof resources.common.menus
+
+export const menuGroups: Record<string, MenuKey[]> = {
+  question: ["whatsPoketto", "whatsDora", "learningCenter"],
+  mobileFooters: ["homepage", "explore", "account", "settings"],
+}
+
+export const sidebarSections: Record<string, MenuKey[]> = {
+  section1: ["homepage", "explore"],
+  section2: ["account", "settings"],
+}

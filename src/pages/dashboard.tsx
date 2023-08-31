@@ -4,8 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { StripePayment } from ".prisma/client"
 import { useElementSize } from "@mantine/hooks"
+import { StripePayment } from "@prisma/client"
 import { ChevronDownIcon, Pencil2Icon } from "@radix-ui/react-icons"
 import { ColumnDef } from "@tanstack/react-table"
 import { useTranslation } from "next-i18next"
@@ -16,7 +16,6 @@ import { MAX_MOBILE_WIDTH } from "@/config"
 
 import { type NextPageWithAuth, SelectChatMessageForDetailView } from "@/ds"
 
-import { AsyncListContainer } from "@/components/containers"
 import { DataTable } from "@/components/data-table"
 import { RootLayout } from "@/components/layouts/root.layout"
 import { Loading } from "@/components/loading"
@@ -25,7 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { UserProfile } from "@/components/user/profile.view"
 
-import { useUserId } from "@/hooks/use-user"
+import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
@@ -33,7 +32,7 @@ import d from "@/lib/datetime"
 
 export const DashboardPage: NextPageWithAuth = () => {
   const { t } = useTranslation()
-  const userId = useUserId()
+  const { userId } = useUser()
   // console.log("dashboard: ", { userId })
   const { data: userProfile } = api.user.getProfile.useQuery({ id: userId }, { enabled: !!userId })
   const { data: payments } = api.bill.listPayments.useQuery()

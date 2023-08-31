@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma } from ".prisma/client"
+import { Prisma } from "@prisma/client"
 import { ChatMessageFormatType } from "@prisma/client"
 import { ConversationWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
@@ -45,7 +45,6 @@ export const convRouter = createTRPCRouter({
         },
         input: { appId },
       }) => {
-        const userId = user.id
         // console.log("adding app: ", { userId, appId })
         const app = await prisma.app.findUniqueOrThrow({ where: { id: appId }, select: selectAppForDetailView })
         const addedConv = await prisma.conversation.create({
@@ -53,8 +52,16 @@ export const convRouter = createTRPCRouter({
             messages: true,
           },
           data: {
-            userId,
-            appId,
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+            app: {
+              connect: {
+                id: app.id,
+              },
+            },
             messages: {
               create: [
                 {
@@ -62,8 +69,8 @@ export const convRouter = createTRPCRouter({
                   content: getWelcomeSystemNotification(user.name ?? "bro"), // do not know app name here, lol
                   format: ChatMessageFormatType.systemNotification,
                 },
-                ...app.modelArgs.prompts,
-              ].map((m) => ({ ...m, userId: user.id })), // !important
+                ...app.prompts,
+              ],
             },
           },
         })

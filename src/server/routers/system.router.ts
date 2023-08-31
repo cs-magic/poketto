@@ -31,7 +31,7 @@ export const systemRouter = createTRPCRouter({
       ...status,
       apps,
       users,
-      calls: (calls / 2) * 23 + 1,
+      calls: (calls / 2) * 26 + 1,
       feedbacks,
     }
   }),

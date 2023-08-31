@@ -1,3 +1,6 @@
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS "vector";
+
 -- CreateEnum
 CREATE TYPE "ChatMessageFormatType" AS ENUM ('text', 'image', 'voice', 'video', 'map', 'realtimeVoice', 'realtimeVideo', 'systemNotification');
 
@@ -5,13 +8,25 @@ CREATE TYPE "ChatMessageFormatType" AS ENUM ('text', 'image', 'voice', 'video', 
 CREATE TYPE "InvitationStatus" AS ENUM ('Idle', 'Pending', 'Accepted', 'Expired');
 
 -- CreateEnum
-CREATE TYPE "PlatformType" AS ENUM ('Poketto', 'FlowGPT', 'OpenAI', 'MidJourney', 'StableDiffusion', 'OpenChat');
+CREATE TYPE "IssueType" AS ENUM ('Debunk', 'PuzzleInUse', 'FeatureRequest', 'BugReport', 'LeakReport', 'BusinessCollaboration');
+
+-- CreateEnum
+CREATE TYPE "PlatformType" AS ENUM ('Poketto', 'FlowGPT', 'OpenAI', 'MidJourney', 'StableDiffusion', 'OpenChat', 'email', 'github', 'discord', 'google');
 
 -- CreateEnum
 CREATE TYPE "PromptRoleType" AS ENUM ('system', 'user', 'assistant', 'function');
 
 -- CreateEnum
 CREATE TYPE "RoleType" AS ENUM ('admin', 'manager', 'normal');
+
+-- CreateEnum
+CREATE TYPE "StripeMode" AS ENUM ('payment', 'subscription');
+
+-- CreateEnum
+CREATE TYPE "StripeSubscriptionLevel" AS ENUM ('basic', 'premium', 'extreme');
+
+-- CreateEnum
+CREATE TYPE "TransactionType" AS ENUM ('charge', 'consume');
 
 -- CreateTable
 CREATE TABLE "Account" (
@@ -34,22 +49,22 @@ CREATE TABLE "Account" (
 
 -- CreateTable
 CREATE TABLE "App" (
-    "id" VARCHAR(5) NOT NULL DEFAULT nanoid(),
-    "platformType" "PlatformType" NOT NULL DEFAULT 'Poketto',
-    "platformId" TEXT NOT NULL,
+    "id" VARCHAR(7) NOT NULL DEFAULT nanoid(7),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "platformType" "PlatformType" NOT NULL DEFAULT 'Poketto',
+    "platformId" TEXT NOT NULL,
     "creatorId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "avatar" TEXT NOT NULL,
     "desc" TEXT NOT NULL,
     "language" TEXT NOT NULL DEFAULT 'en',
+    "isOpenSource" BOOLEAN NOT NULL DEFAULT true,
     "version" TEXT NOT NULL DEFAULT '1.0.0',
     "categoryMain" INTEGER NOT NULL,
     "categorySub" INTEGER NOT NULL,
     "modelName" TEXT NOT NULL,
-    "isOpenSource" BOOLEAN NOT NULL DEFAULT true,
-    "modelArgs" JSONB,
+    "temperature" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "App_pkey" PRIMARY KEY ("id")
 );
@@ -57,8 +72,6 @@ CREATE TABLE "App" (
 -- CreateTable
 CREATE TABLE "AppAction" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
     "userId" TEXT,
     "appId" TEXT NOT NULL,
     "action" TEXT NOT NULL,
@@ -68,19 +81,17 @@ CREATE TABLE "AppAction" (
 
 -- CreateTable
 CREATE TABLE "AppCategory" (
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "id" TEXT NOT NULL,
     "main" INTEGER NOT NULL,
     "sub" INTEGER NOT NULL,
+    "userId" TEXT,
 
-    CONSTRAINT "AppCategory_pkey" PRIMARY KEY ("main","sub")
+    CONSTRAINT "AppCategory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AppComment" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
     "title" TEXT,
@@ -91,10 +102,18 @@ CREATE TABLE "AppComment" (
 );
 
 -- CreateTable
+CREATE TABLE "AppPrompts" (
+    "id" TEXT NOT NULL,
+    "appId" TEXT NOT NULL,
+    "role" "PromptRoleType" NOT NULL,
+    "content" TEXT NOT NULL,
+
+    CONSTRAINT "AppPrompts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "AppState" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
     "views" INTEGER NOT NULL DEFAULT 0,
     "stars" INTEGER NOT NULL DEFAULT 0,
     "forks" INTEGER NOT NULL DEFAULT 0,
@@ -109,8 +128,6 @@ CREATE TABLE "AppState" (
 -- CreateTable
 CREATE TABLE "AppTag" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
     "creatorId" TEXT,
     "name" TEXT NOT NULL,
 
@@ -127,7 +144,11 @@ CREATE TABLE "ChatMessage" (
     "content" TEXT NOT NULL,
     "format" "ChatMessageFormatType" NOT NULL DEFAULT 'text',
     "conversationId" TEXT NOT NULL,
-    "shortId" VARCHAR(5) NOT NULL DEFAULT nanoid(),
+    "namespace" TEXT DEFAULT 'default',
+    "vector" vector,
+    "cost" DOUBLE PRECISION DEFAULT 0,
+    "modelType" TEXT DEFAULT 'gpt-3.5-turbo',
+    "isUsingFree" BOOLEAN DEFAULT false,
 
     CONSTRAINT "ChatMessage_pkey" PRIMARY KEY ("id")
 );
@@ -135,8 +156,6 @@ CREATE TABLE "ChatMessage" (
 -- CreateTable
 CREATE TABLE "ChatMessageAction" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "messageId" TEXT NOT NULL,
     "action" TEXT NOT NULL,
@@ -147,8 +166,6 @@ CREATE TABLE "ChatMessageAction" (
 -- CreateTable
 CREATE TABLE "Conversation" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "userId" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
@@ -158,10 +175,21 @@ CREATE TABLE "Conversation" (
 );
 
 -- CreateTable
+CREATE TABLE "Feedback" (
+    "id" TEXT NOT NULL,
+    "issueType" "IssueType" NOT NULL,
+    "title" TEXT NOT NULL,
+    "detail" TEXT NOT NULL,
+    "contact" TEXT NOT NULL,
+    "anonymous" BOOLEAN NOT NULL DEFAULT false,
+    "userId" TEXT,
+
+    CONSTRAINT "Feedback_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "FollowRelation" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "fromId" TEXT NOT NULL,
     "toId" TEXT NOT NULL,
 
@@ -171,8 +199,6 @@ CREATE TABLE "FollowRelation" (
 -- CreateTable
 CREATE TABLE "InvitationRelation" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "status" "InvitationStatus" NOT NULL DEFAULT 'Idle',
     "fromId" TEXT NOT NULL,
     "toId" TEXT,
@@ -193,8 +219,6 @@ CREATE TABLE "Session" (
 -- CreateTable
 CREATE TABLE "StarringApp" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "appId" TEXT NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "userId" TEXT NOT NULL,
@@ -203,8 +227,33 @@ CREATE TABLE "StarringApp" (
 );
 
 -- CreateTable
+CREATE TABLE "StripeProduct" (
+    "id" TEXT NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "currency" TEXT NOT NULL,
+    "mode" "StripeMode" NOT NULL,
+    "expire" INTEGER,
+    "level" "StripeSubscriptionLevel" DEFAULT 'basic',
+
+    CONSTRAINT "StripeProduct_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "StripePayment" (
+    "id" TEXT NOT NULL,
+    "count" INTEGER NOT NULL DEFAULT 1,
+    "redeemCode" TEXT,
+    "productId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "StripePayment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "User" (
-    "id" VARCHAR(5) NOT NULL DEFAULT nanoid(),
+    "id" VARCHAR(7) NOT NULL DEFAULT nanoid(7),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "platformType" "PlatformType" NOT NULL DEFAULT 'Poketto',
     "platformId" TEXT NOT NULL,
     "platformArgs" JSONB,
@@ -212,10 +261,13 @@ CREATE TABLE "User" (
     "email" TEXT,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
-    "desc" TEXT,
-    "balance" INTEGER NOT NULL DEFAULT 0,
+    "description" TEXT,
     "followedByCount" INTEGER NOT NULL DEFAULT 0,
     "followingCount" INTEGER NOT NULL DEFAULT 0,
+    "balance" INTEGER NOT NULL DEFAULT 0,
+    "stripeSubscriptionEnd" TIMESTAMP(3),
+    "stripeCustomerId" TEXT,
+    "quota" JSONB,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -229,7 +281,7 @@ CREATE TABLE "VerificationToken" (
 
 -- CreateTable
 CREATE TABLE "_AppToAppTag" (
-    "A" VARCHAR(5) NOT NULL,
+    "A" VARCHAR(7) NOT NULL,
     "B" TEXT NOT NULL
 );
 
@@ -240,10 +292,13 @@ CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provi
 CREATE UNIQUE INDEX "App_platformType_platformId_key" ON "App"("platformType", "platformId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "AppCategory_main_sub_key" ON "AppCategory"("main", "sub");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "AppState_appId_key" ON "AppState"("appId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "id2" ON "ChatMessage"("conversationId", "shortId");
+CREATE UNIQUE INDEX "AppTag_name_key" ON "AppTag"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "conversation" ON "Conversation"("userId", "appId");
@@ -256,6 +311,9 @@ CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_stripeCustomerId_key" ON "User"("stripeCustomerId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_platformType_platformId_key" ON "User"("platformType", "platformId");
@@ -288,10 +346,16 @@ ALTER TABLE "AppAction" ADD CONSTRAINT "AppAction_userId_fkey" FOREIGN KEY ("use
 ALTER TABLE "AppAction" ADD CONSTRAINT "AppAction_appId_fkey" FOREIGN KEY ("appId") REFERENCES "App"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "AppCategory" ADD CONSTRAINT "AppCategory_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "AppComment" ADD CONSTRAINT "AppComment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AppComment" ADD CONSTRAINT "AppComment_appId_fkey" FOREIGN KEY ("appId") REFERENCES "App"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AppPrompts" ADD CONSTRAINT "AppPrompts_appId_fkey" FOREIGN KEY ("appId") REFERENCES "App"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AppState" ADD CONSTRAINT "AppState_appId_fkey" FOREIGN KEY ("appId") REFERENCES "App"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -318,6 +382,9 @@ ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_userId_fkey" FOREIGN KEY
 ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_appId_fkey" FOREIGN KEY ("appId") REFERENCES "App"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Feedback" ADD CONSTRAINT "Feedback_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "FollowRelation" ADD CONSTRAINT "FollowRelation_fromId_fkey" FOREIGN KEY ("fromId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -337,6 +404,12 @@ ALTER TABLE "StarringApp" ADD CONSTRAINT "StarringApp_appId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "StarringApp" ADD CONSTRAINT "StarringApp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "StripePayment" ADD CONSTRAINT "StripePayment_productId_fkey" FOREIGN KEY ("productId") REFERENCES "StripeProduct"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "StripePayment" ADD CONSTRAINT "StripePayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_AppToAppTag" ADD CONSTRAINT "_AppToAppTag_A_fkey" FOREIGN KEY ("A") REFERENCES "App"("id") ON DELETE CASCADE ON UPDATE CASCADE;

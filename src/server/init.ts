@@ -4,8 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ChatMessageFormatType } from ".prisma/client"
-import { PlatformType, PromptRoleType } from "@prisma/client"
+import { ChatMessageFormatType, PlatformType, PromptRoleType } from "@prisma/client"
 import range from "lodash/range"
 import { type AdapterUser } from "next-auth/adapters"
 
@@ -25,21 +24,22 @@ import {
   POKETTO_CREATOR_ID,
   POKETTO_CREATOR_NAME,
   POKETTO_MODEL_NAME,
+  POKETTO_MODEL_TEMPERATURE,
   POKETTO_SYSTEM_PROMPT,
   POKETTO_WELCOME_MESSAGE,
   USER_INVITATIONS_COUNT,
+  paymentProducts,
 } from "@/config"
-import { paymentProducts } from "@/config-utils"
 
 import { getWelcomeSystemNotification } from "@/lib/string"
 
 export const initSystem = async (prisma: ExtendedPrismaClient) => {
   const user = await prisma.user.upsert({
-    where: { platform: { platformId: POKETTO_CREATOR_ID, platformType: PlatformType.Poketto } },
+    where: { platform: { platformId: POKETTO_CREATOR_ID, platformType: "Poketto" } },
     update: {},
     create: {
       platformId: POKETTO_CREATOR_ID,
-      platformType: PlatformType.Poketto,
+      platformType: "Poketto",
       platformArgs: {
         uri: "",
       },
@@ -54,10 +54,6 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
   await prisma.app.upsert({
     where: { platform: { platformId: POKETTO_APP_ID, platformType: "Poketto" } },
     update: {},
-    include: {
-      category: true,
-      state: true,
-    },
     create: {
       creator: {
         connect: {
@@ -71,21 +67,22 @@ export const initSystem = async (prisma: ExtendedPrismaClient) => {
       platformType: PlatformType.Poketto,
       desc: POKETTO_APP_DESC,
       modelName: POKETTO_MODEL_NAME,
-      modelArgs: {
-        prompts: [
+      temperature: POKETTO_MODEL_TEMPERATURE,
+      prompts: {
+        create: [
           {
-            role: PromptRoleType.system,
+            role: "system",
             content: POKETTO_SYSTEM_PROMPT,
           },
           {
-            role: PromptRoleType.assistant,
+            role: "assistant",
             content: POKETTO_WELCOME_MESSAGE,
           },
         ],
       },
       category: {
         connectOrCreate: {
-          where: { id: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB } },
+          where: { category: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB } },
           create: { main: POKETTO_CATEGORY_MAIN, sub: POKETTO_CATEGORY_SUB },
         },
       },
