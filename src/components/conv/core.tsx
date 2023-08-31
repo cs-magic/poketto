@@ -33,10 +33,9 @@ import { contentStyleBasedOnRole } from "@/config-utils"
 
 import { AllMessage, type AppForListView, defaultModelQuota, modelTypes } from "@/ds"
 
-import { LogoWithName } from "@/layouts/navbar"
-
 import { AppDetailContainer } from "@/components/app/container"
 import { AutoScrollContainer, IconContainer } from "@/components/containers"
+import { LogoWithName } from "@/components/layouts/navbar"
 import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"
 import {
@@ -183,7 +182,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
     sendExtraMessageFields: true, // 添加 id 信息
     body: { userId, conversationId, modelType },
     onError: (err) => {
-      console.warn(err)
+      console.warn({ err })
       toast.error(err.message, { duration: Infinity })
     },
     onResponse: async (response) => {
@@ -221,7 +220,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
     Math.floor((modelTypes.findIndex((m) => m === modelType)! / modelTypes.length) * 128) + 128
   ).toString(16)
   const color = `#${modelWeight}${modelWeight}00`
-  console.log({ color })
+  // console.log({ color })
 
   const quota = user?.quota ?? defaultModelQuota
 

@@ -28,7 +28,7 @@ import { getOrigin } from "@/lib/string"
 import "@/styles/globals.css"
 
 export function reportWebVitals(metric) {
-  console.log(metric)
+  // console.log(metric)
 }
 
 export const metadata = {
@@ -110,9 +110,9 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
         <link rel="icon" href={siteConfig.icon} />
       </Head>
 
-      <ThemeProvider>
+      <ErrorBoundary>
         <SessionProvider session={session}>
-          <ErrorBoundary>
+          <ThemeProvider>
             <TooltipProvider>
               <main
                 className={clsx(
@@ -129,10 +129,11 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
             </TooltipProvider>
             <Toaster richColors closeButton position="top-right" />
             <TailwindIndicator />
-            <Analytics />
-          </ErrorBoundary>
+
+            {/*<Analytics />*/}
+          </ThemeProvider>
         </SessionProvider>
-      </ThemeProvider>
+      </ErrorBoundary>
     </>
   )
 }

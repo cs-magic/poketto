@@ -26,7 +26,7 @@ import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
-import { getConversationLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { getConversationLink, getImageUri } from "@/lib/string"
 
 export function ConversationList() {
   const { data: convs } = api.conv.list.useQuery()
@@ -107,7 +107,7 @@ export function ConversationListView({ c }: { c: ConvForListView }) {
     >
       <div className="flex h-fit w-full items-center  gap-4">
         <Avatar className="shrink-0">
-          <AvatarImage src={getLocalFlowgptImageUri(c.app.avatar, "md")} />
+          <AvatarImage src={getImageUri(c.app.avatar, "md")} />
         </Avatar>
 
         <div className="| flex grow flex-col gap-2 overflow-hidden">

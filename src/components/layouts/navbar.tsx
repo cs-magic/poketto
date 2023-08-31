@@ -38,7 +38,7 @@ import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
-import { getLocalFlowgptImageUri } from "@/lib/string"
+import { getImageUri } from "@/lib/string"
 
 export function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme()
@@ -292,7 +292,7 @@ function CommandSearch({ className, ...props }: HTMLProps<HTMLDivElement>) {
                         }}
                       >
                         <Avatar className={"wh-5"}>
-                          <AvatarImage src={getLocalFlowgptImageUri(app.avatar)} />
+                          <AvatarImage src={getImageUri(app.avatar)} />
                         </Avatar>
                         <span>{app.name ?? app.id}</span>
                       </Item>

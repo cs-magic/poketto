@@ -54,7 +54,7 @@ export const api = createTRPCNext<RootRouter>({
             // ref: https://tanstack.com/query/v4/docs/react/reference/QueryClient
             // staleTime: Infinity,
             staleTime: 5 * 1000,
-            refetchOnWindowFocus: true,
+            refetchOnWindowFocus: false,
             refetchOnmount: false,
             refetchOnReconnect: false,
 
@@ -99,7 +99,9 @@ export const api = createTRPCNext<RootRouter>({
       links: [
         loggerLink({
           enabled: (opts) =>
-            process.env.NODE_ENV === "development" || (opts.direction === "down" && opts.result instanceof Error),
+            //  enable trpc logger
+            // process.env.NODE_ENV === "development" ||
+            opts.direction === "down" && opts.result instanceof Error,
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,

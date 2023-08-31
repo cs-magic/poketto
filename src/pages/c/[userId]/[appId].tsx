@@ -7,11 +7,10 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { AppDetailView } from "@/components/app/detail.view"
 import { ConversationCore } from "@/components/conv/core"
 import { ConversationList } from "@/components/conv/list"
+import { RootLayout } from "@/components/layouts/root.layout"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
@@ -29,7 +28,7 @@ export default function ConversationPage() {
     },
     { enabled: !!(userId && appId) }
   )
-  console.log({ userId, appId, curConv })
+  // console.log({ userId, appId, curConv })
 
   return (
     <RootLayout>

@@ -16,10 +16,9 @@ import { MAX_MOBILE_WIDTH } from "@/config"
 
 import { type NextPageWithAuth, SelectChatMessageForDetailView } from "@/ds"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { AsyncListContainer } from "@/components/containers"
 import { DataTable } from "@/components/data-table"
+import { RootLayout } from "@/components/layouts/root.layout"
 import { Loading } from "@/components/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,7 +34,7 @@ import d from "@/lib/datetime"
 export const DashboardPage: NextPageWithAuth = () => {
   const { t } = useTranslation()
   const userId = useUserId()
-  console.log("dashboard: ", { userId })
+  // console.log("dashboard: ", { userId })
   const { data: userProfile } = api.user.getProfile.useQuery({ id: userId }, { enabled: !!userId })
   const { data: payments } = api.bill.listPayments.useQuery()
   const { data: messages } = api.message.list.useQuery({ userId }, { enabled: !!userId })

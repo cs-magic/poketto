@@ -6,9 +6,8 @@
  */
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { Icons } from "@/components/icons"
+import { RootLayout } from "@/components/layouts/root.layout"
 
 export default function Custom404() {
   return (

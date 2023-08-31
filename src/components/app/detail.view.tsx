@@ -40,7 +40,7 @@ import { useUserId } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
-import { getConversationLink, getConversationsLink, getLocalFlowgptImageUri, getUserLink } from "@/lib/string"
+import { getConversationLink, getConversationsLink, getImageUri, getUserLink } from "@/lib/string"
 
 import { FLOWGPT_HOMEPAGE } from "@/const"
 
@@ -64,7 +64,7 @@ export function AppDetailView({
     <div className={clsx("flex h-full w-full flex-col gap-2 overflow-auto p-2", className)} {...props}>
       <section id="basic" className="| flex w-full items-center gap-2">
         <Avatar className="shrink-0 p-4  wh-28">
-          <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} className="rounded-2xl" />
+          <AvatarImage src={getImageUri(app.avatar, "md")} className="rounded-2xl" />
         </Avatar>
 
         <div className="| flex grow flex-col gap-2 overflow-hidden">

@@ -19,12 +19,11 @@ import { CAROUSELS } from "@/config"
 import type { SortOrder } from "@/ds"
 import { CardsLayoutType, sortOrders } from "@/ds"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { AppDetailContainer } from "@/components/app/container"
 import { GridContainer, IconContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
 import { Order2icon } from "@/components/icons"
+import { RootLayout } from "@/components/layouts/root.layout"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"

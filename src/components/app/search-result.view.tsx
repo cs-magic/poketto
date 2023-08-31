@@ -9,13 +9,13 @@ import { type AppForListView } from "@/ds"
 import { ViewsField } from "@/components/field"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
-import { getLocalFlowgptImageUri } from "@/lib/string"
+import { getImageUri } from "@/lib/string"
 
 export function SearchResultView({ app }: { app: AppForListView }) {
   return (
     <div className="flex w-full items-center gap-2 p-2 hover:bg-accent">
       <Avatar className="shrink-0">
-        <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
+        <AvatarImage src={getImageUri(app.avatar, "md")} />
       </Avatar>
       <div className="| flex grow flex-col gap-1 overflow-hidden">
         <p className="| truncate text-sm font-semibold text-primary-foreground/75">{app.name}</p>

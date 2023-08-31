@@ -4,15 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import Navbar from "./navbar"
 import React, { type PropsWithChildren, useEffect } from "react"
+import Navbar from "src/components/layouts/navbar"
 
 import { useAppStore } from "@/store"
 
 import { menuGroups, menuItems } from "@/config-utils"
 
-import { Sidebar } from "@/layouts/sidebar"
-
+import { Sidebar } from "@/components/layouts/sidebar"
 import { FooterNavItem } from "@/components/link"
 
 import { useMount } from "@/hooks/use-mount"
@@ -97,6 +96,11 @@ export function RootLayout({ children }: PropsWithChildren) {
       window.removeEventListener("resize", setInnerHeight)
     }
   }, [])
+
+  // todo: toast text overflow
+  // toast.error(
+  //   "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest"
+  // )
 
   if (!mounted) {
     return null

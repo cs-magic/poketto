@@ -9,9 +9,8 @@ import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { Icons } from "@/components/icons"
+import { RootLayout } from "@/components/layouts/root.layout"
 import { buttonVariants } from "@/components/ui/button"
 import { UserAuthForm } from "@/components/user-auth-form"
 

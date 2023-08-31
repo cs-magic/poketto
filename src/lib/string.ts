@@ -47,17 +47,10 @@ export const getUserLink = (userId: string) => `/u/${userId}`
 export const getWelcomeSystemNotification = (userName: string, appName?: string) =>
   `Welcome ${userName}${appName ? `to join the ${appName}` : ""} !`
 
-export const getLocalFlowgptImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
-  let result: string
-  if (uri.startsWith("/") || size === "raw") {
-    result = uri
-  } else if (uri.startsWith("http")) {
-    result = `/api/file?filename=${hash(uri)}&filesize=${size}`
-  } else {
-    result = getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
-  }
-  // console.log({ uri, size, result })
-  return result
+export const getImageUri = (uri: string, size: IMAGE_SIZE = "xs"): string => {
+  if (uri.includes("flowgpt")) return `/api/file?filename=${hash(uri)}&filesize=${size}`
+  if (uri.startsWith("/") || uri.startsWith("http") || size === "raw") return uri
+  return getRobotAvatar(uri, size === "xs" ? { width: 64, height: 64 } : { width: 256, height: 256 })
 }
 
 export const getOrigin = () => (typeof window !== "undefined" ? window.location.origin : baseEnv.HOST)

@@ -6,9 +6,8 @@
  */
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { ConversationList } from "@/components/conv/list"
+import { RootLayout } from "@/components/layouts/root.layout"
 
 export default function ConversationPage() {
   return (

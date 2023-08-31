@@ -10,8 +10,7 @@ import React from "react"
 
 import { type NextPageWithAuth } from "@/ds"
 
-import { RootLayout } from "@/layouts/root.layout"
-
+import { RootLayout } from "@/components/layouts/root.layout"
 import { Loading } from "@/components/loading"
 import { UserProfile } from "@/components/user/profile.view"
 

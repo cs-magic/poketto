@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { DialogTriggerProps } from "@radix-ui/react-dialog"
 import type { TooltipTriggerProps } from "@radix-ui/react-tooltip"
 import { useTranslation } from "next-i18next"
 import React, { type HTMLProps, type PropsWithChildren, type ReactNode, useCallback, useState } from "react"
@@ -119,10 +120,10 @@ export function AutoScrollContainer({ children }: PropsWithChildren) {
   )
 }
 
-export function ChargeContainer({ children }: PropsWithChildren) {
+export function ChargeContainer(props: DialogTriggerProps) {
   return (
     <Dialog>
-      <DialogTrigger>{children}</DialogTrigger>
+      <DialogTrigger {...props} />
       <DialogContent className="w-full max-w-[1080px] max-h-[80vh] overflow-auto">
         <StripePricingTable />
       </DialogContent>

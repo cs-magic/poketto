@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator"
 import { useUserId } from "@/hooks/use-user"
 
 import { todo } from "@/lib/helpers"
-import { getFlowgptUserLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { getFlowgptUserLink, getImageUri } from "@/lib/string"
 
 export function UserProfile({ user }: { user: UserForProfile }) {
   const { t } = useTranslation()
@@ -33,7 +33,7 @@ export function UserProfile({ user }: { user: UserForProfile }) {
   return (
     <div className="| mx-auto flex h-fit max-w-[375px] flex-col justify-around gap-4 rounded-2xl p-4">
       <Avatar className="mx-auto wh-[128px]">
-        <AvatarImage src={getLocalFlowgptImageUri(user?.image ?? user.id, "md")} className="" />
+        <AvatarImage src={getImageUri(user?.image ?? user.id, "md")} className="" />
         <AvatarFallback>
           <AvatarIcon />
         </AvatarFallback>
@@ -96,7 +96,7 @@ export function UserProfile({ user }: { user: UserForProfile }) {
               <span>{user?.balance ?? 0}</span>
             </Button>
 
-            <ChargeContainer>
+            <ChargeContainer asChild>
               <Button variant="outline" disabled={!user} className={"w-full"}>
                 {t("common:Charge")}
               </Button>

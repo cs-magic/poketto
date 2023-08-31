@@ -12,7 +12,7 @@ export const baseEnv = createEnv({
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
 
-    OPENAI_API_KEY: z.string(),
+    OPENAI_API_KEY: z.string().min(1),
     KV_REST_API_URL: z.string(),
     KV_REST_API_TOKEN: z.string(),
 

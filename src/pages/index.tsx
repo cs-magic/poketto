@@ -15,10 +15,9 @@ import { FREE_GPT3_DAILY_TOTAL, FREE_GPT4_DAILY_TOTAL } from "@/config"
 
 import { CardsLayoutType } from "@/ds"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { ExploreAppsWidget } from "@/components/app/explore.widget"
+import { RootLayout } from "@/components/layouts/root.layout"
 import { StatusItem } from "@/components/status"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

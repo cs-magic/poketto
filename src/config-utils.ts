@@ -44,9 +44,5 @@ export const menuGroups: Record<string, MenuKey[]> = {
 }
 export const sidebarSections: Record<string, MenuKey[]> = {
   section1: ["homepage", "explore"],
-  section2: [
-    "account",
-    // "myGallery" // todo: myGallery
-    "settings",
-  ],
+  section2: ["account", "settings"],
 }

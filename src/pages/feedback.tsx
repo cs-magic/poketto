@@ -16,8 +16,7 @@ import { z } from "zod"
 
 import { feedbackFormSchema } from "@/ds"
 
-import { RootLayout } from "@/layouts/root.layout"
-
+import { RootLayout } from "@/components/layouts/root.layout"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"

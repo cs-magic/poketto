@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 import clsx from "@/lib/clsx"
-import { getFlowgptUserLink, getLocalFlowgptImageUri } from "@/lib/string"
+import { getFlowgptUserLink, getImageUri } from "@/lib/string"
 
 export function AppVerticalCardView({
   app,
@@ -34,7 +34,7 @@ export function AppVerticalCardView({
   size?: IMAGE_SIZE
 }) {
   // console.log("app avatar: ", app.avatar)
-  const appAvatar = getLocalFlowgptImageUri(app.avatar, size)
+  const appAvatar = getImageUri(app.avatar, size)
   return (
     <div className="group relative w-full overflow-hidden rounded-2xl text-white">
       {cardsLayout === CardsLayoutType.grid ? (
@@ -97,7 +97,7 @@ export function AppVerticalCardView({
             }}
           >
             <Avatar className="wh-5">
-              <AvatarImage src={getLocalFlowgptImageUri(app.avatar, "md")} />
+              <AvatarImage src={getImageUri(app.avatar, "md")} />
             </Avatar>
             <span className="truncate italic">{app.name}</span>
           </Button>

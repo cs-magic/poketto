@@ -7,17 +7,19 @@
 import { signOut } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
+import { useRouter } from "next/router"
 import React from "react"
 import { toast } from "sonner"
 
 import { useAppStore } from "@/store"
 
+import { URI } from "@/config"
+
 import { CardsLayoutType } from "@/ds"
 
-import { LocaleSwitcher, ThemeSwitcher } from "@/layouts/navbar"
-import { RootLayout } from "@/layouts/root.layout"
-
 import { IconContainer } from "@/components/containers"
+import { LocaleSwitcher, ThemeSwitcher } from "@/components/layouts/navbar"
+import { RootLayout } from "@/components/layouts/root.layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -32,10 +34,17 @@ export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
   const user = useSessionUser()
+
+  const router = useRouter()
+  const logout = () => {
+    void signOut()
+    void router.push(URI.user.auth.login)
+  }
+
   const { mutateAsync: delUser } = api.user.del.useMutation({
     onSuccess: () => {
-      void signOut()
       toast.success("成功删除账号")
+      logout()
     },
   })
 
@@ -119,7 +128,7 @@ export default function SettingsPage() {
             </div>
 
             {user && (
-              <Button variant="destructive" onClick={() => void signOut()} className={"w-full"}>
+              <Button variant="destructive" onClick={logout} className={"w-full"}>
                 {t("common:LogOut")}
               </Button>
             )}

@@ -10,7 +10,7 @@ import { UserIcon } from "lucide-react"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
-import React from "react"
+import React, { Fragment } from "react"
 import ReactMarkdown from "react-markdown"
 
 import { ICON_DIMENSION_MD, ICON_DIMENSION_SM, URI, siteConfig } from "@/config"
@@ -39,14 +39,14 @@ export function Sidebar() {
       )}
     >
       {Object.entries(sidebarSections).map(([key, keys]) => (
-        <>
+        <Fragment key={key}>
           <Separator className={"first:hidden"} />
           <section className="w-full flex flex-col">
             {keys.map((key) => (
               <SidebarNavItem key={key} {...menuItems.find((i) => i.field === key)!} />
             ))}
           </section>
-        </>
+        </Fragment>
       ))}
 
       {/* footer */}

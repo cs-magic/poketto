@@ -12,9 +12,8 @@ import { prisma } from "@/server/db"
 
 import { type AppForListView, selectAppForListView } from "@/ds"
 
-import { RootLayout } from "@/layouts/root.layout"
-
 import { AppDetailView } from "@/components/app/detail.view"
+import { RootLayout } from "@/components/layouts/root.layout"
 
 import clsx from "@/lib/clsx"
 
@@ -25,7 +24,11 @@ export default function ConversationPage({ appStr }: { appStr: string }) {
     <RootLayout>
       <div className="| flex h-full w-full divide-x overflow-hidden">
         <section
-          className={clsx(" w-full shrink-[.1] overflow-x-hidden md:w-[375px] lg:flex", "h-full gap-4 overflow-y-auto p-4", "flex-col ")}
+          className={clsx(
+            " w-full shrink-[.1] overflow-x-hidden md:w-[375px] lg:flex",
+            "h-full gap-4 overflow-y-auto p-4",
+            "flex-col "
+          )}
         >
           <AppDetailView appId={app.id} />
         </section>

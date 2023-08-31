@@ -9,6 +9,7 @@ import { type ChatMessage } from "@prisma/client"
 import { type CreateMessage } from "ai"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
+import sortBy from "lodash/sortBy"
 import sortedUniqBy from "lodash/sortedUniqBy"
 import { ChatMessageUncheckedCreateInputSchema, ChatMessageWhereInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
@@ -17,9 +18,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 
 import { DEFAULT_LATEST_COUNT } from "@/config"
 
-import { ModelType, defaultModelQuota, selectChatMessageForDetailView } from "@/ds"
-
-import UserUpdateArgs = Prisma.UserUpdateArgs
+import { ModelType, defaultModelQuota, modelTypes, selectChatMessageForDetailView } from "@/ds"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
@@ -63,8 +62,8 @@ export const msgRouter = createTRPCRouter({
   }),
 
   getContext: publicProcedure
-    .input(z.object({ conversationId: z.string(), content: z.string(), count: z.number().default(5) }))
-    .query(async ({ ctx: { prisma }, input: { conversationId, content, count } }) => {
+    .input(z.object({ conversationId: z.string(), content: z.string(), modelType: z.string() }))
+    .query(async ({ ctx: { prisma }, input: { conversationId, content, modelType } }) => {
       const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
         prisma: Prisma,
         tableName: "ChatMessage",
@@ -80,15 +79,18 @@ export const msgRouter = createTRPCRouter({
           },
         },
       })
+      // todo: 控制拿多少，better design
+      const count = modelType === "gpt-3.5-turbo" ? 3 : 2
       const similar = (await vectorStore.similaritySearch(content, count)).map((m) => m.metadata)
       const latest = await prisma.chatMessage.findMany({
         where: { conversationId },
-        take: DEFAULT_LATEST_COUNT,
+        take: count,
         orderBy: { id: "desc" },
       })
       // todo: max token control
       // lodash 不能在 edge 里使用
-      return sortedUniqBy([...similar, ...latest.reverse()], "id") as CreateMessage[]
+      // 不能用 sortedUniqBy，因为我们没有先排序，会有 edge case
+      return sortedUniqBy(sortBy([...similar, ...latest.reverse()], "id"), "id") as CreateMessage[]
     }),
 
   list: protectedProcedure.input(ChatMessageWhereInputSchema).query(
