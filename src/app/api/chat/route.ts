@@ -130,6 +130,11 @@ export async function POST(req: Request) {
   try {
     const response = await new OpenAI({
       apiKey: baseEnv.OPENAI_API_KEY,
+      timeout: 3000,
+      /**
+       * edge 环境中 不支持 http / https-proxy-agent 等库
+       */
+      httpAgent: undefined,
     }).chat.completions.create(
       {
         model: modelType,

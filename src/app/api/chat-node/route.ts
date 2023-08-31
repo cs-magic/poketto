@@ -140,7 +140,14 @@ export async function POST(req: Request) {
       },
       {
         timeout: 3000,
-        // todo: validate ali-domestic
+        /**
+         * todo: validate ali-domestic
+         *
+         * ref:
+         *  - https://github.com/openai/openai-node/tree/v4#configuring-an-https-agent-eg-for-proxies
+         *  - https://github.com/openai/openai-node/issues/85
+         *  - https://www.npmjs.com/package/https-proxy-agent
+         */
         httpAgent: new HttpsProxyAgent("http://localhost:7890"),
       }
     )

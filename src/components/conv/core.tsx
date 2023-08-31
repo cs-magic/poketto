@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ChatMessageFormatType, PromptRoleType } from ".prisma/client"
+import { PromptRoleType } from ".prisma/client"
 import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
 import {
   ChevronDownIcon,
@@ -60,8 +60,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
@@ -69,7 +67,6 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { useMustache } from "@/hooks/use-mustache"
 import { useUniversalFullscreen } from "@/hooks/use-universal-fullscreen"
-import { useUrl } from "@/hooks/use-url"
 import { useUserId } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
