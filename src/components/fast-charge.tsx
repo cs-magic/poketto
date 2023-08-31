@@ -10,6 +10,7 @@ import { TRPCClientError } from "@trpc/client"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
+import * as React from "react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -17,6 +18,7 @@ import { z } from "zod"
 
 import { feedbackFormSchema } from "@/ds"
 
+import { ChargeContainer } from "@/components/containers"
 import { RootLayout } from "@/components/layouts/root.layout"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -63,7 +65,7 @@ const FastChargeForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-4 w-full md:w-[480px] mx-auto">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-4 w-full md:w-[360px] mx-auto">
         <FormItem>
           <FormLabel>当前 Dora：</FormLabel>
           <FormControl>
@@ -79,7 +81,12 @@ const FastChargeForm = () => {
             <FormItem>
               <FormLabel>加油券</FormLabel>
               <FormControl>
-                <Input placeholder="cp_xxx" {...field} />
+                <div className={"flex items-center gap-2"}>
+                  <Input placeholder="cp_xxx" {...field} />
+                  <Button type="submit" disabled={isLoading} className={"whitespace-nowrap"}>
+                    确认
+                  </Button>
+                </div>
               </FormControl>
               <FormDescription>使用您或他人的加油券，无需支付流程，直接为您账号续航！</FormDescription>
               <FormMessage />
@@ -87,9 +94,18 @@ const FastChargeForm = () => {
           )}
         />
 
-        <Button type="submit" disabled={isLoading}>
-          提交
-        </Button>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">{t("common:OrYouCanAlso")}</span>
+          </div>
+        </div>
+
+        <ChargeContainer className={"w-full"}>
+          <Button className={"w-full"}>充值</Button>
+        </ChargeContainer>
       </form>
     </Form>
   )

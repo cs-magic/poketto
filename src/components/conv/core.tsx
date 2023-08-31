@@ -30,6 +30,7 @@ import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
+import Typewriter from "typewriter-effect"
 
 import { useAppStore } from "@/store"
 
@@ -266,7 +267,8 @@ export function ConversationInput({ conversationId }: { conversationId: string }
         <Select onValueChange={setModelType} value={modelType}>
           <SelectTrigger variant={"simple"}>
             <IconContainer className={"rounded-sm"}>
-              <CodeSandboxLogoIcon style={{ color }} />({quota[modelType]})
+              <CodeSandboxLogoIcon style={{ color }} />
+              {quota[modelType] ? `(${quota[modelType]})` : ""}
             </IconContainer>
           </SelectTrigger>
           <SelectContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
@@ -315,12 +317,24 @@ export function ConversationInput({ conversationId }: { conversationId: string }
 
         <Popover>
           <PopoverTrigger>
-            <LightningBoltIcon style={{ color }} />
+            <IconContainer>
+              <LightningBoltIcon style={{ color }} />
+            </IconContainer>
           </PopoverTrigger>
-          <PopoverContent side={"top"} className={"w-fit"}>
+          <PopoverContent className={"w-fit"}>
             <FastChargeForm />
           </PopoverContent>
         </Popover>
+
+        {isLoading && (
+          <Typewriter
+            options={{
+              strings: ["正在思考……"],
+              autoStart: true,
+              loop: true,
+            }}
+          />
+        )}
       </div>
 
       <form
@@ -339,7 +353,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
         <Textarea
           style={{ resize: "none" }} // 去掉尾部的 icon，不然视觉上不和谐
           name="prompt"
-          className="w-full rounded-xl min-h-8 lg:min-h-16"
+          className={clsx("w-full rounded-xl min-h-8 lg:min-h-16", isLoading && "animate-pulse")}
           autoFocus
           value={input}
           onChange={handleInputChange}
