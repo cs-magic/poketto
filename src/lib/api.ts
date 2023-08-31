@@ -70,7 +70,7 @@ export const api = createTRPCNext<RootRouter>({
             // 这里可以获得从 server 拿过来的 error，然后在客户端反馈，因此可以在这里用 toast
             onError: (error) => {
               const errorMessage = `error: ${(error as TRPCError).message}`
-              console.log(errorMessage)
+              console.log("trpc error: ", { error })
               toast.error(errorMessage)
               return error
             },
@@ -80,6 +80,14 @@ export const api = createTRPCNext<RootRouter>({
               handleUnauthorizedErrorsOnClient(error)
               return false
             },
+
+            // note: mutation 的 error 直接在客户端处理更好
+            // onError: (error) => {
+            //   const errorMessage = `error: ${(error as TRPCError).message}`
+            //   console.log("trpc error: ", { error })
+            //   toast.error(errorMessage)
+            //   return error
+            // },
           },
         },
       },

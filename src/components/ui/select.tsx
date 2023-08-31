@@ -62,6 +62,13 @@ import { cn } from "@/lib/utils"
  * LICENSE file in the root directory of this source tree.
  */
 
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
@@ -69,12 +76,12 @@ const SelectGroup = SelectPrimitive.Group
 const SelectValue = SelectPrimitive.Value
 
 const selectVariants = cva(
-  "flex h-9 items-center justify-between rounded-md bg-transparent px-3 py-2 text-sm shadow-sm  placeholder:text-muted-foreground focus:outline-none  disabled:cursor-not-allowed disabled:opacity-50",
+  "flex h-9 items-center justify-between rounded-md bg-transparent text-sm shadow-sm  placeholder:text-muted-foreground focus:outline-none  disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
         simple: "",
-        withCaret: "w-full border border-input ring-offset-background focus:ring-1 focus:ring-ring",
+        withCaret: "px-3 py-2 w-full border border-input ring-offset-background focus:ring-1 focus:ring-ring",
       },
     },
     defaultVariants: {

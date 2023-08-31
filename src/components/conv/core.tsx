@@ -9,13 +9,17 @@ import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
 import {
   ChevronDownIcon,
   CodeSandboxLogoIcon,
+  ComponentInstanceIcon,
   DotsVerticalIcon,
   DrawingPinFilledIcon,
   DrawingPinIcon,
   EnterFullScreenIcon,
   ExitFullScreenIcon,
   HamburgerMenuIcon,
+  LayersIcon,
+  LightningBoltIcon,
   Link2Icon,
+  StackIcon,
 } from "@radix-ui/react-icons"
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
@@ -31,10 +35,11 @@ import { useAppStore } from "@/store"
 
 import { contentStyleBasedOnRole } from "@/config-utils"
 
-import { AllMessage, type AppForListView, defaultModelQuota, modelTypes } from "@/ds"
+import { AllMessage, type AppForListView, defaultModelQuota, memoryModes, modelTypes } from "@/ds"
 
 import { AppDetailContainer } from "@/components/app/container"
 import { AutoScrollContainer, IconContainer } from "@/components/containers"
+import FastChargeForm from "@/components/fast-charge"
 import { LogoWithName } from "@/components/layouts/navbar"
 import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"
@@ -54,6 +59,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
@@ -161,11 +168,10 @@ export function ConversationCore({ conversationId }: { conversationId: string })
 }
 
 export function ConversationInput({ conversationId }: { conversationId: string }) {
-  const { modelType, setModelType } = useAppStore()
+  const { modelType, setModelType, memoryMode, setMemoryMode } = useAppStore()
   const { t } = useTranslation()
   const userId = useUserId()
   const { data: user } = api.user.getProfile.useQuery({ id: userId })
-  const { data: balanceOk } = api.user.validateBalance.useQuery({ id: userId })
   const { data: conv } = api.conv.get.useQuery({ id: conversationId })
   const { data: hasApp } = api.conv.has.useQuery({ id: conversationId }, { enabled: !!conv })
   const { data: initialMessages } = api.message.list.useQuery({ conversationId: conversationId }, { enabled: !!userId })
@@ -180,7 +186,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
-    body: { userId, conversationId, modelType },
+    body: { userId, conversationId, modelType, memoryMode },
     onError: (err) => {
       console.warn({ err })
       toast.error(err.message, { duration: Infinity })
@@ -256,7 +262,7 @@ export function ConversationInput({ conversationId }: { conversationId: string }
         </div>
       </ScrollContainer>
 
-      <div className={"w-full px-4 flex items-center"}>
+      <div className={"w-full px-4 flex items-center gap-2"}>
         <Select onValueChange={setModelType} value={modelType}>
           <SelectTrigger variant={"simple"}>
             <IconContainer className={"rounded-sm"}>
@@ -282,6 +288,39 @@ export function ConversationInput({ conversationId }: { conversationId: string }
             </SelectGroup>
           </SelectContent>
         </Select>
+
+        <Select onValueChange={setMemoryMode} value={memoryMode}>
+          <SelectTrigger variant={"simple"}>
+            <IconContainer className={"rounded-sm"}>
+              {memoryMode === "one-time" ? (
+                <ComponentInstanceIcon style={{ color }} />
+              ) : memoryMode === "recent" ? (
+                <StackIcon style={{ color }} />
+              ) : (
+                <LayersIcon style={{ color }} />
+              )}
+            </IconContainer>
+          </SelectTrigger>
+          <SelectContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
+            <SelectGroup>
+              {memoryModes.map((k) => (
+                <SelectItem key={k} value={k}>
+                  {t(`common:memoryMode.${k}.title`)}
+                  <span className={"text-xs text-muted-foreground ml-2"}>({t(`common:memoryMode.${k}.desc`)})</span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Popover>
+          <PopoverTrigger>
+            <LightningBoltIcon style={{ color }} />
+          </PopoverTrigger>
+          <PopoverContent side={"top"} className={"w-fit"}>
+            <FastChargeForm />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <form
@@ -289,9 +328,9 @@ export function ConversationInput({ conversationId }: { conversationId: string }
         className={clsx("w-full gap-2 px-4 py-2 | flex items-center justify-center")}
         onSubmit={(event) => {
           event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
-          console.log({ hasApp, balanceOk })
+          console.log({ hasApp })
 
-          if (!balanceOk && quota[modelType] <= 0) {
+          if (user.balance <= 0 && quota[modelType] <= 0) {
             return setAlertVisible(true)
           }
           handleSubmit(event)

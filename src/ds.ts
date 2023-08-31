@@ -226,3 +226,6 @@ export const feedbackFormSchema = z.object({
   detail: z.string().min(1),
   anonymous: z.boolean().default(false),
 })
+
+export const memoryModes = ["one-time", "recent", "with-memory"] as const
+export type MemoryMode = (typeof memoryModes)[number]

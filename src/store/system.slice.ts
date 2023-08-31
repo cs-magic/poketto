@@ -6,7 +6,7 @@
  */
 import { type StoreSlice } from "@/store/index"
 
-import { ModelType } from "@/ds"
+import { MemoryMode, ModelType } from "@/ds"
 
 import { FixedCacheQueue } from "@/lib/algo"
 
@@ -21,6 +21,9 @@ export interface SystemState {
 
   modelType: ModelType
   setModelType: (v: ModelType) => void
+
+  memoryMode: MemoryMode
+  setMemoryMode: (v: MemoryMode) => void
 }
 
 export const createSystemSlice: StoreSlice<SystemState> = (setState, getState, store) => ({
@@ -34,5 +37,11 @@ export const createSystemSlice: StoreSlice<SystemState> = (setState, getState, s
   setModelType: (v) =>
     setState((state) => {
       state.modelType = v
+    }),
+
+  memoryMode: "one-time",
+  setMemoryMode: (v) =>
+    setState((state) => {
+      state.memoryMode = v
     }),
 })
