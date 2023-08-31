@@ -28,7 +28,7 @@ import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
-export const runtime = isDomestic() ? "node" : "edge" // IMPORTANT! Set the runtime to edge
+export const runtime = isDomestic() ? "nodejs" : "edge" // IMPORTANT! Set the runtime to edge
 
 /**
  * ref:
