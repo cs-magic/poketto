@@ -55,6 +55,8 @@ export type UserForProfile = UserGetPayload<{ select: typeof selectUserProfile }
 
 export const selectAppForListView = validator<AppSelect>()({
   id: true,
+  createdAt: true,
+  updatedAt: true,
   version: true,
   platformId: true,
   platformType: true,
@@ -129,7 +131,8 @@ export type ConvForDetailView = ConversationGetPayload<{
 
 export const selectChatMessageForListView = validator<ChatMessageSelect>()({
   id: true,
-  // updatedAt: true, // todo: support message modification
+  createdAt: true,
+  updatedAt: true, // todo: support message modification
   content: true,
   role: true,
   format: true,

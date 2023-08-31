@@ -31,6 +31,7 @@ export const packMessageWithDate = (messages: Message[], user: UserForListView, 
             },
       format: "format" in m ? (m.format as ChatMessageFormatType) : ChatMessageFormatType.text,
       createdAt: m?.createdAt ?? new Date(),
+      updatedAt: m?.createdAt ?? new Date(),
     })
   }
   return messagesWithDate

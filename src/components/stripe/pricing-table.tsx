@@ -28,7 +28,7 @@ declare global {
  * id: https://dashboard.stripe.com/pricing-tables
  */
 function StripePricingTable() {
-  const user = useUser()
+  const { user } = useUser()
   if (!user) {
     return <h1> You should login first to view the pricing table</h1>
   }

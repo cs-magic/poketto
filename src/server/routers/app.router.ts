@@ -22,7 +22,7 @@ const orderByMap: { [key in SortOrder]: AppOrderByWithRelationInput } = {
   mostUsed: { state: { calls: "desc" } },
   // mostSaved: { state: { stars: "desc" } },
   // mostShared: { state: { shares: "desc" } },
-  newest: { state: { createdAt: "desc" } },
+  newest: { state: { id: "desc" } },
   // top: { state: { calls: "desc" } },
   // trending: { state: { shares: "desc" } },
   // recommend
