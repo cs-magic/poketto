@@ -61,7 +61,11 @@ export async function POST(req: Request) {
             stripePayments: {
               create: {
                 id: session.id,
-                productId,
+                product: {
+                  connect: {
+                    id: productId,
+                  },
+                },
                 count,
               },
             },
@@ -83,7 +87,11 @@ export async function POST(req: Request) {
             stripePayments: {
               create: {
                 id: session.id,
-                productId,
+                product: {
+                  connect: {
+                    id: productId,
+                  },
+                },
                 count,
               },
             },
