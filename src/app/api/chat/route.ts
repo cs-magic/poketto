@@ -47,14 +47,20 @@ export async function POST(req: Request) {
     ],
     transformer: superjson,
   })
+
   /**
    * validate balance
    */
-  const user = await proxy.user.getProfile.query({ id: userId })
+  const {
+    user,
+    app: { prompts: context },
+  } = await proxy.conv.getForChat.query({ id: conversationId })
+
   if (user.balance <= 0 && (user.quota ?? defaultModelQuota)[modelType] <= 0)
     return new Response(ERR_MSG_BALANCE_NOT_ENOUGH, {
       status: 406,
     })
+
   /**
    * 1. 先存储用户的消息，谨防丢失
    */
@@ -78,6 +84,9 @@ export async function POST(req: Request) {
 
   /**
    * 2. 检查频率等相关
+   * note:
+   *  1. 因为我们已经有了用户系统，所以不需要检查频率了
+   *  2. 这个基于 KV 的对于大陆来说，太慢了，真要做，可以使用本地的 redis，参考：rate-limit-redis - npm, https://www.npmjs.com/package/rate-limit-redis
    */
   // if (baseEnv.KV_REST_API_URL && baseEnv.KV_REST_API_TOKEN) {
   //   const ip = req.headers.get("x-forwarded-for")
@@ -99,22 +108,18 @@ export async function POST(req: Request) {
   //       },
   //     })
   //   }
-  //   // todo: 国内这个比较慢
   //   console.log("passed rate limiter")
   // }
 
-  /**
-   * 3. 读取 memory: p ∪ q 条记忆;  p=5: 过往最相关记忆; q=4: 最新记忆
-   */
   const { content } = receivedMessages[receivedMessages.length - 1]
-  let context: { role: PromptRoleType; content: string }[] = []
-  // todo: add system prompt
   if (memoryMode === "one-time") {
-    context = [{ content, role: "user" }]
+    context.push({ content, role: "user" })
   } else if (memoryMode === "recent") {
-    context = receivedMessages.slice(-5)
+    // 最近5条记录
+    context.push(...receivedMessages.slice(-5))
   } else {
-    context = await proxy.message.getContext.query({ conversationId, content, modelType })
+    // 读取 memory: p ∪ q 条记忆;  p=5: 过往最相关记忆; q=4: 最新记忆
+    context.push(...(await proxy.message.getContext.query({ conversationId, content, modelType })))
   }
   const messages = context.map((m) => ({ role: m.role, content: m.content }))
   console.log("context: ", { messages })

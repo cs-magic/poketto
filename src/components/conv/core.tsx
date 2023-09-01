@@ -26,7 +26,7 @@ import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
-import React, { ReactPropTypes, useEffect, useRef, useState } from "react"
+import React, { ComponentProps, ReactPropTypes, useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
@@ -100,6 +100,8 @@ export function ConversationCore({ conversationId }: { conversationId: string })
   const [sticky] = useSticky()
   const m = useMustache()
   const { ref, fullscreen, toggle } = useUniversalFullscreen()
+
+  // todo: 独立后端，因为这个每次都得向服务器发送一堆 messages，不适合生产实践，然后也有各种限制
   const { isLoading, messages, data, handleSubmit, input, handleInputChange, setMessages, stop } = useChat({
     api: "/api/chat", // explicit default
     initialMessages: [],
@@ -156,7 +158,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
   const quota = user?.quota ?? defaultModelQuota
 
   const ScrollContainer = AutoScrollContainer
-  const ColoredIconContainer = (props: ReactPropTypes<typeof IconContainer>) => (
+  const ColoredIconContainer = (props: ComponentProps<typeof IconContainer>) => (
     <IconContainer {...props} style={{ color }} />
   )
 
@@ -245,7 +247,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
             <ScrollContainer>
               <div className={clsx("w-full p-2 ")}>
                 {/* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序 */}
-                {conversation && (
+                {conversation && user && (
                   <div className={clsx("relative  w-full", "flex flex-col-reverse", "overflow-auto")}>
                     {/* 这里为了把下面（倒序）的空间给撑起来，使聊天在不占满的情况下，也能从上显示到下（而非粘在底部，从下到上） */}
                     <div className="grow" />
@@ -397,10 +399,10 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               onSubmit={(event) => {
                 event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
                 console.log({ hasApp })
+                if (!user) return toast.error("请登录后再试！")
 
-                if (user.balance <= 0 && quota[modelType] <= 0) {
-                  return setAlertVisible(true)
-                }
+                if (user.balance <= 0 && quota[modelType] <= 0) return setAlertVisible(true)
+
                 handleSubmit(event)
               }}
             >
