@@ -11,7 +11,7 @@ import { useAppStore } from "@/store"
 
 import { menuGroups } from "@/config"
 
-import { menuItems } from "@/components/icons"
+import { MenuItems } from "@/components/icons"
 import { Sidebar } from "@/components/layouts/sidebar"
 import { FooterNavItem } from "@/components/link"
 
@@ -20,7 +20,7 @@ import { useMount } from "@/hooks/use-mount"
 export const Footer = () => (
   <footer className="w-full shrink-0 | grid grid-cols-4">
     {menuGroups
-      .mobileFooters!.map((f) => menuItems.find((i) => i.field === f)!)
+      .mobileFooters!.map((f) => MenuItems.find((i) => i.field === f)!)
       .map((k) => (
         <FooterNavItem key={k.field} {...k} />
       ))}
@@ -98,10 +98,7 @@ export function RootLayout({ children }: PropsWithChildren) {
     }
   }, [])
 
-  // todo: toast text overflow
-  // toast.error(
-  //   "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest"
-  // )
+  console.log("refreshed")
 
   if (!mounted) {
     return null

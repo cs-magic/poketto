@@ -1,8 +1,16 @@
+## radix-ui
+
+在使用 `dialog` 等交互的时候，子元素不能是 nested 可点击的，应该给一个 pure view component
+
+否则，会报： [Dialog component - validateDOMNesting(...): <button> cannot appear as a descendant of <button> · Issue #1102 · shadcn-ui/ui](https://github.com/shadcn-ui/ui/issues/1102)
+之类的错误
+
 ## eslint
 
 参考 docusaurus 的： https://github.com/facebook/docusaurus/blob/main/.eslintrc.js
 
 再做了一些修改：
+
 - 剔除了 docusaurus 自己的插件
 - 降低了很多规则的level
 

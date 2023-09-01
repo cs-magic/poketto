@@ -49,7 +49,7 @@ export const GithubIcon = ({ ...props }: LucideProps) => (
   </svg>
 )
 
-export const menuItems: IMenuItem[] = [
+export const MenuItems: IMenuItem[] = [
   { field: "homepage", link: URI.app.home, Icon: HomeIcon },
   { field: "explore", link: URI.app.explore, Icon: RocketIcon },
   { field: "account", link: URI.user.mySpace, Icon: MixIcon },

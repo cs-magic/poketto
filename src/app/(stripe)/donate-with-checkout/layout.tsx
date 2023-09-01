@@ -6,7 +6,7 @@
  */
 import type { Metadata } from "next"
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Checkout Session Result",
 }
 

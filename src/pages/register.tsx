@@ -13,7 +13,7 @@ import { UserAuthForm } from "@/components/user-auth-form"
 
 import { cn } from "@/lib/utils"
 
-export const metadata = {
+const metadata = {
   title: "Create an account",
   description: "Create an account to get started.",
 }

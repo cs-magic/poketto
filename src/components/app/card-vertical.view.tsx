@@ -4,15 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { DotsVerticalIcon } from "@radix-ui/react-icons"
 import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
 import Image from "next/image"
 
 import { type AppForListView, CardsLayoutType, IMAGE_SIZE, type SortOrder } from "@/ds"
 
-import { AppDetailContainer } from "@/components/app/container"
-import { AppDetailView } from "@/components/app/detail.view"
 import { UsesField, ViewsField } from "@/components/field"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
@@ -22,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import clsx from "@/lib/clsx"
 import { getFlowgptUserLink, getImageUri } from "@/lib/string"
 
-export function AppVerticalCardView({
+export const AppVerticalCardView = ({
   app,
   cardsLayout,
   sort,
@@ -32,7 +29,7 @@ export function AppVerticalCardView({
   cardsLayout: CardsLayoutType
   sort: SortOrder
   size?: IMAGE_SIZE
-}) {
+}) => {
   // console.log("app avatar: ", app.avatar)
   const appAvatar = getImageUri(app.avatar, size)
   return (
@@ -87,20 +84,14 @@ export function AppVerticalCardView({
         <div className="text-md hidden transition-all group-hover:line-clamp-3">{app.desc}</div>
 
         {/*	user - ranks */}
-        <div className="| flex justify-between text-xs text-gray-100  dark:text-primary-foreground/75 ">
+        <div className="| flex justify-between text-xs text-slate-100  dark:text-primary-foreground/75 ">
           {/* user */}
-          <Button
-            variant="link"
-            className="| flex w-1/2 items-center gap-2"
-            onClick={() => {
-              window.location.href = getFlowgptUserLink(app.creatorId)
-            }}
-          >
+          <div className="| flex w-1/2 items-center gap-2">
             <Avatar className="wh-5">
               <AvatarImage src={getImageUri(app.avatar, "md")} />
             </Avatar>
-            <span className="truncate italic">{app.name}</span>
-          </Button>
+            <span className="truncate italic font-normal">{app.name}</span>
+          </div>
 
           {/* ranks */}
           <div className="flex items-center gap-1">

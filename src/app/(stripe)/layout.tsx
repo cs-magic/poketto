@@ -14,7 +14,7 @@ import { siteConfig } from "@/config"
 
 import { getOrigin } from "@/lib/edge"
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   metadataBase: new URL(getOrigin()),
   title: {
     default: "TypeScript Next.js Stripe Example",

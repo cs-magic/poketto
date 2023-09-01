@@ -1,5 +1,6 @@
-import { Prisma, PrismaClient } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { MongoClient } from "mongodb"
+import { prismaClient } from "scripts/lib/db"
 
 import type sampleBasicPrompt from "@/data/flowgpt/prompt-basic_2.json"
 
@@ -9,13 +10,7 @@ export type IFlowgptPromptBasic = typeof sampleBasicPrompt
 
 const init = async () => {
   const mongoClient = new MongoClient("mongodb://localhost")
-  const prismaClient = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL!,
-      },
-    },
-  })
+
   let p
   try {
     console.log("initializing flowgpt apps")

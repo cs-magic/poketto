@@ -14,7 +14,6 @@ export function AppDetailContainer({
   appId,
   open,
   onOpenChange,
-  children,
   ...props
 }: {
   appId: string
@@ -23,7 +22,7 @@ export function AppDetailContainer({
 } & DialogTriggerProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger {...props}>{children}</DialogTrigger>
+      <DialogTrigger {...props} />
       <DialogContent className="max-h-[80%] w-full overflow-auto sm:max-w-[60%]">
         <AppDetailView appId={appId} setOpen={onOpenChange} />
       </DialogContent>

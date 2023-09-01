@@ -1,7 +1,6 @@
 {
   "printWidth": 120,
   "semi": false,
-  // 保留多行内尾部的逗号，方便开发时代码按行级别的 comment/uncomment
   "trailingComma": "all",
   "importOrder": [
     "^([^@]|@[^/]).*?$",
@@ -9,6 +8,7 @@
     "^@/store.*?$",
     "^@/data.*?$",
     "^@/env.*?$",
+    "^@/const.*?$",
     "^@/config.*?$",
     "^@/ds.*?$",
     "^@/layout.*?$",
@@ -18,5 +18,5 @@
     "^.*?$"
   ],
   "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true,
+  "importOrderSortSpecifiers": true
 }

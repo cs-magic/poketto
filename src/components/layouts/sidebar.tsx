@@ -16,7 +16,7 @@ import ReactMarkdown from "react-markdown"
 import { ICON_DIMENSION_MD, ICON_DIMENSION_SM, URI, sidebarSections, siteConfig } from "@/config"
 
 import { IconContainer } from "@/components/containers"
-import { menuItems } from "@/components/icons"
+import { MenuItems } from "@/components/icons"
 import { SidebarNavItem } from "@/components/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -43,7 +43,7 @@ export function Sidebar() {
           <Separator className={"first:hidden"} />
           <section className="w-full flex flex-col">
             {keys.map((key) => (
-              <SidebarNavItem key={key} {...menuItems.find((i) => i.field === key)!} />
+              <SidebarNavItem key={key} {...MenuItems.find((i) => i.field === key)!} />
             ))}
           </section>
         </Fragment>

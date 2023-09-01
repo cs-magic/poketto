@@ -8,8 +8,7 @@ import type { Metadata } from "next"
 
 import CheckoutForm from "@/components/CheckoutForm"
 
-
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Donate with Checkout | Next.js + TypeScript Example",
 }
 

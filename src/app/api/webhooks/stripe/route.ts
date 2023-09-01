@@ -36,6 +36,19 @@ export async function POST(req: Request) {
   if (event.type === "checkout.session.completed") {
     const { mode, customer } = session
     const userId = session.client_reference_id ?? session?.metadata?.userId
+
+    if (!userId)
+      return new Response(
+        "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
+        { status: 200 }
+      )
+    const user = await prisma.user.findUniqueOrThrow({ id: userId })
+    if (!user)
+      return new Response(
+        "no user of this webhook in database, maybe it's for another server so won't be handled then",
+        { status: 200 }
+      )
+
     const stripeCustomerId = customer as string
 
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id)

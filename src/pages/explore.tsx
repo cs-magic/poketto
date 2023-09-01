@@ -21,9 +21,11 @@ import { CardsLayoutType, Order2icon, sortOrders } from "@/ds"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
 import { AppDetailContainer } from "@/components/app/container"
+import { AppDetailView } from "@/components/app/detail.view"
 import { GridContainer, IconContainer, MasonryContainer, ResponsiveTooltip } from "@/components/containers"
 import { RootLayout } from "@/components/layouts/root.layout"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 

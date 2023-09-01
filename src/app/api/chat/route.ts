@@ -17,14 +17,13 @@ import { type RootRouter } from "@/server/routers/_root.router"
 
 import { baseEnv } from "@/env.mjs"
 
+import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
+
 import { CHAT_MESSAGE_CID_LEN } from "@/config"
 
 import { MemoryMode, defaultModelQuota } from "@/ds"
 
-import { isDomestic } from "@/lib/edge"
-import { nanoid } from "@/lib/id"
-
-import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
+import { isDomestic, nanoid } from "@/lib/edge"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
@@ -139,11 +138,13 @@ export async function POST(req: Request) {
        *
        * edge 环境中 不支持 http / https-proxy-agent 等库
        */
-      httpAgent: isDomestic()
-        ? new (
-            await import("https-proxy-agent")
-          ).HttpsProxyAgent("http://localhost:7890")
-        : undefined,
+      httpAgent:
+        // isDomestic()
+        // ? new (
+        //     await import("https-proxy-agent")
+        //   ).HttpsProxyAgent("http://localhost:7890")
+        // :
+        undefined,
     }).chat.completions.create(
       {
         model: modelType,
@@ -151,7 +152,7 @@ export async function POST(req: Request) {
         messages,
         temperature: 0.7,
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     )
 
     const stream = OpenAIStream(response, {

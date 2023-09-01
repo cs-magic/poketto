@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { SessionProvider } from "next-auth/react"
 import { appWithTranslation } from "next-i18next"
 import Head from "next/head"
@@ -22,16 +16,38 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
+import d from "@/lib/datetime"
 import { getOrigin } from "@/lib/edge"
 import { fontHeading, fontSans } from "@/lib/fonts"
 
 import "@/styles/globals.css"
 
-export function reportWebVitals(metric) {
-  // console.log(metric)
+/**
+ * Copyright (c) CS-Magic, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+let init = false
+const originalLog = console.log // Store the original console.log function
+
+console.log = function () {
+  if (!init) {
+    const currentTime = d(new Date()).format("YYYY-MM-DD ddd HH:mm:ss Z") // Get the current datetime in a desired format
+
+    const updatedArgs = [`[${currentTime}]`, ...arguments] // Add the datetime as an additional argument
+
+    originalLog.apply(console, updatedArgs) // Call the original console.log function with the updated arguments
+    init = true
+  }
 }
 
-export const metadata = {
+function reportWebVitals(metric) {
+  console.log(metric)
+}
+
+const metadata = {
   metadataBase: new URL(getOrigin()),
   title: {
     default: siteConfig.name,

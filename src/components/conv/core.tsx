@@ -428,7 +428,7 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
             key={msg.id}
             className={clsx(
               "group chat text-sm tracking-normal",
-              msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end"
+              msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end",
             )}
           >
             <div className="avatar chat-image">
@@ -444,7 +444,7 @@ export function ConversationMessages({ messages }: { messages: AllMessage[] }) {
               {m(msg.content)}
             </ReactMarkdown>
           </div>
-        )
+        ),
       )}
       {hasUnread && !sticky && (
         <Badge variant="default" className="absolute bottom-4 right-4 cursor-pointer" onClick={() => scrollToBottom()}>

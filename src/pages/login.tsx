@@ -17,7 +17,7 @@ import { UserAuthForm } from "@/components/user-auth-form"
 
 import { cn } from "@/lib/utils"
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Login",
   description: "Login to your account",
 }

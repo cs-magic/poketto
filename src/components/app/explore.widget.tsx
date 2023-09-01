@@ -72,7 +72,7 @@ export function ExploreAppsWidget() {
               ))
             : apps.length >= n &&
               sampleSize(range(n), k).map((i) => (
-                <AppDetailContainer appId={apps[i]!.id} key={i}>
+                <AppDetailContainer appId={apps[i]!.id} key={i} asChild>
                   <AppHorizontalCardView app={apps[i]} key={i} />
                 </AppDetailContainer>
               ))}

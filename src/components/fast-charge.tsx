@@ -92,8 +92,10 @@ const FastChargeForm = () => {
           </div>
         </div>
 
-        <ChargeContainer className={"w-full"}>
-          <Button className={"w-full"}>充值</Button>
+        <ChargeContainer className={"w-full"} asChild>
+          <Button variant={"outline"} className={"w-full"}>
+            充值
+          </Button>
         </ChargeContainer>
       </form>
     </Form>

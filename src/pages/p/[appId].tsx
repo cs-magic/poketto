@@ -37,7 +37,7 @@ export default function ConversationPage({ appStr }: { appStr: string }) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ locale, query }) => {
+const getServerSideProps: GetServerSideProps = async ({ locale, query }) => {
   const appId = query!.appId as string
 
   const app = await prisma.app.findUniqueOrThrow({
