@@ -16,7 +16,7 @@ import { paymentEnv } from "@/env.mjs"
 import { subscriptionLevel2Unit } from "@/config"
 
 import d from "@/lib/datetime"
-import { getOrigin } from "@/lib/router"
+import { getOrigin, getServerId, isDomestic } from "@/lib/router"
 import { decodeClientReferenceId } from "@/lib/stripe"
 
 /**
@@ -56,10 +56,10 @@ export async function POST(req: Request) {
         return NextResponse.json({
           message: "skip handling since  no client_reference_id in this webhook",
         })
-      const { userId, origin } = decodeClientReferenceId(client_reference_id)
+      const { userId, serverId } = decodeClientReferenceId(client_reference_id)
       console.log({ client_reference_id: { origin, userId }, event: { id, type } })
 
-      if (origin !== getOrigin()) {
+      if (serverId !== getServerId()) {
         return NextResponse.json({
           message: "skip handling since origin mismatch",
         })

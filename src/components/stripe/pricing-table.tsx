@@ -35,6 +35,10 @@ function StripePricingTable() {
   if (!user) {
     return <h1> You should login first to view the pricing table</h1>
   }
+
+  const clientReferenceId = encodeClientReferenceId(user.id)
+  console.log({ clientReferenceId })
+
   return (
     <>
       <Head>
@@ -44,7 +48,7 @@ function StripePricingTable() {
       <stripe-pricing-table
         pricing-table-id={paymentEnv.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
         publishable-key={paymentEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-        client-reference-id={encodeClientReferenceId({ userId: user.id, origin: getOrigin() })}
+        client-reference-id={clientReferenceId}
         customer-email={user.email}
       />
     </>
