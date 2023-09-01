@@ -40,8 +40,9 @@ import { contentStyleBasedOnRole } from "@/config"
 import { defaultModelQuota, memoryModes, modelTypes } from "@/ds"
 
 import { AppDetailContainer } from "@/components/app/container"
+import FastChargeForm from "@/components/charge-fast"
+import SlowChargeForm from "@/components/charge-slow"
 import { AutoScrollContainer, IconContainer } from "@/components/containers"
-import FastChargeForm from "@/components/fast-charge"
 import { LogoWithName } from "@/components/layouts/navbar"
 import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"
@@ -171,52 +172,58 @@ export function ConversationCore({ conversationId }: { conversationId: string })
           {fullscreen ? <LogoWithName /> : <div />}
           <h2 className="truncate text-center">{conversation.app.name}</h2>
 
-          <Popover>
-            <PopoverTrigger className="shrink-0">
-              <IconContainer>
-                <DotsVerticalIcon />
-              </IconContainer>
-            </PopoverTrigger>
-            <PopoverContent className="flex flex-col gap-2">
-              <Link
-                href="/c/[userId]"
-                as={getConversationsLink(conversation.userId)}
-                className="p-btn-horizontal justify-between lg:hidden"
-              >
-                <span>{t("common:general.appList")}</span> <HamburgerMenuIcon />
-              </Link>
+          {fullscreen ? (
+            <IconContainer onClick={toggle}>
+              <ExitFullScreenIcon />
+            </IconContainer>
+          ) : (
+            <Popover>
+              <PopoverTrigger className="shrink-0">
+                <IconContainer>
+                  <DotsVerticalIcon />
+                </IconContainer>
+              </PopoverTrigger>
+              <PopoverContent className="flex flex-col gap-2">
+                <Link
+                  href="/c/[userId]"
+                  as={getConversationsLink(conversation.userId)}
+                  className="p-btn-horizontal justify-between lg:hidden"
+                >
+                  <span>{t("common:general.appList")}</span> <HamburgerMenuIcon />
+                </Link>
 
-              <AppDetailContainer appId={conversation.appId} asChild>
-                <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
-                  <span>{t("common:general.detail")}</span> <FrameIcon />
+                <AppDetailContainer appId={conversation.appId} asChild>
+                  <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
+                    <span>{t("common:general.detail")}</span> <FrameIcon />
+                  </Button>
+                </AppDetailContainer>
+
+                <Separator orientation="horizontal" className="xl:hidden" />
+
+                <Button
+                  className="justify-between"
+                  variant="ghost"
+                  onClick={() => pinConv({ conversationId: conversation.id, toStatus: !conversation.pinned })}
+                >
+                  {conversation.pinned ? (
+                    <>
+                      <span>{t("common:general.unpin")}</span>
+                      <DrawingPinIcon />
+                    </>
+                  ) : (
+                    <>
+                      <span>{t("common:general.pin")}</span>
+                      <DrawingPinFilledIcon />
+                    </>
+                  )}
                 </Button>
-              </AppDetailContainer>
 
-              <Separator orientation="horizontal" className="xl:hidden" />
-
-              <Button
-                className="justify-between"
-                variant="ghost"
-                onClick={() => pinConv({ conversationId: conversation.id, toStatus: !conversation.pinned })}
-              >
-                {conversation.pinned ? (
-                  <>
-                    <span>{t("common:general.unpin")}</span>
-                    <DrawingPinIcon />
-                  </>
-                ) : (
-                  <>
-                    <span>{t("common:general.pin")}</span>
-                    <DrawingPinFilledIcon />
-                  </>
-                )}
-              </Button>
-
-              <Button className="justify-between" variant="ghost" disabled>
-                <span>{t("common:general.share")}</span> <Link2Icon />
-              </Button>
-            </PopoverContent>
-          </Popover>
+                <Button className="justify-between" variant="ghost" disabled>
+                  <span>{t("common:general.share")}</span> <Link2Icon />
+                </Button>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         <div className={clsx("w-full grow ", "overflow-auto")}>
@@ -312,7 +319,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               </div>
             </ScrollContainer>
 
-            <div className={"w-full px-4 flex items-center gap-2"}>
+            <div className={clsx("w-full px-4 flex items-center gap-2", fullscreen && "hidden")}>
               <Select onValueChange={setModelType} value={modelType}>
                 <SelectTrigger variant={"simple"}>
                   <ColoredIconContainer className={"rounded-sm"}>
@@ -374,7 +381,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
                   </ColoredIconContainer>
                 </PopoverTrigger>
                 <PopoverContent className={"w-fit"}>
-                  <FastChargeForm />
+                  <SlowChargeForm />
                 </PopoverContent>
               </Popover>
 
