@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { headers } from "next/headers"
+import { NextRequest, NextResponse } from "next/server"
 import type Stripe from "stripe"
 
 import { prisma } from "@/server/db"
@@ -16,24 +17,21 @@ import { subscriptionLevel2Unit } from "@/config"
 import d from "@/lib/datetime"
 import { stripe } from "@/lib/stripe"
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-export async function POST(req: Request) {
+// NextRequest, ref: https://github.com/BastidaNicolas/nextauth-prisma-stripe/blob/master/src/app/api/webhooks/route.ts
+export async function POST(req: NextRequest) {
   const body = await req.text()
-  const signature = headers().get("Stripe-Signature") as string
+  const signature = headers().get("Stripe-Signature")!
 
   let event: Stripe.Event
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, paymentEnv.STRIPE_WEBHOOK_SECRET)
-  } catch (error) {
-    console.warn({ error })
-    const { message } = error as { message: string }
-    return new Response(`Webhook Error: ${message}`, { status: 400 })
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error"
+    // On error, log and return the error message.
+    if (err! instanceof Error) console.log(err)
+    console.log(`❌ Error message: ${errorMessage}`)
+    return NextResponse.json(`Webhook Error: ${errorMessage}`, { status: 400 })
   }
 
   console.debug("event: ", JSON.stringify(event))
@@ -51,15 +49,13 @@ export async function POST(req: Request) {
       const userId = session.client_reference_id ?? session?.metadata?.userId
 
       if (!userId)
-        return new Response(
+        return NextResponse.json(
           "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
-          { status: 200 },
         )
       const user = await prisma.user.findUnique({ where: { id: userId } })
       if (!user)
-        return new Response(
+        return NextResponse.json(
           "no user of this webhook in database, maybe it's for another server so won't be handled then",
-          { status: 200 },
         )
 
       const stripeCustomerId = customer as string
@@ -130,5 +126,5 @@ export async function POST(req: Request) {
       break
   }
 
-  return new Response("✅", { status: 200 })
+  return NextResponse.json("✅")
 }
