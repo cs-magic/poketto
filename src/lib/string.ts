@@ -28,7 +28,6 @@ export const getRobotAvatar = (
 
 export const getConversationsLink = (userId: string) => `/c/${userId}`
 export const getConversationLink = (userId: string, appId: string) => `/c/${userId}/${appId}`
-export const getAppLink = (appId: string) => `/p/${appId}`
 
 // export const getFlowgptUserLink = (userId: string) => `${FLOWGPT_URL}/user/${userId}`
 export const getFlowgptUserLink = (userId: string) => `${FLOWGPT_HOMEPAGE}/@${userId}`

@@ -40,13 +40,13 @@ export async function POST(req: Request) {
     if (!userId)
       return new Response(
         "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
-        { status: 200 }
+        { status: 200 },
       )
-    const user = await prisma.user.findUniqueOrThrow({ id: userId })
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } })
     if (!user)
       return new Response(
         "no user of this webhook in database, maybe it's for another server so won't be handled then",
-        { status: 200 }
+        { status: 200 },
       )
 
     const stripeCustomerId = customer as string
