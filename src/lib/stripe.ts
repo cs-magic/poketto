@@ -9,10 +9,7 @@ import Stripe from "stripe"
 
 import { paymentEnv } from "@/env.mjs"
 
-const key = paymentEnv.STRIPE_API_KEY
-console.log({ key })
-
-export const stripe = new Stripe(key, {
+export const stripe = new Stripe(paymentEnv.STRIPE_API_KEY, {
   // https://github.com/stripe/stripe-node#configuration
   apiVersion: "2023-08-16",
   appInfo: {

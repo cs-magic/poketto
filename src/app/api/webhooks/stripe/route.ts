@@ -16,6 +16,12 @@ import { subscriptionLevel2Unit } from "@/config"
 import d from "@/lib/datetime"
 import { stripe } from "@/lib/stripe"
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 export async function POST(req: Request) {
   const body = await req.text()
   const signature = headers().get("Stripe-Signature") as string
@@ -25,7 +31,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, paymentEnv.STRIPE_WEBHOOK_SECRET)
   } catch (error) {
-    console.log({ error })
+    console.warn({ error })
     const { message } = error as { message: string }
     return new Response(`Webhook Error: ${message}`, { status: 400 })
   }
@@ -38,86 +44,90 @@ export async function POST(req: Request) {
   } = event
   console.log({ event: { id, type } })
 
-  if (type === "checkout.session.completed") {
-    const session = object as Stripe.Checkout.Session
-    const { mode, customer } = session
-    const userId = session.client_reference_id ?? session?.metadata?.userId
+  switch (type) {
+    case "checkout.session.completed":
+      const session = object as Stripe.Checkout.Session
+      const { mode, customer } = session
+      const userId = session.client_reference_id ?? session?.metadata?.userId
 
-    if (!userId)
-      return new Response(
-        "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
-        { status: 200 },
-      )
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user)
-      return new Response(
-        "no user of this webhook in database, maybe it's for another server so won't be handled then",
-        { status: 200 },
-      )
+      if (!userId)
+        return new Response(
+          "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
+          { status: 200 },
+        )
+      const user = await prisma.user.findUnique({ where: { id: userId } })
+      if (!user)
+        return new Response(
+          "no user of this webhook in database, maybe it's for another server so won't be handled then",
+          { status: 200 },
+        )
 
-    const stripeCustomerId = customer as string
+      const stripeCustomerId = customer as string
 
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
-    for (const item of lineItems.data) {
-      const productId = item.price?.product as string // get the product ID
-      const productInfo = await prisma.stripeProduct.findUniqueOrThrow({ where: { id: productId } })
-      const { quantity } = item // get the quantity
-      const count = quantity ?? 1
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+      for (const item of lineItems.data) {
+        const productId = item.price?.product as string // get the product ID
+        const productInfo = await prisma.stripeProduct.findUniqueOrThrow({ where: { id: productId } })
+        const { quantity } = item // get the quantity
+        const count = quantity ?? 1
 
-      console.log({ customer, mode, userId, productId, quantity })
+        console.log({ customer, mode, userId, productId, quantity })
 
-      if (mode === "payment") {
-        await prisma.user.update({
-          where: { id: userId },
-          include: {
-            stripePayments: true,
-          },
-          data: {
-            balance: {
-              increment: subscriptionLevel2Unit[productInfo.level ?? "basic"] * count * 100,
+        if (mode === "payment") {
+          await prisma.user.update({
+            where: { id: userId },
+            include: {
+              stripePayments: true,
             },
-            stripeCustomerId,
-            stripePayments: {
-              create: {
-                id: session.id,
-                product: {
-                  connect: {
-                    id: productId,
+            data: {
+              balance: {
+                increment: subscriptionLevel2Unit[productInfo.level ?? "basic"] * count * 100,
+              },
+              stripeCustomerId,
+              stripePayments: {
+                create: {
+                  id: session.id,
+                  product: {
+                    connect: {
+                      id: productId,
+                    },
                   },
+                  count,
                 },
-                count,
               },
             },
-          },
-        })
-      }
+          })
+        }
 
-      if (mode === "subscription") {
-        await prisma.user.update({
-          where: {
-            id: userId,
-          },
-          data: {
-            balance: {
-              increment: subscriptionLevel2Unit[productInfo.level ?? "basic"] * count * 100,
+        if (mode === "subscription") {
+          await prisma.user.update({
+            where: {
+              id: userId,
             },
-            stripeSubscriptionEnd: d(new Date()).add(30, "days").toDate(),
-            stripeCustomerId,
-            stripePayments: {
-              create: {
-                id: session.id,
-                product: {
-                  connect: {
-                    id: productId,
+            data: {
+              balance: {
+                increment: subscriptionLevel2Unit[productInfo.level ?? "basic"] * count * 100,
+              },
+              stripeSubscriptionEnd: d(new Date()).add(30, "days").toDate(),
+              stripeCustomerId,
+              stripePayments: {
+                create: {
+                  id: session.id,
+                  product: {
+                    connect: {
+                      id: productId,
+                    },
                   },
+                  count,
                 },
-                count,
               },
             },
-          },
-        })
+          })
+        }
       }
-    }
+      break
+    default:
+      break
   }
 
   return new Response("✅", { status: 200 })
