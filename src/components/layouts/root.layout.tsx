@@ -98,8 +98,6 @@ export function RootLayout({ children }: PropsWithChildren) {
     }
   }, [])
 
-  console.log("refreshed")
-
   if (!mounted) {
     return null
   }

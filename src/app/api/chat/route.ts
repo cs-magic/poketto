@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     app: { prompts: context },
   } = await proxy.conv.getForChat.query({ id: conversationId })
 
-  if (user.balance <= 0 && (user.quota ?? defaultModelQuota)[modelType] <= 0)
+  if (user.balance <= 0 && (user.quota || defaultModelQuota)[modelType] <= 0)
     return new Response(ERR_MSG_BALANCE_NOT_ENOUGH, {
       status: 406,
     })

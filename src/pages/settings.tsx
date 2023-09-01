@@ -33,7 +33,7 @@ import { api } from "@/lib/api"
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
-  const user = useUser()
+  const { user } = useUser()
 
   const router = useRouter()
   const logout = () => {

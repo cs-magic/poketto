@@ -390,13 +390,16 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               </ColoredIconContainer>
 
               {isLoading && (
-                <Typewriter
-                  options={{
-                    strings: ["……", "……", "……"],
-                    autoStart: true,
-                    loop: true,
-                  }}
-                />
+                // <Typewriter
+                //   options={{
+                //     strings: ["……", "……", "……"],
+                //     autoStart: true,
+                //     loop: true,
+                //   }}
+                // />
+                <Button variant={"outline"} onClick={stop}>
+                  打断施法
+                </Button>
               )}
             </div>
 
@@ -405,7 +408,9 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               className={clsx("w-full gap-2 px-4 py-2 | flex items-center justify-center")}
               onSubmit={(event) => {
                 event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
-                console.log({ hasApp })
+
+                if (isLoading) return toast.error("请耐心等待回复完成或者直接中断回复！")
+
                 if (!user) return toast.error("请登录后再试！")
 
                 if (user.balance <= 0 && quota[modelType] <= 0) return setAlertVisible(true)

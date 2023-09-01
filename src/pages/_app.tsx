@@ -36,8 +36,6 @@ console.log = function () {
   originalLog.apply(console, [`[${currentTime}]`, ...arguments])
 }
 
-console.log("xx xxxx xxxx")
-
 function reportWebVitals(metric) {
   console.log(metric)
 }

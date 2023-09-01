@@ -4,8 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma } from "@prisma/client"
-import { type ChatMessage } from "@prisma/client"
+import { type ChatMessage, Prisma } from "@prisma/client"
 import { type CreateMessage } from "ai"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import { PrismaVectorStore } from "langchain/vectorstores/prisma"
@@ -16,35 +15,40 @@ import { z } from "zod"
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc-helpers"
 
-import { DEFAULT_LATEST_COUNT } from "@/config"
-
-import { ModelType, defaultModelQuota, modelTypes, selectChatMessageForDetailView } from "@/ds"
+import { ModelType, defaultModelQuota, selectChatMessageForDetailView } from "@/ds"
 
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {
-    const { user } = await prisma.conversation.findUniqueOrThrow({
+    let {
+      user: { id, balance, quota },
+    } = await prisma.conversation.findUniqueOrThrow({
       where: { id: input.conversationId },
       select: {
         user: true,
       },
     })
+    // possible null
+    if (!quota) quota = defaultModelQuota
 
     // todo: token calculation
     const ourToken = input.content.length / 1000
-    const { isUsingFree, role } = input
     const modelType = input.modelType as ModelType
-    let { balance } = user
-    const quota = user.quota ?? defaultModelQuota
-    if (isUsingFree && role === "assistant") --quota[modelType]
-    else --balance
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        quota,
-        balance,
-      },
-    })
+    if (input.role === "assistant") {
+      if (balance > 0) {
+        const cost = modelType === "gpt-4" ? 2 : 1
+        balance -= cost
+      } else {
+        --quota[modelType]
+      }
+      await prisma.user.update({
+        where: { id },
+        data: {
+          quota,
+          balance,
+        },
+      })
+    }
 
     const vectorStore = PrismaVectorStore.withModel<ChatMessage>(prisma).create(new OpenAIEmbeddings(), {
       prisma: Prisma,
@@ -107,7 +111,7 @@ export const msgRouter = createTRPCRouter({
         select: selectChatMessageForDetailView,
         orderBy: { id: "desc" },
         take: 10,
-      })
+      }),
   ),
 
   syncLatestId: protectedProcedure.input(z.object({ conversationId: z.string() })).mutation(
@@ -117,6 +121,6 @@ export const msgRouter = createTRPCRouter({
           take: -1,
           where: { conversationId },
         })
-      ).id
+      ).id,
   ),
 })
