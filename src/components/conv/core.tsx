@@ -409,7 +409,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               onSubmit={(event) => {
                 event.preventDefault() // 下面不需要是因为 ai sdk 里已经写了
 
-                if (isLoading) return toast.error("请耐心等待回复完成或者直接中断回复！")
+                if (isLoading) return // toast.error("请耐心等待回复完成或者直接中断回复！")
 
                 if (!user) return toast.error("请登录后再试！")
 

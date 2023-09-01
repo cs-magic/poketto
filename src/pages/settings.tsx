@@ -44,7 +44,7 @@ export default function SettingsPage() {
   const { mutateAsync: delUser } = api.user.del.useMutation({
     onSuccess: () => {
       toast.success("成功删除账号")
-      logout()
+      void logout()
     },
   })
 
