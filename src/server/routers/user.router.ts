@@ -17,13 +17,8 @@ export const userRouter = createTRPCRouter({
   getProfile: publicProcedure
     .input(UserWhereUniqueInputSchema)
     .query(async ({ ctx: { prisma }, input }) =>
-      prisma.user.findUniqueOrThrow({ where: input, select: selectUserProfile })
+      prisma.user.findUniqueOrThrow({ where: input, select: selectUserProfile }),
     ),
-
-  validateBalance: publicProcedure.input(UserWhereUniqueInputSchema).query(async ({ ctx: { prisma }, input }) => {
-    const { balance } = await prisma.user.findUniqueOrThrow({ where: input })
-    return balance > 0
-  }),
 
   del: protectedProcedure.mutation(
     async ({
@@ -33,6 +28,6 @@ export const userRouter = createTRPCRouter({
       },
     }) => {
       return prisma.user.delete({ where: { id: user.id } })
-    }
+    },
   ),
 })

@@ -22,12 +22,11 @@ import { stripe } from "@/lib/stripe"
  * ❤️ https://makerkit.dev/blog/tutorials/nextjs13
  * NextRequest, ref: https://github.com/BastidaNicolas/nextauth-prisma-stripe/blob/master/src/app/api/webhooks/route.ts
  * ode:stream/consumers, ref: https://github.com/vercel/next.js/issues/49739#issuecomment-1553858264
- * @constructor
  */
 export async function POST(req: Request) {
   const body = await req.text()
   const signature = headers().get("Stripe-Signature")!
-
+  console.log({ body })
   let event: Stripe.Event
 
   try {
@@ -37,7 +36,7 @@ export async function POST(req: Request) {
     // On error, log and return the error message.
     if (err! instanceof Error) console.log(err)
     console.log(`❌ Error message: ${errorMessage}`)
-    return NextResponse.json(`Webhook Error: ${errorMessage}`, { status: 400 })
+    return NextResponse.json({ message: `Webhook Error: ${errorMessage}` }, { status: 400 })
   }
 
   console.debug("event: ", JSON.stringify(event))
@@ -55,14 +54,14 @@ export async function POST(req: Request) {
       const userId = session.client_reference_id ?? session?.metadata?.userId
 
       if (!userId)
-        return NextResponse.json(
-          "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
-        )
+        return NextResponse.json({
+          message: "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
+        })
       const user = await prisma.user.findUnique({ where: { id: userId } })
       if (!user)
-        return NextResponse.json(
-          "no user of this webhook in database, maybe it's for another server so won't be handled then",
-        )
+        return NextResponse.json({
+          message: "no user of this webhook in database, maybe it's for another server so won't be handled then",
+        })
 
       const stripeCustomerId = customer as string
 
@@ -132,5 +131,5 @@ export async function POST(req: Request) {
       break
   }
 
-  return NextResponse.json("✅")
+  return NextResponse.json({ message: "✅" })
 }
