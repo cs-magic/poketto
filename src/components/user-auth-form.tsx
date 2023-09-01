@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import type * as z from "zod"
+import * as z from "zod"
 
 import { POKETTO_INTERNATIONAL_HOME, POKETTO_MAINLAND_CHINA_HOME } from "@/config"
 
@@ -21,12 +21,14 @@ import { Label } from "@/components/ui/label"
 import { useLocale } from "@/hooks/use-i18n"
 import { useMustache } from "@/hooks/use-mustache"
 
-import { getOrigin } from "@/lib/edge"
+import { getOrigin } from "@/lib/router"
 import { cn } from "@/lib/utils"
-import { userAuthSchema } from "@/lib/validations/auth"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
+const userAuthSchema = z.object({
+  email: z.string().email(),
+})
 type FormData = z.infer<typeof userAuthSchema>
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
@@ -59,7 +61,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           redirect: false,
           callbackUrl: searchParams?.get("from") || "/dashboard",
         },
-        { locale, origin }
+        { locale, origin },
       )
 
       setIsLoading(false)

@@ -17,8 +17,8 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
-import { getOrigin } from "@/lib/edge"
 import { fontHeading, fontSans } from "@/lib/fonts"
+import { getOrigin } from "@/lib/router"
 
 import "@/styles/globals.css"
 

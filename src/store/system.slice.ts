@@ -8,7 +8,7 @@ import { type StoreSlice } from "@/store/index"
 
 import { MemoryMode, ModelType } from "@/ds"
 
-import { FixedCacheQueue } from "@/lib/algo"
+import { FixedCacheQueue } from "@/lib/queue"
 
 /**
  * system | search for commands

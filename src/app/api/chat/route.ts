@@ -21,7 +21,9 @@ import { CHAT_MESSAGE_CID_LEN, ERR_MSG_BALANCE_NOT_ENOUGH } from "@/config"
 
 import { MemoryMode, defaultModelQuota } from "@/ds"
 
-import { createHttpAgent, isDomestic, nanoid } from "@/lib/edge"
+import { nanoid } from "@/lib/id"
+import { createHttpAgent } from "@/lib/proxy"
+import { isDomestic } from "@/lib/router"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 

@@ -4,12 +4,11 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import type { Stripe } from "stripe"
 
+import { stripe } from "@/server/stripe"
+
 import { CURRENCY } from "@/config"
 
-import { stripe } from "@/lib/stripe"
-
 import { formatAmountForStripe } from "@/utils/stripe-helpers"
-
 
 export async function createCheckoutSession(data: FormData): Promise<void> {
   const checkoutSession: Stripe.Checkout.Session = await stripe.checkout.sessions.create({

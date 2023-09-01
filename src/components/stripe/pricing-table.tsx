@@ -11,7 +11,7 @@ import { paymentEnv } from "@/env.mjs"
 
 import { useUser } from "@/hooks/use-user"
 
-import { getOrigin } from "@/lib/edge"
+import { getOrigin } from "@/lib/router"
 import { encodeClientReferenceId } from "@/lib/stripe"
 
 declare global {

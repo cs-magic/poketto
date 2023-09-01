@@ -11,7 +11,7 @@ import { POKETTO_APP_ID } from "@/config"
 import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
-import { getOrigin } from "@/lib/edge"
+import { getOrigin } from "@/lib/router"
 import { getConversationLink } from "@/lib/string"
 
 export const useUrl = () => {
@@ -26,7 +26,7 @@ export const usePokettoConversationUrl = () => {
   const { userId } = useUser()
   const { data: app } = api.app.get.useQuery(
     { platform: { platformId: POKETTO_APP_ID, platformType: "Poketto" } },
-    { enabled: !!userId }
+    { enabled: !!userId },
   )
   if (!userId || !app) return null
   return getConversationLink(userId, app.id)
