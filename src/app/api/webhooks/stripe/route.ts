@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { headers } from "next/headers"
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import type Stripe from "stripe"
 
 import { prisma } from "@/server/db"
@@ -17,8 +17,14 @@ import { subscriptionLevel2Unit } from "@/config"
 import d from "@/lib/datetime"
 import { stripe } from "@/lib/stripe"
 
-// NextRequest, ref: https://github.com/BastidaNicolas/nextauth-prisma-stripe/blob/master/src/app/api/webhooks/route.ts
-export async function POST(req: NextRequest) {
+/**
+ * ref:
+ * ❤️ https://makerkit.dev/blog/tutorials/nextjs13
+ * NextRequest, ref: https://github.com/BastidaNicolas/nextauth-prisma-stripe/blob/master/src/app/api/webhooks/route.ts
+ * ode:stream/consumers, ref: https://github.com/vercel/next.js/issues/49739#issuecomment-1553858264
+ * @constructor
+ */
+export async function POST(req: Request) {
   const body = await req.text()
   const signature = headers().get("Stripe-Signature")!
 
