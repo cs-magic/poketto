@@ -29,21 +29,14 @@ import "@/styles/globals.css"
  * LICENSE file in the root directory of this source tree.
  */
 
-let init = false
+// todo: nextjs log best practice: 1. universal 2. bind console
 const originalLog = console.log // Store the original console.log function
-
 console.log = function () {
-  if (init) {
-    originalLog.apply(console, arguments)
-  } else {
-    const currentTime = d(new Date()).format("YYYY-MM-DD ddd HH:mm:ss Z") // Get the current datetime in a desired format
-
-    const updatedArgs = [`[${currentTime}]`, ...arguments] // Add the datetime as an additional argument
-
-    originalLog.apply(console, updatedArgs) // Call the original console.log function with the updated arguments
-    init = true
-  }
+  const currentTime = d(new Date()).format("YYYY-MM-DD ddd HH:mm:ss Z")
+  originalLog.apply(console, [`[${currentTime}]`, ...arguments])
 }
+
+console.log("xx xxxx xxxx")
 
 function reportWebVitals(metric) {
   console.log(metric)

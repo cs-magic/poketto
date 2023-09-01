@@ -60,7 +60,7 @@ export async function POST(req: Request) {
    */
 
   // console.log("req: ", { data })
-  const pushMessage = (msg: Message) => {
+  const pushMessage = async (msg: Message) => {
     const { role, content } = msg
     const newMessage: ChatMessageUncheckedCreateInput = {
       role,
@@ -74,34 +74,34 @@ export async function POST(req: Request) {
     void proxy.message.push.mutate(newMessage)
   }
 
-  void pushMessage(receivedMessages[receivedMessages.length - 1])
+  await pushMessage(receivedMessages[receivedMessages.length - 1])
 
   /**
    * 2. 检查频率等相关
    */
-  if (baseEnv.KV_REST_API_URL && baseEnv.KV_REST_API_TOKEN) {
-    const ip = req.headers.get("x-forwarded-for")
-    const ratelimit = new Ratelimit({
-      redis: kv,
-      // rate limit to 1 requests per 20 seconds
-      limiter: Ratelimit.slidingWindow(3, "10s"),
-    })
-
-    const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
-
-    if (!success) {
-      return NextResponse.json("您的速度太快啦，请慢点！", {
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": limit.toString(),
-          "X-RateLimit-Remaining": remaining.toString(),
-          "X-RateLimit-Reset": reset.toString(),
-        },
-      })
-    }
-    // todo: 国内这个比较慢
-    console.log("passed rate limiter")
-  }
+  // if (baseEnv.KV_REST_API_URL && baseEnv.KV_REST_API_TOKEN) {
+  //   const ip = req.headers.get("x-forwarded-for")
+  //   const ratelimit = new Ratelimit({
+  //     redis: kv,
+  //     // rate limit to 1 requests per 20 seconds
+  //     limiter: Ratelimit.slidingWindow(3, "10s"),
+  //   })
+  //
+  //   const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
+  //
+  //   if (!success) {
+  //     return NextResponse.json("您的速度太快啦，请慢点！", {
+  //       status: 429,
+  //       headers: {
+  //         "X-RateLimit-Limit": limit.toString(),
+  //         "X-RateLimit-Remaining": remaining.toString(),
+  //         "X-RateLimit-Reset": reset.toString(),
+  //       },
+  //     })
+  //   }
+  //   // todo: 国内这个比较慢
+  //   console.log("passed rate limiter")
+  // }
 
   /**
    * 3. 读取 memory: p ∪ q 条记忆;  p=5: 过往最相关记忆; q=4: 最新记忆
@@ -148,9 +148,9 @@ export async function POST(req: Request) {
     )
 
     const stream = OpenAIStream(response, {
-      onCompletion: (completion) => {
+      onCompletion: async (completion) => {
         console.log({ completion })
-        pushMessage({ content: completion, role: "assistant", id: replyId })
+        await pushMessage({ content: completion, role: "assistant", id: replyId })
       },
       onFinal: (final) => {
         // 之前直接监听这个回调，结果拿不到数据，监听 onCompletion就好了，很奇怪……现在两个都拿的到。。

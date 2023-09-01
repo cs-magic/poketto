@@ -33,7 +33,7 @@ export function ExploreAppsWidget() {
     },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
-    }
+    },
   )
   const apps = query.data?.pages.flatMap((item) => item.items)
 
@@ -72,7 +72,7 @@ export function ExploreAppsWidget() {
               ))
             : apps.length >= n &&
               sampleSize(range(n), k).map((i) => (
-                <AppDetailContainer appId={apps[i]!.id} key={i} asChild>
+                <AppDetailContainer appId={apps[i]!.id} key={i}>
                   <AppHorizontalCardView app={apps[i]} key={i} />
                 </AppDetailContainer>
               ))}
