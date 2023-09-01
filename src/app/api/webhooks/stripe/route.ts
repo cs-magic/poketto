@@ -40,12 +40,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: `Webhook Error: ${errorMessage}` }, { status: 400 })
   }
 
-  console.debug("event: ", JSON.stringify(event))
   const {
     id,
     type,
     data: { object },
   } = event
+  // console.debug("event: ", JSON.stringify(event))
+  console.log("stripe web hook event: ", { id, type })
 
   switch (type) {
     case "checkout.session.completed":
@@ -57,7 +58,7 @@ export async function POST(req: Request) {
           message: "skip handling since  no client_reference_id in this webhook",
         })
       const { userId, serverId } = decodeClientReferenceId(client_reference_id)
-      console.log({ client_reference_id: { origin, userId }, event: { id, type } })
+      console.log({ client_reference_id: { serverId, userId } })
 
       if (serverId !== getServerId()) {
         return NextResponse.json({
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
 
       const user = await prisma.user.findUnique({ where: { id: userId } })
       if (!user) {
-        console.error("既然有origin、userId，不应该没有user！", { origin, userId })
+        console.error("既然有origin、userId，不应该没有user！", { serverId, userId })
         return NextResponse.json({
           message: "no user of this webhook in database, maybe it's for another server so won't be handled then",
         })
