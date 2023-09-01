@@ -115,7 +115,7 @@ export function ConversationListView({ c }: { c: ConvForListView }) {
           <div className="| flex w-full justify-between gap-2">
             <span className="truncate ">{c.app.name}</span>
             {/* todo: dayjs locale calendar */}
-            <span>{d(getCuidTimestamp(latestMessage.id)).locale(language).calendar()}</span>
+            <span>{d(latestMessage.updatedAt).locale(language).calendar()}</span>
           </div>
           <div className="flex gap-2">
             {/* 只有 group 才需要打开 */}

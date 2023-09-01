@@ -1,3 +1,7 @@
+## prisma / validate
+
+ref: https://stackoverflow.com/a/69943634/9422455
+
 ## radix-ui
 
 在使用 `dialog` 等交互的时候，子元素不能是 nested 可点击的，应该给一个 pure view component

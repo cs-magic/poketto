@@ -12,7 +12,13 @@ import { HTMLProps, useCallback, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
 
-import { POKETTO_APP_ID, POKETTO_DETAIL_FEATURES_ENABLED, POKETTO_DETAIL_RATINGS_ENABLED, URI } from "@/config"
+import {
+  FLOWGPT_HOMEPAGE,
+  POKETTO_APP_ID,
+  POKETTO_DETAIL_FEATURES_ENABLED,
+  POKETTO_DETAIL_RATINGS_ENABLED,
+  URI,
+} from "@/config"
 
 import { MasonryContainer } from "@/components/containers"
 import { Loading } from "@/components/loading"
@@ -41,8 +47,6 @@ import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import { vIsNumber } from "@/lib/number"
 import { getConversationLink, getConversationsLink, getImageUri, getUserLink } from "@/lib/string"
-
-import { FLOWGPT_HOMEPAGE } from "@/const"
 
 export function AppDetailView({
   appId,

@@ -82,53 +82,6 @@ export const selectAppForListView = validator<AppSelect>()({
 })
 export type AppForListView = AppGetPayload<{ select: typeof selectAppForListView }>
 
-export const selectAppForDetailView = validator<AppSelect>()({
-  ...selectAppForListView,
-  comments: true,
-  prompts: {
-    select: {
-      content: true,
-      role: true,
-    },
-  },
-  temperature: true,
-})
-export type AppForDetailView = AppGetPayload<{ select: typeof selectAppForDetailView }>
-
-// ref: https://stackoverflow.com/a/69943634/9422455
-export const selectConvForListView = validator<ConversationSelect>()({
-  // @ts-ignore
-  // latestMessage: true, // 这会覆盖我的 messages 数据结构，因为 latestMessages need messages
-  messages: {
-    orderBy: { id: "desc" },
-    take: 1,
-    select: {
-      id: true,
-      content: true,
-    },
-  },
-  pinned: true,
-  userId: true,
-  appId: true,
-  app: {
-    select: selectAppForListView,
-  },
-})
-
-export type ConvForListView = ConversationGetPayload<{ select: typeof selectConvForListView }>
-
-export const includeConvForDetailView = validator<ConversationInclude>()({
-  app: { select: selectAppForDetailView },
-  messages: {
-    include: {
-      user: true, // 获取每条信息的用户
-    },
-  },
-})
-export type ConvForDetailView = ConversationGetPayload<{
-  include: typeof includeConvForDetailView
-}>
-
 export const selectChatMessageForListView = validator<ChatMessageSelect>()({
   id: true,
   createdAt: true,
@@ -142,6 +95,37 @@ export const selectChatMessageForListView = validator<ChatMessageSelect>()({
 })
 export type SelectChatMessageForListView = ChatMessageGetPayload<{ select: typeof selectChatMessageForListView }>
 
+export const selectConvForListView = validator<ConversationSelect>()({
+  // @ts-ignore
+  // latestMessage: true, // 这会覆盖我的 messages 数据结构，因为 latestMessages need messages
+  messages: {
+    orderBy: { id: "desc" },
+    take: 1,
+    select: selectChatMessageForListView,
+  },
+  pinned: true,
+  userId: true,
+  appId: true,
+  app: {
+    select: selectAppForListView,
+  },
+})
+
+export type ConvForListView = ConversationGetPayload<{ select: typeof selectConvForListView }>
+
+export const selectAppForDetailView = validator<AppSelect>()({
+  ...selectAppForListView,
+  comments: true,
+  prompts: {
+    select: {
+      content: true,
+      role: true,
+    },
+  },
+  temperature: true,
+})
+export type AppForDetailView = AppGetPayload<{ select: typeof selectAppForDetailView }>
+
 export const selectChatMessageForDetailView = validator<ChatMessageSelect>()({
   ...selectChatMessageForListView,
   cost: true,
@@ -150,6 +134,18 @@ export const selectChatMessageForDetailView = validator<ChatMessageSelect>()({
   },
 })
 export type SelectChatMessageForDetailView = ChatMessageGetPayload<{ select: typeof selectChatMessageForDetailView }>
+
+export const includeConvForDetailView = validator<ConversationInclude>()({
+  app: { select: selectAppForDetailView },
+  messages: {
+    include: {
+      user: true, // 获取每条信息的用户
+    },
+  },
+})
+export type ConvForDetailView = ConversationGetPayload<{
+  include: typeof includeConvForDetailView
+}>
 
 // -----------------------------------------------------------------------------
 // next-auth, ref: https://stackoverflow.com/a/69968164/9422455

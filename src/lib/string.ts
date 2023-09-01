@@ -6,9 +6,9 @@
  */
 import hash from "js-sha1"
 
-import { type IMAGE_SIZE } from "@/ds"
+import { FLOWGPT_HOMEPAGE } from "@/config"
 
-import { FLOWGPT_HOMEPAGE } from "@/const"
+import { type IMAGE_SIZE } from "@/ds"
 
 /**
  * ref: https://robohash.org/
@@ -23,7 +23,7 @@ export const getRobotAvatar = (
     width?: number
     height?: number
     mode?: number
-  } = {}
+  } = {},
 ) => `https://robohash.org/${key}?set=set${mode}&size=${width}x${height}`
 
 export const getConversationsLink = (userId: string) => `/c/${userId}`

@@ -17,13 +17,11 @@ import { type RootRouter } from "@/server/routers/_root.router"
 
 import { baseEnv } from "@/env.mjs"
 
-import { ERR_MSG_BALANCE_NOT_ENOUGH } from "@/const"
-
-import { CHAT_MESSAGE_CID_LEN } from "@/config"
+import { CHAT_MESSAGE_CID_LEN, ERR_MSG_BALANCE_NOT_ENOUGH } from "@/config"
 
 import { MemoryMode, defaultModelQuota } from "@/ds"
 
-import { isDomestic, nanoid } from "@/lib/edge"
+import { createHttpAgent, isDomestic, nanoid } from "@/lib/edge"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
@@ -138,13 +136,7 @@ export async function POST(req: Request) {
        *
        * edge 环境中 不支持 http / https-proxy-agent 等库
        */
-      httpAgent:
-        // isDomestic()
-        // ? new (
-        //     await import("https-proxy-agent")
-        //   ).HttpsProxyAgent("http://localhost:7890")
-        // :
-        undefined,
+      httpAgent: await createHttpAgent(),
     }).chat.completions.create(
       {
         model: modelType,
