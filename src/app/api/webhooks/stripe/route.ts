@@ -24,9 +24,8 @@ import { stripe } from "@/lib/stripe"
  * ode:stream/consumers, ref: https://github.com/vercel/next.js/issues/49739#issuecomment-1553858264
  */
 export async function POST(req: Request) {
-  const body = await req.text()
+  const body = await req.text() // 直接获取 raw body，值得注意的是，webhook不能有相同的，会导致 signature 不匹配
   const signature = headers().get("Stripe-Signature")!
-  console.log({ body })
   let event: Stripe.Event
 
   try {
