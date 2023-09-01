@@ -30,10 +30,16 @@ export async function POST(req: Request) {
     return new Response(`Webhook Error: ${message}`, { status: 400 })
   }
 
-  console.log("event: ", JSON.stringify(event, null, 2))
-  const session = event.data.object as Stripe.Checkout.Session
+  console.debug("event: ", JSON.stringify(event))
+  const {
+    id,
+    type,
+    data: { object },
+  } = event
+  console.log({ event: { id, type } })
 
-  if (event.type === "checkout.session.completed") {
+  if (type === "checkout.session.completed") {
+    const session = object as Stripe.Checkout.Session
     const { mode, customer } = session
     const userId = session.client_reference_id ?? session?.metadata?.userId
 
@@ -42,7 +48,7 @@ export async function POST(req: Request) {
         "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
         { status: 200 },
       )
-    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } })
+    const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user)
       return new Response(
         "no user of this webhook in database, maybe it's for another server so won't be handled then",
@@ -114,5 +120,5 @@ export async function POST(req: Request) {
     }
   }
 
-  return new Response(null, { status: 200 })
+  return new Response("✅", { status: 200 })
 }

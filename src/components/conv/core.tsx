@@ -397,7 +397,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
                 //     loop: true,
                 //   }}
                 // />
-                <Button variant={"outline"} onClick={stop}>
+                <Button variant={"outline"} onClick={stop} className={"text-muted-foreground"}>
                   打断施法
                 </Button>
               )}
