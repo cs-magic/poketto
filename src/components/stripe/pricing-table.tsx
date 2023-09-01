@@ -9,6 +9,8 @@ import React from "react"
 
 import { paymentEnv } from "@/env.mjs"
 
+import { STRIPE_PRICING_TABLE_ID, STRIPE_PUBLISHABLE_KEY } from "@/config"
+
 import { useUser } from "@/hooks/use-user"
 
 import { getOrigin } from "@/lib/router"
@@ -46,8 +48,8 @@ function StripePricingTable() {
       </Head>
 
       <stripe-pricing-table
-        pricing-table-id={paymentEnv.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
-        publishable-key={paymentEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        pricing-table-id={STRIPE_PRICING_TABLE_ID}
+        publishable-key={STRIPE_PUBLISHABLE_KEY}
         client-reference-id={clientReferenceId}
         customer-email={user.email}
       />

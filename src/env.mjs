@@ -16,11 +16,9 @@ export const baseEnv = createEnv({
     KV_REST_API_URL: z.string(),
     KV_REST_API_TOKEN: z.string(),
 
-    HOST: z.string().min(1),
+    HOST: z.string().min(1)
   },
-  client: {
-
-  },
+  client: {},
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
@@ -29,9 +27,9 @@ export const baseEnv = createEnv({
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
 
-    HOST: process.env.HOST,
+    HOST: process.env.HOST
   }
-})
+});
 
 export const authEnv = createEnv({
   /**
@@ -61,7 +59,7 @@ export const authEnv = createEnv({
     AWS_SK: z.string().min(1),
     POSTMARK_API_TOKEN: z.string().min(1),
     POSTMARK_SIGN_IN_TEMPLATE: z.string().min(1),
-    POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1),
+    POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1)
   },
 
   /**
@@ -90,7 +88,7 @@ export const authEnv = createEnv({
     AWS_SK: process.env.AWS_SK,
     POSTMARK_API_TOKEN: process.env.POSTMARK_API_TOKEN,
     POSTMARK_SIGN_IN_TEMPLATE: process.env.POSTMARK_SIGN_IN_TEMPLATE,
-    POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE,
+    POSTMARK_ACTIVATION_TEMPLATE: process.env.POSTMARK_ACTIVATION_TEMPLATE
 
   },
   /**
@@ -105,14 +103,9 @@ export const paymentEnv = createEnv({
     STRIPE_API_KEY: z.string().min(1),
     STRIPE_WEBHOOK_SECRET: z.string().min(1)
   },
-  client: {
-    NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID: z.string().min(1),
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1)
-  },
+  client: {},
   runtimeEnv: {
     STRIPE_API_KEY: process.env.STRIPE_API_KEY,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-    NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID: process.env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET
   }
-})
+});
