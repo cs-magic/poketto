@@ -15,6 +15,7 @@ import {
   DrawingPinIcon,
   EnterFullScreenIcon,
   ExitFullScreenIcon,
+  FrameIcon,
   HamburgerMenuIcon,
   LayersIcon,
   LightningBoltIcon,
@@ -25,7 +26,7 @@ import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
-import React, { useEffect, useRef, useState } from "react"
+import React, { ReactPropTypes, useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
@@ -86,7 +87,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
     },
   })
 
-  const { ref, toggle, fullscreen } = useUniversalFullscreen()
+  const { ref, fullscreen, toggle } = useUniversalFullscreen()
 
   if (!c) return <Loading />
 
@@ -97,76 +98,73 @@ export function ConversationCore({ conversationId }: { conversationId: string })
           {fullscreen ? <LogoWithName /> : <div />}
           <h2 className="truncate text-center">{c.app.name}</h2>
 
-          {fullscreen ? (
-            <IconContainer onClick={toggle}>
-              <ExitFullScreenIcon />
-            </IconContainer>
-          ) : (
-            <Popover>
-              <PopoverTrigger className="shrink-0">
-                <IconContainer>
-                  <DotsVerticalIcon />
-                </IconContainer>
-              </PopoverTrigger>
-              <PopoverContent className="flex flex-col gap-2">
-                <Button variant="ghost" onClick={toggle} className="flex w-full justify-between">
-                  <span>{fullscreen ? t("common:general.windowMode") : t("common:general.fullscreenMode")}</span>
-                  {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+          <Popover>
+            <PopoverTrigger className="shrink-0">
+              <IconContainer>
+                <DotsVerticalIcon />
+              </IconContainer>
+            </PopoverTrigger>
+            <PopoverContent className="flex flex-col gap-2">
+              <Link
+                href="/c/[userId]"
+                as={getConversationsLink(c.userId)}
+                className="p-btn-horizontal justify-between lg:hidden"
+              >
+                <span>{t("common:general.appList")}</span> <HamburgerMenuIcon />
+              </Link>
+
+              <AppDetailContainer appId={c.appId} asChild>
+                <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
+                  <span>{t("common:general.detail")}</span> <FrameIcon />
                 </Button>
+              </AppDetailContainer>
 
-                <Separator orientation="horizontal" className="hidden md:flex" />
+              <Separator orientation="horizontal" className="xl:hidden" />
 
-                <Link
-                  href="/c/[userId]"
-                  as={getConversationsLink(c.userId)}
-                  className="p-btn-horizontal justify-between lg:hidden"
-                >
-                  <span>{t("common:general.appList")}</span> <HamburgerMenuIcon />
-                </Link>
+              <Button
+                className="justify-between"
+                variant="ghost"
+                onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}
+              >
+                {c.pinned ? (
+                  <>
+                    <span>{t("common:general.unpin")}</span>
+                    <DrawingPinIcon />
+                  </>
+                ) : (
+                  <>
+                    <span>{t("common:general.pin")}</span>
+                    <DrawingPinFilledIcon />
+                  </>
+                )}
+              </Button>
 
-                <AppDetailContainer appId={c.appId}>
-                  <Button variant="ghost" className="w-full justify-between xl:hidden" onClick={() => {}}>
-                    <span>{t("common:general.detail")}</span> <CodeSandboxLogoIcon />
-                  </Button>
-                </AppDetailContainer>
-
-                <Separator orientation="horizontal" className="xl:hidden" />
-
-                <Button
-                  className="justify-between"
-                  variant="ghost"
-                  onClick={() => pinConv({ conversationId: c.id, toStatus: !c.pinned })}
-                >
-                  {c.pinned ? (
-                    <>
-                      <span>{t("common:general.unpin")}</span>
-                      <DrawingPinIcon />
-                    </>
-                  ) : (
-                    <>
-                      <span>{t("common:general.pin")}</span>
-                      <DrawingPinFilledIcon />
-                    </>
-                  )}
-                </Button>
-
-                <Button className="justify-between" variant="ghost">
-                  <span>{t("common:general.share")}</span> <Link2Icon />
-                </Button>
-              </PopoverContent>
-            </Popover>
-          )}
+              <Button className="justify-between" variant="ghost" disabled>
+                <span>{t("common:general.share")}</span> <Link2Icon />
+              </Button>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className={clsx("w-full grow ", "overflow-auto")}>
-          <ConversationInput conversationId={c.id} />
+          <ConversationInput conversationId={c.id} toggle={toggle} fullscreen={fullscreen} />
         </div>
       </div>
     </div>
   )
 }
 
-export function ConversationInput({ conversationId }: { conversationId: string }) {
+export function ConversationInput({
+  conversationId,
+  toggle,
+  fullscreen,
+}: {
+  conversationId: string
+
+  // 这个 fullscreen 和 toggle 是有 context 的，所以要传下来，不能直接在子组件使用 useUniversalFullscreen
+  fullscreen: boolean
+  toggle: () => void
+}) {
   const { modelType, setModelType, memoryMode, setMemoryMode } = useAppStore()
   const { t } = useTranslation()
   const { userId } = useUser()
@@ -219,8 +217,6 @@ export function ConversationInput({ conversationId }: { conversationId: string }
     }
   }, [initialMessages])
 
-  if (!conv || !user) return null
-
   const modelWeight = (
     Math.floor((modelTypes.findIndex((m) => m === modelType)! / modelTypes.length) * 128) + 128
   ).toString(16)
@@ -228,6 +224,12 @@ export function ConversationInput({ conversationId }: { conversationId: string }
   // console.log({ color })
 
   const quota = user?.quota ?? defaultModelQuota
+
+  const ColoredIconContainer = (props: ReactPropTypes<typeof IconContainer>) => (
+    <IconContainer {...props} style={{ color }} />
+  )
+
+  if (!conv || !user) return null
 
   return (
     <div className={clsx("relative  h-full w-full", "flex  flex-col", "overflow-hidden")}>
@@ -264,10 +266,9 @@ export function ConversationInput({ conversationId }: { conversationId: string }
       <div className={"w-full px-4 flex items-center gap-2"}>
         <Select onValueChange={setModelType} value={modelType}>
           <SelectTrigger variant={"simple"}>
-            <IconContainer className={"rounded-sm"}>
-              <CodeSandboxLogoIcon style={{ color }} />
-              {quota[modelType] ? `(${quota[modelType]})` : ""}
-            </IconContainer>
+            <ColoredIconContainer className={"rounded-sm"}>
+              <CodeSandboxLogoIcon />
+            </ColoredIconContainer>
           </SelectTrigger>
           <SelectContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
             <SelectGroup>
@@ -282,7 +283,9 @@ export function ConversationInput({ conversationId }: { conversationId: string }
                   disabled={k === "openchat"}
                 >
                   {k}
-                  <span className={"text-xs text-muted-foreground ml-2"}>({t(`common:model.${k}`)})</span>
+                  <span className={"text-xs text-muted-foreground ml-2"}>
+                    ({t(`common:model.${k}`)}, 今日试用剩余: {quota[k]})
+                  </span>
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -291,15 +294,15 @@ export function ConversationInput({ conversationId }: { conversationId: string }
 
         <Select onValueChange={setMemoryMode} value={memoryMode}>
           <SelectTrigger variant={"simple"}>
-            <IconContainer className={"rounded-sm"}>
+            <ColoredIconContainer className={"rounded-sm"}>
               {memoryMode === "one-time" ? (
-                <ComponentInstanceIcon style={{ color }} />
+                <ComponentInstanceIcon />
               ) : memoryMode === "recent" ? (
-                <StackIcon style={{ color }} />
+                <StackIcon />
               ) : (
-                <LayersIcon style={{ color }} />
+                <LayersIcon />
               )}
-            </IconContainer>
+            </ColoredIconContainer>
           </SelectTrigger>
           <SelectContent side={"top"} className={"w-fit whitespace-nowrap flex flex-col"}>
             <SelectGroup>
@@ -315,19 +318,23 @@ export function ConversationInput({ conversationId }: { conversationId: string }
 
         <Popover>
           <PopoverTrigger>
-            <IconContainer>
-              <LightningBoltIcon style={{ color }} />
-            </IconContainer>
+            <ColoredIconContainer>
+              <LightningBoltIcon />
+            </ColoredIconContainer>
           </PopoverTrigger>
           <PopoverContent className={"w-fit"}>
             <FastChargeForm />
           </PopoverContent>
         </Popover>
 
+        <ColoredIconContainer onClick={toggle}>
+          {fullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+        </ColoredIconContainer>
+
         {isLoading && (
           <Typewriter
             options={{
-              strings: ["正在思考……"],
+              strings: ["……", "……", "……"],
               autoStart: true,
               loop: true,
             }}

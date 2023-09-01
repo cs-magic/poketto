@@ -2,7 +2,7 @@
   "Login": "登录",
   "LoadingMoreData": "正在加载更多数据……",
   "CurrentlyNoResult": "暂无结果！",
-  "CurrentlyNoComments":"暂无评价！",
+  "CurrentlyNoComments": "暂无评价！",
   "Following": "关注",
   "Followers": "粉丝",
   "Impact": "影响力",
@@ -83,8 +83,8 @@
     "inputPlaceholder": "你想搜点什么呢？"
   },
   "model": {
-    "gpt-3.5-turbo": "一般问题足够，较便宜",
-    "gpt-4": "专业问题效果更好，较贵，且限量哦",
+    "gpt-3.5-turbo": "一般问题足够",
+    "gpt-4": "专业问题效果更好",
     "openchat": "清华开源的大语言模型，一度排名第一"
   },
   "memoryMode": {

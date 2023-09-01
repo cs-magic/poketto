@@ -33,7 +33,9 @@ let init = false
 const originalLog = console.log // Store the original console.log function
 
 console.log = function () {
-  if (!init) {
+  if (init) {
+    originalLog.apply(console, arguments)
+  } else {
     const currentTime = d(new Date()).format("YYYY-MM-DD ddd HH:mm:ss Z") // Get the current datetime in a desired format
 
     const updatedArgs = [`[${currentTime}]`, ...arguments] // Add the datetime as an additional argument
@@ -137,7 +139,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppP
                   // fontChinese.className
                   "font-sans antialiased",
                   fontSans.variable,
-                  fontHeading.variable
+                  fontHeading.variable,
                 )}
               >
                 <Component {...pageProps} />
