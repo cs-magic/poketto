@@ -15,5 +15,14 @@ export const stripe = new Stripe(paymentEnv.STRIPE_API_KEY, {
   appInfo: {
     name: "poketto.ai",
     url: "https://poketto.ai",
+    version: "0.1.0",
   },
 })
+
+export interface IClientReferenceId {
+  userId: string
+  origin: string
+}
+
+export const encodeClientReferenceId = (v: IClientReferenceId) => JSON.stringify(v)
+export const decodeClientReferenceId = (v: string) => JSON.parse(v) as IClientReferenceId

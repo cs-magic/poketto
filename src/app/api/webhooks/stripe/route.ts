@@ -15,7 +15,8 @@ import { paymentEnv } from "@/env.mjs"
 import { subscriptionLevel2Unit } from "@/config"
 
 import d from "@/lib/datetime"
-import { stripe } from "@/lib/stripe"
+import { getOrigin } from "@/lib/edge"
+import { decodeClientReferenceId, stripe } from "@/lib/stripe"
 
 /**
  * ref:
@@ -44,23 +45,32 @@ export async function POST(req: Request) {
     type,
     data: { object },
   } = event
-  console.log({ event: { id, type } })
 
   switch (type) {
     case "checkout.session.completed":
       const session = object as Stripe.Checkout.Session
       const { mode, customer } = session
-      const userId = session.client_reference_id ?? session?.metadata?.userId
-
-      if (!userId)
+      const { client_reference_id } = session
+      if (!client_reference_id)
         return NextResponse.json({
-          message: "no userId in this webhook, maybe it comes from stripe web directly so won't be handled then",
+          message: "skip handling since  no client_reference_id in this webhook",
         })
+      const { userId, origin } = decodeClientReferenceId(client_reference_id)
+      console.log({ client_reference_id: { origin, userId }, event: { id, type } })
+
+      if (origin !== getOrigin()) {
+        return NextResponse.json({
+          message: "skip handling since origin mismatch",
+        })
+      }
+
       const user = await prisma.user.findUnique({ where: { id: userId } })
-      if (!user)
+      if (!user) {
+        console.error("既然有origin、userId，不应该没有user！", { origin, userId })
         return NextResponse.json({
           message: "no user of this webhook in database, maybe it's for another server so won't be handled then",
         })
+      }
 
       const stripeCustomerId = customer as string
 

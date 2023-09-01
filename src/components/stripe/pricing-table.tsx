@@ -11,6 +11,9 @@ import { paymentEnv } from "@/env.mjs"
 
 import { useUser } from "@/hooks/use-user"
 
+import { getOrigin } from "@/lib/edge"
+import { encodeClientReferenceId } from "@/lib/stripe"
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -41,7 +44,7 @@ function StripePricingTable() {
       <stripe-pricing-table
         pricing-table-id={paymentEnv.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
         publishable-key={paymentEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-        client-reference-id={user.id}
+        client-reference-id={encodeClientReferenceId({ userId: user.id, origin: getOrigin() })}
         customer-email={user.email}
       />
     </>
