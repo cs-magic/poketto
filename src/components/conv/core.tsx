@@ -26,9 +26,9 @@ import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
-import React, { ComponentProps, ReactPropTypes, useEffect, useRef, useState } from "react"
+import React, { ComponentProps, ReactPropTypes, useCallback, useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
-import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
+import { useObserveScrollPosition, useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 import Typewriter from "typewriter-effect"
@@ -226,8 +226,8 @@ export function ConversationCore({ conversationId }: { conversationId: string })
           )}
         </div>
 
-        <div className={clsx("w-full grow ", "overflow-auto")}>
-          <div className={clsx("relative  h-full w-full", "flex  flex-col", "overflow-hidden")}>
+        <div className={clsx("w-full grow overflow-hidden")}>
+          <div className={clsx("relative h-full w-full | flex flex-col overflow-hidden")}>
             <Dialog>
               <AlertDialog open={alertVisible} onOpenChange={setAlertVisible}>
                 <AlertDialogContent>
@@ -251,73 +251,75 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               </DialogContent>
             </Dialog>
 
-            <ScrollContainer>
-              <div className={clsx("w-full p-2 ")}>
-                {/* 因为 ai sdk 是顺序的，所以要逆序，todo: 强制逆序 */}
-                {conversation && user && (
-                  <div className={clsx("relative  w-full", "flex flex-col-reverse", "overflow-auto")}>
-                    {/* 这里为了把下面（倒序）的空间给撑起来，使聊天在不占满的情况下，也能从上显示到下（而非粘在底部，从下到上） */}
-                    <div className="grow" />
-                    {packMessageWithDate(messages, user, conversation.app)
-                      .reverse()
-                      .map((msg, index) =>
-                        "systemType" in msg || msg.format === "systemNotification" ? (
-                          <div key={index} className="mx-auto my-2 text-center text-muted-foreground">
-                            {m(msg.content)}
-                          </div>
-                        ) : msg.role === "system" ? (
-                          <Card key={msg.id} className={"my-4"}>
-                            <CardHeader>
-                              <CardTitle>AI 人设</CardTitle>
-                              <CardDescription>AI 的回答将基于此人设进行</CardDescription>
-                            </CardHeader>
-                            <CardContent>
+            <div className={"grow w-full overflow-hidden"}>
+              <ScrollContainer>
+                <div className={clsx("w-full p-2 ")}>
+                  {/* 因为 ai sdk 是顺序的，所以要逆序 */}
+                  {conversation && user && (
+                    <div className={clsx("relative w-full | flex flex-col-reverse")}>
+                      {/* 这里为了把下面（倒序）的空间给撑起来，使聊天在不占满的情况下，也能从上显示到下（而非粘在底部，从下到上） */}
+                      <div className="grow" />
+                      {packMessageWithDate(messages, user, conversation.app)
+                        .reverse()
+                        .map((msg, index) =>
+                          "systemType" in msg || msg.format === "systemNotification" ? (
+                            <div key={index} className="mx-auto my-2 text-center text-muted-foreground">
+                              {m(msg.content)}
+                            </div>
+                          ) : msg.role === "system" ? (
+                            <Card key={msg.id} className={"my-4"}>
+                              <CardHeader>
+                                <CardTitle>AI 人设</CardTitle>
+                                <CardDescription>AI 的回答将基于此人设进行</CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <ReactMarkdown
+                                  className={clsx("p-prose py-0", contentStyleBasedOnRole[msg.role])}
+                                  remarkPlugins={[remarkGfm]}
+                                >
+                                  {m(msg.content)}
+                                </ReactMarkdown>
+                              </CardContent>
+                            </Card>
+                          ) : (
+                            // normal messages
+                            <div
+                              id={msg.id}
+                              key={msg.id}
+                              className={clsx(
+                                "group chat text-sm tracking-normal",
+                                msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end",
+                              )}
+                            >
+                              <div className="avatar chat-image">
+                                <Avatar>
+                                  <AvatarImage src={msg.user!.image!} />
+                                </Avatar>
+                              </div>
+
                               <ReactMarkdown
-                                className={clsx("p-prose py-0", contentStyleBasedOnRole[msg.role])}
+                                className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])}
                                 remarkPlugins={[remarkGfm]}
                               >
                                 {m(msg.content)}
                               </ReactMarkdown>
-                            </CardContent>
-                          </Card>
-                        ) : (
-                          // normal messages
-                          <div
-                            id={msg.id}
-                            key={msg.id}
-                            className={clsx(
-                              "group chat text-sm tracking-normal",
-                              msg.role === PromptRoleType.assistant ? "chat-start" : "chat-end",
-                            )}
-                          >
-                            <div className="avatar chat-image">
-                              <Avatar>
-                                <AvatarImage src={msg.user!.image!} />
-                              </Avatar>
                             </div>
-
-                            <ReactMarkdown
-                              className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])}
-                              remarkPlugins={[remarkGfm]}
-                            >
-                              {m(msg.content)}
-                            </ReactMarkdown>
-                          </div>
-                        ),
+                          ),
+                        )}
+                      {hasUnread && !sticky && (
+                        <Badge
+                          variant="default"
+                          className="absolute bottom-4 right-4 cursor-pointer"
+                          onClick={() => scrollToBottom()}
+                        >
+                          New Message <ChevronDownIcon />
+                        </Badge>
                       )}
-                    {hasUnread && !sticky && (
-                      <Badge
-                        variant="default"
-                        className="absolute bottom-4 right-4 cursor-pointer"
-                        onClick={() => scrollToBottom()}
-                      >
-                        New Message <ChevronDownIcon />
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-            </ScrollContainer>
+                    </div>
+                  )}
+                </div>
+              </ScrollContainer>
+            </div>
 
             <div className={clsx("w-full px-4 flex items-center gap-2", fullscreen && "hidden")}>
               <Select onValueChange={setModelType} value={modelType}>
