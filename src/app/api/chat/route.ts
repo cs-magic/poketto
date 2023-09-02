@@ -142,15 +142,12 @@ export async function POST(req: Request) {
        * 大陆服务器需要开启 clash tun mode !
        */
       httpAgent: undefined,
-    }).chat.completions.create(
-      {
-        model: modelType,
-        stream: true,
-        messages,
-        temperature: 0.7,
-      },
-      { timeout: 3000 },
-    )
+    }).chat.completions.create({
+      model: modelType,
+      stream: true,
+      messages,
+      temperature: 0.7,
+    })
 
     const stream = OpenAIStream(response, {
       onToken: async (token) => {

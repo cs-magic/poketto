@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { getHotkeyHandler, useClipboard } from "@mantine/hooks"
+import { getHotkeyHandler } from "@mantine/hooks"
 import { PromptRoleType } from "@prisma/client"
 import {
   ChevronDownIcon,
@@ -26,12 +26,11 @@ import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
-import React, { ComponentProps, ReactPropTypes, useCallback, useEffect, useRef, useState } from "react"
+import React, { ComponentProps, useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
-import { useObserveScrollPosition, useScrollToBottom, useSticky } from "react-scroll-to-bottom"
+import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
-import Typewriter from "typewriter-effect"
 
 import { useAppStore } from "@/store"
 
@@ -40,7 +39,6 @@ import { contentStyleBasedOnRole } from "@/config"
 import { defaultModelQuota, memoryModes, modelTypes } from "@/ds"
 
 import { AppDetailContainer } from "@/components/app/container"
-import FastChargeForm from "@/components/charge-fast"
 import SlowChargeForm from "@/components/charge-slow"
 import { AutoScrollContainer, IconContainer } from "@/components/containers"
 import { LogoWithName } from "@/components/layouts/navbar"
