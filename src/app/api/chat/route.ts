@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { Prisma, PromptRoleType } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
-import { Ratelimit } from "@upstash/ratelimit"
-import { kv } from "@vercel/kv"
 import { type Message, OpenAIStream, StreamingTextResponse } from "ai"
 import { NextResponse } from "next/server"
 import OpenAI, { APIError as OpenAIAPIError } from "openai"
@@ -22,12 +20,10 @@ import { CHAT_MESSAGE_CID_LEN, ERR_MSG_BALANCE_NOT_ENOUGH } from "@/config"
 import { MemoryMode, defaultModelQuota } from "@/ds"
 
 import { nanoid } from "@/lib/id"
-import { createHttpAgent } from "@/lib/proxy"
-import { isDomestic } from "@/lib/router"
 
 import ChatMessageUncheckedCreateInput = Prisma.ChatMessageUncheckedCreateInput
 
-export const runtime = isDomestic() ? "nodejs" : "edge" // IMPORTANT! Set the runtime to edge
+export const runtime = "edge" // IMPORTANT! nodejs 好像不支持 stream ！
 
 /**
  * ref:
@@ -142,8 +138,10 @@ export async function POST(req: Request) {
        *  - https://www.npmjs.com/package/https-proxy-agent
        *
        * edge 环境中 不支持 http / https-proxy-agent 等库
+       *
+       * 大陆服务器需要开启 clash tun mode !
        */
-      httpAgent: await createHttpAgent(),
+      httpAgent: undefined,
     }).chat.completions.create(
       {
         model: modelType,
