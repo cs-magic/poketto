@@ -153,6 +153,9 @@ export async function POST(req: Request) {
     )
 
     const stream = OpenAIStream(response, {
+      onToken: async (token) => {
+        console.log({ token })
+      },
       onCompletion: async (completion) => {
         console.log({ completion })
         await pushMessage({ content: completion, role: "assistant", id: replyId })
