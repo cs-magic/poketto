@@ -16,6 +16,7 @@ import { Sidebar } from "@/components/layouts/sidebar"
 import { FooterNavItem } from "@/components/link"
 
 import { useMount } from "@/hooks/use-mount"
+import { useUser } from "@/hooks/use-user"
 
 export const Footer = () => (
   <footer className="w-full shrink-0 | grid grid-cols-4">
@@ -97,6 +98,9 @@ export function RootLayout({ children }: PropsWithChildren) {
       window.removeEventListener("resize", setInnerHeight)
     }
   }, [])
+
+  const { user } = useUser()
+  console.log({ user })
 
   if (!mounted) {
     return null

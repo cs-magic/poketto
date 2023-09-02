@@ -16,9 +16,7 @@ export const userRouter = createTRPCRouter({
 
   getProfile: publicProcedure
     .input(UserWhereUniqueInputSchema)
-    .query(async ({ ctx: { prisma }, input }) =>
-      prisma.user.findUniqueOrThrow({ where: input, select: selectUserProfile }),
-    ),
+    .query(async ({ ctx: { prisma }, input }) => prisma.user.findUnique({ where: input, select: selectUserProfile })),
 
   del: protectedProcedure.mutation(
     async ({
