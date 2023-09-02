@@ -100,7 +100,7 @@ export function RootLayout({ children }: PropsWithChildren) {
   }, [])
 
   const { user } = useUser()
-  console.log({ user })
+  // console.log({ user })
 
   if (!mounted) {
     return null

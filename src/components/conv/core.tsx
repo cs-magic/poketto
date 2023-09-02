@@ -113,7 +113,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
       toast.error(err.message, { duration: Infinity })
     },
     onResponse: async (response) => {
-      // console.log("onResponse:", {response })
+      console.log("onResponse:", { response })
       refMessage.current = response.headers.get("replyId")!
     },
     onFinish: async (msg) => {
@@ -162,6 +162,12 @@ export function ConversationCore({ conversationId }: { conversationId: string })
   const ColoredIconContainer = (props: ComponentProps<typeof IconContainer>) => (
     <IconContainer {...props} style={{ color }} />
   )
+
+  console.log({
+    isLoading,
+    messageLength: messages.length,
+    data,
+  })
 
   if (!conversation) return <Loading />
 
