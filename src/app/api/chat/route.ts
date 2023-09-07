@@ -130,10 +130,10 @@ export async function POST(req: Request) {
 
     const stream = OpenAIStream(response, {
       onStart: async () => {
-        console.log("onStart")
+        // console.log("onStart")
       },
       onToken: async (token) => {
-        console.log("onToken: ", { token })
+        // console.log("onToken: ", { token })
       },
       onCompletion: async (completion) => {
         console.log("onCompletion: ", { completion })
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
       },
       onFinal: (final) => {
         // 之前直接监听这个回调，结果拿不到数据，监听 onCompletion就好了，很奇怪……现在两个都拿的到。。
-        console.log("onFinal: ", { final })
+        // console.log("onFinal: ", { final })
       },
     })
 

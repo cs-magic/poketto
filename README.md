@@ -1,6 +1,6 @@
 # Poketto AI
 
-## congig
+## config
 
 ### nginx
 

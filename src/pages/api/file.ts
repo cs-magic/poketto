@@ -11,7 +11,7 @@ export const config = {
   },
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // Extract the filename from the URL
   const filename = req.query.filename as string
   const filesize: IMAGE_SIZE = (req.query.filesize as IMAGE_SIZE) ?? "sm"
@@ -39,3 +39,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(404).end()
   }
 }
+
+export default handler
