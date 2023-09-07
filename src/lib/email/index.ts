@@ -21,7 +21,9 @@ export const sendVerificationRequest = async (params: ISendVerificationRequest) 
 
   const send = emailProvider === "aws" ? sendViaAWS : sendViaPostmark
   try {
-    await send(params)
+    const result = await send(params)
+    console.log({ result })
+    return result
   } catch (error) {
     console.error(error)
     throw new Error("failed to send verification request")

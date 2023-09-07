@@ -71,7 +71,7 @@ export const sendViaAWS = async ({ identifier, url, provider, token, locale, ori
       ],
     }),
     {
-      requestTimeout: 3000,
+      requestTimeout: 300,
     },
   )
 }
