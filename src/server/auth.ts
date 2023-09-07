@@ -13,17 +13,26 @@ import GithubProvider from "next-auth/providers/github"
 
 import { authEnv } from "@/env.mjs"
 
-import { DEFAULT_LOCALE, URI, allowDangerousEmailAccountLinking } from "@/config"
+import { DEFAULT_LOCALE, URI, allowDangerousEmailAccountLinking, siteConfig } from "@/config"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
-import { emailFrom, sendVerificationRequest } from "@/lib/email"
+import { sendVerificationRequest } from "@/lib/email"
+import { getOrigin } from "@/lib/router"
+
+export const emailFrom = siteConfig.welcomeEmailAddress
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
  * @see https://next-auth.js.org/configuration/options
  */
-export const createAuthOptions = ({ locale, origin }: { locale: string; origin?: string }): NextAuthOptions => ({
+export const createAuthOptions = ({
+  locale,
+  origin = getOrigin(),
+}: {
+  locale: string
+  origin?: string
+}): NextAuthOptions => ({
   pages: {
     signIn: URI.user.auth.signIn,
   },
@@ -61,8 +70,8 @@ export const createAuthOptions = ({ locale, origin }: { locale: string; origin?:
       from: emailFrom,
       // 它之所以没有配置 server，是因为直接在 sendVerificationRequest 中完成邮箱的所有验证等操作了
       // 而我在本地初始化 aws 客户端，之所以不需要输入 credentials 信息，是因为我本地有 ~/.aws 配置文件
-      sendVerificationRequest: ({ identifier, url, provider, token }) =>
-        sendVerificationRequest({ identifier, url, provider, token, locale, origin }),
+      sendVerificationRequest: ({ identifier, url, provider, token, ...props }) =>
+        sendVerificationRequest({ identifier, url, provider, token, locale, origin, ...props }),
     }),
     GithubProvider({
       clientId: authEnv.GITHUB_CLIENT_ID,
