@@ -119,7 +119,7 @@ export function ConversationListView({ c }: { c: ConvForListView }) {
           </div>
           <div className="flex gap-2">
             {/* 只有 group 才需要打开 */}
-            <span className="truncate text-muted-foreground">{m(latestMessage.content)}</span>
+            <span className="truncate text-muted-foreground">{m(latestMessage.content ?? "")}</span>
           </div>
         </div>
       </div>

@@ -32,7 +32,7 @@ export const msgRouter = createTRPCRouter({
     if (!quota) quota = defaultModelQuota
 
     // todo: token calculation
-    const ourToken = input.content.length / 1000
+    const ourToken = (input.content ?? "").length / 1000
     const modelType = input.modelType as ModelType
     if (input.role === "assistant") {
       if (balance > 0) {

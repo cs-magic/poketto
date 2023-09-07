@@ -22,6 +22,7 @@ import {
   Link2Icon,
   StackIcon,
 } from "@radix-ui/react-icons"
+import { Message } from "ai"
 import { useChat } from "ai/react"
 import { SendIcon } from "lucide-react"
 import { useTranslation } from "next-i18next"
@@ -74,7 +75,6 @@ import { packMessageWithDate } from "@/lib/message"
 import { getConversationsLink } from "@/lib/string"
 
 export function ConversationCore({ conversationId }: { conversationId: string }) {
-  const refMessage = useRef<string>("")
   const refForm = useRef<HTMLFormElement>(null)
 
   const { modelType, setModelType, memoryMode, setMemoryMode } = useAppStore()
@@ -85,7 +85,6 @@ export function ConversationCore({ conversationId }: { conversationId: string })
   const utils = api.useContext()
   const { data: conversation } = api.conv.get.useQuery({ id: conversationId })
   const { data: user } = api.user.getProfile.useQuery({ id: userId }, { enabled: !!userId })
-  const { data: hasApp } = api.conv.has.useQuery({ id: conversationId }, { enabled: !!conversation })
   const { data: initialMessages } = api.message.list.useQuery({ conversationId: conversationId }, { enabled: !!userId })
   const { mutateAsync: pinConv } = api.conv.pin.useMutation({
     onSuccess: () => {
@@ -106,13 +105,12 @@ export function ConversationCore({ conversationId }: { conversationId: string })
     initialMessages: [],
     sendExtraMessageFields: true, // 添加 id 信息
     body: { userId, conversationId, modelType, memoryMode },
+    onResponse: async (response) => {
+      console.log("onResponse: ", response)
+    },
     onError: (err) => {
       console.warn({ err })
       toast.error(err.message, { duration: Infinity })
-    },
-    onResponse: async (response) => {
-      console.log("onResponse:", { response })
-      refMessage.current = response.headers.get("replyId")!
     },
     onFinish: async (msg) => {
       void utils.conv.list.invalidate()
@@ -134,7 +132,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
 
   useEffect(() => {
     if (initialMessages) {
-      setMessages([...initialMessages].reverse())
+      setMessages([...(initialMessages as Message[])].reverse())
     }
   }, [initialMessages])
 
@@ -161,11 +159,11 @@ export function ConversationCore({ conversationId }: { conversationId: string })
     <IconContainer {...props} style={{ color }} />
   )
 
-  console.log({
-    isLoading,
-    messageLength: messages.length,
-    data,
-  })
+  // console.log({
+  //   isLoading,
+  //   messageLength: messages.length,
+  //   data,
+  // })
 
   if (!conversation) return <Loading />
 
@@ -268,7 +266,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
                         .map((msg, index) =>
                           "systemType" in msg || msg.format === "systemNotification" ? (
                             <div key={index} className="mx-auto my-2 text-center text-muted-foreground">
-                              {m(msg.content)}
+                              {m(msg.content ?? "")}
                             </div>
                           ) : msg.role === "system" ? (
                             <Card key={msg.id} className={"my-4"}>
@@ -281,7 +279,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
                                   className={clsx("p-prose py-0", contentStyleBasedOnRole[msg.role])}
                                   remarkPlugins={[remarkGfm]}
                                 >
-                                  {m(msg.content)}
+                                  {m(msg.content ?? "")}
                                 </ReactMarkdown>
                               </CardContent>
                             </Card>
@@ -305,7 +303,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
                                 className={clsx("p-prose chat-bubble py-0", contentStyleBasedOnRole[msg.role])}
                                 remarkPlugins={[remarkGfm]}
                               >
-                                {m(msg.content)}
+                                {m(msg.content ?? "")}
                               </ReactMarkdown>
                             </div>
                           ),

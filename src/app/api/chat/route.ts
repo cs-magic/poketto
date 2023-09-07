@@ -6,9 +6,10 @@
  */
 import { Prisma } from "@prisma/client"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
-import { type Message, OpenAIStream, StreamingTextResponse } from "ai"
+import { OpenAIStream, StreamingTextResponse } from "ai"
 import { NextResponse } from "next/server"
 import OpenAI, { APIError as OpenAIAPIError } from "openai"
+import { ChatCompletionMessage } from "openai/resources/chat"
 import superjson from "superjson"
 
 import { type RootRouter } from "@/server/routers/_root.router"
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
    */
 
   // console.log("req: ", { data })
-  const pushMessage = async (msg: Message) => {
+  const pushMessage = async (msg: ChatCompletionMessage & { id?: string }) => {
     const { role, content } = msg
     const newMessage: ChatMessageUncheckedCreateInput = {
       role,
@@ -86,28 +87,6 @@ export async function POST(req: Request) {
    *  1. 因为我们已经有了用户系统，所以不需要检查频率了
    *  2. 这个基于 KV 的对于大陆来说，太慢了，真要做，可以使用本地的 redis，参考：rate-limit-redis - npm, https://www.npmjs.com/package/rate-limit-redis
    */
-  // if (baseEnv.KV_REST_API_URL && baseEnv.KV_REST_API_TOKEN) {
-  //   const ip = req.headers.get("x-forwarded-for")
-  //   const ratelimit = new Ratelimit({
-  //     redis: kv,
-  //     // rate limit to 1 requests per 20 seconds
-  //     limiter: Ratelimit.slidingWindow(3, "10s"),
-  //   })
-  //
-  //   const { success, limit, reset, remaining } = await ratelimit.limit(`ratelimit_${ip}`)
-  //
-  //   if (!success) {
-  //     return NextResponse.json("您的速度太快啦，请慢点！", {
-  //       status: 429,
-  //       headers: {
-  //         "X-RateLimit-Limit": limit.toString(),
-  //         "X-RateLimit-Remaining": remaining.toString(),
-  //         "X-RateLimit-Reset": reset.toString(),
-  //       },
-  //     })
-  //   }
-  //   console.log("passed rate limiter")
-  // }
 
   const { content } = receivedMessages[receivedMessages.length - 1]
   if (memoryMode === "one-time") {
@@ -150,16 +129,19 @@ export async function POST(req: Request) {
     })
 
     const stream = OpenAIStream(response, {
+      onStart: async () => {
+        console.log("onStart")
+      },
       onToken: async (token) => {
-        console.log({ token })
+        console.log("onToken: ", { token })
       },
       onCompletion: async (completion) => {
-        console.log({ completion })
+        console.log("onCompletion: ", { completion })
         await pushMessage({ content: completion, role: "assistant", id: replyId })
       },
       onFinal: (final) => {
         // 之前直接监听这个回调，结果拿不到数据，监听 onCompletion就好了，很奇怪……现在两个都拿的到。。
-        // console.log({ final })
+        console.log("onFinal: ", { final })
       },
     })
 
