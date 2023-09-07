@@ -44,7 +44,7 @@ export const emailFrom = siteConfig.welcomeEmailAddress
  * @param origin 用户填的地址
  */
 export const sendVerificationRequest = async ({ identifier, url, provider, token, locale, origin }) => {
-  // console.log("sendVerificationRequest: ", { identifier, url, provider, token, locale })
+  console.log("sendVerificationRequest: ", { identifier, url, provider, token, locale, origin })
 
   const user = await prisma.user.findUnique({
     where: {
@@ -109,7 +109,7 @@ export const sendVerificationRequest = async ({ identifier, url, provider, token
           siteConfig.supportEmailAddress,
           /* more items */
         ],
-      })
+      }),
     )
   } else {
     const templateId = user?.emailVerified ? authEnv.POSTMARK_SIGN_IN_TEMPLATE : authEnv.POSTMARK_ACTIVATION_TEMPLATE
