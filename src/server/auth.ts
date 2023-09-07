@@ -7,6 +7,7 @@
 import { PlatformType } from "@prisma/client"
 import { type GetServerSidePropsContext } from "next"
 import { type NextAuthOptions, type User as NextAuthUser, getServerSession } from "next-auth"
+import { SendVerificationRequestParams } from "next-auth/providers"
 import DiscordProvider from "next-auth/providers/discord"
 import EmailProvider from "next-auth/providers/email"
 import GithubProvider from "next-auth/providers/github"
@@ -67,11 +68,18 @@ export const createAuthOptions = ({
   adapter: pokettoPrismaAdapter,
   providers: [
     EmailProvider({
-      from: emailFrom,
       // 它之所以没有配置 server，是因为直接在 sendVerificationRequest 中完成邮箱的所有验证等操作了
       // 而我在本地初始化 aws 客户端，之所以不需要输入 credentials 信息，是因为我本地有 ~/.aws 配置文件
-      sendVerificationRequest: ({ identifier, url, provider, token, ...props }) =>
-        sendVerificationRequest({ identifier, url, provider, token, locale, origin, ...props }),
+      from: emailFrom,
+      /**
+       * note: 如果发起邮箱登录的网址与环境变量中配置的 next-auth-url 不一致，则该函数将被跳过执行！并触发signIn！
+       */
+      sendVerificationRequest: (props: SendVerificationRequestParams) =>
+        sendVerificationRequest({
+          locale,
+          origin,
+          ...props,
+        }),
     }),
     GithubProvider({
       clientId: authEnv.GITHUB_CLIENT_ID,
