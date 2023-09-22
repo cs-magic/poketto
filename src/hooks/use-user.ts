@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { signOut, useSession } from "next-auth/react"
 
 import { api } from "@/lib/api"
@@ -13,7 +7,7 @@ export const useUser = () => {
   const userInSession = session?.user
   const { data: userInDB, isLoading: isLoadingUser } = api.user.getProfile.useQuery(
     { id: userInSession?.id },
-    { enabled: !!userInSession?.id }
+    { enabled: !!userInSession?.id },
   )
   if (userInSession && !isLoadingUser && !userInDB) {
     // 数据库不匹配，重置浏览器端

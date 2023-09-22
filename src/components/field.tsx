@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { BookmarkFilledIcon, EyeOpenIcon, VideoIcon } from "@radix-ui/react-icons"
 import numeral from "numeral"
 import React, { type HTMLProps, type ReactNode } from "react"
@@ -23,7 +17,10 @@ export function ResponsiveField({
 } & HTMLProps<HTMLDivElement>) {
   return (
     <div
-      className={clsx("inline-flex cursor-pointer items-center gap-1 whitespace-nowrap hover:text-primary-foreground/75", className)}
+      className={clsx(
+        "inline-flex cursor-pointer items-center gap-1 whitespace-nowrap hover:text-primary-foreground/75",
+        className,
+      )}
       {...props}
     >
       {icon}

@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { Prisma } from "@prisma/client"
 import { AppWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
@@ -46,7 +40,7 @@ export const pokettoAppRouter = createTRPCRouter({
         searchKey: z.string().optional(),
         // todo: array augment
         sortOrder: z.enum(sortOrders).default("mostUsed"),
-      })
+      }),
     )
     .query(
       async ({
@@ -86,7 +80,7 @@ export const pokettoAppRouter = createTRPCRouter({
           items,
           nextCursor,
         }
-      }
+      },
     ),
 
   get: publicProcedure.input(AppWhereUniqueInputSchema).query(async ({ ctx: { prisma }, input }) => {

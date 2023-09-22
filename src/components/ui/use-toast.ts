@@ -1,13 +1,6 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import * as React from "react"
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast"
-
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -110,7 +103,7 @@ export const reducer = (state: State, action: Action): State => {
                 ...t,
                 open: false,
               }
-            : t
+            : t,
         ),
       }
     }

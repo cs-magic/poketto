@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { InvitationStatus } from "@prisma/client"
 import { BellIcon, Cross1Icon } from "@radix-ui/react-icons"
 import { UserIcon } from "lucide-react"
@@ -35,7 +29,7 @@ export function Sidebar() {
   return (
     <div
       className={clsx(
-        "shrink-0 h-full overflow-auto pt-8 gap-6 | hidden md:flex flex-col items-center | whitespace-nowrap bg-sidebar text-sm text-primary-foreground"
+        "shrink-0 h-full overflow-auto pt-8 gap-6 | hidden md:flex flex-col items-center | whitespace-nowrap bg-sidebar text-sm text-primary-foreground",
       )}
     >
       {Object.entries(sidebarSections).map(([key, keys]) => (

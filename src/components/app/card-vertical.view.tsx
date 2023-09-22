@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import capitalize from "lodash/capitalize"
 import startCase from "lodash/startCase"
 import Image from "next/image"
@@ -75,7 +69,7 @@ export const AppVerticalCardView = ({
         className={clsx(
           "| absolute bottom-0 flex w-full flex-col gap-2 p-4",
           "backdrop-blur",
-          "backdrop-brightness-[.75] dark:backdrop-brightness-50 "
+          "backdrop-brightness-[.75] dark:backdrop-brightness-50 ",
         )}
       >
         {/* title */}

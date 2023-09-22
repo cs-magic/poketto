@@ -22,13 +22,6 @@ import { getOrigin } from "@/lib/router"
 
 import "@/styles/globals.css"
 
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
 // todo: nextjs log best practice: 1. universal 2. bind console
 const originalLog = console.log // Store the original console.log function
 console.log = function () {

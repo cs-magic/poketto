@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { BellIcon, GearIcon, HandIcon, HomeIcon, MixIcon, RocketIcon, TargetIcon } from "@radix-ui/react-icons"
 import { Loader2, type LucideProps } from "lucide-react"
 import Image, { ImageProps } from "next/image"

@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { IssueType, Prisma } from "@prisma/client"
 import { Crosshair2Icon, CubeIcon, EyeOpenIcon } from "@radix-ui/react-icons"
 import { type IconProps } from "@radix-ui/react-icons/dist/types"

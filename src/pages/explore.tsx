@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { useIntersection } from "@mantine/hooks"
 import { FrameIcon } from "@radix-ui/react-icons"
 import { useTranslation } from "next-i18next"
@@ -43,7 +37,7 @@ export default function ExplorePage() {
     { sortOrder, language: language === "all" ? undefined : language === "zh-CN" ? "zh" : language },
     {
       getNextPageParam: (lastPage, allPages) => lastPage.nextCursor, // 这个必须加
-    }
+    },
   )
   const apps = query.data?.pages.flatMap((item) => item.items) ?? []
 
@@ -167,7 +161,7 @@ function ScrollTrigger({ trigger }: { trigger: any }) {
       ref={ref}
       className={clsx(
         "flex-center m-auto shrink-0 rounded-2xl px-16 py-8",
-        " animate-pulse bg-card font-bold text-primary-foreground"
+        " animate-pulse bg-card font-bold text-primary-foreground",
       )}
     >
       {entry?.isIntersecting && t("common:LoadingMoreData")}

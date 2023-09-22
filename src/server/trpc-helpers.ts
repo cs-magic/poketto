@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { TRPCError, initTRPC } from "@trpc/server"
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next"
 import { type Session } from "next-auth"
@@ -12,7 +6,6 @@ import { ZodError } from "zod"
 
 import { getServerAuthSession } from "@/server/auth"
 import { prisma } from "@/server/db"
-
 
 /**
  * 1. CONTEXT

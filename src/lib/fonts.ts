@@ -1,12 +1,5 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-import { Inter as FontSans } from "next/font/google";
-import localFont from "next/font/local";
-
+import { Inter as FontSans } from "next/font/google"
+import localFont from "next/font/local"
 
 // const interFont = Inter({ subsets: ["latin"] })
 export const fontChinese = localFont({

@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { type VariantProps, cva } from "class-variance-authority"
 import * as React from "react"
 
@@ -28,38 +22,40 @@ const cardVariants = cva("rounded-lg border bg-card text-card-foreground shadow-
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof cardVariants>>(
   ({ variant, size, className, ...props }, ref) => (
     <div ref={ref} className={cn(cardVariants({ variant, size, className }))} {...props} />
-  )
+  ),
 )
 Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6 border-b", className)} {...props} />
-  )
+  ),
 )
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h3 ref={ref} className={cn("text-lg font-semibold leading-none tracking-tight", className)} {...props} />
-  )
+  ),
 )
 CardTitle.displayName = "CardTitle"
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
-  )
+  ),
 )
 CardDescription.displayName = "CardDescription"
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />,
 )
 CardContent.displayName = "CardContent"
 
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
+  ),
 )
 CardFooter.displayName = "CardFooter"
 

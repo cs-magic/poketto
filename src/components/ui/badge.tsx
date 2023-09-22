@@ -1,14 +1,7 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { type VariantProps, cva } from "class-variance-authority"
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-
 
 const badgeVariants = cva(
   "shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2" +
@@ -25,7 +18,7 @@ const badgeVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 )
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}

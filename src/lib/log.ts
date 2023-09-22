@@ -1,12 +1,5 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-import pino from "pino";
-import { logflarePinoVercel } from "pino-logflare";
-
+import pino from "pino"
+import { logflarePinoVercel } from "pino-logflare"
 
 // create pino-logflare console stream for serverless functions and send function for browser logs
 // Browser logs are going to: https://logflare.app/sources/13989
@@ -40,7 +33,7 @@ const log = pino(
       // revision: process.env.VERCEL_GITHUB_COMMIT_SHA,
     },
   },
-  stream
+  stream,
 )
 
 export default typeof window === "undefined" ? log : log

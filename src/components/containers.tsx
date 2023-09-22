@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { DialogTriggerProps } from "@radix-ui/react-dialog"
 import type { TooltipTriggerProps } from "@radix-ui/react-tooltip"
 import { useTranslation } from "next-i18next"

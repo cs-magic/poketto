@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { PlatformType } from "@prisma/client"
 import { type GetServerSidePropsContext } from "next"
 import { type NextAuthOptions, type User as NextAuthUser, getServerSession } from "next-auth"

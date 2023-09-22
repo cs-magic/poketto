@@ -1,13 +1,6 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
@@ -15,7 +8,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ classNa
   <textarea
     className={cn(
       "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-      className
+      className,
     )}
     ref={ref}
     {...props}

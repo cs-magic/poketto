@@ -1,16 +1,9 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { type StateCreator, create } from "zustand"
 import { devtools, persist } from "zustand/middleware"
 import { immer } from "zustand/middleware/immer"
 
 import { type SystemState, createSystemSlice } from "@/store/system.slice"
 import { type UIState, createUISlice } from "@/store/ui.slice"
-
 
 /**
  * store
@@ -49,7 +42,7 @@ export const useAppStore = create<StoreState>()(
           }
           return persistedState
         },
-      }
-    )
-  )
+      },
+    ),
+  ),
 )

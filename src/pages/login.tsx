@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { ChevronLeftIcon } from "@radix-ui/react-icons"
 import { type Metadata } from "next"
 import { useTranslation } from "next-i18next"

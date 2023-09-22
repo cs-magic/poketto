@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
 
@@ -26,7 +20,7 @@ export default function ConversationPage() {
         appId,
       },
     },
-    { enabled: !!(userId && appId) }
+    { enabled: !!(userId && appId) },
   )
   // console.log({ userId, appId, curConv })
 

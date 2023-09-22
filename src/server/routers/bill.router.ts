@@ -1,9 +1,3 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 
@@ -14,7 +8,7 @@ export const billRouter = createTRPCRouter({
     .input(
       z.object({
         coupon: z.string(),
-      })
+      }),
     )
     .mutation(
       async ({
@@ -38,7 +32,7 @@ export const billRouter = createTRPCRouter({
             },
           },
         })
-      }
+      },
     ),
 
   listPayments: protectedProcedure.query(
@@ -47,6 +41,6 @@ export const billRouter = createTRPCRouter({
         prisma,
         session: { user },
       },
-    }) => prisma.stripePayment.findMany({ where: { userId: user.id } })
+    }) => prisma.stripePayment.findMany({ where: { userId: user.id } }),
   ),
 })

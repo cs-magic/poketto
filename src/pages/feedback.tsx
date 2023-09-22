@@ -1,11 +1,5 @@
-/**
- * Copyright (c) CS-Magic, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-import { IssueType } from "@prisma/client"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { IssueType } from "@prisma/client"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
