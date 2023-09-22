@@ -20,7 +20,6 @@ import { useUser } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import { getConversationLink, getConversationsLink } from "@/lib/string"
 
-
 export default function HomePage() {
   return (
     <RootLayout>
@@ -28,6 +27,16 @@ export default function HomePage() {
         <SystemStatus />
         <RecentConversations />
         <ExploreAppsWidget />
+
+        <div className={"mt-auto text-center p-2"}>
+          <Link
+            href={"/en/privacy.html"}
+            className={"text-muted-foreground underline underline-offset-4"}
+            target={"_blank"}
+          >
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </RootLayout>
   )

@@ -8,7 +8,6 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import _ from "lodash"
 import { useTranslation } from "next-i18next"
 import { useState } from "react"
 

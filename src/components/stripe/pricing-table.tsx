@@ -1,13 +1,10 @@
 import Head from "next/head"
 import React from "react"
 
-import { paymentEnv } from "@/env.mjs"
-
 import { STRIPE_PRICING_TABLE_ID, STRIPE_PUBLISHABLE_KEY } from "@/config"
 
 import { useUser } from "@/hooks/use-user"
 
-import { getOrigin } from "@/lib/router"
 import { encodeClientReferenceId } from "@/lib/stripe"
 
 declare global {

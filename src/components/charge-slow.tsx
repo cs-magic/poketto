@@ -6,13 +6,8 @@ import { defaultModelQuota, modelTypes } from "@/ds"
 import { ChargeContainer } from "@/components/containers"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { SelectItem } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 
 import { useUser } from "@/hooks/use-user"
-
-import clsx from "@/lib/clsx"
 
 const SlowChargeForm = () => {
   const { t } = useTranslation()

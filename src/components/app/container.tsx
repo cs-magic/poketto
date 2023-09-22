@@ -1,5 +1,5 @@
 import { DialogTriggerProps } from "@radix-ui/react-dialog"
-import React, { useState } from "react"
+import React from "react"
 
 import { AppDetailView } from "@/components/app/detail.view"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"

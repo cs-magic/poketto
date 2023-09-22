@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TRPCClientError } from "@trpc/client"
 import { useTranslation } from "next-i18next"
-import { useRouter } from "next/router"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"

@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import React from "react"
 
-import { DEFAULT_USER_ID, DEFAULT_USER_NAME } from "@/config"
+import { DEFAULT_USER_NAME } from "@/config"
 
 import { type UserForProfile } from "@/ds"
 

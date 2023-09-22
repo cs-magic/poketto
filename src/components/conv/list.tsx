@@ -17,7 +17,7 @@ import { useUser } from "@/hooks/use-user"
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
 import d from "@/lib/datetime"
-import { getConversationLink, getCuidTimestamp, getImageUri } from "@/lib/string"
+import { getConversationLink, getImageUri } from "@/lib/string"
 
 export function ConversationList() {
   const { data: convs } = api.conv.list.useQuery()

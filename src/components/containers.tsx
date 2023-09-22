@@ -3,7 +3,7 @@ import type { TooltipTriggerProps } from "@radix-ui/react-tooltip"
 import { useTranslation } from "next-i18next"
 import React, { type HTMLProps, type PropsWithChildren, type ReactNode, useCallback, useState } from "react"
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import ScrollToBottom, { useObserveScrollPosition } from "react-scroll-to-bottom"
+import ScrollToBottom from "react-scroll-to-bottom"
 
 import { Loading } from "@/components/loading"
 import StripePricingTable from "@/components/stripe/pricing-table"

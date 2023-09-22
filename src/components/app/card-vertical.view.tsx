@@ -8,10 +8,9 @@ import { UsesField, ViewsField } from "@/components/field"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 
 import clsx from "@/lib/clsx"
-import { getFlowgptUserLink, getImageUri } from "@/lib/string"
+import { getImageUri } from "@/lib/string"
 
 export const AppVerticalCardView = ({
   app,

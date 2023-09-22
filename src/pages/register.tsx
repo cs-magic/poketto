@@ -7,7 +7,6 @@ import { UserAuthForm } from "@/components/user-auth-form"
 
 import { cn } from "@/lib/utils"
 
-
 const metadata = {
   title: "Create an account",
   description: "Create an account to get started.",
@@ -38,7 +37,7 @@ export default function RegisterPage() {
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="hover:text-brand underline underline-offset-4">
+            <Link href="/src/pages/privacy" className="hover:text-brand underline underline-offset-4">
               Privacy Policy
             </Link>
             .
