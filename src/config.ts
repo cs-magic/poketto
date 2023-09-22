@@ -2,6 +2,7 @@ import { Prisma, PromptRoleType, StripeSubscriptionLevel } from "@prisma/client"
 
 import resources from "@/@types/resources"
 
+
 import StripeProductUncheckedCreateInput = Prisma.StripeProductUncheckedCreateInput
 
 export const FontWeightGlowSansSC = [

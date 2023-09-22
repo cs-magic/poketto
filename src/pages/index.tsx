@@ -5,8 +5,6 @@ import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import Link from "next/link"
 
-import { FREE_GPT3_DAILY_TOTAL, FREE_GPT4_DAILY_TOTAL } from "@/config"
-
 import { CardsLayoutType } from "@/ds"
 
 import { AppVerticalCardView } from "@/components/app/card-vertical.view"
@@ -21,6 +19,7 @@ import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import { getConversationLink, getConversationsLink } from "@/lib/string"
+
 
 export default function HomePage() {
   return (

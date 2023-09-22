@@ -3,6 +3,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { ErrorIcon } from "@/components/icons"
 import { RootLayout } from "@/components/layouts/root.layout"
 
+
 export default function Custom404() {
   return (
     <RootLayout>

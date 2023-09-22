@@ -10,8 +10,9 @@ import { paymentEnv } from "@/env.mjs"
 import { subscriptionLevel2Unit } from "@/config"
 
 import d from "@/lib/datetime"
-import { getOrigin, getServerId, isDomestic } from "@/lib/router"
+import { getServerId } from "@/lib/router"
 import { decodeClientReferenceId } from "@/lib/stripe"
+
 
 /**
  * ref:

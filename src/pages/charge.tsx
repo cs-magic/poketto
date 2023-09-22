@@ -4,6 +4,7 @@ import React from "react"
 import { RootLayout } from "@/components/layouts/root.layout"
 import StripePricingTable from "@/components/stripe/pricing-table"
 
+
 export default function GalleryPage() {
   return (
     <RootLayout>

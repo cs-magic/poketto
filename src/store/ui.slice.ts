@@ -2,6 +2,7 @@ import { type StoreSlice } from "@/store/index"
 
 import { CardsLayoutType } from "@/ds"
 
+
 export interface UIState {
   cardsLayout: CardsLayoutType
   setCardsLayout: (v: CardsLayoutType) => void

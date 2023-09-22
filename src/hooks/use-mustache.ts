@@ -2,6 +2,7 @@ import Mustache from "mustache"
 
 import { useUser } from "@/hooks/use-user"
 
+
 export const useMustache = () => {
   const { user } = useUser()
   return (s: string, dict?: { [key: string]: string | number | boolean }) => {

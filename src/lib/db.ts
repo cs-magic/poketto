@@ -5,6 +5,7 @@ import { type AdapterUser, type Adapter as NextAuthAdapter } from "next-auth/ada
 import { prisma } from "@/server/db"
 import { initUser } from "@/server/init"
 
+
 const { createUser: prismaCreateUser, ...adapterExtra } = PrismaAdapter(prisma as unknown as PrismaClient)
 
 export const pokettoPrismaAdapter: NextAuthAdapter = {

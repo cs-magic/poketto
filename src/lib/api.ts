@@ -8,6 +8,7 @@ import { type RootRouter } from "@/server/routers/_root.router"
 
 import { URI } from "@/config"
 
+
 const getBaseUrl = () => {
   if (typeof window !== "undefined") {
     return ""

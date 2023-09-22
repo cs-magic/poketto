@@ -1,4 +1,5 @@
-import { isDomestic } from "@/lib/router"
+import { isDomestic } from "@/lib/router";
+
 
 /**
  * 在没有配置 tun mode 下，需要使用这个函数，并且只能用 nodejs 环境了，否则可以用edge

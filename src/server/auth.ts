@@ -14,6 +14,7 @@ import { pokettoPrismaAdapter } from "@/lib/db"
 import { sendVerificationRequest } from "@/lib/email"
 import { getOrigin } from "@/lib/router"
 
+
 export const emailFrom = siteConfig.welcomeEmailAddress
 
 /**

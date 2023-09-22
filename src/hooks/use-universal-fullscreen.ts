@@ -2,6 +2,7 @@ import { useFullscreen } from "@mantine/hooks"
 
 import { useAppStore } from "@/store"
 
+
 export const useUniversalFullscreen = () => {
   const { ref, toggle, fullscreen: fullscreenUse } = useFullscreen()
   const { switchFullscreen, fullscreen: fullscreenStore } = useAppStore()

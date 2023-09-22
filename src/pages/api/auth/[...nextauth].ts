@@ -5,6 +5,7 @@ import { createAuthOptions } from "@/server/auth"
 
 import { DEFAULT_LOCALE } from "@/config"
 
+
 const handler: NextApiHandler = async (req, res) => {
   // console.log("auth: [query] ", req.query)
   const locale = (req.query.locale as string | undefined) ?? DEFAULT_LOCALE

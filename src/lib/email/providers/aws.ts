@@ -9,6 +9,7 @@ import { AWS_REGION, siteConfig } from "@/config"
 
 import d from "@/lib/datetime"
 
+
 export const sesClient = new SESClient({
   region: AWS_REGION,
   credentials: {

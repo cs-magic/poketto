@@ -1,10 +1,10 @@
 import { ChatMessageFormatType, PromptRoleType } from "@prisma/client"
-import { ChatMessage } from "@prisma/client"
 import { Message } from "ai"
 
 import { AllMessage, AppForListView, UserForListView } from "@/ds"
 
 import d from "@/lib/datetime"
+
 
 export const packMessageWithDate = (messages: Message[], user: UserForListView, app: AppForListView) => {
   const messagesWithDate: AllMessage[] = []

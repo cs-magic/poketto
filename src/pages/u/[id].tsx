@@ -10,6 +10,7 @@ import { UserProfile } from "@/components/user/profile.view"
 
 import { api } from "@/lib/api"
 
+
 export const DashboardPage: NextPageWithAuth = () => {
   const router = useRouter()
   const userId = router.query.id as string

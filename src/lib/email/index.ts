@@ -5,6 +5,7 @@ import { emailProvider } from "@/config"
 import { sendViaAWS } from "@/lib/email/providers/aws"
 import { sendViaPostmark } from "@/lib/email/providers/postmark"
 
+
 export interface ISendVerificationRequest extends SendVerificationRequestParams {
   locale: string
   origin: string

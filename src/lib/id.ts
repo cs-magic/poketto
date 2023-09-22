@@ -1,4 +1,5 @@
-import { customAlphabet } from "nanoid/non-secure"
+import { customAlphabet } from "nanoid/non-secure";
+
 
 /**
  * ai/nanoid

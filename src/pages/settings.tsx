@@ -24,6 +24,7 @@ import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 
+
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()

@@ -3,7 +3,6 @@ import { IssueType } from "@prisma/client"
 import { useTranslation } from "next-i18next"
 import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 import { useRouter } from "next/router"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -20,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { api } from "@/lib/api"
 import { getZodDefaults } from "@/lib/zod"
+
 
 const FeedbackForm = () => {
   const { t } = useTranslation()

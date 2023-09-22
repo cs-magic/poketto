@@ -1,12 +1,9 @@
-import { UserWhereUniqueInputSchema } from "prisma/generated/zod"
 import { Simulate } from "react-dom/test-utils"
-import { z } from "zod"
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc-helpers"
 
-import { type UserForProfile, feedbackFormSchema, selectUserProfile } from "@/ds"
+import { feedbackFormSchema } from "@/ds"
 
-import input = Simulate.input
 
 export const feedbackRouter = createTRPCRouter({
   list: publicProcedure.query(async ({ ctx: { prisma } }) => {

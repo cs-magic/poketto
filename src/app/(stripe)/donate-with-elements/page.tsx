@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import ElementsForm from "@/components/ElementsForm"
 
+
 const metadata: Metadata = {
   title: "Donate with Elements",
 }

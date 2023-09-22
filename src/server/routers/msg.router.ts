@@ -11,6 +11,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 
 import { ModelType, defaultModelQuota, selectChatMessageForDetailView } from "@/ds"
 
+
 export const msgRouter = createTRPCRouter({
   // the action of pushing is at the backend
   push: publicProcedure.input(ChatMessageUncheckedCreateInputSchema).mutation(async ({ ctx: { prisma }, input }) => {

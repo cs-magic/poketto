@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from "@/server/trpc-helpers"
 
 import { FREE_GPT3_DAILY_TOTAL, FREE_GPT4_DAILY_TOTAL } from "@/config"
 
+
 const status = {
   gpt3: {
     free: {

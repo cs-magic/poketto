@@ -1,5 +1,6 @@
-import { Inter as FontSans } from "next/font/google"
-import localFont from "next/font/local"
+import { Inter as FontSans } from "next/font/google";
+import localFont from "next/font/local";
+
 
 // const interFont = Inter({ subsets: ["latin"] })
 export const fontChinese = localFont({

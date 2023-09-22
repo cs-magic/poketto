@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client"
-import { ChatMessageFormatType } from "@prisma/client"
+import { ChatMessageFormatType, Prisma } from "@prisma/client"
 import { ConversationWhereUniqueInputSchema } from "prisma/generated/zod"
 import { z } from "zod"
 
@@ -9,7 +8,6 @@ import { includeConvForDetailView, selectAppForDetailView, selectConvForListView
 
 import { getWelcomeSystemNotification } from "@/lib/string"
 
-import ConversationWhereUniqueInput = Prisma.ConversationWhereUniqueInput
 
 export const convRouter = createTRPCRouter({
   /**

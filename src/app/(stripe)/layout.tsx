@@ -8,6 +8,7 @@ import { siteConfig } from "@/config"
 
 import { getOrigin } from "@/lib/router"
 
+
 const metadata: Metadata = {
   metadataBase: new URL(getOrigin()),
   title: {
