@@ -24,6 +24,7 @@ import Link from "next/link"
 import React, { ComponentProps, useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useScrollToBottom, useSticky } from "react-scroll-to-bottom"
+import TextareaAutosize from "react-textarea-autosize"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 
@@ -417,13 +418,13 @@ export function ConversationCore({ conversationId }: { conversationId: string })
               }}
             >
               <Textarea
-                style={{ resize: "none" }} // 去掉尾部的 icon，不然视觉上不和谐
-                name="prompt"
-                className={clsx("w-full rounded-xl min-h-8 lg:min-h-16", isLoading && "animate-pulse")}
+                id="input"
+                name={"prompt"}
+                minRows={3}
+                maxRows={20}
                 autoFocus
                 value={input}
                 onChange={handleInputChange}
-                id="input"
                 onKeyDown={getHotkeyHandler([
                   [
                     "Enter",
