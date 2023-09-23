@@ -164,7 +164,7 @@ export function ConversationCore({ conversationId }: { conversationId: string })
 
   return (
     <div className={clsx("flex h-full w-full flex-col items-center overflow-hidden ")} ref={ref}>
-      <div className={clsx("flex h-full w-full max-w-[1080px] flex-col overflow-hidden")}>
+      <div className={clsx("flex h-full w-full  flex-col overflow-hidden")}>
         <div className={clsx("flex w-full items-center justify-between gap-4 bg-muted px-2 py-5 overflow-hidden")}>
           {fullscreen ? <LogoWithName /> : <div />}
           <h2 className="truncate text-center">{conversation.app.name}</h2>
