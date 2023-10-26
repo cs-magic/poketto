@@ -1,23 +1,11 @@
-// -----------------------------------------------------------------------------
-// ref: https://pris.ly/d/prisma-schema
-// -----------------------------------------------------------------------------
-
 generator client {
-  provider = "prisma-client-js"
-  // output   = "../node_modules/@prisma/client/generated" // support for webstorm autocompletion
-
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
 generator json {
-  /// Always after the prisma-client-js generator
   provider  = "prisma-json-types-generator"
   namespace = "PrismaJson"
-  // clientOutput = "<finds it automatically>"
-  // (./ -> relative to schema, or an importable path to require() it)
-  // useType = "MyType"
-  // In case you need to use a type, export it inside the namespace and we will add a index signature to it
-  // (e.g.  export namespace PrismaJson { export type MyType = {a: 1, b: 2} }; will generate namespace.MyType["TYPE HERE"])
 }
 
 generator zod {
@@ -25,19 +13,10 @@ generator zod {
 }
 
 datasource db {
-  provider = "postgresql"
-  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-  url      = env("DATABASE_URL")
-
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
   extensions = [vector]
 }
-
-// -----------------------------------------------------------------------------
-// models
-// -----------------------------------------------------------------------------
 
 model Account {
   id                       String  @id @default(cuid())
@@ -45,174 +24,145 @@ model Account {
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? // @db.Text
-  access_token             String? // @db.Text
+  refresh_token            String?
+  access_token             String?
   expires_at               Int?
   token_type               String?
   scope                    String?
-  id_token                 String? // @db.Text
+  id_token                 String?
   session_state            String?
+  refresh_token_expires_in Int?
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refresh_token_expires_in Int? // github necessary
 
   @@unique([provider, providerAccountId])
 }
 
 model App {
-  id        String   @id @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  platformType PlatformType @default(Poketto)
+  id           String         @id @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  platformType PlatformType   @default(Poketto)
   platformId   String
-
-  creator      User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   creatorId    String
   name         String
   avatar       String
   desc         String
-  language     String      @default("en")
-  isOpenSource Boolean     @default(true)
-  version      String      @default("1.0.0")
-  tags         AppTag[]
-  category     AppCategory @relation(fields: [categoryMain, categorySub], references: [main, sub], onDelete: Cascade)
+  language     String         @default("en")
+  isOpenSource Boolean        @default(true)
+  version      String         @default("1.0.0")
   categoryMain Int
   categorySub  Int
-
-  actions  AppAction[]
-  using    Conversation[]
-  starring StarringApp[]
-  comments AppComment[]
-  state    AppState?
-
-  modelName   String
-  prompts     AppPrompts[]
-  temperature Float
+  modelName    String
+  temperature  Float
+  category     AppCategory    @relation(fields: [categoryMain, categorySub], references: [main, sub], onDelete: Cascade)
+  creator      User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  actions      AppAction[]
+  comments     AppComment[]
+  prompts      AppPrompts[]
+  state        AppState?
+  using        Conversation[]
+  starring     StarringApp[]
+  tags         AppTag[]       @relation("AppToAppTag")
 
   @@unique([platformType, platformId], name: "platform")
 }
 
 model AppAction {
-  id String @id @default(cuid())
-
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String  @id @default(cuid())
   userId String?
-  app    App     @relation(fields: [appId], references: [id], onDelete: Cascade)
   appId  String
-
   action String
+  app    App     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AppCategory {
-  // category 是由我们自己创建，不交给用户
-  id String @id @default(cuid())
-
+  id     String  @id @default(cuid())
   main   Int
   sub    Int
+  userId String?
   App    App[]
   User   User?   @relation(fields: [userId], references: [id])
-  userId String?
 
   @@unique([main, sub], name: "category")
 }
 
 model AppComment {
-  id String @id @default(cuid())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  aApp   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
-  appId  String
-
+  id      String  @id @default(cuid())
+  userId  String
+  appId   String
   title   String?
   content String
   rate    Int?    @default(0)
+  aApp    App     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AppPrompts {
-  id    String @id @default(cuid())
-  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
-  appId String
-
+  id      String         @id @default(cuid())
+  appId   String
   role    PromptRoleType
   content String
+  app     App            @relation(fields: [appId], references: [id], onDelete: Cascade)
 }
 
 model AppState {
-  id String @id @default(cuid())
-
-  views  Int   @default(0)
-  stars  Int   @default(0)
-  forks  Int   @default(0)
-  tips   Float @default(0)
-  calls  Int   @default(0)
-  shares Int   @default(0)
-
-  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
-  appId String @unique
+  id     String @id @default(cuid())
+  views  Int    @default(0)
+  stars  Int    @default(0)
+  forks  Int    @default(0)
+  tips   Float  @default(0)
+  calls  Int    @default(0)
+  shares Int    @default(0)
+  appId  String @unique
+  app    App    @relation(fields: [appId], references: [id], onDelete: Cascade)
 }
 
 model AppTag {
-  id String @id @default(cuid())
-
-  creator   User?   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
   creatorId String?
-
-  name String @unique
-  apps App[]
+  name      String  @unique
+  creator   User?   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  apps      App[]   @relation("AppToAppTag")
 }
 
 model ChatMessage {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String? // system notification
-
-  role                PromptRoleType        @default(user)
+  id                  String                 @id @default(cuid())
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  userId              String?
+  role                PromptRoleType         @default(user)
   content             String?
-  format              ChatMessageFormatType @default(text)
+  format              ChatMessageFormatType  @default(text)
+  conversationId      String
+  namespace           String?                @default("default")
+  vector              Unsupported("vector")?
+  cost                Float?                 @default(0)
+  modelType           String?                @default("gpt-3.5-turbo")
+  isUsingFree         Boolean?               @default(false)
+  conversation        Conversation           @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user                User?                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userActionOnMessage ChatMessageAction[]
-
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  conversationId String
-
-  // ref: https://js.langchain.com/docs/modules/data_connection/vectorstores/integrations/prisma
-  namespace String?                @default("default")
-  vector    Unsupported("vector")?
-
-  // 每条 message 付费
-  cost Float? @default(0)
-
-  modelType   String?  @default("gpt-3.5-turbo")
-  isUsingFree Boolean? @default(false)
 }
 
 model ChatMessageAction {
-  id String @id @default(cuid())
-
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String      @id @default(cuid())
   userId    String
-  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   messageId String
-
-  action String
+  action    String
+  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Conversation {
-  id String @id @default(cuid())
-
+  id       String        @id @default(cuid())
   isActive Boolean       @default(true)
+  userId   String
+  appId    String
+  pinned   Boolean       @default(false)
   messages ChatMessage[]
-
-  userId String
-  appId  String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade)
-
-  pinned Boolean @default(false)
+  app      App           @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, appId], name: "conversation", map: "conversation")
 }
@@ -221,49 +171,40 @@ model Coupon {
   id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @db.VarChar(7)
+  userId    String   @db.VarChar(7)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Feedback {
-  id String @id @default(cuid())
-
+  id        String    @id @default(cuid())
   issueType IssueType
   title     String
   detail    String
   contact   String
   anonymous Boolean   @default(false)
-
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId String?
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 model FollowRelation {
-  id String @id @default(cuid())
-
-  from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
-  to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
   fromId String
   toId   String
+  from   User   @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
+  to     User   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
 }
 
 model InvitationRelation {
-  id String @id @default(cuid())
-
+  id     String           @id @default(cuid())
   status InvitationStatus @default(Idle)
-  // code if necessary
-
-  from   User?  @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
   fromId String
-
-  to   User?   @relation("to", fields: [toId], references: [id], onDelete: Cascade)
-  toId String? @unique
+  toId   String?          @unique
+  from   User             @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
+  to     User?            @relation("to", fields: [toId], references: [id], onDelete: Cascade)
 }
 
 model Session {
-  id String @id @default(cuid())
-
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -271,106 +212,75 @@ model Session {
 }
 
 model StarringApp {
-  id String @id @default(cuid())
-
-  app   App    @relation(fields: [appId], references: [id], onDelete: Cascade)
-  appId String
-
+  id       String  @id @default(cuid())
+  appId    String
   isActive Boolean @default(true)
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  userId   String
+  app      App     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// todo: stripe 自己的 api 是不是够用了
 model StripeProduct {
-  // id 从 stripe 拿
-  id String @id
-
+  id       String                   @id
   price    Float
   currency String
   mode     StripeMode
-  // 订阅的期限
   expire   Int?
   level    StripeSubscriptionLevel? @default(basic)
-
   payments StripePayment[]
 }
 
 model StripePayment {
-  // id 从 stripe 拿
-  id String @id
-
-  // 记录要保留
+  id         String        @id
+  count      Int           @default(1)
+  redeemCode String?
+  productId  String
+  userId     String
   product    StripeProduct @relation(fields: [productId], references: [id], onDelete: NoAction)
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  count      Int           @default(1)
-  // 优惠码
-  redeemCode String?
-
-  productId String
-  userId    String
 }
 
 model User {
-  id        String   @id @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  platformType PlatformType @default(Poketto)
-  platformId   String
-
+  id                    String               @id @default(dbgenerated("nanoid(7)")) @db.VarChar(7)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  platformType          PlatformType         @default(Poketto)
+  platformId            String
   /// [UserPlatformArgs]
-  platformArgs Json?
-
-  accounts Account[]
-  sessions Session[]
-
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  description   String?
-
-  invitedFrom InvitationRelation[] @relation("from")
-  invitedTo   InvitationRelation[] @relation("to")
-
-  followedBy FollowRelation[] @relation("from")
-  following  FollowRelation[] @relation("to")
-
+  platformArgs          Json?
+  name                  String?
+  email                 String?              @unique
+  emailVerified         DateTime?
+  image                 String?
+  description           String?
   /// note: 这里显式声明计数字段，是为了提高性能，以及 prisma 对 computed field 的 type support 还处于开始阶段
   /// 我们为了对象的数据切片，故分开
-  followedByCount Int @default(0)
-  followingCount  Int @default(0)
-
-  chatMessages       ChatMessage[]
-  chatMessageActions ChatMessageAction[]
-
-  tags AppTag[]
-
-  appComments AppComment[]
-  appActions  AppAction[]
-  StarringApp StarringApp[]
-  createdApps App[]
-
-  conversations Conversation[]
-
-  balance Int @default(0)
-
-  // 应该要有个多模态，获取账单历史数据……
-  stripePayments        StripePayment[]
+  followedByCount       Int                  @default(0)
+  followingCount        Int                  @default(0)
+  balance               Int                  @default(0)
   stripeSubscriptionEnd DateTime?
-  stripeCustomerId      String?         @unique
-
-  // 每日需要更新
-
+  stripeCustomerId      String?              @unique
   /// [ModelQuota]
-  quota       Json?
-  Feedback    Feedback[]
-  AppCategory AppCategory[]
-  Coupon      Coupon[]
+  quota                 Json?
+  accounts              Account[]
+  createdApps           App[]
+  appActions            AppAction[]
+  AppCategory           AppCategory[]
+  appComments           AppComment[]
+  tags                  AppTag[]
+  chatMessages          ChatMessage[]
+  chatMessageActions    ChatMessageAction[]
+  conversations         Conversation[]
+  Coupon                Coupon[]
+  Feedback              Feedback[]
+  followedBy            FollowRelation[]     @relation("from")
+  following             FollowRelation[]     @relation("to")
+  invitedFrom           InvitationRelation[] @relation("from")
+  invitedTo             InvitationRelation?  @relation("to")
+  sessions              Session[]
+  StarringApp           StarringApp[]
+  stripePayments        StripePayment[]
 
-  // maybe we only need one id
   @@unique([platformType, platformId], name: "platform")
 }
 
@@ -382,10 +292,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// -----------------------------------------------------------------------------
-// enums
-// -----------------------------------------------------------------------------
-
 enum ChatMessageFormatType {
   text
   image
@@ -394,7 +300,6 @@ enum ChatMessageFormatType {
   map
   realtimeVoice
   realtimeVideo
-
   systemNotification
 }
 
@@ -421,8 +326,6 @@ enum PlatformType {
   MidJourney
   StableDiffusion
   OpenChat
-
-  // align for next-auth
   email
   github
   discord
