@@ -6,6 +6,7 @@ import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { useRouter } from "next/router"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -47,6 +48,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isDiscordLoading, setIsDiscordLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
   const locale = useLocale()
+  const router = useRouter()
 
   async function onSubmit(data: FormData) {
     setIsLoading(true)
@@ -59,7 +61,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         {
           email,
           redirect: false,
-          callbackUrl: searchParams?.get("from") || "/dashboard",
+          callbackUrl: searchParams?.get("from") || "/",
         },
         { locale, origin },
       )
@@ -69,7 +71,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       console.log("signInResult: ", { signInResult })
       if (!signInResult?.ok || signInResult.error !== null) return toast.error(t("auth:LoginFailed"))
 
-      return toast.success(m(t("auth:MailSent"), { email }))
+      toast.success(m(t("auth:MailSent"), { email }))
+      void router.push("/")
     } catch (error) {
       console.log({ error })
     }
@@ -120,7 +123,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             className={cn(buttonVariants({ variant: "outline" }))}
             onClick={() => {
               setIsGitHubLoading(true)
-              void signIn("github")
+              void signIn("github", { callbackUrl: "/" })
             }}
             disabled={isLoading || isGitHubLoading}
           >
@@ -137,7 +140,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             className={cn(buttonVariants({ variant: "outline" }))}
             onClick={() => {
               setIsDiscordLoading(true)
-              void signIn("discord")
+              void signIn("discord", { callbackUrl: "/" })
             }}
             disabled={isLoading || isGitHubLoading}
           >
