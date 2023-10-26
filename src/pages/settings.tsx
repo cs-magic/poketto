@@ -24,7 +24,6 @@ import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 
-
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
@@ -128,8 +127,8 @@ export default function SettingsPage() {
               </Button>
             )}
             {user && (
-              <Button variant="destructive" onClick={() => delUser()} className={"w-full"}>
-                注销账号
+              <Button variant="destructive" disabled onClick={() => delUser()} className={"w-full"}>
+                （暂不支持）注销账号
               </Button>
             )}
           </CardContent>
