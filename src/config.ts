@@ -1,9 +1,9 @@
-import { Prisma, PromptRoleType, StripeSubscriptionLevel } from "@prisma/client"
+import {Prisma, PromptRoleType, StripeSubscriptionLevel} from "@prisma/client"
 
 import resources from "@/@types/resources"
-
-
-import StripeProductUncheckedCreateInput = Prisma.StripeProductUncheckedCreateInput
+import {Metadata} from "next";
+import {getOrigin} from "@/lib/router";
+import StripeProductUncheckedCreateInput = Prisma.StripeProductUncheckedCreateInput;
 
 export const FontWeightGlowSansSC = [
   "Thin",
@@ -241,3 +241,61 @@ export const STRIPE_PRICING_TABLE_ID = "prctbl_1NiZjCHb6cJdkB4p6robW7m2" // 人�
 // export const STRIPE_PRICING_TABLE_ID = “prctbl_1NifItHb6cJdkB4pTEPLvStl” // 美元版本（还未完善）
 export const STRIPE_PUBLISHABLE_KEY =
   "pk_live_51N0prGHb6cJdkB4pSlnkbhd0ZQTSHdePHA0rJN29ZpiZdQRf8PYJYvqc4CMIP85it2Jws5uvbU0CcZOjGGBm9vLj00JB8RUMHw"
+
+export const metadata: Metadata = {
+  metadataBase: new URL(getOrigin()),
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: [
+    "Poketto AI",
+    "MarkShawn",
+    "南川",
+
+    "AIGC",
+    "OpenAI",
+    "ChatGPT",
+    "prompt",
+    "FlowGPT",
+
+    "Next.js",
+    "React",
+    "Tailwind CSS",
+    "Server Components",
+    "Radix UI",
+  ],
+  authors: [
+    {
+      name: "MarkShawn",
+      url: "https://github.com/markshawn2020",
+    },
+  ],
+  creator: "MarkShawn",
+  themeColor: [
+    {media: "(prefers-color-scheme: light)", color: "white"},
+    {media: "(prefers-color-scheme: dark)", color: "black"},
+  ],
+  openGraph: {
+    type: "website",
+    locale: "zh_CN",
+    url: getOrigin(),
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  // twitter: {
+  //   card: "summary_large_image",
+  //   title: siteConfig.name,
+  //   description: siteConfig.description,
+  //   images: [`${siteConfig.url}/og.jpg`],
+  //   creator: "@MarkShawn",
+  // },
+  icons: {
+    icon: "/favicon.ico",
+    // shortcut: "/favicon-16x16.png",
+    // apple: "/apple-touch-icon.png",
+  },
+  manifest: `${getOrigin()}/site.webmanifest`,
+}

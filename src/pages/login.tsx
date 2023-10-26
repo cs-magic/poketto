@@ -10,6 +10,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { UserAuthForm } from "@/components/user-auth-form"
 
 import { cn } from "@/lib/utils"
+import Head from "next/head"
 
 
 const metadata: Metadata = {
@@ -22,6 +23,11 @@ export default function LoginPage() {
 
   return (
     <RootLayout>
+      <Head>
+        <title>{metadata.title as string}</title>
+        <meta name={'description'}>{metadata.description}</meta>
+      </Head>
+
       <div className="container relative flex h-full w-full overflow-auto flex-col items-center justify-center">
         <Link href="/" className={cn(buttonVariants({ variant: "ghost" }), "absolute left-4 top-4 md:left-8 md:top-8")}>
           <>

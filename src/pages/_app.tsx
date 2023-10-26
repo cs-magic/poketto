@@ -1,32 +1,26 @@
-import { SessionProvider } from "next-auth/react";
-import { appWithTranslation } from "next-i18next";
+import {SessionProvider} from "next-auth/react";
+import {appWithTranslation} from "next-i18next";
 import Head from "next/head";
 import React from "react";
-import { Toaster } from "sonner";
+import {Toaster} from "sonner";
 
 
-
-import { siteConfig } from "@/config";
-
+import {siteConfig} from "@/config";
 
 
-import { type ExtendedAppProps } from "@/ds";
-
+import {type ExtendedAppProps} from "@/ds";
 
 
 import ErrorBoundary from "@/components/error-boundary";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
-import { ThemeProvider } from "@/components/theme-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import {TailwindIndicator} from "@/components/tailwind-indicator";
+import {ThemeProvider} from "@/components/theme-provider";
+import {TooltipProvider} from "@/components/ui/tooltip";
 
 
-
-import { api } from "@/lib/api";
+import {api} from "@/lib/api";
 import clsx from "@/lib/clsx";
 import d from "@/lib/datetime";
-import { fontHeading, fontSans } from "@/lib/fonts";
-import { getOrigin } from "@/lib/router";
-
+import {fontHeading, fontSans} from "@/lib/fonts";
 
 
 import "@/styles/globals.css";
@@ -41,64 +35,6 @@ console.log = function () {
 
 function reportWebVitals(metric) {
   console.log(metric)
-}
-
-const metadata = {
-  metadataBase: new URL(getOrigin()),
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  keywords: [
-    "Poketto AI",
-    "MarkShawn",
-    "南川",
-
-    "AIGC",
-    "OpenAI",
-    "ChatGPT",
-    "prompt",
-    "FlowGPT",
-
-    "Next.js",
-    "React",
-    "Tailwind CSS",
-    "Server Components",
-    "Radix UI",
-  ],
-  authors: [
-    {
-      name: "MarkShawn",
-      url: "https://github.com/markshawn2020",
-    },
-  ],
-  creator: "MarkShawn",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-  openGraph: {
-    type: "website",
-    locale: "zh_CN",
-    url: getOrigin(),
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-  },
-  // twitter: {
-  //   card: "summary_large_image",
-  //   title: siteConfig.name,
-  //   description: siteConfig.description,
-  //   images: [`${siteConfig.url}/og.jpg`],
-  //   creator: "@MarkShawn",
-  // },
-  icons: {
-    icon: "/favicon.ico",
-    // shortcut: "/favicon-16x16.png",
-    // apple: "/apple-touch-icon.png",
-  },
-  manifest: `${getOrigin()}/site.webmanifest`,
 }
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: ExtendedAppProps) {
