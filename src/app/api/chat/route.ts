@@ -102,8 +102,10 @@ export async function POST(req: Request) {
 
   try {
     const response = await new OpenAI({
+
+
       apiKey: baseEnv.OPENAI_API_KEY,
-      timeout: 3000,
+      timeout: 5000,
       /**
        *
        * ref:

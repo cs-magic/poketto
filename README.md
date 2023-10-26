@@ -2,6 +2,24 @@
 
 ## config
 
+### database
+
+1. 确保 remote mongodb 数据库连接（打开防火墙27017端口）（或本地）
+2. 初始化数据库
+```shell
+bash -c '
+cd scripts
+yarn
+'
+npx tsx scripts/init-flowgpt-data.ts
+# 这步需要
+# 1. install `pgvector`
+#    - ubuntu: `sudo apt install postgresql-14-pgvector` # support 14/15
+#    - mac: `brew install pgvector` # only supports 14
+# 2. 确保 OPENAI_KEY 正常
+npx tsx scripts/init-pg-vector.ts 
+```
+
 ### nginx
 
 ```shell

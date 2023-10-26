@@ -9,7 +9,9 @@ import AppPromptsCreateManyAppInput = Prisma.AppPromptsCreateManyAppInput
 export type IFlowgptPromptBasic = typeof sampleBasicPrompt
 
 const init = async () => {
-  const mongoClient = new MongoClient("mongodb://localhost")
+  const database_url = process.env.MONGO_URI!
+  console.log({database_url})
+  const mongoClient = new MongoClient(database_url)
 
   let p
   try {
