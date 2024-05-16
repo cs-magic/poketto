@@ -1,7 +1,8 @@
+"use client"
+
 import { signOut, useSession } from "next-auth/react"
 
 import { api } from "@/lib/api"
-
 
 export const useUser = () => {
   const { data: session } = useSession()

@@ -6,10 +6,11 @@ import { authEnv } from "@/env.mjs"
 
 import { siteConfig } from "@/config"
 
-
-export const postmarkClient = new Client(authEnv.POSTMARK_API_TOKEN)
-
 export const sendViaPostmark = async ({ identifier, url, provider, token, locale, origin }) => {
+  const api_token = authEnv.POSTMARK_API_TOKEN
+  if (!api_token) throw new Error("no POSTMARK_API_TOKEN in env")
+  const postmarkClient = new Client(api_token)
+
   const user = await prisma.user.findUnique({
     where: {
       email: identifier,

@@ -9,19 +9,23 @@ import { AWS_REGION, siteConfig } from "@/config"
 
 import d from "@/lib/datetime"
 
-
-export const sesClient = new SESClient({
-  region: AWS_REGION,
-  credentials: {
-    accessKeyId: authEnv.AWS_AK,
-    secretAccessKey: authEnv.AWS_SK,
-  },
-})
-
 export const sendViaAWS = async ({ identifier, url, provider, token, locale, origin }) => {
+  if (!AWS_REGION) throw new Error("no AWS_REGION")
+  if (!authEnv.AWS_AK) throw new Error("no AWS_AK")
+  if (!authEnv.AWS_SK) throw new Error("no AWS_SK")
+
+  const sesClient = new SESClient({
+    region: AWS_REGION,
+    credentials: {
+      accessKeyId: authEnv.AWS_AK,
+      secretAccessKey: authEnv.AWS_SK,
+    },
+  })
+
   const t = await fs.readFile(path.resolve("./public", `email.templates/welcome_${locale}.html`), {
     encoding: "utf-8",
   })
+
   return sesClient.send(
     new SendEmailCommand({
       Destination: {

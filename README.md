@@ -1,57 +1,36 @@
 # Poketto AI
 
-## config
+## 配置
 
-### nginx
+### 1. 环境变量
+
+参考 `.env.sample` 里的配置一下 `.env`，一些是可选的，一些是必填的，不懂的要去对应平台查询配置使用。
+
+### 2. 初始化
 
 ```shell
-server {
-  # listen on *:443 -> ssl; instead of *:80
-  listen 443 ssl;
-
-  server_name poketto.cs-magic.cn;
-
-  ssl_certificate /etc/letsencrypt/live/cs-magic.cn-0002/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/cs-magic.cn-0002/privkey.pem;
-  include snippets/ssl-params.conf;
-
-  set $backend_port 2001;
-
-  location / {
-    # reverse proxy for next server
-    proxy_pass http://localhost:30817;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
-    proxy_set_header Host $host;
-    proxy_cache_bypass $http_upgrade;
-
-    # 这里很关键，用于 sse 的（不加的话国内服务器就没有stream了，国外服务器有，这点也不知道为什么）
-    # 参考：https://stackoverflow.com/a/13673298/9422455
-    chunked_transfer_encoding off;
-    proxy_buffering off;
-    proxy_cache off;
-
-    # we need to remove this 404 handling
-    # because next's _next folder and own handling
-    # try_files $uri $uri/ =404;
-  }
-  location ~ /.well-known {
-    allow all;
-  }
-}
+yarn
 ```
 
-## todo
+### 3. 开发模式启动
 
-### bug
+```shell
+yarn dev
+```
 
-- [ ] 关于邮箱与`next-auth-url`不同时的表现：
-    - button、callback_url等都是next-auth-url，login_url则是请求地址
-    - 如果是https，则地址不对时，sendVerificationRequest函数无法触发
-- [ ] 关于 https build 下 streaming 失败的问题
-    - 只build（或者不build），不用 https，测试可
-    - build，则用 https，则不可
+### 4. 生产模式启动
+
+```shell
+yarn build && yarn start
+```
+
+## Todo
+
+## Tech
+
+- [Dev Notes](./__docs__/dev-notes.md)
+- [BugFix](./__docs__/bugfix.md)
+- [How To Config Nginx](./__docs__/nginx.md)
 
 ## ref
 

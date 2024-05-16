@@ -2,7 +2,6 @@ import { Prisma, PromptRoleType, StripeSubscriptionLevel } from "@prisma/client"
 
 import resources from "@/@types/resources"
 
-
 import StripeProductUncheckedCreateInput = Prisma.StripeProductUncheckedCreateInput
 
 export const FontWeightGlowSansSC = [
@@ -68,7 +67,7 @@ export const URI = {
     auth: {
       signIn: "/login",
       // signin: "/api/auth/signin",
-      login: "/login",
+      logIn: "/login",
       register: "/register",
     },
   },
@@ -241,3 +240,8 @@ export const STRIPE_PRICING_TABLE_ID = "prctbl_1NiZjCHb6cJdkB4p6robW7m2" // 人�
 // export const STRIPE_PRICING_TABLE_ID = “prctbl_1NifItHb6cJdkB4pTEPLvStl” // 美元版本（还未完善）
 export const STRIPE_PUBLISHABLE_KEY =
   "pk_live_51N0prGHb6cJdkB4pSlnkbhd0ZQTSHdePHA0rJN29ZpiZdQRf8PYJYvqc4CMIP85it2Jws5uvbU0CcZOjGGBm9vLj00JB8RUMHw"
+
+export const SMS_PROVIDER_ID = "sms"
+
+// ref: https://stackoverflow.com/a/16702965/9422455
+export const PHONE_REGEX = /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/

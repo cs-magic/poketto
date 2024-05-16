@@ -1,3 +1,5 @@
+"use client"
+
 import React, { type PropsWithChildren, useEffect } from "react"
 import Navbar from "src/components/layouts/navbar"
 

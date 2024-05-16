@@ -1,16 +1,20 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const nodeEnv = process.env.NODE_ENV;
+// console.log({ nodeEnv });
+
 export const baseEnv = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
 
-    OPENAI_API_KEY: z.string().min(1),
-    KV_REST_API_URL: z.string(),
-    KV_REST_API_TOKEN: z.string(),
+    OPENAI_API_KEY: z.string(),
+    KV_REST_API_URL: z.string().optional(),
+    KV_REST_API_TOKEN: z.string().optional(),
 
-    HOST: z.string().min(1)
+    ALI_AK: z.string().optional(),
+    ALI_SK: z.string().optional()
   },
   client: {},
   runtimeEnv: {
@@ -21,9 +25,11 @@ export const baseEnv = createEnv({
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
 
-    HOST: process.env.HOST
+    ALI_AK: process.env.ALI_AK,
+    ALI_SK: process.env.ALI_SK
   }
 });
+console.log({ baseEnv });
 
 export const authEnv = createEnv({
   /**
@@ -32,28 +38,28 @@ export const authEnv = createEnv({
    */
   server: {
     NEXTAUTH_SECRET:
-      process.env.NODE_ENV === "production"
-        ? z.string().min(1)
-        : z.string().min(1).optional(),
+      nodeEnv === "production"
+        ? z.string()
+        : z.string().optional(),
     NEXTAUTH_URL: z.preprocess(
       // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
       // Since NextAuth.js automatically uses the VERCEL_URL if present.
       (str) => process.env.VERCEL_URL ?? str,
       // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-      process.env.VERCEL ? z.string().min(1) : z.string().url()
+      process.env.VERCEL ? z.string() : z.string().url()
     ),
 
-    // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
-    DISCORD_CLIENT_ID: z.string(),
-    DISCORD_CLIENT_SECRET: z.string(),
-    GITHUB_CLIENT_ID: z.string(),
-    GITHUB_CLIENT_SECRET: z.string(),
+    // Add ` on ID and SECRET if you want to make sure they're not empty
+    DISCORD_CLIENT_ID: z.string().optional(),
+    DISCORD_CLIENT_SECRET: z.string().optional(),
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
 
-    AWS_AK: z.string().min(1),
-    AWS_SK: z.string().min(1),
-    POSTMARK_API_TOKEN: z.string().min(1),
-    POSTMARK_SIGN_IN_TEMPLATE: z.string().min(1),
-    POSTMARK_ACTIVATION_TEMPLATE: z.string().min(1)
+    AWS_AK: z.string().optional(),
+    AWS_SK: z.string().optional(),
+    POSTMARK_API_TOKEN: z.string().optional(),
+    POSTMARK_SIGN_IN_TEMPLATE: z.string().optional(),
+    POSTMARK_ACTIVATION_TEMPLATE: z.string().optional()
   },
 
   /**
@@ -62,7 +68,7 @@ export const authEnv = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+    // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
   /**
@@ -94,8 +100,8 @@ export const authEnv = createEnv({
 
 export const paymentEnv = createEnv({
   server: {
-    STRIPE_API_KEY: z.string().min(1),
-    STRIPE_WEBHOOK_SECRET: z.string().min(1)
+    STRIPE_API_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional()
   },
   client: {},
   runtimeEnv: {

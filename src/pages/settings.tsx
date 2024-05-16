@@ -24,7 +24,6 @@ import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 
-
 export default function SettingsPage() {
   const { cardsLayout, setCardsLayout } = useAppStore()
   const { t } = useTranslation()
@@ -33,7 +32,7 @@ export default function SettingsPage() {
   const router = useRouter()
   const logout = () => {
     void signOut()
-    void router.push(URI.user.auth.login)
+    void router.push(URI.user.auth.logIn)
   }
 
   const { mutateAsync: delUser } = api.user.del.useMutation({

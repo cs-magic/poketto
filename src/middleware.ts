@@ -28,7 +28,7 @@ export default withAuth(
       const proxy = createTRPCProxyClient<RootRouter>({
         links: [
           // loggerLink(),
-          httpBatchLink({ url: `${req.headers.get("origin") ?? process.env.HOST!}/api/trpc` }),
+          httpBatchLink({ url: `${req.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL!}/api/trpc` }),
         ],
         transformer: superjson,
       })

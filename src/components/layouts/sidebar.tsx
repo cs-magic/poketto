@@ -29,7 +29,7 @@ export function Sidebar() {
   return (
     <div
       className={clsx(
-        "shrink-0 h-full overflow-auto pt-8 gap-6 | hidden md:flex flex-col items-center | whitespace-nowrap bg-sidebar text-sm text-primary-foreground",
+        "shrink-0 h-full overflow-auto pt-8 p-2 gap-6 | hidden md:flex flex-col items-center | whitespace-nowrap bg-sidebar text-sm text-primary-foreground",
       )}
     >
       {Object.entries(sidebarSections).map(([key, keys]) => (

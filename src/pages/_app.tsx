@@ -1,39 +1,29 @@
-import { SessionProvider } from "next-auth/react";
-import { appWithTranslation } from "next-i18next";
-import Head from "next/head";
-import React from "react";
-import { Toaster } from "sonner";
+import { SessionProvider } from "next-auth/react"
+import { appWithTranslation } from "next-i18next"
+import Head from "next/head"
+import React from "react"
+import { Toaster } from "sonner"
 
+import { siteConfig } from "@/config"
 
+import { type ExtendedAppProps } from "@/ds"
 
-import { siteConfig } from "@/config";
+import ErrorBoundary from "@/components/error-boundary"
+import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
+import { api } from "@/lib/api"
+import clsx from "@/lib/clsx"
+import d from "@/lib/datetime"
+import { fontHeading, fontSans } from "@/lib/fonts"
+import { getOrigin } from "@/lib/router"
 
-
-import { type ExtendedAppProps } from "@/ds";
-
-
-
-import ErrorBoundary from "@/components/error-boundary";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
-import { ThemeProvider } from "@/components/theme-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
-
-
-
-import { api } from "@/lib/api";
-import clsx from "@/lib/clsx";
-import d from "@/lib/datetime";
-import { fontHeading, fontSans } from "@/lib/fonts";
-import { getOrigin } from "@/lib/router";
-
-
-
-import "@/styles/globals.css";
-
+import "@/styles/globals.css"
 
 // todo: nextjs log best practice: 1. universal 2. bind console
 const originalLog = console.log // Store the original console.log function
+
 console.log = function () {
   const currentTime = d(new Date()).format("YYYY-MM-DD ddd HH:mm:ss Z")
   originalLog.apply(console, [`[${currentTime}]`, ...arguments])

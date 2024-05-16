@@ -1,6 +1,7 @@
 import { useDebouncedValue } from "@mantine/hooks"
 import { HandIcon, LapTimerIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons"
 import { CommandLoading } from "cmdk"
+import { Globe } from "lucide-react"
 import { signIn } from "next-auth/react"
 import { useTranslation } from "next-i18next"
 import { useTheme } from "next-themes"
@@ -12,7 +13,13 @@ import { toast } from "sonner"
 
 import { useAppStore } from "@/store"
 
-import { ICON_DIMENSION_SM, POKETTO_APP_ID, URI } from "@/config"
+import {
+  ICON_DIMENSION_SM,
+  POKETTO_APP_ID,
+  POKETTO_INTERNATIONAL_HOME,
+  POKETTO_MAINLAND_CHINA_HOME,
+  URI,
+} from "@/config"
 
 import { AppDetailContainer } from "@/components/app/container"
 import { IconContainer } from "@/components/containers"
@@ -31,6 +38,7 @@ import { useUser } from "@/hooks/use-user"
 
 import { api } from "@/lib/api"
 import clsx from "@/lib/clsx"
+import { getOrigin } from "@/lib/router"
 import { getImageUri } from "@/lib/string"
 
 export function ThemeSwitcher() {
@@ -144,17 +152,25 @@ export default function Navbar() {
       {/*  </IconContainer>*/}
       {/*</Link>*/}
 
-      {userId ? (
-        <Link href={URI.user.feedback}>
-          <IconContainer>
-            <HandIcon />
-          </IconContainer>
-        </Link>
-      ) : (
-        <Button size={"xs"} variant={"outline"} onClick={() => void signIn()} className={"whitespace-nowrap"}>
-          {t("common:Login")}
-        </Button>
-      )}
+      <Link href={`${getOrigin().includes("cn") ? POKETTO_INTERNATIONAL_HOME : POKETTO_MAINLAND_CHINA_HOME}/login`}>
+        <IconContainer>
+          <Globe className={"w-4 h-4"} />
+        </IconContainer>
+      </Link>
+
+      <span className={"ml-2"}>
+        {userId ? (
+          <Link href={URI.user.feedback}>
+            <IconContainer>
+              <HandIcon />
+            </IconContainer>
+          </Link>
+        ) : (
+          <Button size={"xs"} variant={"outline"} onClick={() => void signIn()} className={"whitespace-nowrap"}>
+            {t("common:Login")}
+          </Button>
+        )}
+      </span>
     </div>
   )
 }

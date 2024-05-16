@@ -2,18 +2,20 @@ import { PlatformType } from "@prisma/client"
 import { type GetServerSidePropsContext } from "next"
 import { type NextAuthOptions, type User as NextAuthUser, getServerSession } from "next-auth"
 import { SendVerificationRequestParams } from "next-auth/providers"
+import CredentialProvider from "next-auth/providers/credentials"
 import DiscordProvider from "next-auth/providers/discord"
 import EmailProvider from "next-auth/providers/email"
 import GithubProvider from "next-auth/providers/github"
 
+import { prisma } from "@/server/db"
+
 import { authEnv } from "@/env.mjs"
 
-import { DEFAULT_LOCALE, URI, allowDangerousEmailAccountLinking, siteConfig } from "@/config"
+import { DEFAULT_LOCALE, SMS_PROVIDER_ID, URI, allowDangerousEmailAccountLinking, siteConfig } from "@/config"
 
 import { pokettoPrismaAdapter } from "@/lib/db"
 import { sendVerificationRequest } from "@/lib/email"
 import { getOrigin } from "@/lib/router"
-
 
 export const emailFrom = siteConfig.welcomeEmailAddress
 
@@ -62,6 +64,26 @@ export const createAuthOptions = ({
   }, // ref: https://github.com/nextauthjs/next-auth/issues/6078
   adapter: pokettoPrismaAdapter,
   providers: [
+    CredentialProvider({
+      id: SMS_PROVIDER_ID,
+      type: "credentials",
+      credentials: {
+        phone: { type: "string", label: "phone" },
+        code: { type: "string", label: "code" },
+      },
+      authorize: async (credentials) => {
+        if (!credentials) throw new Error("no credentials")
+        const { phone, code } = credentials
+        if (!phone || !code) throw new Error("no phone or code")
+        const accountInDB = await prisma.account.findUnique({
+          where: { provider_providerAccountId: { provider: "sms", providerAccountId: phone }, access_token: code },
+          include: { user: true },
+        })
+        if (!accountInDB) throw new Error("no account")
+        return accountInDB.user
+      },
+    }),
+
     EmailProvider({
       // 它之所以没有配置 server，是因为直接在 sendVerificationRequest 中完成邮箱的所有验证等操作了
       // 而我在本地初始化 aws 客户端，之所以不需要输入 credentials 信息，是因为我本地有 ~/.aws 配置文件
