@@ -10,6 +10,7 @@
 
 ```shell
 yarn
+yarn prebuild
 ```
 
 ### 3. 开发模式启动
