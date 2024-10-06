@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import CheckoutForm from "@cs-magic/common/stripe/components/CheckoutForm";
+import CheckoutForm from "@cs-magic/react/stripe/components/CheckoutForm";
 
 const metadata: Metadata = {
   title: "Donate with Checkout | Next.js + TypeScript Example",

@@ -1,5 +1,5 @@
 import { useUserInDb } from "@/hooks/use-user-in-db";
-import StripePricingTable from "@cs-magic/common/stripe/components/pricing-table";
+import StripePricingTable from "@cs-magic/react/stripe/components/pricing-table";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { PromptRoleType } from "@prisma/client";
 import {

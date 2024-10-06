@@ -1,4 +1,4 @@
-import StripePricingTable from "@cs-magic/common/stripe/components/pricing-table";
+import StripePricingTable from "@cs-magic/react/stripe/components/pricing-table";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React from "react";
 

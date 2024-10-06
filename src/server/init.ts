@@ -1,4 +1,4 @@
-import { paymentProducts } from "@cs-magic/common/stripe/config";
+import { paymentProducts } from "@cs-magic/react/stripe/config";
 import {
   ChatMessageFormatType,
   PlatformType,

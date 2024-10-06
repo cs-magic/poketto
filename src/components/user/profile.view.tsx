@@ -1,5 +1,5 @@
 import { useUserInDb } from "@/hooks/use-user-in-db";
-import { ChargeContainer } from "@cs-magic/common/stripe/components/charge-container";
+import { ChargeContainer } from "@cs-magic/react/stripe/components/charge-container";
 import { AvatarIcon } from "@radix-ui/react-icons";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";

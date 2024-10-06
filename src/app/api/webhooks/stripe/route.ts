@@ -1,9 +1,9 @@
 import d from "@cs-magic/common/datetime";
 import { prisma } from "@cs-magic/common/db/prisma";
 import { getServerId } from "@cs-magic/common/router";
-import { subscriptionLevel2Unit } from "@cs-magic/common/stripe/config";
-import { stripe } from "@cs-magic/common/stripe/server";
-import { decodeClientReferenceId } from "@cs-magic/common/stripe/utils";
+import { subscriptionLevel2Unit } from "@cs-magic/react/stripe/config";
+import { stripe } from "@cs-magic/react/stripe/server";
+import { decodeClientReferenceId } from "@cs-magic/react/stripe/utils";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";

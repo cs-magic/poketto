@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import ElementsForm from "@cs-magic/common/stripe/components/ElementsForm";
+import ElementsForm from "@cs-magic/react/stripe/components/ElementsForm";
 
 const metadata: Metadata = {
   title: "Donate with Elements",

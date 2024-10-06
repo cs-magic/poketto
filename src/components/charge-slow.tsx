@@ -1,6 +1,6 @@
 import { defaultModelQuota, modelTypes } from "@/ds";
 import { useUserInDb } from "@/hooks/use-user-in-db";
-import { ChargeContainer } from "@cs-magic/common/stripe/components/charge-container";
+import { ChargeContainer } from "@cs-magic/react/stripe/components/charge-container";
 
 import { Button } from "@cs-magic/shadcn/ui/button";
 import {
