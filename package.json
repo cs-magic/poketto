@@ -96,7 +96,6 @@
   },
   "devDependencies": {
     "@cs-magic/eslint-config": "workspace:^",
-    "@cs-magic/webpack": "workspace:^",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.9",
     "@trivago/prettier-plugin-sort-imports": "*",
